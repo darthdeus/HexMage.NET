@@ -5,16 +5,51 @@ VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HexMage.Simulator", "HexMage.Simulator\HexMage.Simulator.csproj", "{597FFF01-9F07-4F0D-9DBA-CED5CA9B76E9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HexMage.Simulator.Tests", "HexMage.Simulator.Tests\HexMage.Simulator.Tests.csproj", "{C763045C-13FC-4763-9175-115F49A920F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HexMage.GUI", "HexMage.GUI\HexMage.GUI.csproj", "{EECE0189-FCF4-40CC-AD6A-0BCEC2FAA6E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HexMage.Benchmarks", "HexMage.Benchmarks\HexMage.Benchmarks.csproj", "{85118626-8106-414F-8EF3-D906C92EAA5B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{597FFF01-9F07-4F0D-9DBA-CED5CA9B76E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{597FFF01-9F07-4F0D-9DBA-CED5CA9B76E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{597FFF01-9F07-4F0D-9DBA-CED5CA9B76E9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{597FFF01-9F07-4F0D-9DBA-CED5CA9B76E9}.Debug|x86.Build.0 = Debug|Any CPU
 		{597FFF01-9F07-4F0D-9DBA-CED5CA9B76E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{597FFF01-9F07-4F0D-9DBA-CED5CA9B76E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{597FFF01-9F07-4F0D-9DBA-CED5CA9B76E9}.Release|x86.ActiveCfg = Release|Any CPU
+		{597FFF01-9F07-4F0D-9DBA-CED5CA9B76E9}.Release|x86.Build.0 = Release|Any CPU
+		{C763045C-13FC-4763-9175-115F49A920F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C763045C-13FC-4763-9175-115F49A920F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C763045C-13FC-4763-9175-115F49A920F0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C763045C-13FC-4763-9175-115F49A920F0}.Debug|x86.Build.0 = Debug|Any CPU
+		{C763045C-13FC-4763-9175-115F49A920F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C763045C-13FC-4763-9175-115F49A920F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C763045C-13FC-4763-9175-115F49A920F0}.Release|x86.ActiveCfg = Release|Any CPU
+		{C763045C-13FC-4763-9175-115F49A920F0}.Release|x86.Build.0 = Release|Any CPU
+		{EECE0189-FCF4-40CC-AD6A-0BCEC2FAA6E6}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{EECE0189-FCF4-40CC-AD6A-0BCEC2FAA6E6}.Debug|Any CPU.Build.0 = Debug|x86
+		{EECE0189-FCF4-40CC-AD6A-0BCEC2FAA6E6}.Debug|x86.ActiveCfg = Debug|x86
+		{EECE0189-FCF4-40CC-AD6A-0BCEC2FAA6E6}.Debug|x86.Build.0 = Debug|x86
+		{EECE0189-FCF4-40CC-AD6A-0BCEC2FAA6E6}.Release|Any CPU.ActiveCfg = Release|x86
+		{EECE0189-FCF4-40CC-AD6A-0BCEC2FAA6E6}.Release|x86.ActiveCfg = Release|x86
+		{EECE0189-FCF4-40CC-AD6A-0BCEC2FAA6E6}.Release|x86.Build.0 = Release|x86
+		{85118626-8106-414F-8EF3-D906C92EAA5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85118626-8106-414F-8EF3-D906C92EAA5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85118626-8106-414F-8EF3-D906C92EAA5B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{85118626-8106-414F-8EF3-D906C92EAA5B}.Debug|x86.Build.0 = Debug|Any CPU
+		{85118626-8106-414F-8EF3-D906C92EAA5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85118626-8106-414F-8EF3-D906C92EAA5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85118626-8106-414F-8EF3-D906C92EAA5B}.Release|x86.ActiveCfg = Release|Any CPU
+		{85118626-8106-414F-8EF3-D906C92EAA5B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
