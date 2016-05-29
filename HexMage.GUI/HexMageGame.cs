@@ -12,7 +12,7 @@ namespace HexMage.GUI
     /// </summary>
     public class HexMageGame : Game
     {
-        public readonly int GridSize = 32;
+        public readonly int GridSize = 64;
 
         private readonly FrameCounter _frameCounter = new FrameCounter();
         private readonly Camera2D _camera = new Camera2D();
@@ -23,6 +23,8 @@ namespace HexMage.GUI
         private Simulator.Game _game;
         private Texture2D _hexTexture;
         private SpriteFont _arialFont;
+        private Texture2D _hexGreen;
+        private Texture2D _mobTexture;
 
 
         public HexMageGame() {
@@ -37,7 +39,8 @@ namespace HexMage.GUI
         /// and initialize them as well.
         /// </summary>
         protected override void Initialize() {
-            _game = new Simulator.Game(30);
+            _game = new Simulator.Game(10);
+            IsMouseVisible = true;
 
             base.Initialize();
         }
@@ -49,6 +52,10 @@ namespace HexMage.GUI
         protected override void LoadContent() {
             // Create a new SpriteBatch, which can be used to draw textures.
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            //_hexGreen = new Texture2D(GraphicsDevice, GridSize, GridSize);
+            _hexGreen = Content.Load<Texture2D>("purplegon");
+            _mobTexture = Content.Load<Texture2D>("mob");
 
             _hexTexture = new Texture2D(GraphicsDevice, GridSize, GridSize);
 
@@ -101,18 +108,29 @@ namespace HexMage.GUI
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _spriteBatch.Begin(transformMatrix: _camera.Projection());
-            for (int i = 0; i < _game.Map.Size; i++) {
-                for (int j = 0; j < _game.Map.Size; j++) {
-                    _spriteBatch.Draw(_hexTexture, new Vector2(i*GridSize, j*GridSize));
+            for (int row = 0; row < _game.Map.Size; row++) {
+                for (int col = 0; col < _game.Map.Size; col++) {
+                    DrawAt(_hexGreen, row, col);
                 }
             }
 
-            _spriteBatch.Draw(_hexTexture, new Vector2(50, 50));
+            DrawAt(_mobTexture, 1, 1);
+            DrawAt(_mobTexture, 4, 7);
+            DrawAt(_mobTexture, 8, 3);
             _spriteBatch.End();
 
             _frameCounter.DrawFPS(_spriteBatch, _arialFont);
 
             base.Draw(gameTime);
+        }
+
+        private void DrawAt(Texture2D texture, int row, int col)
+        {
+            int x = col * GridSize + row * (GridSize / 2);
+            double heightOffset = GridSize / 4 + Math.Sin(30 * Math.PI / 180) * GridSize;
+            int y = (int)(row * heightOffset);
+
+            _spriteBatch.Draw(texture, new Vector2(x, y));
         }
     }
 }
