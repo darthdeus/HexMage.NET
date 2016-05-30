@@ -13,7 +13,8 @@ namespace HexMage.GUI
     /// </summary>
     public class HexMageGame : Game
     {
-        public readonly int GridSize = 32;
+        public static readonly int GridSize = 32;
+        private static readonly double HeightOffset = GridSize/4 + Math.Sin(30*Math.PI/180)*GridSize;
 
         private readonly FrameCounter _frameCounter = new FrameCounter();
         private readonly Camera2D _camera = new Camera2D();
@@ -132,7 +133,7 @@ namespace HexMage.GUI
             {
                 var bounds = GraphicsDevice.PresentationParameters.Bounds;
                 var mouseTextPos = new Vector2(0, 450);
-                Console.WriteLine(mouseTextPos);
+                //Console.WriteLine(mouseTextPos);
                 _spriteBatch.DrawString(_arialFont, $"{_lastMousePos} - {bounds}", mouseTextPos, Color.Black);
             }
 
@@ -147,35 +148,21 @@ namespace HexMage.GUI
         }
 
         public Vector2 HexToPixel(int row, int col) {
-            int size = GridSize/2;
+            int x = (int) (GridSize*(col + row/2.0));
+            int y = (int) (row*HeightOffset);
 
-            float x = (float) (size * Math.Sqrt(3) * (col + row / 2.0));
-            float y = (float) (size * 3.0 / 2.0 * row);
             return new Vector2(x, y);
         }
 
         public Vector2 PixelToHex(Vector2 pos) {
-            int size = GridSize/2;
-            int x = (int) (Math.Sqrt(3)/3.0f*pos.X - 1.0f/3.0*pos.Y)/size;
-            int y = (int) (2.0f/3.0f*pos.Y/size);
+            int row = (int) (pos.Y/HeightOffset);
+            int col = (int) (pos.X/GridSize - row/2.0);
 
-            return new Vector2(x, y);
+            return new Vector2(col, row);
         }
 
         private void DrawAt(Texture2D texture, int row, int col) {
-            int size = GridSize/2;
-            //int x = (int) (size*Math.Sqrt(3)*(col + row/2.0));
-            //int y = (int) (size*3.0/2.0*row);
-
-            //var mat = size * new Matrix2d( Math.Sqrt(3),  (Math.Sqrt(3) / 2.0), 0, 3.0 / 2.0);
-            //var coord = new OpenTK.Vector2d(col, row);
-
-            int x = col * GridSize + row * (GridSize / 2);
-            double heightOffset = GridSize / 4 + Math.Sin(30 * Math.PI / 180) * GridSize;
-            int y = (int)(row * heightOffset);
-            _spriteBatch.Draw(texture, new Vector2(x, y));
-
-            //_spriteBatch.Draw(texture, HexToPixel(row, col));
+            _spriteBatch.Draw(texture, HexToPixel(row, col));
         }
     }
 }
