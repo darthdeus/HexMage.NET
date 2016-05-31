@@ -12,7 +12,7 @@ namespace HexMage.Benchmarks
     {
         static void Main(string[] args) {
             int size = 30;
-            var g = new Game(size);
+            var g = new GameInstance(size);
 
             var t1 = g.MobManager.AddTeam();
             var t2 = g.MobManager.AddTeam();

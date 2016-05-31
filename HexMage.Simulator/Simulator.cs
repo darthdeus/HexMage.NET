@@ -9,7 +9,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
-[assembly:InternalsVisibleTo("HexMage.Simulator.Tests")]
+[assembly: InternalsVisibleTo("HexMage.Simulator.Tests")]
 
 namespace HexMage.Simulator
 {
@@ -22,7 +22,7 @@ namespace HexMage.Simulator
         public Matrix(int m, int n) {
             M = m;
             N = n;
-            _data = new T[M,N];
+            _data = new T[M, N];
         }
 
         public T this[int x, int y] {
@@ -42,7 +42,6 @@ namespace HexMage.Simulator
                 }
             }
         }
-
     }
 
     public struct Coord : IEquatable<Coord>
@@ -73,6 +72,16 @@ namespace HexMage.Simulator
 
         public override string ToString() {
             return $"[{X},{Y}]";
+        }
+
+        public static Coord operator +(Coord lhs, Coord rhs)
+        {
+            return new Coord(lhs.X + rhs.X, lhs.Y + rhs.Y);
+        }
+
+        public static Coord operator -(Coord lhs, Coord rhs)
+        {
+            return new Coord(lhs.X - rhs.X, lhs.Y - rhs.Y);
         }
     }
 
@@ -248,13 +257,13 @@ namespace HexMage.Simulator
                 p.State = VertexState.Closed;
 
                 foreach (var diff in diffs) {
-                    Coord neighbour = new Coord(current.X + diff.X, current.Y + diff.Y);
+                    Coord neighbour = current + diff;
 
                     if (IsValidCoord(neighbour)) {
-                        Path n = Paths[neighbour.X, neighbour.Y];
+                        Path n = Paths[neighbour];
 
                         bool notClosed = n.State != VertexState.Closed;
-                        bool noWall = map.Hexes[neighbour.X, neighbour.Y] != HexType.Wall;
+                        bool noWall = map[neighbour] != HexType.Wall;
                         bool noMob = mobManager.AtCoord(neighbour) == null;
 
                         //if (notClosed && noWall && noMob) {
@@ -337,7 +346,7 @@ namespace HexMage.Simulator
         }
     }
 
-    public class Game
+    public class GameInstance
     {
         public Map Map { get; set; }
         public MobManager MobManager { get; set; }
@@ -345,13 +354,14 @@ namespace HexMage.Simulator
         public TurnManager TurnManager { get; set; }
         public int Size { get; set; }
 
-        public Game(int size) {
+        public GameInstance(int size) {
             Size = size;
             MobManager = new MobManager();
             Pathfinder = new Pathfinder(size);
             TurnManager = new TurnManager(MobManager);
             Map = new Map(size);
         }
+
 
         public bool IsFinished() {
 #if DEBUG
@@ -394,8 +404,8 @@ namespace HexMage.Simulator
     public interface IPlayer
     {
         bool IsAI();
-        void ActionTo(Coord c, Game game, Mob mob);
-        void AnyAction(Game game, Mob mob);
+        void ActionTo(Coord c, GameInstance gameInstance, Mob mob);
+        void AnyAction(GameInstance gameInstance, Mob mob);
     }
 
     public class Team
@@ -442,12 +452,31 @@ namespace HexMage.Simulator
 
     public class Map
     {
-        public Matrix<HexType> Hexes { get; set; }
+        private readonly Matrix<HexType> _hexes;
         public int Size { get; set; }
+        public List<Coord> AllCoords { get; set; } = new List<Coord>();
 
         public Map(int size) {
             Size = size;
-            Hexes = new Matrix<HexType>(size, size);
+            _hexes = new Matrix<HexType>(size, size);
+            RecalculateCoords();
+        }
+
+        public void RecalculateCoords() {
+            AllCoords.Clear();
+
+            // TODO - go from -Size
+            for (int i = 0; i < Size; i++) {
+                for (int j = 0; j < Size; j++) {
+                    AllCoords.Add(new Coord(j, i));
+                }
+            }
+        }
+
+
+        public HexType this[Coord c] {
+            get { return _hexes[c]; }
+            set { _hexes[c] = value; }
         }
     }
 

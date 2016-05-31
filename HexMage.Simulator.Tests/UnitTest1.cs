@@ -22,7 +22,7 @@ namespace HexMage.Simulator.Tests
         [TestMethod]
         public void TestAll() {
             int size = 10;
-            var game = new Game(size);
+            var game = new GameInstance(size);
 
             var t1 = new Team();
             var t2 = new Team();
