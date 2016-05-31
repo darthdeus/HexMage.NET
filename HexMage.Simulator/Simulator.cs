@@ -16,29 +16,43 @@ namespace HexMage.Simulator
     public class Matrix<T>
     {
         readonly T[,] _data;
-        public int M { get; set; }
-        public int N { get; set; }
+        public int Size { get; set; }
+        public List<Coord> AllCoords { get; private set; } = new List<Coord>();
 
         public Matrix(int m, int n) {
-            M = m;
-            N = n;
-            _data = new T[M, N];
+            Debug.Assert(m == n);
+            Size = m;
+            _data = new T[Size*2 + 5, Size*2 + 5];
+            RecalculateCoords();
         }
 
-        public T this[int x, int y] {
+        private T this[int x, int y] {
             get { return _data[x, y]; }
             set { _data[x, y] = value; }
         }
 
         public T this[Coord c] {
-            get { return _data[c.X, c.Y]; }
-            set { _data[c.X, c.Y] = value; }
+            get { return _data[c.X + Size, c.Y + Size]; }
+            set { _data[c.X + Size, c.Y + Size] = value; }
         }
 
         public void Initialize(Func<T> builder) {
-            for (int i = 0; i < M; i++) {
-                for (int j = 0; j < N; j++) {
-                    this[i, j] = builder();
+            foreach (var coord in AllCoords) {
+                this[coord] = builder();
+            }
+        }
+
+        public void RecalculateCoords() {
+            AllCoords.Clear();
+
+            // TODO - go from -Size
+            for (int i = -Size; i < Size; i++) {
+                for (int j = -Size; j < Size; j++) {
+                    for (int k = -Size; k < Size; k++) {
+                        if (i + j + k == 0) {
+                            AllCoords.Add(new Coord(j, i));
+                        }
+                    }
                 }
             }
         }
@@ -74,13 +88,11 @@ namespace HexMage.Simulator
             return $"[{X},{Y}]";
         }
 
-        public static Coord operator +(Coord lhs, Coord rhs)
-        {
+        public static Coord operator +(Coord lhs, Coord rhs) {
             return new Coord(lhs.X + rhs.X, lhs.Y + rhs.Y);
         }
 
-        public static Coord operator -(Coord lhs, Coord rhs)
-        {
+        public static Coord operator -(Coord lhs, Coord rhs) {
             return new Coord(lhs.X - rhs.X, lhs.Y - rhs.Y);
         }
     }
@@ -177,6 +189,11 @@ namespace HexMage.Simulator
 
             Path path = Paths[current];
 
+            // TODO - this is ugly, the hexagonal-map abstraction leaks
+            if (path == null) {
+                return result;
+            }
+
             int iterations = 1000;
             while (path.Distance > 0 && --iterations > 0) {
                 if (path.Source != null) {
@@ -202,7 +219,7 @@ namespace HexMage.Simulator
         }
 
         public int Distance(Coord c) {
-            return Paths[c.X, c.Y].Distance;
+            return Paths[c].Distance;
         }
 
         public void PathfindFrom(Coord start, Map map, MobManager mobManager) {
@@ -217,19 +234,17 @@ namespace HexMage.Simulator
                 new Coord(-1, 1),
             };
 
-            for (int i = 0; i < Size; i++) {
-                for (int j = 0; j < Size; j++) {
-                    var path = Paths[i, j];
+            foreach (var coord in map.AllCoords) {
+                var path = Paths[coord];
 
-                    path.Source = null;
-                    path.Distance = Int32.MaxValue;
-                    path.Reachable = false;
-                    path.State = VertexState.Unvisited;
-                }
+                path.Source = null;
+                path.Distance = Int32.MaxValue;
+                path.Reachable = false;
+                path.State = VertexState.Unvisited;
             }
 
             // TODO - nema byt Y - X?
-            var startPath = Paths[start.X, start.Y];
+            var startPath = Paths[start];
 
             startPath.Distance = 0;
             startPath.State = VertexState.Open;
@@ -249,7 +264,7 @@ namespace HexMage.Simulator
                 }
 
                 // TODO - opet, nema byt Y a X?
-                var p = Paths[current.X, current.Y];
+                var p = Paths[current];
 
                 if (p.State == VertexState.Closed) continue;
 
@@ -454,23 +469,14 @@ namespace HexMage.Simulator
     {
         private readonly Matrix<HexType> _hexes;
         public int Size { get; set; }
-        public List<Coord> AllCoords { get; set; } = new List<Coord>();
+
+        public List<Coord> AllCoords {
+            get { return _hexes.AllCoords; }
+        }
 
         public Map(int size) {
             Size = size;
             _hexes = new Matrix<HexType>(size, size);
-            RecalculateCoords();
-        }
-
-        public void RecalculateCoords() {
-            AllCoords.Clear();
-
-            // TODO - go from -Size
-            for (int i = 0; i < Size; i++) {
-                for (int j = 0; j < Size; j++) {
-                    AllCoords.Add(new Coord(j, i));
-                }
-            }
         }
 
 
