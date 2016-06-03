@@ -5,7 +5,7 @@ namespace HexMage.Simulator
 {
     public static class Generator
     {
-        public static Mob RandomMob(Team team, int size, Predicate<Coord> isCoordAvailable) {
+        public static Mob RandomMob(Team team, int size, Predicate<AxialCoord> isCoordAvailable) {
             var abilities = new List<Ability>();
 
             var random = new Random();
@@ -17,7 +17,7 @@ namespace HexMage.Simulator
             team.Mobs.Add(mob);
 
             while (true) {
-                Coord c = new Coord(random.Next(0, size), random.Next(0, size));
+                AxialCoord c = new AxialCoord(random.Next(0, size), random.Next(0, size));
                 if (isCoordAvailable(c)) {
                     mob.Coord = c;
                     break;

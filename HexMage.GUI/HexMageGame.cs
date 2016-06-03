@@ -15,7 +15,7 @@ namespace HexMage.GUI
     {
         public static readonly int GridSize = 32;
         private static readonly double HeightOffset = GridSize/4 + Math.Sin(30*Math.PI/180)*GridSize;
-        private readonly Camera2D _camera = new Camera2D();
+        private readonly Camera2D _camera = new Camera2D(GridSize, HeightOffset);
 
         private readonly FrameCounter _frameCounter = new FrameCounter();
         private SpriteFont _arialFont;
@@ -109,7 +109,7 @@ namespace HexMage.GUI
 
             if (_lastMouseState.RightButton == ButtonState.Pressed
                 && mouseState.RightButton == ButtonState.Released) {
-                var mouseHex = PixelToHex(mousePos);
+                var mouseHex = _camera.PixelToHex(mousePos);
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
                     if (_gameInstance.Map[mouseHex] == HexType.Empty) {
                         _gameInstance.Map[mouseHex] = HexType.Wall;
@@ -118,7 +118,8 @@ namespace HexMage.GUI
                     }
 
                     // TODO - pathfindovani ze zdi najde cesty
-                    _gameInstance.Pathfinder.PathfindFrom(new Coord(0, 0), _gameInstance.Map, _gameInstance.MobManager);
+                    _gameInstance.Pathfinder.PathfindFrom(new AxialCoord(0, 0), _gameInstance.Map,
+                        _gameInstance.MobManager);
                 }
             }
 
@@ -154,7 +155,7 @@ namespace HexMage.GUI
                 DrawAt(_mobTexture, mob.Coord);
             }
 
-            var mouseHex = PixelToHex(_lastMousePos);
+            var mouseHex = _camera.PixelToHex(_lastMousePos);
             DrawAt(_mobTexture, mouseHex);
 
             _spriteBatch.End();
@@ -166,7 +167,6 @@ namespace HexMage.GUI
                 foreach (var coord in path) {
                     DrawAt(_hexPath, coord);
                 }
-
                 _spriteBatch.End();
             }
 
@@ -187,26 +187,8 @@ namespace HexMage.GUI
             _spriteBatch.End();
         }
 
-        private void DrawAt(Texture2D mobTexture, Coord coord) {
-            DrawAt(mobTexture, coord.Y, coord.X);
-        }
-
-        public Vector2 HexToPixel(int row, int col) {
-            var x = (int) (GridSize*(col + row/2.0));
-            var y = (int) (row*HeightOffset);
-
-            return new Vector2(x, y);
-        }
-
-        public Coord PixelToHex(Vector2 pos) {
-            var row = (int) (pos.Y/HeightOffset);
-            var col = (int) (pos.X/GridSize - row/2.0);
-
-            return new Coord(col, row);
-        }
-
-        private void DrawAt(Texture2D texture, int row, int col) {
-            _spriteBatch.Draw(texture, HexToPixel(row, col));
+        private void DrawAt(Texture2D texture, AxialCoord coord) {
+            _spriteBatch.Draw(texture, _camera.HexToPixel(coord.Y, coord.X));
         }
     }
 }

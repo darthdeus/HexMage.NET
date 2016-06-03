@@ -27,8 +27,8 @@ namespace HexMage.Benchmarks
             mobManager.Mobs.Add(m1);
             mobManager.Mobs.Add(m2);
 
-            m1.Coord = new Coord(0, 0);
-            m2.Coord = new Coord(0, 1);
+            m1.Coord = new AxialCoord(0, 0);
+            m2.Coord = new AxialCoord(0, 1);
 
             var map = g.Map;
 

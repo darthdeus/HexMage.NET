@@ -9,10 +9,10 @@ namespace HexMage.Simulator.Tests
         [TestMethod]
         public void TestSubscriptOperator()
         {
-            var m = new Matrix<int>(5, 5);
+            var m = new HexMap<int>(5);
 
             m[3, 4] = 6;
-            Assert.AreEqual(6, m[new Coord(3, 4)]);
+            Assert.AreEqual(6, m[new AxialCoord(3, 4)]);
         }
     }
 

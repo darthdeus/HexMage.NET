@@ -6,19 +6,19 @@ namespace HexMage.Simulator
 {
     public class Pathfinder
     {
-        public Matrix<Path> Paths { get; set; }
+        public HexMap<Path> Paths { get; set; }
         public int Size { get; set; }
 
         public Pathfinder(int size) {
             Size = size;
-            Paths = new Matrix<Path>(size, size);
+            Paths = new HexMap<Path>(size);
             Paths.Initialize(() => new Path());
         }
 
-        public IList<Coord> PathTo(Coord target) {
-            var result = new List<Coord>();
+        public IList<AxialCoord> PathTo(AxialCoord target) {
+            var result = new List<AxialCoord>();
 
-            Coord current = target;
+            AxialCoord current = target;
             result.Add(current);
 
             Path path = Paths[current];
@@ -43,7 +43,7 @@ namespace HexMage.Simulator
             return result;
         }
 
-        public void MoveAsFarAsPossible(MobManager mobManager, Mob mob, IList<Coord> path) {
+        public void MoveAsFarAsPossible(MobManager mobManager, Mob mob, IList<AxialCoord> path) {
             int i = path.Count - 1;
 
             while (mob.AP > 0 && i > 0) {
@@ -52,20 +52,20 @@ namespace HexMage.Simulator
             }
         }
 
-        public int Distance(Coord c) {
+        public int Distance(AxialCoord c) {
             return Paths[c].Distance;
         }
 
-        public void PathfindFrom(Coord start, Map map, MobManager mobManager) {
-            var queue = new Queue<Coord>();
+        public void PathfindFrom(AxialCoord start, Map map, MobManager mobManager) {
+            var queue = new Queue<AxialCoord>();
 
-            var diffs = new List<Coord> {
-                new Coord(-1, 0),
-                new Coord(1, 0),
-                new Coord(0, -1),
-                new Coord(0, 1),
-                new Coord(1, -1),
-                new Coord(-1, 1),
+            var diffs = new List<AxialCoord> {
+                new AxialCoord(-1, 0),
+                new AxialCoord(1, 0),
+                new AxialCoord(0, -1),
+                new AxialCoord(0, 1),
+                new AxialCoord(1, -1),
+                new AxialCoord(-1, 1),
             };
 
             foreach (var coord in map.AllCoords) {
@@ -106,7 +106,7 @@ namespace HexMage.Simulator
                 p.State = VertexState.Closed;
 
                 foreach (var diff in diffs) {
-                    Coord neighbour = current + diff;
+                    AxialCoord neighbour = current + diff;
 
                     if (IsValidCoord(neighbour)) {
                         Path n = Paths[neighbour];
@@ -131,7 +131,7 @@ namespace HexMage.Simulator
             }
         }
 
-        public bool IsValidCoord(Coord c) {
+        public bool IsValidCoord(AxialCoord c) {
             return c.Abs().Max() < Size && c.Min() >= 0;
         }
     }
