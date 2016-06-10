@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -25,49 +23,6 @@ namespace HexMage.GUI
     /// </summary>
     public class HexMageGame : Game
     {
-        // TODO - don't reallocate everything on a new frame
-        public class GuiWindow
-        {
-            List<Tuple<string, Rectangle>> Labels = new List<Tuple<string, Rectangle>>();
-            List<Tuple<string, Rectangle>> Buttons = new List<Tuple<string, Rectangle>>();
-
-            private readonly InputManager _inputManager;
-            private readonly SpriteBatch _spriteBatch;
-
-            public GuiWindow(InputManager inputManager, SpriteBatch spriteBatch) {
-                _inputManager = inputManager;
-                _spriteBatch = spriteBatch;
-            }
-
-            public void Label(string text, Rectangle rect) {
-                Labels.Add(Tuple.Create(text, rect));
-            }
-
-            public bool Button(string text, Rectangle rect) {
-                Buttons.Add(Tuple.Create(text, rect));
-
-                return rect.Contains(_inputManager.MousePosition.ToPoint());
-            }
-
-            public void Draw(SpriteFont font) {
-                foreach (var label in Labels) {
-                    _spriteBatch.DrawString(
-                        font,
-                        label.Item1,
-                        label.Item2.Location.ToVector2(),
-                        Color.Black);
-                }
-
-                foreach (var button in Buttons) {
-                    _spriteBatch.DrawString(
-                        font,
-                        button.Item1,
-                        button.Item2.Location.ToVector2(),
-                        Color.Red);
-                }
-            }
-        }
-
         public static readonly int GridSize = 32;
         private static readonly double HeightOffset = GridSize/4 + Math.Sin(30*Math.PI/180)*GridSize;
         private readonly Camera2D _camera = new Camera2D(GridSize, HeightOffset);
@@ -87,8 +42,9 @@ namespace HexMage.GUI
         private MouseState _lastMouseState;
         private KeyboardState _lastKeyboardState;
         private Texture2D _mobTexture;
-        private bool _mouseChanged;
         private SpriteBatch _spriteBatch;
+        private InputManager _inputManager;
+        private Texture2D _texGray;
 
         public HexMageGame() {
             _graphics = new GraphicsDeviceManager(this);
@@ -118,6 +74,9 @@ namespace HexMage.GUI
 
             _gameInstance.TurnManager.StartNextTurn();
 
+            _inputManager = new InputManager();
+
+            // MonoGame doesn't show mouse by default
             IsMouseVisible = true;
 
             base.Initialize();
@@ -130,6 +89,15 @@ namespace HexMage.GUI
         protected override void LoadContent() {
             // Create a new SpriteBatch, which can be used to draw textures.
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            _texGray = new Texture2D(GraphicsDevice, 32, 32);
+
+            var colors = new Color[32*32];
+            for (int i = 0; i < 32*32; i++) {
+                colors[i] = Color.LightGray;
+            }
+
+            _texGray.SetData(colors);
 
             //_hexGreen = new Texture2D(GraphicsDevice, GridSize, GridSize);
             _hexGreen = Content.Load<Texture2D>("green_hex");
@@ -158,6 +126,8 @@ namespace HexMage.GUI
                 Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            _inputManager.Refresh();
+
             var mouseState = Mouse.GetState();
 
             var mousePos = new Vector2(mouseState.X, mouseState.Y);
@@ -177,7 +147,6 @@ namespace HexMage.GUI
                 }
             }
 
-            _mouseChanged = _lastMousePos != mousePos;
             _lastMousePos = mousePos;
             _lastMouseState = mouseState;
 
@@ -214,6 +183,16 @@ namespace HexMage.GUI
             DrawMousePosition();
 
             _frameCounter.DrawFPS(_spriteBatch, _arialFont);
+
+            var gui = new ImGui(_inputManager);
+
+            if (gui.Button("Hello", new Rectangle(100, 100, 50, 15))) {
+                Console.WriteLine("prd");
+            }
+
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            gui.Draw(_arialFont, _texGray, _spriteBatch);
 
             base.Draw(gameTime);
         }

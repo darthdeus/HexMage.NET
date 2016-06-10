@@ -7,7 +7,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{EECE0189-FCF4-40CC-AD6A-0BCEC2FAA6E6}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HexMage.GUI</RootNamespace>
     <AssemblyName>HexMage.GUI</AssemblyName>
@@ -46,6 +46,8 @@
     <Compile Include="Camera2D.cs" />
     <Compile Include="FrameCounter.cs" />
     <Compile Include="HexMageGame.cs" />
+    <Compile Include="ImGui.cs" />
+    <Compile Include="InputManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

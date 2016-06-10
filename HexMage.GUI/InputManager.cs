@@ -5,23 +5,34 @@ namespace HexMage.GUI
 {
     public class InputManager
     {
-        private KeyboardState _lastState;
+        private MouseState _lastMouseState;
+        private MouseState _currentMouseState;
+
+        private KeyboardState _lastKeyboardState;
+        private KeyboardState _currentKeyboardState;
 
         public bool IsKeyJustPressed(Keys key) {
-            var current = Keyboard.GetState();
-            return current.IsKeyDown(key) && _lastState.IsKeyUp(key);
+            return _lastKeyboardState.IsKeyUp(key) && _currentKeyboardState.IsKeyDown(key);
         }
 
         public bool IsKeyJustReleased(Keys key) {
-            var current = Keyboard.GetState();            
-            return current.IsKeyUp(key) && _lastState.IsKeyDown(key);
+            return _lastKeyboardState.IsKeyDown(key) && _currentKeyboardState.IsKeyUp(key);
         }
 
         public void Refresh() {
-            _lastState = Keyboard.GetState();
+            _lastMouseState = _currentMouseState;
+            _currentMouseState = Mouse.GetState();
+
+            _lastKeyboardState = _currentKeyboardState;
+            _currentKeyboardState = Keyboard.GetState();
         }
 
         public PixelCoord MousePosition => new PixelCoord(Mouse.GetState().X, Mouse.GetState().Y);
+
+        public bool JustLeftClicked() {
+            return _lastMouseState.LeftButton == ButtonState.Released &&
+                   _currentMouseState.LeftButton == ButtonState.Pressed;
+        }
     }
 
     public class GameInputManager
