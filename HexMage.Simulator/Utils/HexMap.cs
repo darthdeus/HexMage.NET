@@ -33,9 +33,9 @@ namespace HexMage.Simulator
                 var from = -_size;
                 var to = _size;
 
-                for (var i = from; i < to; i++) {
-                    for (var j = from; j < to; j++) {
-                        for (var k = from; k < to; k++) {
+                for (var i = from; i <= to; i++) {
+                    for (var j = from; j <= to; j++) {
+                        for (var k = from; k <= to; k++) {
                             if (i + j + k == 0) {
                                 result.Add(new AxialCoord(j, i));
                             }

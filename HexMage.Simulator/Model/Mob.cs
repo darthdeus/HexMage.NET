@@ -26,6 +26,8 @@ namespace HexMage.Simulator
             AP = maxAp;
             Coord = new AxialCoord(0, 0);
             ID = _lastId++;
+
+            team.Mobs.Add(this);
         }
     }
 }

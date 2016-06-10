@@ -24,21 +24,21 @@ namespace HexMage.Simulator.Tests
             int size = 10;
             var game = new GameInstance(size);
 
-            var t1 = new Team();
-            var t2 = new Team();
-            game.MobManager.Teams.Add(t1);
-            game.MobManager.Teams.Add(t2);
+            var mobManager = game.MobManager;
+
+            var t1 = mobManager.AddTeam();
+            var t2 = mobManager.AddTeam();
 
             var m1 = Generator.RandomMob(t1, size, _ => true);
             var m2 = Generator.RandomMob(t2, size, c => !m1.Coord.Equals(c));
 
             Assert.AreNotEqual(m1.Coord, m2.Coord);
 
-            game.MobManager.Mobs.Add(m1);
-            game.MobManager.Mobs.Add(m2);
+            mobManager.AddMob(m1);
+            mobManager.AddMob(m2);
 
-            var pathfinder = new Pathfinder(size);
-            pathfinder.PathfindFrom(m1.Coord, game.Map, game.MobManager);
+            var pathfinder = new Pathfinder(game.Map, game.MobManager);
+            pathfinder.PathfindFrom(m1.Coord);
 
             Assert.AreNotEqual(0, pathfinder.Distance(m2.Coord));
 

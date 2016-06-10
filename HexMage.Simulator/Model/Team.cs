@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace HexMage.Simulator
 {
@@ -8,5 +9,10 @@ namespace HexMage.Simulator
         public Color Color { get; set; }
         public List<Mob> Mobs { get; set; } = new List<Mob>();
         public IPlayer Player { get; set; }
+
+        public Team() {
+            var random = new Random();
+            Color = new Color(random.NextDouble(), random.NextDouble(), random.NextDouble());
+        }
     }
 }

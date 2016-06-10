@@ -1,15 +1,18 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace HexMage.Simulator
 {
     public class MobManager
     {
-        public List<Mob> Mobs { get; set; } = new List<Mob>();
+        private readonly List<Mob> _mobs = new List<Mob>();
+        public IEnumerable<Mob> Mobs => _mobs;
         public List<Team> Teams { get; set; } = new List<Team>();
 
         public bool MoveMob(Mob mob, AxialCoord to) {
-            // TODO - check that the move is only to a neighbour block
+            Debug.Assert(mob.Coord.Distance(to) == 1);
+
             if (mob.AP > 0) {
                 mob.Coord = to;
                 mob.AP--;
@@ -28,6 +31,10 @@ namespace HexMage.Simulator
             var team = new Team();
             Teams.Add(team);
             return team;
+        }
+
+        public void AddMob(Mob mob) {
+            _mobs.Add(mob);
         }
     }
 }

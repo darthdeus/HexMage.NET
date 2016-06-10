@@ -6,14 +6,18 @@ namespace HexMage.Simulator
 {
     public class Pathfinder
     {
+        private readonly Map _map;
+        private readonly MobManager _mobManager;
         public HexMap<Path> Paths { get; set; }
-        public int Size { get; set; }
 
-        public Pathfinder(int size) {
-            Size = size;
-            Paths = new HexMap<Path>(size);
+        public Pathfinder(Map map, MobManager mobManager) {
+            _map = map;
+            _mobManager = mobManager;
+            Paths = new HexMap<Path>(map.Size);
             Paths.Initialize(() => new Path());
         }
+
+        private int Size => _map.Size;
 
         public IList<AxialCoord> PathTo(AxialCoord target) {
             var result = new List<AxialCoord>();
@@ -43,11 +47,11 @@ namespace HexMage.Simulator
             return result;
         }
 
-        public void MoveAsFarAsPossible(MobManager mobManager, Mob mob, IList<AxialCoord> path) {
+        public void MoveAsFarAsPossible(Mob mob, IList<AxialCoord> path) {
             int i = path.Count - 1;
 
             while (mob.AP > 0 && i > 0) {
-                mobManager.MoveMob(mob, path[i]);
+                _mobManager.MoveMob(mob, path[i]);
                 i--;
             }
         }
@@ -56,7 +60,7 @@ namespace HexMage.Simulator
             return Paths[c].Distance;
         }
 
-        public void PathfindFrom(AxialCoord start, Map map, MobManager mobManager) {
+        public void PathfindFrom(AxialCoord start) {
             var queue = new Queue<AxialCoord>();
 
             var diffs = new List<AxialCoord> {
@@ -68,7 +72,7 @@ namespace HexMage.Simulator
                 new AxialCoord(-1, 1),
             };
 
-            foreach (var coord in map.AllCoords) {
+            foreach (var coord in _map.AllCoords) {
                 var path = Paths[coord];
 
                 path.Source = null;
@@ -111,9 +115,12 @@ namespace HexMage.Simulator
                     if (IsValidCoord(neighbour)) {
                         Path n = Paths[neighbour];
 
+                        // TODO - this is not right
+                        if (n == null) continue;
+
                         bool notClosed = n.State != VertexState.Closed;
-                        bool noWall = map[neighbour] != HexType.Wall;
-                        bool noMob = mobManager.AtCoord(neighbour) == null;
+                        bool noWall = _map[neighbour] != HexType.Wall;
+                        bool noMob = _mobManager.AtCoord(neighbour) == null;
 
                         //if (notClosed && noWall && noMob) {
                         if (notClosed && noWall) {
@@ -132,7 +139,8 @@ namespace HexMage.Simulator
         }
 
         public bool IsValidCoord(AxialCoord c) {
-            return c.Abs().Max() < Size && c.Min() >= 0;
+            return c.Abs().Max() < Size && c.Min() > -Size && c.ToCube().Sum() == 0;
+            //return c.Abs().Max() < Size && c.Min() >= 0;
         }
     }
 }

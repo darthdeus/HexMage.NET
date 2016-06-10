@@ -28,6 +28,12 @@ namespace HexMage.Simulator
             return Math.Max(X, Y);
         }
 
+        public int Distance(AxialCoord to) {
+            return (Math.Abs(X - to.X)
+                    + Math.Abs(X + Y - to.X - to.Y)
+                    + Math.Abs(Y - to.Y))/2;
+        }
+
         public static AxialCoord operator +(AxialCoord a, AxialCoord b) {
             return new AxialCoord(a.X + b.X, a.Y + b.Y);
         }

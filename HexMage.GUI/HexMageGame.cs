@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
@@ -8,11 +9,65 @@ using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI
 {
+    public static class XnaCoordHelpers
+    {
+        public static Vector3 ToVector3(this PixelCoord coord) {
+            return new Vector3(coord.X, coord.Y, 0);
+        }
+
+        public static Point ToPoint(this PixelCoord coord) {
+            return new Point(coord.X, coord.Y);
+        }
+    }
+
     /// <summary>
     ///     This is the main type for your game.
     /// </summary>
     public class HexMageGame : Game
     {
+        // TODO - don't reallocate everything on a new frame
+        public class GuiWindow
+        {
+            List<Tuple<string, Rectangle>> Labels = new List<Tuple<string, Rectangle>>();
+            List<Tuple<string, Rectangle>> Buttons = new List<Tuple<string, Rectangle>>();
+
+            private readonly InputManager _inputManager;
+            private readonly SpriteBatch _spriteBatch;
+
+            public GuiWindow(InputManager inputManager, SpriteBatch spriteBatch) {
+                _inputManager = inputManager;
+                _spriteBatch = spriteBatch;
+            }
+
+            public void Label(string text, Rectangle rect) {
+                Labels.Add(Tuple.Create(text, rect));
+            }
+
+            public bool Button(string text, Rectangle rect) {
+                Buttons.Add(Tuple.Create(text, rect));
+
+                return rect.Contains(_inputManager.MousePosition.ToPoint());
+            }
+
+            public void Draw(SpriteFont font) {
+                foreach (var label in Labels) {
+                    _spriteBatch.DrawString(
+                        font,
+                        label.Item1,
+                        label.Item2.Location.ToVector2(),
+                        Color.Black);
+                }
+
+                foreach (var button in Buttons) {
+                    _spriteBatch.DrawString(
+                        font,
+                        button.Item1,
+                        button.Item2.Location.ToVector2(),
+                        Color.Red);
+                }
+            }
+        }
+
         public static readonly int GridSize = 32;
         private static readonly double HeightOffset = GridSize/4 + Math.Sin(30*Math.PI/180)*GridSize;
         private readonly Camera2D _camera = new Camera2D(GridSize, HeightOffset);
@@ -25,12 +80,12 @@ namespace HexMage.GUI
         private GraphicsDeviceManager _graphics;
         private Texture2D _hexGreen;
         private Texture2D _hexPath;
-        private Texture2D _hexTexture;
         private Texture2D _hexWall;
 
 
         private Vector2 _lastMousePos = new Vector2(0);
         private MouseState _lastMouseState;
+        private KeyboardState _lastKeyboardState;
         private Texture2D _mobTexture;
         private bool _mouseChanged;
         private SpriteBatch _spriteBatch;
@@ -48,6 +103,21 @@ namespace HexMage.GUI
         /// </summary>
         protected override void Initialize() {
             _gameInstance = new GameInstance(20);
+
+            var t1 = _gameInstance.MobManager.AddTeam();
+            var t2 = _gameInstance.MobManager.AddTeam();
+
+            for (int team = 0; team < 2; team++) {
+                for (int mobI = 0; mobI < 5; mobI++) {
+                    var mob = Generator.RandomMob(team%2 == 0 ? t1 : t2, _gameInstance.Size,
+                        c => _gameInstance.MobManager.AtCoord(c) == null);
+
+                    _gameInstance.MobManager.AddMob(mob);
+                }
+            }
+
+            _gameInstance.TurnManager.StartNextTurn();
+
             IsMouseVisible = true;
 
             base.Initialize();
@@ -66,21 +136,6 @@ namespace HexMage.GUI
             _hexWall = Content.Load<Texture2D>("wall_hex");
             _hexPath = Content.Load<Texture2D>("path_hex");
             _mobTexture = Content.Load<Texture2D>("mob");
-
-            _hexTexture = new Texture2D(GraphicsDevice, GridSize, GridSize);
-
-            var hexColors = new Color[GridSize, GridSize];
-            for (var i = 0; i < GridSize; i++) {
-                for (var j = 0; j < GridSize; j++) {
-                    if (Math.Sqrt(i*i + j*j) < GridSize) {
-                        hexColors[i, j] = Color.MediumPurple;
-                    } else {
-                        hexColors[i, j] = Color.Black;
-                    }
-                }
-            }
-
-            _hexTexture.SetData(hexColors.Cast<Color>().ToArray());
 
             _arialFont = Content.Load<SpriteFont>("Arial");
         }
@@ -118,8 +173,7 @@ namespace HexMage.GUI
                     }
 
                     // TODO - pathfindovani ze zdi najde cesty
-                    _gameInstance.Pathfinder.PathfindFrom(new AxialCoord(0, 0), _gameInstance.Map,
-                        _gameInstance.MobManager);
+                    _gameInstance.Pathfinder.PathfindFrom(new AxialCoord(0, 0));
                 }
             }
 
@@ -127,11 +181,24 @@ namespace HexMage.GUI
             _lastMousePos = mousePos;
             _lastMouseState = mouseState;
 
+            bool keyboardChanged = _lastKeyboardState != Keyboard.GetState();
+            HandleUserInput(keyboardChanged, Keyboard.GetState());
+            _lastKeyboardState = Keyboard.GetState();
+
             _camera.Update(gameTime);
 
             _frameCounter.Update(gameTime.ElapsedGameTime.TotalSeconds);
 
             base.Update(gameTime);
+        }
+
+        private void HandleUserInput(bool keyboardStatechanged, KeyboardState currentState) {
+            if (keyboardStatechanged) {
+                if (currentState.IsKeyDown(Keys.Space)) {
+                    _gameInstance.TurnManager.MoveNext();
+                    _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob().Coord);
+                }
+            }
         }
 
         /// <summary>
@@ -141,35 +208,9 @@ namespace HexMage.GUI
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            _spriteBatch.Begin(transformMatrix: _camera.Projection());
-
-            foreach (var coord in _gameInstance.Map.AllCoords) {
-                if (_gameInstance.Map[coord] == HexType.Empty) {
-                    DrawAt(_hexGreen, coord);
-                } else {
-                    DrawAt(_hexWall, coord);
-                }
-            }
-
-            foreach (var mob in _gameInstance.MobManager.Mobs) {
-                DrawAt(_mobTexture, mob.Coord);
-            }
-
-            var mouseHex = _camera.PixelToHex(_lastMousePos);
-            DrawAt(_mobTexture, mouseHex);
-
-            _spriteBatch.End();
-
-            if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                _spriteBatch.Begin(transformMatrix: _camera.Projection());
-                var path = _gameInstance.Pathfinder.PathTo(mouseHex);
-
-                foreach (var coord in path) {
-                    DrawAt(_hexPath, coord);
-                }
-                _spriteBatch.End();
-            }
-
+            DrawBackground();
+            DrawHoverPath();
+            DrawAllMobs();
             DrawMousePosition();
 
             _frameCounter.DrawFPS(_spriteBatch, _arialFont);
@@ -177,18 +218,78 @@ namespace HexMage.GUI
             base.Draw(gameTime);
         }
 
+        private void DrawBackground() {
+            _spriteBatch.Begin(transformMatrix: _camera.Projection());
+
+            int maxX = Int32.MinValue;
+            int maxY = Int32.MinValue;
+            int maxZ = Int32.MinValue;
+
+            int minX = Int32.MaxValue;
+            int minY = Int32.MaxValue;
+            int minZ = Int32.MaxValue;
+
+            foreach (var coord in _gameInstance.Map.AllCoords) {
+                maxX = Math.Max(maxX, coord.ToCube().X);
+                maxY = Math.Max(maxY, coord.ToCube().Y);
+                maxZ = Math.Max(maxZ, coord.ToCube().Z);
+
+                minX = Math.Min(minX, coord.ToCube().X);
+                minY = Math.Min(minY, coord.ToCube().Y);
+                minZ = Math.Min(minZ, coord.ToCube().Z);
+
+                if (_gameInstance.Map[coord] == HexType.Empty) {
+                    DrawAt(_hexGreen, coord);
+                } else {
+                    DrawAt(_hexWall, coord);
+                }
+            }
+
+            _spriteBatch.DrawString(_arialFont, $"{minX},{minY},{minZ}   {maxX},{maxY},{maxZ}", new Vector2(0, 50),
+                Color.Red);
+            _spriteBatch.End();
+        }
+
+        private void DrawHoverPath() {
+            _spriteBatch.Begin(transformMatrix: _camera.Projection());
+            var mouseHex = _camera.PixelToHex(_lastMousePos);
+
+            if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
+                var path = _gameInstance.Pathfinder.PathTo(mouseHex);
+
+                foreach (var coord in path) {
+                    DrawAt(_hexPath, coord);
+                }
+            }
+            _spriteBatch.End();
+        }
+
+        private void DrawAllMobs() {
+            _spriteBatch.Begin(transformMatrix: _camera.Projection());
+            foreach (var mob in _gameInstance.MobManager.Mobs) {
+                DrawAt(_mobTexture, mob.Coord);
+            }
+            _spriteBatch.End();
+        }
+
         private void DrawMousePosition() {
             _spriteBatch.Begin();
             {
                 var bounds = GraphicsDevice.PresentationParameters.Bounds;
                 var mouseTextPos = new Vector2(0, 450);
-                _spriteBatch.DrawString(_arialFont, $"{_lastMousePos} - {bounds}", mouseTextPos, Color.Black);
+
+                string str = $"{_lastMousePos} - {bounds} - {_camera.PixelToHex(_lastMousePos)}";
+                _spriteBatch.DrawString(_arialFont, str, mouseTextPos, Color.Black);
             }
             _spriteBatch.End();
         }
 
         private void DrawAt(Texture2D texture, AxialCoord coord) {
-            _spriteBatch.Draw(texture, _camera.HexToPixel(coord.Y, coord.X));
+            _spriteBatch.Draw(texture, _camera.HexToPixel(coord));
+        }
+
+        private void DrawAt(Texture2D texture, AxialCoord coord, Color color) {
+            _spriteBatch.Draw(texture, _camera.HexToPixel(coord), color);
         }
     }
 }

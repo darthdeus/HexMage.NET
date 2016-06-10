@@ -14,6 +14,10 @@ namespace HexMage.Simulator
             Z = z;
         }
 
+        public int Distance(CubeCoord to) {
+            return (Math.Abs(X - to.X) + Math.Abs(Y - to.Y) + Math.Abs(Z - to.Z))/2;
+        }
+
         public static CubeCoord operator +(CubeCoord a, CubeCoord b) {
             return new CubeCoord(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
         }
@@ -25,7 +29,6 @@ namespace HexMage.Simulator
         public AxialCoord ToAxial() {
             return new AxialCoord(X, Z);
         }
-
 
         public static implicit operator AxialCoord(CubeCoord cube) {
             return cube.ToAxial();
@@ -47,6 +50,10 @@ namespace HexMage.Simulator
                 hashCode = (hashCode*397) ^ Z;
                 return hashCode;
             }
+        }
+
+        public int Sum() {
+            return X + Y + Z;
         }
     }
 }

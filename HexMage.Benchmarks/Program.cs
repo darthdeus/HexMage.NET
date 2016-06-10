@@ -24,8 +24,8 @@ namespace HexMage.Benchmarks
             var mobManager = g.MobManager;
             var pathfinder = g.Pathfinder;
 
-            mobManager.Mobs.Add(m1);
-            mobManager.Mobs.Add(m2);
+            mobManager.AddMob(m1);
+            mobManager.AddMob(m2);
 
             m1.Coord = new AxialCoord(0, 0);
             m2.Coord = new AxialCoord(0, 1);
@@ -36,7 +36,9 @@ namespace HexMage.Benchmarks
             int iterations = 0;
             s.Start();
             while (iterations < 10000000) {
-                mobManager.Mobs.ForEach(mob => mob.HP = mob.MaxHP);
+                foreach (var mob in mobManager.Mobs) {
+                    mob.HP = mob.MaxHP;
+                }
 
                 while (!g.IsFinished()) {
                     iterations++;
@@ -62,7 +64,7 @@ namespace HexMage.Benchmarks
                             } else {
                                 var path = pathfinder.PathTo(target.Coord);
 
-                                pathfinder.MoveAsFarAsPossible(mobManager, mob, path);
+                                pathfinder.MoveAsFarAsPossible(mob, path);
                             }
                         } else {
                             Console.WriteLine("No enemies in range, moving closer");
@@ -72,7 +74,7 @@ namespace HexMage.Benchmarks
 
                             var enemy = enemies.First();
                             var path = pathfinder.PathTo(enemy.Coord);
-                            pathfinder.MoveAsFarAsPossible(mobManager, mob, path);
+                            pathfinder.MoveAsFarAsPossible(mob, path);
                         }
 
                         if (turnManager.MoveNext()) {

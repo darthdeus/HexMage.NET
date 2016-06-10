@@ -35,6 +35,12 @@ namespace HexMage.Simulator
             return TurnOrder[_current];
         }
 
+        public void NextMobOrNewTurn() {
+            if (!MoveNext()) {
+                StartNextTurn();
+            }
+        }
+
         public bool MoveNext() {
             if (!IsTurnDone()) _current++;
             return !IsTurnDone();

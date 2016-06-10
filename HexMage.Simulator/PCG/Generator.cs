@@ -17,9 +17,12 @@ namespace HexMage.Simulator
             team.Mobs.Add(mob);
 
             while (true) {
-                AxialCoord c = new AxialCoord(random.Next(0, size), random.Next(0, size));
-                if (isCoordAvailable(c)) {
-                    mob.Coord = c;
+                var x = random.Next(-size, size);
+                var y = random.Next(-size, size);
+                var z = -x - y;
+                var cube = new CubeCoord(x, y, z);
+                if (isCoordAvailable(cube)) {
+                    mob.Coord = cube.ToAxial();
                     break;
                 }
             }

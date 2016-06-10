@@ -15,9 +15,9 @@ namespace HexMage.Simulator
         public GameInstance(int size) {
             Size = size;
             MobManager = new MobManager();
-            Pathfinder = new Pathfinder(size);
-            TurnManager = new TurnManager(MobManager);
             Map = new Map(size);
+            Pathfinder = new Pathfinder(Map, MobManager);
+            TurnManager = new TurnManager(MobManager);
         }
 
 
@@ -29,7 +29,7 @@ namespace HexMage.Simulator
         }
 
         public void Refresh() {
-            Pathfinder.PathfindFrom(TurnManager.CurrentMob().Coord, Map, MobManager);
+            Pathfinder.PathfindFrom(TurnManager.CurrentMob().Coord);
         }
 
         public IList<Ability> UsableAbilities(Mob mob) {

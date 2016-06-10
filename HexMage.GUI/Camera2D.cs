@@ -44,7 +44,10 @@ namespace HexMage.GUI
             return Matrix.CreateScale(_zoomLevel)*Matrix.CreateTranslation(_translate);
         }
 
-        public Vector2 HexToPixel(int row, int col) {
+        public Vector2 HexToPixel(AxialCoord coord) {
+            int row = coord.Y;
+            int col = coord.X;
+
             var x = (int) (_gridSize*(col + row/2.0));
             var y = (int) (row*_heightOffset);
 
