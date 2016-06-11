@@ -1,4 +1,5 @@
 using HexMage.Simulator;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace HexMage.GUI
@@ -27,11 +28,16 @@ namespace HexMage.GUI
             _currentKeyboardState = Keyboard.GetState();
         }
 
-        public PixelCoord MousePosition => new PixelCoord(Mouse.GetState().X, Mouse.GetState().Y);
+        public Point MousePosition => new Point(Mouse.GetState().X, Mouse.GetState().Y);
 
         public bool JustLeftClicked() {
             return _lastMouseState.LeftButton == ButtonState.Released &&
                    _currentMouseState.LeftButton == ButtonState.Pressed;
+        }
+
+        public bool JustRightClicked() {
+            return _lastMouseState.RightButton == ButtonState.Released &&
+                   _currentMouseState.RightButton == ButtonState.Pressed;
         }
     }
 

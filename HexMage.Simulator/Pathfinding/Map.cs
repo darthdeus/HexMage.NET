@@ -21,5 +21,13 @@ namespace HexMage.Simulator
             get { return _hexes[c]; }
             set { _hexes[c] = value; }
         }
+
+        public void Toogle(AxialCoord coord) {
+            if (this[coord] == HexType.Empty) {
+                this[coord] = HexType.Wall;
+            } else {
+                this[coord] = HexType.Empty;
+            }
+        }
     }
 }

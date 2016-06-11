@@ -14,7 +14,7 @@ namespace HexMage.GUI
         private Vector3 _translate = Vector3.Zero;
         private float _zoomLevel = 1.0f;
 
-        public Camera2D(int gridSize, double heightOffset) {
+        public Camera2D(int gridSize, double heightOffset, InputManager inputManager) {
             _gridSize = gridSize;
             _heightOffset = heightOffset;
         }
@@ -62,5 +62,7 @@ namespace HexMage.GUI
 
             return new AxialCoord(col, row);
         }
+
+        public AxialCoord MouseHex { get {  return PixelToHex(new Vector2(Mouse.GetState().X, Mouse.GetState().Y));} }
     }
 }

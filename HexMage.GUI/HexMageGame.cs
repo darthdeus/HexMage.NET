@@ -3,6 +3,7 @@ using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using OpenTK.Platform.Windows;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI
@@ -25,10 +26,9 @@ namespace HexMage.GUI
     {
         public static readonly int GridSize = 32;
         private static readonly double HeightOffset = GridSize/4 + Math.Sin(30*Math.PI/180)*GridSize;
-        private readonly Camera2D _camera = new Camera2D(GridSize, HeightOffset);
+        private readonly Camera2D _camera;
 
         private readonly FrameCounter _frameCounter = new FrameCounter();
-        private SpriteFont _arialFont;
 
         private GameInstance _gameInstance;
 
@@ -38,25 +38,26 @@ namespace HexMage.GUI
         private Texture2D _hexWall;
 
 
-        private Vector2 _lastMousePos = new Vector2(0);
-        private MouseState _lastMouseState;
         private KeyboardState _lastKeyboardState;
         private Texture2D _mobTexture;
         private SpriteBatch _spriteBatch;
-        private InputManager _inputManager;
+        private readonly InputManager _inputManager = new InputManager();
         private Texture2D _texGray;
+        private readonly AssetManager _assetManager;
 
         public HexMageGame() {
-            _graphics = new GraphicsDeviceManager(this);
+            _graphics = new GraphicsDeviceManager(this) {
+                PreferredBackBufferWidth = 1280,
+                PreferredBackBufferHeight = 1024
+            };
+
+            _assetManager = new AssetManager(Content);
+
+            _camera = new Camera2D(GridSize, HeightOffset, _inputManager);
+
             Content.RootDirectory = "Content";
         }
 
-        /// <summary>
-        ///     Allows the game to perform any initialization it needs to before starting to run.
-        ///     This is where it can query for any required services and load any non-graphic
-        ///     related content.  Calling base.Initialize will enumerate through any components
-        ///     and initialize them as well.
-        /// </summary>
         protected override void Initialize() {
             _gameInstance = new GameInstance(20);
 
@@ -74,81 +75,43 @@ namespace HexMage.GUI
 
             _gameInstance.TurnManager.StartNextTurn();
 
-            _inputManager = new InputManager();
-
             // MonoGame doesn't show mouse by default
             IsMouseVisible = true;
 
             base.Initialize();
         }
 
-        /// <summary>
-        ///     LoadContent will be called once per game and is the place to load
-        ///     all of your content.
-        /// </summary>
         protected override void LoadContent() {
-            // Create a new SpriteBatch, which can be used to draw textures.
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            _texGray = new Texture2D(GraphicsDevice, 32, 32);
-
-            var colors = new Color[32*32];
-            for (int i = 0; i < 32*32; i++) {
-                colors[i] = Color.LightGray;
-            }
-
-            _texGray.SetData(colors);
+            _texGray = TextureGenerator.SolidColor(GraphicsDevice, 32, 32, Color.LightGray);
 
             //_hexGreen = new Texture2D(GraphicsDevice, GridSize, GridSize);
-            _hexGreen = Content.Load<Texture2D>("green_hex");
+            _hexGreen = Content.Load<Texture2D>("photoshopTile");
             _hexWall = Content.Load<Texture2D>("wall_hex");
             _hexPath = Content.Load<Texture2D>("path_hex");
             _mobTexture = Content.Load<Texture2D>("mob");
 
-            _arialFont = Content.Load<SpriteFont>("Arial");
+            _assetManager.Preload();
         }
 
-        /// <summary>
-        ///     UnloadContent will be called once per game and is the place to unload
-        ///     game-specific content.
-        /// </summary>
-        protected override void UnloadContent() {
-            // TODO: Unload any non ContentManager content here
-        }
-
-        /// <summary>
-        ///     Allows the game to run logic such as updating the world,
-        ///     checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime) {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
-                Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
             _inputManager.Refresh();
 
-            var mouseState = Mouse.GetState();
+            if (_inputManager.IsKeyJustPressed(Keys.Escape)) {
+                Exit();
+            }
 
-            var mousePos = new Vector2(mouseState.X, mouseState.Y);
 
-            if (_lastMouseState.RightButton == ButtonState.Pressed
-                && mouseState.RightButton == ButtonState.Released) {
-                var mouseHex = _camera.PixelToHex(mousePos);
+            if (_inputManager.JustRightClicked()) {
+                var mouseHex = _camera.MouseHex;
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                    if (_gameInstance.Map[mouseHex] == HexType.Empty) {
-                        _gameInstance.Map[mouseHex] = HexType.Wall;
-                    } else {
-                        _gameInstance.Map[mouseHex] = HexType.Empty;
-                    }
+                    _gameInstance.Map.Toogle(mouseHex);
 
                     // TODO - pathfindovani ze zdi najde cesty
                     _gameInstance.Pathfinder.PathfindFrom(new AxialCoord(0, 0));
                 }
             }
-
-            _lastMousePos = mousePos;
-            _lastMouseState = mouseState;
 
             bool keyboardChanged = _lastKeyboardState != Keyboard.GetState();
             HandleUserInput(keyboardChanged, Keyboard.GetState());
@@ -170,10 +133,6 @@ namespace HexMage.GUI
             }
         }
 
-        /// <summary>
-        ///     This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
@@ -182,17 +141,16 @@ namespace HexMage.GUI
             DrawAllMobs();
             DrawMousePosition();
 
-            _frameCounter.DrawFPS(_spriteBatch, _arialFont);
+            _frameCounter.DrawFPS(_spriteBatch, _assetManager.Font);
 
-            var gui = new ImGui(_inputManager);
+            var gui = new ImGui(_inputManager, _assetManager.Font);
 
-            if (gui.Button("Hello", new Rectangle(100, 100, 50, 15))) {
-                Console.WriteLine("prd");
-            }
+            //gui.Button("Foo bar\nbaz", new Point(50, 50));
+            //if (gui.Button("Hello", new Point(100, 100))) {
+            //    Console.WriteLine("prd");
+            //}
 
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            gui.Draw(_arialFont, _texGray, _spriteBatch);
+            gui.Draw(_texGray, _spriteBatch);
 
             base.Draw(gameTime);
         }
@@ -224,17 +182,16 @@ namespace HexMage.GUI
                 }
             }
 
-            _spriteBatch.DrawString(_arialFont, $"{minX},{minY},{minZ}   {maxX},{maxY},{maxZ}", new Vector2(0, 50),
+            _spriteBatch.DrawString(_assetManager.Font, $"{minX},{minY},{minZ}   {maxX},{maxY},{maxZ}", new Vector2(0, 50),
                 Color.Red);
             _spriteBatch.End();
         }
 
         private void DrawHoverPath() {
             _spriteBatch.Begin(transformMatrix: _camera.Projection());
-            var mouseHex = _camera.PixelToHex(_lastMousePos);
 
-            if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                var path = _gameInstance.Pathfinder.PathTo(mouseHex);
+            if (_gameInstance.Pathfinder.IsValidCoord(_camera.MouseHex)) {
+                var path = _gameInstance.Pathfinder.PathTo(_camera.MouseHex);
 
                 foreach (var coord in path) {
                     DrawAt(_hexPath, coord);
@@ -257,8 +214,8 @@ namespace HexMage.GUI
                 var bounds = GraphicsDevice.PresentationParameters.Bounds;
                 var mouseTextPos = new Vector2(0, 450);
 
-                string str = $"{_lastMousePos} - {bounds} - {_camera.PixelToHex(_lastMousePos)}";
-                _spriteBatch.DrawString(_arialFont, str, mouseTextPos, Color.Black);
+                string str = $"{bounds} - {_camera.MouseHex}";
+                _spriteBatch.DrawString(_assetManager.Font, str, mouseTextPos, Color.Black);
             }
             _spriteBatch.End();
         }
