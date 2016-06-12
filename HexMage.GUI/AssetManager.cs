@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -6,6 +8,14 @@ namespace HexMage.GUI
 {
     class AssetManager
     {
+        public static readonly string WallTexture = "wall_hex";
+        public static readonly string PathTexture = "path_hex";
+        public static readonly string MobTexture = "mage";
+        public static readonly string EmptyHexTexture = "photoshopTile";
+        public static readonly string GrayTexture = "gray";
+
+        private static readonly string FontName = "Arial";
+
         private readonly ContentManager _contentManager;
         private readonly Dictionary<string, Texture2D> _textures = new Dictionary<string, Texture2D>();
         private SpriteFont _font;
@@ -26,11 +36,22 @@ namespace HexMage.GUI
         }
 
         public SpriteFont Font {
-            get { return _font ?? (_font = _contentManager.Load<SpriteFont>("Arial")); }
+            get {
+                Debug.Assert(_font != null);
+                return _font;
+            }
         }
 
+
         public void Preload() {
-            var _ = Font;
+            _font = _contentManager.Load<SpriteFont>(FontName);
+            foreach (var texture in new[] { WallTexture, PathTexture, MobTexture, EmptyHexTexture }) {
+                _textures[texture] = _contentManager.Load<Texture2D>(texture);
+            }
+        }
+
+        public void RegisterTexture(string name, Texture2D texture2D) {
+            _textures[name] = texture2D;
         }
     }
 }

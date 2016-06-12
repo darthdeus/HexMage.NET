@@ -1,3 +1,4 @@
+using System;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -6,17 +7,15 @@ namespace HexMage.GUI
 {
     public class Camera2D
     {
+        private readonly InputManager _inputManager;
         private const float ScrollAmount = 0.03f;
         private const float TranslateAmount = 10;
-        private readonly int _gridSize;
-        private readonly double _heightOffset;
         private int _lastWheel;
         private Vector3 _translate = Vector3.Zero;
         private float _zoomLevel = 1.0f;
 
-        public Camera2D(int gridSize, double heightOffset, InputManager inputManager) {
-            _gridSize = gridSize;
-            _heightOffset = heightOffset;
+        public Camera2D(InputManager inputManager) {
+            _inputManager = inputManager;
         }
 
         public void Update(GameTime gameTime) {
@@ -40,29 +39,30 @@ namespace HexMage.GUI
             if (keyboard.IsKeyDown(Keys.D)) _translate.X -= TranslateAmount;
         }
 
-        public Matrix Projection() {
-            return Matrix.CreateScale(_zoomLevel)*Matrix.CreateTranslation(_translate);
-        }
+        public Matrix Projection => Matrix.CreateScale(_zoomLevel)*Matrix.CreateTranslation(_translate);
 
         public Vector2 HexToPixel(AxialCoord coord) {
             int row = coord.Y;
             int col = coord.X;
 
-            var x = (int) (_gridSize*(col + row/2.0));
-            var y = (int) (row*_heightOffset);
+            var x = (int) (Config.GridSize*(col + row/2.0));
+            var y = (int) (row*Config.HeightOffset);
 
             return new Vector2(x, y);
         }
 
-        public AxialCoord PixelToHex(Vector2 pos) {
-            pos = Vector2.Transform(pos, Matrix.Invert(Projection()));
+        public Vector2 MousePixelPos => new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+        public Vector2 MouseWorldPixelPos => Vector2.Transform(MousePixelPos, Matrix.Invert(Projection));
 
-            var row = (int) (pos.Y/_heightOffset);
-            var col = (int) (pos.X/_gridSize - row/2.0);
+        public AxialCoord PixelToHex(Vector2 pos) {
+            pos = Vector2.Transform(pos, Matrix.Invert(Projection)) - new Vector2(Config.GridSize/2);
+
+            var row = (int) Math.Round(pos.Y/Config.HeightOffset);
+            var col = (int) Math.Round(pos.X/Config.GridSize - row/2.0);
 
             return new AxialCoord(col, row);
         }
 
-        public AxialCoord MouseHex { get {  return PixelToHex(new Vector2(Mouse.GetState().X, Mouse.GetState().Y));} }
+        public AxialCoord MouseHex => PixelToHex(MousePixelPos);
     }
 }

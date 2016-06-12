@@ -7,9 +7,7 @@ namespace HexMage.Simulator
         private readonly HexMap<HexType> _hexes;
         public int Size { get; set; }
 
-        public List<AxialCoord> AllCoords {
-            get { return _hexes.AllCoords; }
-        }
+        public List<AxialCoord> AllCoords => _hexes.AllCoords;
 
         public Map(int size) {
             Size = size;
