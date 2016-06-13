@@ -6,38 +6,20 @@ using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI
 {
-    class GameManager
-    {
-        public Camera2D Camera { get; set; }
-        public InputManager InputManager { get; set; }
-        public AssetManager AssetManager { get; set; }
-        public SpriteBatch SpriteBatch { get; set; }
-
-        public GameManager(Camera2D camera, InputManager inputManager, AssetManager assetManager, SpriteBatch spriteBatch) {
-            Camera = camera;
-            InputManager = inputManager;
-            AssetManager = assetManager;
-            SpriteBatch = spriteBatch;
-        }
-    }
-
     /// <summary>
     ///     This is the main type for your game.
     /// </summary>
     public class HexMageGame : Game
     {
-        private readonly Camera2D _camera;
-
-        private GameInstance _gameInstance;
-
         private GraphicsDeviceManager _graphics;
-
         private SceneManager _sceneManager;
 
+        private readonly Camera2D _camera;
         private SpriteBatch _spriteBatch;
 
         private readonly InputManager _inputManager = new InputManager();
         private readonly AssetManager _assetManager;
+        private GameManager _gameManager;
 
         public HexMageGame() {
             _graphics = new GraphicsDeviceManager(this) {
@@ -53,8 +35,6 @@ namespace HexMage.GUI
         }
 
         protected override void Initialize() {
-            _sceneManager = new SceneManager(new ArenaScene());
-
             // MonoGame doesn't show mouse by default
             IsMouseVisible = true;
 
@@ -63,6 +43,9 @@ namespace HexMage.GUI
 
         protected override void LoadContent() {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            _gameManager = new GameManager(_camera, _inputManager, _assetManager, _spriteBatch);
+            _sceneManager = new SceneManager(new ArenaScene(_gameManager));
 
             _assetManager.Preload();
             _assetManager.RegisterTexture(AssetManager.GrayTexture,
@@ -75,32 +58,13 @@ namespace HexMage.GUI
             if (_inputManager.IsKeyJustPressed(Keys.Escape)) {
                 Exit();
             }
+            _camera.Update(gameTime);
 
             _sceneManager.Update(gameTime);
-
-            if (_inputManager.JustRightClicked()) {
-                var mouseHex = _camera.MouseHex;
-                if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                    _gameInstance.Map.Toogle(mouseHex);
-
-                    // TODO - pathfindovani ze zdi najde cesty
-                    _gameInstance.Pathfinder.PathfindFrom(new AxialCoord(0, 0));
-                }
-            }
-
-            HandleUserInput();
-
-            _camera.Update(gameTime);
 
             base.Update(gameTime);
         }
 
-        private void HandleUserInput() {
-            if (_inputManager.IsKeyJustPressed(Keys.Space)) {
-                _gameInstance.TurnManager.MoveNext();
-                _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob().Coord);
-            }
-        }
 
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.CornflowerBlue);
