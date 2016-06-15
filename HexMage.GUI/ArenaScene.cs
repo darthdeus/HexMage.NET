@@ -28,11 +28,9 @@ namespace HexMage.GUI
         }
 
 
-        public override void Initialize() {            
-        }
+        public override void Initialize() {}
 
-        public override void Cleanup() {
-        }
+        public override void Cleanup() {}
 
         public override Either<GameScene, SceneUpdateResult> Update(GameTime gameTime) {
             if (_inputManager.JustRightClicked()) {
@@ -116,9 +114,17 @@ namespace HexMage.GUI
         }
 
         private void DrawAllMobs() {
+            var gray = _assetManager[AssetManager.GrayTexture];
+
             _spriteBatch.Begin(transformMatrix: _camera.Projection);
             foreach (var mob in _gameInstance.MobManager.Mobs) {
                 DrawAt(_assetManager[AssetManager.MobTexture], mob.Coord);
+                var location = _camera.HexToPixel(mob.Coord).ToPoint() + new Point(27, 4);
+
+                double hpPercent = (double)mob.HP/mob.MaxHP;
+                int healthbarHeight = 20;
+                _spriteBatch.Draw(gray, new Rectangle(location, new Point(5, healthbarHeight)), Color.DarkGreen);
+                _spriteBatch.Draw(gray, new Rectangle(location, new Point(5, (int) (healthbarHeight * hpPercent))), Color.Yellow);
             }
             _spriteBatch.End();
         }
