@@ -29,7 +29,7 @@ namespace HexMage.Simulator
         }
 
         public void Refresh() {
-            Pathfinder.PathfindFrom(TurnManager.CurrentMob().Coord);
+            Pathfinder.PathfindFrom(TurnManager.CurrentMob.Coord);
         }
 
         public IList<Ability> UsableAbilities(Mob mob) {

@@ -31,9 +31,7 @@ namespace HexMage.Simulator
             TurnOrder.Sort((a, b) => a.AP.CompareTo(b.AP));
         }
 
-        public Mob CurrentMob() {
-            return TurnOrder[_current];
-        }
+        public Mob CurrentMob => TurnOrder[_current];
 
         public void NextMobOrNewTurn() {
             if (!MoveNext()) {

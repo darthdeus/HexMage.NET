@@ -21,7 +21,9 @@ namespace HexMage.Simulator
                 var y = random.Next(-size, size);
                 var z = -x - y;
                 var cube = new CubeCoord(x, y, z);
-                if (isCoordAvailable(cube)) {
+                var zero = new CubeCoord(0, 0, 0);
+
+                if (isCoordAvailable(cube) && cube.Distance(zero) < size) {
                     mob.Coord = cube.ToAxial();
                     break;
                 }
