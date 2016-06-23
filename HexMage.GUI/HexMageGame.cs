@@ -28,7 +28,6 @@ namespace HexMage.GUI
             };
 
             _assetManager = new AssetManager(Content);
-
             _camera = new Camera2D(_inputManager);
 
             Content.RootDirectory = "Content";

@@ -44,7 +44,7 @@ namespace HexMage.GUI
             }
 
             if (_inputManager.IsKeyJustPressed(Keys.Space)) {
-                _gameInstance.TurnManager.MoveNext();
+                _gameInstance.TurnManager.NextMobOrNewTurn();
                 _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
             }
 
