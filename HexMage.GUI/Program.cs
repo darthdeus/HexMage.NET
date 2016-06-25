@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace HexMage.GUI
 {
@@ -11,8 +12,7 @@ namespace HexMage.GUI
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
-        {
+        static void Main() {
             using (var game = new HexMageGame())
                 game.Run();
         }

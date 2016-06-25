@@ -10,6 +10,7 @@ namespace HexMage.GUI
 
         public SceneManager(GameScene initialScene) {
             _scenes.Push(initialScene);
+            initialScene.Initialize();
         }
 
         public void Update(GameTime gameTime) {

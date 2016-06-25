@@ -2,7 +2,7 @@
 
 namespace HexMage.GUI
 {
-    class GameManager
+    public class GameManager
     {
         public Camera2D Camera { get; set; }
         public InputManager InputManager { get; set; }

@@ -35,6 +35,11 @@ namespace HexMage.GUI
                    _currentMouseState.LeftButton == ButtonState.Pressed;
         }
 
+        public bool JustLeftClickReleased() {
+            return _lastMouseState.LeftButton == ButtonState.Pressed &&
+                   _currentMouseState.LeftButton == ButtonState.Released;
+        }
+
         public bool JustRightClicked() {
             return _lastMouseState.RightButton == ButtonState.Released &&
                    _currentMouseState.RightButton == ButtonState.Pressed;

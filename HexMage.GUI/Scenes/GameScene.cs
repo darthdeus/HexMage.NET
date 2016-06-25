@@ -3,15 +3,15 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI
 {
-    enum SceneUpdateResult
+    public enum SceneUpdateResult
     {
         Terminate,
         Continue
     }
 
-    abstract class GameScene
+    public abstract class GameScene
     {
-        private readonly GameManager _gameManager;
+        protected readonly GameManager _gameManager;
 
         protected GameScene(GameManager gameManager) {
             _gameManager = gameManager;

@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI
 {
-    class AssetManager
+    public class AssetManager
     {
         public static readonly string WallTexture = "wall_hex";
         public static readonly string PathTexture = "path_hex";

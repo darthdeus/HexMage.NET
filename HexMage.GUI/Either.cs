@@ -2,7 +2,7 @@
 
 namespace HexMage.GUI
 {
-    class Either<L, R>
+    public class Either<L, R>
     {
         private readonly R _right;
         private readonly L _left;

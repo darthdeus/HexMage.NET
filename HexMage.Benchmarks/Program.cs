@@ -52,7 +52,7 @@ namespace HexMage.Benchmarks
                         //Console.WriteLine("Starting next turn");
                         turnManager.StartNextTurn();
                     } else {
-                        var mob = turnManager.CurrentMob();
+                        var mob = turnManager.CurrentMob;
                         var targets = g.PossibleTargets(mob);
 
                         if (targets.Count > 0) {

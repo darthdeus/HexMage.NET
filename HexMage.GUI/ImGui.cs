@@ -47,7 +47,7 @@ namespace HexMage.GUI
             var button = new TextRectangle(text, _font, pos);
             _buttons.Add(button);
             
-            return button.Contains(_inputManager.MousePosition) && _inputManager.JustLeftClicked();
+            return button.Contains(_inputManager.MousePosition) && _inputManager.JustLeftClickReleased();
         }
 
         public void Draw(Texture2D bgTex, SpriteBatch spriteBatch) {

@@ -43,12 +43,12 @@ namespace HexMage.GUI
         protected override void LoadContent() {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            _gameManager = new GameManager(_camera, _inputManager, _assetManager, _spriteBatch);
-            _sceneManager = new SceneManager(new ArenaScene(_gameManager));
-
             _assetManager.Preload();
             _assetManager.RegisterTexture(AssetManager.GrayTexture,
-                TextureGenerator.SolidColor(GraphicsDevice, 32, 32, Color.LightGray));            
+                TextureGenerator.SolidColor(GraphicsDevice, 32, 32, Color.LightGray));
+
+            _gameManager = new GameManager(_camera, _inputManager, _assetManager, _spriteBatch);
+            _sceneManager = new SceneManager(new MapSelectionScene(_gameManager));
         }
 
         protected override void Update(GameTime gameTime) {
