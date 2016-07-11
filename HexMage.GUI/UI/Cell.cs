@@ -23,11 +23,24 @@ namespace HexMage.GUI.UI {
         public AlignmentOptions Alignment;
         public Vector4 Padding;
 
-        public Vector2 CachedPosition { get; protected internal set; }
-        public virtual Vector2 CachedSize { get; set; }
+        public Vector2 CachedRelativePosition { get; protected internal set; }
+        public Vector2 CachedSize { get; set; }
 
-        public virtual void Layout() {}
-        public virtual void Render(AssetManager assetManager, SpriteBatch batch) {}
+        public virtual void Layout() {
+            foreach (var element in Children) {
+                element.Layout();
+            }
+        }
+
+        public virtual void Render(Vector2 fromParent, AssetManager assetManager, SpriteBatch batch) {
+            foreach (var element in Children) {
+                element.Render(fromParent + element.CachedRelativePosition, assetManager, batch);
+            }
+        }
+
+        public void Add(Element element) {
+            Children.Add(element);
+        }
     }
 
     public class TextButton : Element {
@@ -40,14 +53,19 @@ namespace HexMage.GUI.UI {
         }
 
         public override void Layout() {
-            CachedSize = Font.MeasureString(Text);
+            CachedSize = Font.MeasureString(Text) + new Vector2(4);
         }
 
-        public override void Render(AssetManager assetManager, SpriteBatch batch) {
-            batch.DrawString(Font, Text, Vector2.Zero, Color.Black);
-            foreach (var element in Children) {
-                // TODO - recursively render children using composed transformation matrix
-            }
+        public override void Render(Vector2 fromParent, AssetManager assetManager, SpriteBatch batch) {
+            var tex = assetManager[AssetManager.GrayTexture];
+
+            Rectangle rectBg = new Rectangle(fromParent.ToPoint(), CachedSize.ToPoint());
+            Rectangle rectShadow = rectBg;
+            rectShadow.Offset(2, 2);
+            
+            batch.Draw(tex, rectShadow, Color.Gray);
+            batch.Draw(tex, rectBg, Color.White);
+            batch.DrawString(Font, Text, fromParent + new Vector2(2), Color.Black);
         }
     }
 
@@ -64,10 +82,8 @@ namespace HexMage.GUI.UI {
             CachedSize = Font.MeasureString(Text);
         }
 
-        public override void Render(AssetManager assetManager, SpriteBatch batch) {
-            batch.Draw(assetManager[AssetManager.GrayTexture], new Rectangle(Point.Zero, CachedSize.ToPoint()),
-                       Color.Gray);
-            batch.DrawString(Font, Text, Vector2.Zero, Color.Black);
+        public override void Render(Vector2 fromParent, AssetManager assetManager, SpriteBatch batch) {
+            batch.DrawString(Font, Text, fromParent, Color.Black);
         }
     }
 
@@ -76,15 +92,32 @@ namespace HexMage.GUI.UI {
             float offset = 0;
             float maxWidth = 0;
 
-            foreach (var child in Children) {
-                child.Layout();
+            foreach (var element in Children) {
+                element.Layout();
 
-                child.CachedPosition = new Vector2(0, offset);
-                offset += child.CachedSize.Y;
-                maxWidth = Math.Max(maxWidth, child.CachedSize.X);
+                element.CachedRelativePosition = new Vector2(0, offset);
+                offset += element.CachedSize.Y;
+                maxWidth = Math.Max(maxWidth, element.CachedSize.X);
             }
 
             CachedSize = new Vector2(maxWidth, Children.Sum(x => x.CachedSize.Y));
+        }
+    }
+
+    public class HorizontalLayout : Element {
+        public override void Layout() {
+            float offset = 0;
+            float maxHeight = 0;
+
+            foreach (var element in Children) {
+                element.Layout();
+
+                element.CachedRelativePosition = new Vector2(offset, 0);
+                offset += element.CachedSize.X;
+                maxHeight = Math.Max(maxHeight, element.CachedSize.Y);
+            }
+
+            CachedSize = new Vector2(maxHeight, Children.Sum(x => x.CachedSize.X));
         }
     }
 

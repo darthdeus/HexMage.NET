@@ -7,12 +7,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace HexMage.GUI
-{
-    public class ImGui
-    {
-        class TextRectangle
-        {
+namespace HexMage.GUI {
+    public class ImGui {
+        class TextRectangle {
             public string Text { get; set; }
             public Rectangle AABB { get; set; }
 
@@ -24,7 +21,6 @@ namespace HexMage.GUI
             public bool Contains(Point point) {
                 return AABB.Contains(point);
             }
-
         }
 
         // TODO - don't reallocate everything on a new frame
@@ -46,7 +42,7 @@ namespace HexMage.GUI
         public bool Button(string text, Point pos) {
             var button = new TextRectangle(text, _font, pos);
             _buttons.Add(button);
-            
+
             return button.Contains(_inputManager.MousePosition) && _inputManager.JustLeftClickReleased();
         }
 
@@ -62,9 +58,9 @@ namespace HexMage.GUI
             }
 
             foreach (var button in _buttons) {
-                 Point bgSize = button.AABB.Size;
+                Point bgSize = button.AABB.Size;
                 bgSize += new Point(4, 4);
-                Rectangle bgRect = new Rectangle(button.AABB.Location,  bgSize);
+                Rectangle bgRect = new Rectangle(button.AABB.Location, bgSize);
                 Rectangle shadowRect = bgRect;
                 shadowRect.Offset(2, 2);
 
@@ -88,7 +84,6 @@ namespace HexMage.GUI
                 spriteBatch.DrawString(_font, button.Text, textPos.ToVector2(), Color.Black);
             }
 
-            
 
             spriteBatch.End();
         }
