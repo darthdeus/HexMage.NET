@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -23,7 +20,7 @@ namespace HexMage.GUI {
 
         public Entity Parent { get; set; }
         public List<Entity> Children { get; } = new List<Entity>();
-        private List<Component> Components { get; } = new List<Component>();
+        protected List<Component> Components { get; } = new List<Component>();
 
         public T GetComponent<T>() where T : Component {
             return (T) Components.FirstOrDefault(c => c is T);
@@ -51,7 +48,7 @@ namespace HexMage.GUI {
     }
 
     public class SpriteRenderer : RenderableComponent {
-        private Texture2D _tex;
+        private readonly Texture2D _tex;
 
         public SpriteRenderer(Texture2D tex) {
             _tex = tex;
@@ -60,6 +57,9 @@ namespace HexMage.GUI {
         public override void Render(SpriteBatch batch) {
             Debug.Assert(Entity != null);
             batch.Draw(_tex, Entity.RenderPosition);
+        }
+
+        public override void Update() {
         }
     }
 }

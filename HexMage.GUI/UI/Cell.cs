@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI.UI {
-    public interface ILayoutInfo {}
+    public interface ILayoutInfo {
+    }
 
     public enum AlignmentOptions {
         Left,
@@ -16,41 +14,43 @@ namespace HexMage.GUI.UI {
         Center
     }
 
-    public class Element {
-        protected readonly List<Element> Children = new List<Element>();
+    public class Element : Entity {
+        public AlignmentOptions Alignment;
+
+        public List<Element> ChildElements = new List<Element>();
         //public ILayoutInfo LayoutInfo;
         public bool FillParent;
-        public AlignmentOptions Alignment;
         public Vector4 Padding;
 
         public Vector2 CachedRelativePosition { get; protected internal set; }
         public Vector2 CachedSize { get; set; }
 
         public virtual void Layout() {
-            foreach (var element in Children) {
+            foreach (var element in ChildElements) {
                 element.Layout();
             }
         }
 
-        public virtual void Render(Vector2 fromParent, AssetManager assetManager, SpriteBatch batch) {
-            foreach (var element in Children) {
-                element.Render(fromParent + element.CachedRelativePosition, assetManager, batch);
-            }
-        }
+        //public virtual void Render(Vector2 fromParent, AssetManager assetManager, SpriteBatch batch) {
+        //    foreach (var element in ChildElements) {
+        //        element.Render(fromParent + element.CachedRelativePosition, assetManager, batch);
+        //    }
+        //}
 
         public void Add(Element element) {
             Children.Add(element);
+            ChildElements.Add(element);
         }
     }
 
     public class TextButton : Element {
-        public string Text { get; set; }
-        public SpriteFont Font { get; set; }
-
         public TextButton(string text, SpriteFont font) {
             Text = text;
             Font = font;
         }
+
+        public string Text { get; set; }
+        public SpriteFont Font { get; set; }
 
         public override void Layout() {
             CachedSize = Font.MeasureString(Text) + new Vector2(4);
@@ -59,10 +59,10 @@ namespace HexMage.GUI.UI {
         public override void Render(Vector2 fromParent, AssetManager assetManager, SpriteBatch batch) {
             var tex = assetManager[AssetManager.GrayTexture];
 
-            Rectangle rectBg = new Rectangle(fromParent.ToPoint(), CachedSize.ToPoint());
-            Rectangle rectShadow = rectBg;
+            var rectBg = new Rectangle(fromParent.ToPoint(), CachedSize.ToPoint());
+            var rectShadow = rectBg;
             rectShadow.Offset(2, 2);
-            
+
             batch.Draw(tex, rectShadow, Color.Gray);
             batch.Draw(tex, rectBg, Color.White);
             batch.DrawString(Font, Text, fromParent + new Vector2(2), Color.Black);
@@ -70,13 +70,13 @@ namespace HexMage.GUI.UI {
     }
 
     public class Label : Element {
-        public string Text { get; set; }
-        public SpriteFont Font { get; set; }
-
         public Label(string text, SpriteFont font) {
             Text = text;
             Font = font;
         }
+
+        public string Text { get; set; }
+        public SpriteFont Font { get; set; }
 
         public override void Layout() {
             CachedSize = Font.MeasureString(Text);
@@ -92,7 +92,7 @@ namespace HexMage.GUI.UI {
             float offset = 0;
             float maxWidth = 0;
 
-            foreach (var element in Children) {
+            foreach (var element in ChildElements) {
                 element.Layout();
 
                 element.CachedRelativePosition = new Vector2(0, offset);
@@ -100,7 +100,7 @@ namespace HexMage.GUI.UI {
                 maxWidth = Math.Max(maxWidth, element.CachedSize.X);
             }
 
-            CachedSize = new Vector2(maxWidth, Children.Sum(x => x.CachedSize.Y));
+            CachedSize = new Vector2(maxWidth, ChildElements.Sum(x => x.CachedSize.Y));
         }
     }
 
@@ -109,7 +109,7 @@ namespace HexMage.GUI.UI {
             float offset = 0;
             float maxHeight = 0;
 
-            foreach (var element in Children) {
+            foreach (var element in ChildElements) {
                 element.Layout();
 
                 element.CachedRelativePosition = new Vector2(offset, 0);
@@ -117,7 +117,7 @@ namespace HexMage.GUI.UI {
                 maxHeight = Math.Max(maxHeight, element.CachedSize.Y);
             }
 
-            CachedSize = new Vector2(maxHeight, Children.Sum(x => x.CachedSize.X));
+            CachedSize = new Vector2(maxHeight, ChildElements.Sum(x => x.CachedSize.X));
         }
     }
 
