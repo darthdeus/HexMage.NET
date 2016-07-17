@@ -32,7 +32,7 @@ namespace HexMage.GUI
 
         public override void Cleanup() {}
 
-        public override Either<GameScene, SceneUpdateResult> Update(GameTime gameTime) {
+        public override SceneUpdateResult Update(GameTime gameTime, ref GameScene newScene) {
             if (_inputManager.JustRightClicked()) {
                 var mouseHex = _camera.MouseHex;
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
@@ -48,7 +48,7 @@ namespace HexMage.GUI
                 _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
             }
 
-            return Either<GameScene, SceneUpdateResult>.Right(SceneUpdateResult.Continue);
+            return SceneUpdateResult.Continue;
         }
 
         public override void Draw(GameTime gameTime) {

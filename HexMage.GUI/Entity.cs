@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -9,9 +10,8 @@ namespace HexMage.GUI {
         public Entity Entity { get; set; }
     }
 
-    public abstract class RenderableComponent : Component {
-        public abstract void Render(SpriteBatch batch);
-        public abstract void Update();
+    public interface IRenderer {
+        void Render(Entity entity, SpriteBatch batch, AssetManager assetManager);
     }
 
     public class Entity {
@@ -21,6 +21,7 @@ namespace HexMage.GUI {
         public Entity Parent { get; set; }
         public List<Entity> Children { get; } = new List<Entity>();
         protected List<Component> Components { get; } = new List<Component>();
+        public IRenderer Renderer { get; set; }
 
         public T GetComponent<T>() where T : Component {
             return (T) Components.FirstOrDefault(c => c is T);
@@ -36,30 +37,33 @@ namespace HexMage.GUI {
             entity.Parent = this;
         }
 
-        public void Render(SpriteBatch batch) {
-            RenderPosition = Position + (Parent?.Position ?? Vector2.Zero);
+        public void Render(SpriteBatch batch, AssetManager assetManager) {
+            RenderPosition = Position + (Parent?.RenderPosition ?? Vector2.Zero);
 
-            GetComponent<RenderableComponent>()?.Render(batch);
+            Renderer?.Render(this, batch, assetManager);
 
             foreach (var entity in Children) {
-                entity.Render(batch);
+                entity.Render(batch, assetManager);
             }
+        }
+
+        public Entity CreateChild() {
+            var entity = new Entity();
+            AddChild(entity);
+            return entity;
         }
     }
 
-    public class SpriteRenderer : RenderableComponent {
+    public class SpriteRenderer : IRenderer {
         private readonly Texture2D _tex;
 
         public SpriteRenderer(Texture2D tex) {
             _tex = tex;
         }
 
-        public override void Render(SpriteBatch batch) {
-            Debug.Assert(Entity != null);
-            batch.Draw(_tex, Entity.RenderPosition);
+        public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
+            batch.Draw(_tex, entity.RenderPosition);
         }
 
-        public override void Update() {
-        }
     }
 }

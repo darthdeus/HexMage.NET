@@ -18,16 +18,24 @@ namespace HexMage.GUI
 
             var currentScene = _scenes.Peek();
 
-            var result = currentScene.Update(gameTime);
-            if (result.IsRight) {
-                if (result.RightValue == SceneUpdateResult.Terminate) {
+            GameScene newScene = null;
+
+            var result = currentScene.Update(gameTime, ref newScene);
+
+            switch (result) {
+                case SceneUpdateResult.Terminate:
                     currentScene.Cleanup();
                     _scenes.Pop();
-                }
-            } else {
-                var newScene = result.LeftValue;
-                newScene.Initialize();
-                _scenes.Push(newScene);
+                    break;
+
+                case SceneUpdateResult.NewScene:
+                    Debug.Assert(newScene != null);
+                    newScene.Initialize();
+                    _scenes.Push(newScene);
+                    break;
+
+                case SceneUpdateResult.Continue:
+                    break;
             }
         }
 

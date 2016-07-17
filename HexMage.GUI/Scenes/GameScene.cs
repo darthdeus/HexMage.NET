@@ -6,7 +6,8 @@ namespace HexMage.GUI
     public enum SceneUpdateResult
     {
         Terminate,
-        Continue
+        Continue,
+        NewScene
     }
 
     public abstract class GameScene
@@ -24,8 +25,8 @@ namespace HexMage.GUI
 
         public abstract void Initialize();
         public abstract void Cleanup();
-        public abstract Either<GameScene, SceneUpdateResult> Update(GameTime gameTime);
         public abstract void Draw(GameTime gameTime);
+        public abstract SceneUpdateResult Update(GameTime gameTime, ref GameScene newScene);
     }
 
     
