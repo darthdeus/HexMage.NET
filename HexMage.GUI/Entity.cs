@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace HexMage.GUI {
     public class Component {
         public Entity Entity { get; set; }
+        public virtual void Update(GameTime time) {}
     }
 
     public interface IRenderer {
@@ -44,6 +45,20 @@ namespace HexMage.GUI {
 
             foreach (var entity in Children) {
                 entity.Render(batch, assetManager);
+            }
+        }
+
+        protected virtual void Update(GameTime time) { }
+
+        public void UpdateEntity(GameTime time) {
+            foreach (var component in Components) {
+                component.Update(time);
+            }
+
+            Update(time);
+
+            foreach (var entity in Children) {
+                entity.UpdateEntity(time);
             }
         }
 

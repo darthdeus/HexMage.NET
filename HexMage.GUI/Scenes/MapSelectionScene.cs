@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using HexMage.GUI.UI;
 using Microsoft.Xna.Framework;
 
@@ -15,6 +16,8 @@ namespace HexMage.GUI {
             _rootElement.Position = new Vector2(50, 50);
 
             var btn1 = new TextButton("click!", _assetManager.Font);
+            btn1.OnClick += _ => Console.WriteLine("click");
+
             var lbl1 = new Label("label1", _assetManager.Font);
             var lbl2 = new Label("label2", _assetManager.Font);
             var btn2 = new TextButton("me!", _assetManager.Font);
@@ -36,6 +39,8 @@ namespace HexMage.GUI {
 
         public override SceneUpdateResult Update(GameTime gameTime, ref GameScene newScene) {
             _rootElement.Layout();
+            _rootElement.UpdateEntity(gameTime);
+
             if (_gui.Button("Start game", new Point(20, 20))) {
                 newScene = new ArenaScene(_gameManager);
                 return SceneUpdateResult.NewScene;

@@ -17,7 +17,7 @@ namespace HexMage.GUI
         private readonly Camera2D _camera;
         private SpriteBatch _spriteBatch;
 
-        private readonly InputManager _inputManager = new InputManager();
+        private readonly InputManager _inputManager = InputManager.Instance;
         private readonly AssetManager _assetManager;
         private GameManager _gameManager;
 

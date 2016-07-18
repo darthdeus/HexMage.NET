@@ -18,6 +18,7 @@ namespace HexMage.GUI
             _gameManager = gameManager;
         }
 
+        protected Entity _rootEntity;
         protected Camera2D _camera => _gameManager.Camera;
         protected InputManager _inputManager => _gameManager.InputManager;
         protected AssetManager _assetManager => _gameManager.AssetManager;

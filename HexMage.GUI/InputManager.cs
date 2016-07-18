@@ -4,8 +4,9 @@ using Microsoft.Xna.Framework.Input;
 
 namespace HexMage.GUI
 {
-    public class InputManager
-    {
+    public class InputManager {
+        public static readonly InputManager Instance = new InputManager();
+
         private MouseState _lastMouseState;
         private MouseState _currentMouseState;
 
