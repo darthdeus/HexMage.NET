@@ -48,7 +48,7 @@ namespace HexMage.GUI
                 TextureGenerator.SolidColor(GraphicsDevice, 32, 32, Color.LightGray));
 
             _gameManager = new GameManager(_camera, _inputManager, _assetManager, _spriteBatch);
-            _sceneManager = new SceneManager(new MapSelectionScene(_gameManager));
+            _sceneManager = new SceneManager(new ArenaScene(_gameManager));
         }
 
         protected override void Update(GameTime gameTime) {

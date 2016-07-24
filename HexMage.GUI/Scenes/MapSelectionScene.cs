@@ -38,7 +38,7 @@ namespace HexMage.GUI {
         public override void Cleanup() {}
 
         public override SceneUpdateResult Update(GameTime gameTime, ref GameScene newScene) {
-            _rootElement.Layout();
+            _rootElement.LayoutEntity();
             _rootElement.UpdateEntity(gameTime);
 
             if (_gui.Button("Start game", new Point(20, 20))) {

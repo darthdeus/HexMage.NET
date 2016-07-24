@@ -29,5 +29,9 @@ namespace HexMage.Simulator
 
             team.Mobs.Add(this);
         }
+
+        public override string ToString() {
+            return $"{HP}/{MaxHP} {AP}/{MaxAP}";
+        }
     }
 }

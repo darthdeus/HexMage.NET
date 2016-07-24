@@ -1,15 +1,15 @@
 using System;
+using HexMage.GUI.UI;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Color = Microsoft.Xna.Framework.Color;
 
-namespace HexMage.GUI
-{
-    internal class ArenaScene : GameScene
-    {
+namespace HexMage.GUI {
+    internal class ArenaScene : GameScene {
         private readonly GameInstance _gameInstance = new GameInstance(20);
+        private VerticalLayout _mobUI;
 
         public ArenaScene(GameManager gameManager) : base(gameManager) {
             var t1 = _gameInstance.MobManager.AddTeam();
@@ -18,7 +18,7 @@ namespace HexMage.GUI
             for (int team = 0; team < 2; team++) {
                 for (int mobI = 0; mobI < 5; mobI++) {
                     var mob = Generator.RandomMob(team%2 == 0 ? t1 : t2, _gameInstance.Size,
-                        c => _gameInstance.MobManager.AtCoord(c) == null);
+                                                  c => _gameInstance.MobManager.AtCoord(c) == null);
 
                     _gameInstance.MobManager.AddMob(mob);
                 }
@@ -28,7 +28,10 @@ namespace HexMage.GUI
         }
 
 
-        public override void Initialize() {}
+        public override void Initialize() {
+            BuildUI();
+            _rootEntity.InitializeEntity();
+        }
 
         public override void Cleanup() {}
 
@@ -48,6 +51,9 @@ namespace HexMage.GUI
                 _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
             }
 
+            _rootEntity.LayoutEntity();
+            _rootEntity.UpdateEntity(gameTime);
+
             return SceneUpdateResult.Continue;
         }
 
@@ -59,6 +65,10 @@ namespace HexMage.GUI
             var gui = new ImGui(_inputManager, _assetManager.Font);
 
             gui.Draw(_assetManager[AssetManager.GrayTexture], _spriteBatch);
+
+            _spriteBatch.Begin();
+            _rootEntity.Render(_spriteBatch, _assetManager);
+            _spriteBatch.End();
         }
 
 
@@ -93,8 +103,8 @@ namespace HexMage.GUI
             }
 
             _spriteBatch.DrawString(_assetManager.Font, $"{minX},{minY},{minZ}   {maxX},{maxY},{maxZ}",
-                new Vector2(0, 50),
-                Color.Red);
+                                    new Vector2(0, 50),
+                                    Color.Red);
             _spriteBatch.End();
         }
 
@@ -121,10 +131,11 @@ namespace HexMage.GUI
                 DrawAt(_assetManager[AssetManager.MobTexture], mob.Coord);
                 var location = _camera.HexToPixel(mob.Coord).ToPoint() + new Point(27, 4);
 
-                double hpPercent = (double)mob.HP/mob.MaxHP;
+                double hpPercent = (double) mob.HP/mob.MaxHP;
                 int healthbarHeight = 20;
                 _spriteBatch.Draw(gray, new Rectangle(location, new Point(5, healthbarHeight)), Color.DarkGreen);
-                _spriteBatch.Draw(gray, new Rectangle(location, new Point(5, (int) (healthbarHeight * hpPercent))), Color.Yellow);
+                _spriteBatch.Draw(gray, new Rectangle(location, new Point(5, (int) (healthbarHeight*hpPercent))),
+                                  Color.Yellow);
             }
             _spriteBatch.End();
         }
@@ -134,7 +145,7 @@ namespace HexMage.GUI
             var mouseTextPos = new Vector2(0, 850);
 
             var mousePos = Vector2.Transform(_inputManager.MousePosition.ToVector2(),
-                Matrix.Invert(_camera.Projection));
+                                             Matrix.Invert(_camera.Projection));
 
             string str = $"{mousePos} - {_camera.MouseHex}";
             _spriteBatch.DrawString(_assetManager.Font, str, mouseTextPos, Color.Black);
@@ -147,6 +158,68 @@ namespace HexMage.GUI
 
         private void DrawAt(Texture2D texture, AxialCoord coord, Color color) {
             _spriteBatch.Draw(texture, _camera.HexToPixel(coord), color);
+        }
+
+        private void BuildUI() {
+            var layout = new HorizontalLayout();
+            _rootEntity = layout;
+
+            foreach (var mob in _gameInstance.MobManager.Teams[0].Mobs) {
+                var mobDetail = new VerticalLayout();
+
+                var label = new TextButton(mob.ToString(), _assetManager.Font);
+                var prd = new TextButton("prd", _assetManager.Font);
+                mobDetail.AddChild(label);
+                mobDetail.AddChild(prd);
+
+                var panel = new Panel();
+
+                panel.AddChild(new Label("^", _assetManager.Font));
+                panel.AddChild(new Label("->", _assetManager.Font) {Position = new Vector2(50, 0)});
+                panel.AddChild(new Label("V", _assetManager.Font) {Position = new Vector2(0, 50)});
+
+                mobDetail.AddChild(panel);
+
+                _rootEntity.AddChild(mobDetail);
+            }
+
+            foreach (var mob in _gameInstance.MobManager.Teams[0].Mobs) {
+                var mobDetail = new VerticalLayout();
+                mobDetail.Renderer = new ColorRenderer(Color.LightCyan);
+                mobDetail.AddComponent(new ColorChanger(Color.DarkCyan));
+
+                mobDetail.Position = new Vector2(0, 400);
+
+                mobDetail.AddChild(new SpriteElement(_assetManager[AssetManager.MobTexture]));
+                mobDetail.AddChild(new Label($"HP: {mob.HP}/{mob.MaxHP}", _assetManager.Font));
+                mobDetail.AddChild(new Label($"AP: {mob.AP}/{mob.MaxAP}", _assetManager.Font));
+
+                _rootEntity.AddChild(mobDetail);
+            }
+        }
+    }
+
+    public class ColorChanger : Component {
+        private readonly Color _hoverColor;
+        private ColorRenderer _renderer;
+        private Color _origColor;
+
+        public ColorChanger(Color hoverColor) {
+            _hoverColor = hoverColor;
+        }
+
+        public override void Initialize() {
+            _renderer = (ColorRenderer)Entity.Renderer;
+            _origColor = _renderer.Color;
+        }
+
+        public override void Update(GameTime time) {
+
+            if (Entity.AABB.Contains(InputManager.Instance.MousePosition)) {
+                _renderer.Color = _hoverColor;
+            } else {
+                _renderer.Color = _origColor;
+            }
         }
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace HexMage.GUI {
     public class Component {
         public Entity Entity { get; set; }
+        public virtual void Initialize() {}
         public virtual void Update(GameTime time) {}
     }
 
@@ -18,6 +19,7 @@ namespace HexMage.GUI {
     public class Entity {
         public Vector2 Position { get; set; }
         public Vector2 RenderPosition { get; set; }
+        public Rectangle AABB => new Rectangle(RenderPosition.ToPoint(), CachedSize.ToPoint());
 
         public Entity Parent { get; set; }
         public List<Entity> Children { get; } = new List<Entity>();
@@ -34,21 +36,41 @@ namespace HexMage.GUI {
         }
 
         public void AddChild(Entity entity) {
+            Debug.Assert(entity != this);
             Children.Add(entity);
             entity.Parent = this;
         }
 
-        public void Render(SpriteBatch batch, AssetManager assetManager) {
-            RenderPosition = Position + (Parent?.RenderPosition ?? Vector2.Zero);
 
-            Renderer?.Render(this, batch, assetManager);
+        public Vector2 CachedSize { get; set; }
+
+        public void InitializeEntity() {
+            foreach (var component in Components) {
+                component.Initialize();
+            }
+
+            Initialize();
 
             foreach (var entity in Children) {
-                entity.Render(batch, assetManager);
+                entity.InitializeEntity();
             }
         }
 
-        protected virtual void Update(GameTime time) { }
+        public void Initialize() {}
+
+        public void LayoutEntity() {
+            foreach (var entity in Children) {
+                entity.LayoutEntity();
+            }
+
+            Layout();
+        }
+
+        protected virtual void Layout() {
+            CachedSize = Children.LastOrDefault()?.CachedSize ?? Vector2.Zero;
+        }
+
+        protected virtual void Update(GameTime time) {}
 
         public void UpdateEntity(GameTime time) {
             foreach (var component in Components) {
@@ -62,6 +84,17 @@ namespace HexMage.GUI {
             }
         }
 
+        public void Render(SpriteBatch batch, AssetManager assetManager) {
+            RenderPosition = Position + (Parent?.RenderPosition ?? Vector2.Zero);
+
+            Renderer?.Render(this, batch, assetManager);
+
+            foreach (var entity in Children) {
+                entity.Render(batch, assetManager);
+            }
+        }
+
+
         public Entity CreateChild() {
             var entity = new Entity();
             AddChild(entity);
@@ -70,15 +103,14 @@ namespace HexMage.GUI {
     }
 
     public class SpriteRenderer : IRenderer {
-        private readonly Texture2D _tex;
+        public readonly Texture2D Tex;
 
         public SpriteRenderer(Texture2D tex) {
-            _tex = tex;
+            Tex = tex;
         }
 
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
-            batch.Draw(_tex, entity.RenderPosition);
+            batch.Draw(Tex, entity.RenderPosition);
         }
-
     }
 }
