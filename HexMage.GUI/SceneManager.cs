@@ -9,6 +9,7 @@ namespace HexMage.GUI {
         public SceneManager(GameScene initialScene) {
             _scenes.Push(initialScene);
             initialScene.Initialize();
+            initialScene.InitializeRootEntities();
         }
 
         public void Update(GameTime gameTime) {
@@ -37,9 +38,9 @@ namespace HexMage.GUI {
             }
         }
 
-        public void Draw(GameTime gameTime) {
+        public void Render(GameTime gameTime) {
             Debug.Assert(_scenes.Count > 0);
-            _scenes.Peek().Draw(gameTime);
+            _scenes.Peek().Render(gameTime);
         }
     }
 }

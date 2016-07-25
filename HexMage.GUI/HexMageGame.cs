@@ -68,7 +68,7 @@ namespace HexMage.GUI
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            _sceneManager.Draw(gameTime);
+            _sceneManager.Render(gameTime);
 
             base.Draw(gameTime);
         }

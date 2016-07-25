@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using HexMage.GUI.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -17,14 +18,25 @@ namespace HexMage.GUI {
     }
 
     public class Entity {
+        // TODO - remove this
+        [Obsolete]
+        public ElementMouseState MouseState;
         public Vector2 Position { get; set; }
         public Vector2 RenderPosition { get; set; }
         public Rectangle AABB => new Rectangle(RenderPosition.ToPoint(), CachedSize.ToPoint());
+
+        public bool Active = true;
+
+        public Vector4 Padding;
+        public Vector2 PaddingOffset => new Vector2(Padding.W, Padding.X);
+        public Vector2 PaddingSizeIncrease => new Vector2(Padding.Y + Padding.W, Padding.X + Padding.Z);
 
         public Entity Parent { get; set; }
         public List<Entity> Children { get; } = new List<Entity>();
         protected List<Component> Components { get; } = new List<Component>();
         public IRenderer Renderer { get; set; }
+
+        public IEnumerable<Entity> ActiveChildren => Children.Where(x => x.Active);
 
         public T GetComponent<T>() where T : Component {
             return (T) Components.FirstOrDefault(c => c is T);
@@ -40,7 +52,6 @@ namespace HexMage.GUI {
             Children.Add(entity);
             entity.Parent = this;
         }
-
 
         public Vector2 CachedSize { get; set; }
 
@@ -59,7 +70,7 @@ namespace HexMage.GUI {
         public void Initialize() {}
 
         public void LayoutEntity() {
-            foreach (var entity in Children) {
+            foreach (var entity in ActiveChildren) {
                 entity.LayoutEntity();
             }
 
@@ -68,6 +79,7 @@ namespace HexMage.GUI {
 
         protected virtual void Layout() {
             CachedSize = Children.LastOrDefault()?.CachedSize ?? Vector2.Zero;
+            CachedSize += PaddingSizeIncrease;
         }
 
         protected virtual void Update(GameTime time) {}
@@ -79,17 +91,18 @@ namespace HexMage.GUI {
 
             Update(time);
 
-            foreach (var entity in Children) {
+            foreach (var entity in ActiveChildren) {
                 entity.UpdateEntity(time);
             }
         }
 
         public void Render(SpriteBatch batch, AssetManager assetManager) {
-            RenderPosition = Position + (Parent?.RenderPosition ?? Vector2.Zero);
+            RenderPosition = Position
+                             + (Parent?.RenderPosition ?? Vector2.Zero);
 
             Renderer?.Render(this, batch, assetManager);
 
-            foreach (var entity in Children) {
+            foreach (var entity in ActiveChildren) {
                 entity.Render(batch, assetManager);
             }
         }

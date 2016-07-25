@@ -30,46 +30,42 @@ namespace HexMage.GUI {
 
         public override void Initialize() {
             BuildUI();
-            _rootEntity.InitializeEntity();
         }
 
         public override void Cleanup() {}
 
-        public override SceneUpdateResult Update(GameTime gameTime, ref GameScene newScene) {
-            if (_inputManager.JustRightClicked()) {
-                var mouseHex = _camera.MouseHex;
-                if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                    _gameInstance.Map.Toogle(mouseHex);
+        // TODO - remove this later when hex map is implemented using a component
+        //public override SceneUpdateResult Update(GameTime gameTime, ref GameScene newScene) {
+        //    if (_inputManager.JustRightClicked()) {
+        //        var mouseHex = _camera.MouseHex;
+        //        if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
+        //            _gameInstance.Map.Toogle(mouseHex);
 
-                    // TODO - pathfindovani ze zdi najde cesty
-                    _gameInstance.Pathfinder.PathfindFrom(new AxialCoord(0, 0));
-                }
-            }
+        //            // TODO - pathfindovani ze zdi najde cesty
+        //            _gameInstance.Pathfinder.PathfindFrom(new AxialCoord(0, 0));
+        //        }
+        //    }
 
-            if (_inputManager.IsKeyJustPressed(Keys.Space)) {
-                _gameInstance.TurnManager.NextMobOrNewTurn();
-                _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
-            }
+        //    if (_inputManager.IsKeyJustPressed(Keys.Space)) {
+        //        _gameInstance.TurnManager.NextMobOrNewTurn();
+        //        _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
+        //    }
 
-            _rootEntity.LayoutEntity();
-            _rootEntity.UpdateEntity(gameTime);
+        //    _rootEntity.LayoutEntity();
+        //    _rootEntity.UpdateEntity(gameTime);
 
-            return SceneUpdateResult.Continue;
-        }
+        //    return SceneUpdateResult.Continue;
+        //}
 
-        public override void Draw(GameTime gameTime) {
-            DrawBackground();
-            DrawAllMobs();
-            DrawHoverPath();
-            DrawMousePosition();
-            var gui = new ImGui(_inputManager, _assetManager.Font);
+        //public override void Render(GameTime gameTime) {
+        //    DrawBackground();
+        //    DrawAllMobs();
+        //    DrawHoverPath();
+        //    DrawMousePosition();
+        //    var gui = new ImGui(_inputManager, _assetManager.Font);
 
-            gui.Draw(_assetManager[AssetManager.GrayTexture], _spriteBatch);
-
-            _spriteBatch.Begin();
-            _rootEntity.Render(_spriteBatch, _assetManager);
-            _spriteBatch.End();
-        }
+        //    gui.Draw(_assetManager[AssetManager.GrayTexture], _spriteBatch);
+        //}
 
 
         private void DrawBackground() {
@@ -162,63 +158,40 @@ namespace HexMage.GUI {
 
         private void BuildUI() {
             var layout = new HorizontalLayout();
-            _rootEntity = layout;
+            _rootEntities.Add(layout);
 
             foreach (var mob in _gameInstance.MobManager.Teams[0].Mobs) {
-                var mobDetail = new VerticalLayout();
-
-                var label = new TextButton(mob.ToString(), _assetManager.Font);
-                var prd = new TextButton("prd", _assetManager.Font);
-                mobDetail.AddChild(label);
-                mobDetail.AddChild(prd);
-
-                var panel = new Panel();
-
-                panel.AddChild(new Label("^", _assetManager.Font));
-                panel.AddChild(new Label("->", _assetManager.Font) {Position = new Vector2(50, 0)});
-                panel.AddChild(new Label("V", _assetManager.Font) {Position = new Vector2(0, 50)});
-
-                mobDetail.AddChild(panel);
-
-                _rootEntity.AddChild(mobDetail);
-            }
-
-            foreach (var mob in _gameInstance.MobManager.Teams[0].Mobs) {
-                var mobDetail = new VerticalLayout();
+                var mobDetail = new VerticalLayout() {
+                    Padding = new Vector4(10, 10, 10, 10)
+                };
                 mobDetail.Renderer = new ColorRenderer(Color.LightCyan);
                 mobDetail.AddComponent(new ColorChanger(Color.DarkCyan));
 
                 mobDetail.Position = new Vector2(0, 400);
 
                 mobDetail.AddChild(new SpriteElement(_assetManager[AssetManager.MobTexture]));
-                mobDetail.AddChild(new Label($"HP: {mob.HP}/{mob.MaxHP}", _assetManager.Font));
-                mobDetail.AddChild(new Label($"AP: {mob.AP}/{mob.MaxAP}", _assetManager.Font));
 
-                _rootEntity.AddChild(mobDetail);
-            }
-        }
-    }
+                var hpBg = mobDetail.CreateChild();
+                hpBg.Renderer = new ColorRenderer(Color.DarkRed);
+                hpBg.AddComponent(new ColorChanger(Color.Red));
 
-    public class ColorChanger : Component {
-        private readonly Color _hoverColor;
-        private ColorRenderer _renderer;
-        private Color _origColor;
+                hpBg.AddChild(new Label($"HP: {mob.HP}/{mob.MaxHP}", _assetManager.Font) {
+                    TextColor = Color.White
+                });
+                mobDetail.AddChild(hpBg);
 
-        public ColorChanger(Color hoverColor) {
-            _hoverColor = hoverColor;
-        }
+                var apBg = mobDetail.CreateChild();
+                apBg.Renderer = new ColorRenderer(Color.DarkBlue);
+                apBg.AddComponent(new ColorChanger(Color.Blue));
 
-        public override void Initialize() {
-            _renderer = (ColorRenderer)Entity.Renderer;
-            _origColor = _renderer.Color;
-        }
+                apBg.AddChild(new Label($"AP: {mob.AP}/{mob.MaxAP}", _assetManager.Font) {
+                    TextColor = Color.White
+                });
+                mobDetail.AddChild(apBg);
 
-        public override void Update(GameTime time) {
+                mobDetail.AddChild(new TextButton("Kill me", _assetManager.Font));
 
-            if (Entity.AABB.Contains(InputManager.Instance.MousePosition)) {
-                _renderer.Color = _hoverColor;
-            } else {
-                _renderer.Color = _origColor;
+                layout.AddChild(mobDetail);
             }
         }
     }
