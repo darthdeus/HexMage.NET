@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -7,6 +8,8 @@ namespace HexMage.GUI
 {
     public class Camera2D
     {
+        public static Camera2D Instance;
+
         private readonly InputManager _inputManager;
         private const float ScrollAmount = 0.03f;
         private const float TranslateAmount = 10;
@@ -16,6 +19,10 @@ namespace HexMage.GUI
 
         public Camera2D(InputManager inputManager) {
             _inputManager = inputManager;
+
+            // TODO - change this into a proper singleton later
+            Debug.Assert(Instance == null);
+            Instance = this;
         }
 
         public void Update(GameTime gameTime) {

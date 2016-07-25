@@ -1,4 +1,6 @@
 using System;
+using HexMage.GUI.Components;
+using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
@@ -29,135 +31,20 @@ namespace HexMage.GUI {
 
 
         public override void Initialize() {
-            BuildUI();
+            var gameBoardEntity = CreateRootEntity();
+            gameBoardEntity.AddComponent(new GameBoardController(_gameInstance));
+            gameBoardEntity.Renderer = new GameBoardRenderer(_gameInstance, _camera);
+            gameBoardEntity.SortOrder = 1;
+
+            var uiEntity = BuildUI();
+            uiEntity.SortOrder = 2;
         }
 
         public override void Cleanup() {}
 
-        // TODO - remove this later when hex map is implemented using a component
-        //public override SceneUpdateResult Update(GameTime gameTime, ref GameScene newScene) {
-        //    if (_inputManager.JustRightClicked()) {
-        //        var mouseHex = _camera.MouseHex;
-        //        if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-        //            _gameInstance.Map.Toogle(mouseHex);
-
-        //            // TODO - pathfindovani ze zdi najde cesty
-        //            _gameInstance.Pathfinder.PathfindFrom(new AxialCoord(0, 0));
-        //        }
-        //    }
-
-        //    if (_inputManager.IsKeyJustPressed(Keys.Space)) {
-        //        _gameInstance.TurnManager.NextMobOrNewTurn();
-        //        _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
-        //    }
-
-        //    _rootEntity.LayoutEntity();
-        //    _rootEntity.UpdateEntity(gameTime);
-
-        //    return SceneUpdateResult.Continue;
-        //}
-
-        //public override void Render(GameTime gameTime) {
-        //    DrawBackground();
-        //    DrawAllMobs();
-        //    DrawHoverPath();
-        //    DrawMousePosition();
-        //    var gui = new ImGui(_inputManager, _assetManager.Font);
-
-        //    gui.Draw(_assetManager[AssetManager.GrayTexture], _spriteBatch);
-        //}
-
-
-        private void DrawBackground() {
-            _spriteBatch.Begin(transformMatrix: _camera.Projection);
-
-            int maxX = Int32.MinValue;
-            int maxY = Int32.MinValue;
-            int maxZ = Int32.MinValue;
-
-            int minX = Int32.MaxValue;
-            int minY = Int32.MaxValue;
-            int minZ = Int32.MaxValue;
-
-            var hexGreen = _assetManager[AssetManager.EmptyHexTexture];
-            var hexWall = _assetManager[AssetManager.WallTexture];
-
-            foreach (var coord in _gameInstance.Map.AllCoords) {
-                maxX = Math.Max(maxX, coord.ToCube().X);
-                maxY = Math.Max(maxY, coord.ToCube().Y);
-                maxZ = Math.Max(maxZ, coord.ToCube().Z);
-
-                minX = Math.Min(minX, coord.ToCube().X);
-                minY = Math.Min(minY, coord.ToCube().Y);
-                minZ = Math.Min(minZ, coord.ToCube().Z);
-
-                if (_gameInstance.Map[coord] == HexType.Empty) {
-                    DrawAt(hexGreen, coord);
-                } else {
-                    DrawAt(hexWall, coord);
-                }
-            }
-
-            _spriteBatch.DrawString(_assetManager.Font, $"{minX},{minY},{minZ}   {maxX},{maxY},{maxZ}",
-                                    new Vector2(0, 50),
-                                    Color.Red);
-            _spriteBatch.End();
-        }
-
-        private void DrawHoverPath() {
-            _spriteBatch.Begin(transformMatrix: _camera.Projection);
-
-            var hexPath = _assetManager[AssetManager.PathTexture];
-
-            if (_gameInstance.Pathfinder.IsValidCoord(_camera.MouseHex)) {
-                var path = _gameInstance.Pathfinder.PathTo(_camera.MouseHex);
-
-                foreach (var coord in path) {
-                    DrawAt(hexPath, coord);
-                }
-            }
-            _spriteBatch.End();
-        }
-
-        private void DrawAllMobs() {
-            var gray = _assetManager[AssetManager.GrayTexture];
-
-            _spriteBatch.Begin(transformMatrix: _camera.Projection);
-            foreach (var mob in _gameInstance.MobManager.Mobs) {
-                DrawAt(_assetManager[AssetManager.MobTexture], mob.Coord);
-                var location = _camera.HexToPixel(mob.Coord).ToPoint() + new Point(27, 4);
-
-                double hpPercent = (double) mob.HP/mob.MaxHP;
-                int healthbarHeight = 20;
-                _spriteBatch.Draw(gray, new Rectangle(location, new Point(5, healthbarHeight)), Color.DarkGreen);
-                _spriteBatch.Draw(gray, new Rectangle(location, new Point(5, (int) (healthbarHeight*hpPercent))),
-                                  Color.Yellow);
-            }
-            _spriteBatch.End();
-        }
-
-        private void DrawMousePosition() {
-            _spriteBatch.Begin();
-            var mouseTextPos = new Vector2(0, 850);
-
-            var mousePos = Vector2.Transform(_inputManager.MousePosition.ToVector2(),
-                                             Matrix.Invert(_camera.Projection));
-
-            string str = $"{mousePos} - {_camera.MouseHex}";
-            _spriteBatch.DrawString(_assetManager.Font, str, mouseTextPos, Color.Black);
-            _spriteBatch.End();
-        }
-
-        private void DrawAt(Texture2D texture, AxialCoord coord) {
-            _spriteBatch.Draw(texture, _camera.HexToPixel(coord));
-        }
-
-        private void DrawAt(Texture2D texture, AxialCoord coord, Color color) {
-            _spriteBatch.Draw(texture, _camera.HexToPixel(coord), color);
-        }
-
-        private void BuildUI() {
+        private Entity BuildUI() {
             var layout = new HorizontalLayout();
+            layout.Position = new Vector2(0, 850);
             _rootEntities.Add(layout);
 
             foreach (var mob in _gameInstance.MobManager.Teams[0].Mobs) {
@@ -193,6 +80,8 @@ namespace HexMage.GUI {
 
                 layout.AddChild(mobDetail);
             }
+
+            return layout;
         }
     }
 }

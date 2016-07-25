@@ -1,18 +1,16 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace HexMage.GUI
-{
-    public enum SceneUpdateResult
-    {
+namespace HexMage.GUI {
+    public enum SceneUpdateResult {
         Terminate,
         Continue,
         NewScene
     }
 
-    public abstract class GameScene
-    {
+    public abstract class GameScene {
         protected readonly GameManager _gameManager;
         protected readonly List<Entity> _rootEntities = new List<Entity>();
         protected Camera2D _camera => _gameManager.Camera;
@@ -47,10 +45,13 @@ namespace HexMage.GUI
         }
 
         public void RenderRootEntities() {
+            // TODO - remove this and force all renderers to batch themselves
             _spriteBatch.Begin();
-            foreach (var entity in _rootEntities) {
+
+            foreach (var entity in _rootEntities.OrderBy(x => x.SortOrder)) {
                 entity.Render(_spriteBatch, _assetManager);
             }
+
             _spriteBatch.End();
         }
 
@@ -63,11 +64,13 @@ namespace HexMage.GUI
         public abstract void Cleanup();
 
         private GameScene _newScene = null;
+
         public void LoadNewScene(GameScene scene) {
             _newScene = scene;
         }
 
         private bool _shouldTerminate = false;
+
         public void Terminate() {
             _shouldTerminate = true;
         }
@@ -83,7 +86,6 @@ namespace HexMage.GUI
             } else {
                 return SceneUpdateResult.Continue;
             }
-
         }
 
         public void Render(GameTime gameTime) {
@@ -91,6 +93,4 @@ namespace HexMage.GUI
             RenderRootEntities();
         }
     }
-
-    
 }

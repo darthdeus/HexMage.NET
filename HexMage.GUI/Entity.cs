@@ -18,6 +18,11 @@ namespace HexMage.GUI {
     }
 
     public class Entity {
+        public int SortOrder = 0;
+        // Setting this to true will cause the generic render lifecycle to not start
+        // a new batch when rendering this entity, but *only* if the entity is root.
+        public bool CustomBatchWhenRoot = false;
+
         // TODO - remove this
         [Obsolete]
         public ElementMouseState MouseState;
