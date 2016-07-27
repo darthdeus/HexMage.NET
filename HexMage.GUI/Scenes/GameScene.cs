@@ -48,7 +48,7 @@ namespace HexMage.GUI {
             // TODO - remove this and force all renderers to batch themselves
             _spriteBatch.Begin();
 
-            foreach (var entity in _rootEntities.OrderBy(x => x.SortOrder)) {
+            foreach (var entity in _rootEntities.OrderBy(x => x.SortOrder).Where(x => x.Active)) {
                 entity.Render(_spriteBatch, _assetManager);
             }
 

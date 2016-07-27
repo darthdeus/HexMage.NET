@@ -4,6 +4,8 @@ namespace HexMage.Simulator
 {
     public class Mob
     {
+        public static readonly int NumberOfAbilities = 6;
+
         private static int _lastId = 0;
         public int ID { get; set; }
 

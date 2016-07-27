@@ -2,10 +2,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace HexMage.Simulator
-{
-    public class GameInstance
-    {
+namespace HexMage.Simulator {
+    public class GameInstance {
         public Map Map { get; set; }
         public MobManager MobManager { get; set; }
         public Pathfinder Pathfinder { get; set; }
