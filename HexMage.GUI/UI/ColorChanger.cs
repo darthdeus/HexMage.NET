@@ -11,7 +11,7 @@ namespace HexMage.GUI {
             _hoverColor = hoverColor;
         }
 
-        public override void Initialize() {
+        public override void Initialize(AssetManager assetManager) {
             _renderer = (ColorRenderer)Entity.Renderer;
             _origColor = _renderer.Color;
         }

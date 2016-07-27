@@ -46,7 +46,7 @@ namespace HexMage.GUI {
         private Entity BuildUI() {
             var layout = new HorizontalLayout();
             layout.Position = new Vector2(0, 850);
-            _rootEntities.Add(layout);
+            AddRootEntity(layout);
 
             var mob = _gameInstance.TurnManager.CurrentMob;
 

@@ -8,8 +8,11 @@ namespace HexMage.GUI {
 
         public SceneManager(GameScene initialScene) {
             _scenes.Push(initialScene);
-            initialScene.Initialize();
-            initialScene.InitializeRootEntities();
+        }
+
+        public void Initialize() {
+            _scenes.Peek().Initialize();
+            _scenes.Peek().InitializeRootEntities();
         }
 
         public void Update(GameTime gameTime) {

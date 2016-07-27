@@ -49,6 +49,7 @@ namespace HexMage.GUI
 
             _gameManager = new GameManager(_camera, _inputManager, _assetManager, _spriteBatch);
             _sceneManager = new SceneManager(new ArenaScene(_gameManager));
+            _sceneManager.Initialize();
         }
 
         protected override void Update(GameTime gameTime) {

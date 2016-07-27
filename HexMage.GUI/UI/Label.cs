@@ -16,13 +16,26 @@ namespace HexMage.GUI.UI {
         public Label(string text, SpriteFont font) {
             Text = text;
             Font = font;
+            Renderer = this;
         }
 
         public Label(Func<string> textFunc, SpriteFont font) {
-            Font = font;            
+            Font = font;
             Renderer = this;
             AddComponent(new TextSetter(this, textFunc));
         }
+
+        protected override void Layout() {
+            CachedSize = Font.MeasureString(Text);
+        }
+
+        public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
+            if (DebugMode) {
+                Console.WriteLine($"RENDER: {this} at {RenderPosition} with size {CachedSize}");
+            }
+            batch.DrawString(Font, Text, RenderPosition, TextColor);
+        }
+
 
         private class TextSetter : Component {
             private readonly Label _label;
@@ -36,16 +49,6 @@ namespace HexMage.GUI.UI {
             public override void Update(GameTime time) {
                 _label.Text = _textFunc();
             }
-        }
-
-        protected override void Layout() {
-            CachedSize = Font.MeasureString(Text);
-        }
-
-
-
-        public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
-            batch.DrawString(Font, Text, RenderPosition, TextColor);
         }
     }
 }

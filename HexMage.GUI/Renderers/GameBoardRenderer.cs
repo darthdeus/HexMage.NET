@@ -23,9 +23,9 @@ namespace HexMage.GUI.Renderers {
             _spriteBatch.End();
 
             DrawBackground();
-            DrawAllMobs();
             DrawHoverPath();
-            DrawMousePosition();
+            DrawAllMobs();
+            DrawMousePosition();            
 
             _spriteBatch.Begin();
         }
@@ -102,8 +102,7 @@ namespace HexMage.GUI.Renderers {
             _spriteBatch.Begin();
             var mouseTextPos = new Vector2(0, 850);
 
-            var mousePos = Vector2.Transform(InputManager.Instance.MousePosition.ToVector2(),
-                                             Matrix.Invert(_camera.Projection));
+            var mousePos = _camera.MouseWorldPixelPos;
 
             string str = $"{mousePos} - {_camera.MouseHex}";
             _spriteBatch.DrawString(_assetManager.Font, str, mouseTextPos, Color.Black);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace HexMage.Simulator {
     public static class Generator {
-        private static Random _random = new Random();
+        private static readonly Random _random = new Random();
 
         public static Mob RandomMob(Team team, int size, Predicate<AxialCoord> isCoordAvailable) {
             var abilities = new List<Ability>();

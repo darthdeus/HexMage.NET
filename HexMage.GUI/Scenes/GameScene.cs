@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,7 +13,8 @@ namespace HexMage.GUI {
 
     public abstract class GameScene {
         protected readonly GameManager _gameManager;
-        protected readonly List<Entity> _rootEntities = new List<Entity>();
+        private readonly List<Entity> _rootEntities = new List<Entity>();
+
         protected Camera2D _camera => _gameManager.Camera;
         protected InputManager _inputManager => _gameManager.InputManager;
         protected AssetManager _assetManager => _gameManager.AssetManager;
@@ -22,12 +24,12 @@ namespace HexMage.GUI {
             _gameManager = gameManager;
         }
 
-
         public abstract void Initialize();
 
         public void InitializeRootEntities() {
-            foreach (var entity in _rootEntities) {
-                entity.InitializeEntity();
+            var currentRootEntities = _rootEntities.ToList();
+            foreach (var entity in currentRootEntities) {
+                entity.InitializeEntity(_assetManager);
             }
         }
 
@@ -56,12 +58,17 @@ namespace HexMage.GUI {
         }
 
         protected Entity CreateRootEntity() {
-            var entity = new Entity();
+            var entity = new Entity { Scene = this };
             _rootEntities.Add(entity);
             return entity;
         }
 
         public abstract void Cleanup();
+
+        public void AddRootEntity(Entity entity) {
+            _rootEntities.Add(entity);
+            entity.Scene = this;
+        }
 
         private GameScene _newScene = null;
 

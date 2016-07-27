@@ -8,9 +8,19 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI {
     public class Component {
+        public bool IsInitialized { get; private set; } = false;
         public Entity Entity { get; set; }
-        public virtual void Initialize() {}
+        public virtual void Initialize(AssetManager assetManager) {}
         public virtual void Update(GameTime time) {}
+
+        // TODO - find a better name for this
+        protected void AssertNotInitialized() {
+            if (IsInitialized) {
+                Console.WriteLine($"Component {this} for {Entity} already initialized.");
+            } else {
+                IsInitialized = true;
+            }
+        }
     }
 
     public interface IRenderer {
@@ -18,10 +28,12 @@ namespace HexMage.GUI {
     }
 
     public class Entity {
+        public bool DebugMode { get; set; } = false;
         public int SortOrder = 0;
         // Setting this to true will cause the generic render lifecycle to not start
         // a new batch when rendering this entity, but *only* if the entity is root.
         public bool CustomBatchWhenRoot = false;
+        public GameScene Scene { get; set; }
 
         // TODO - remove this
         [Obsolete]
@@ -60,15 +72,15 @@ namespace HexMage.GUI {
 
         public Vector2 CachedSize { get; set; }
 
-        public void InitializeEntity() {
+        public void InitializeEntity(AssetManager assetManager) {
             foreach (var component in Components) {
-                component.Initialize();
+                component.Initialize(assetManager);
             }
 
             Initialize();
 
             foreach (var entity in Children) {
-                entity.InitializeEntity();
+                entity.InitializeEntity(assetManager);
             }
         }
 

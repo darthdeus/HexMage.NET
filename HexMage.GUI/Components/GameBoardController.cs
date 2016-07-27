@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HexMage.GUI.UI;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -13,6 +15,16 @@ namespace HexMage.GUI.Components {
 
         public GameBoardController(GameInstance gameInstance) {
             _gameInstance = gameInstance;
+        }
+
+        public override void Initialize(AssetManager assetManager) {
+            AssertNotInitialized();
+            var popover = new VerticalLayout();
+            
+            popover.AddChild(new Label("Future popover", assetManager.Font));
+                        
+            Entity.Scene.AddRootEntity(popover);           
+            popover.InitializeEntity(assetManager);
         }
 
         public override void Update(GameTime time) {
