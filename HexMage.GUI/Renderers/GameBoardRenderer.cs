@@ -20,14 +20,10 @@ namespace HexMage.GUI.Renderers {
             _spriteBatch = batch;
             _assetManager = assetManager;
             
-            _spriteBatch.End();
-
             DrawBackground();
             DrawHoverPath();
             DrawAllMobs();
             DrawMousePosition();            
-
-            _spriteBatch.Begin();
         }
 
         private void DrawBackground() {

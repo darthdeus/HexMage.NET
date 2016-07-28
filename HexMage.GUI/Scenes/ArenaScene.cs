@@ -36,6 +36,7 @@ namespace HexMage.GUI {
             gameBoardEntity.AddComponent(new GameBoardController(_gameInstance));
             gameBoardEntity.Renderer = new GameBoardRenderer(_gameInstance, _camera);
             gameBoardEntity.SortOrder = 1;
+            gameBoardEntity.CustomBatch = true;
 
             var uiEntity = BuildUI();
             uiEntity.SortOrder = 2;

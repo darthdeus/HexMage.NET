@@ -47,14 +47,11 @@ namespace HexMage.GUI {
         }
 
         public void RenderRootEntities() {
-            // TODO - remove this and force all renderers to batch themselves
-            _spriteBatch.Begin();
-
             foreach (var entity in _rootEntities.OrderBy(x => x.SortOrder).Where(x => x.Active)) {
+                if (!entity.CustomBatch) _spriteBatch.Begin(transformMatrix: entity.Projection());
                 entity.Render(_spriteBatch, _assetManager);
+                if (!entity.CustomBatch) _spriteBatch.End();
             }
-
-            _spriteBatch.End();
         }
 
         protected Entity CreateRootEntity() {

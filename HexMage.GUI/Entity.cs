@@ -28,11 +28,13 @@ namespace HexMage.GUI {
     }
 
     public class Entity {
+        public Func<Matrix> Projection = () => Matrix.Identity;
+
         public bool DebugMode { get; set; } = false;
         public int SortOrder = 0;
         // Setting this to true will cause the generic render lifecycle to not start
         // a new batch when rendering this entity, but *only* if the entity is root.
-        public bool CustomBatchWhenRoot = false;
+        public bool CustomBatch = false;
         public GameScene Scene { get; set; }
 
         // TODO - remove this
@@ -119,7 +121,7 @@ namespace HexMage.GUI {
                              + (Parent?.RenderPosition ?? Vector2.Zero);
 
             Renderer?.Render(this, batch, assetManager);
-
+            
             foreach (var entity in ActiveChildren) {
                 entity.Render(batch, assetManager);
             }

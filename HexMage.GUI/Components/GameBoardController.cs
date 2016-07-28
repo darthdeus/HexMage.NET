@@ -29,7 +29,8 @@ namespace HexMage.GUI.Components {
                 _emptyHexPopover = new VerticalLayout {
                     Renderer = new ColorRenderer(Color.LightGray),
                     Padding = new Vector4(20, 10, 20, 10),
-                    SortOrder = 1000
+                    SortOrder = 1000,
+                    Projection = () => Camera2D.Instance.Projection
                 };
 
                 _emptyHexLabel = _emptyHexPopover.AddChild(new Label("Just an empty hex", assetManager.Font));
@@ -42,7 +43,8 @@ namespace HexMage.GUI.Components {
                 _mobPopover = new VerticalLayout {
                     Renderer = new ColorRenderer(Color.LightGray),
                     Padding = new Vector4(20, 10, 20, 10),
-                    SortOrder = 1000
+                    SortOrder = 1000,
+                    Projection = () => Camera2D.Instance.Projection
                 };
 
                 _mobHealthLabel = _mobPopover.AddChild(new Label("Mob health", assetManager.Font));
