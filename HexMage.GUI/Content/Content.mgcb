@@ -19,18 +19,6 @@
 /processorParam:TextureFormat=Compressed
 /build:Arial.spritefont
 
-#begin green_hex.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:green_hex.png
-
 #begin mob.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -42,18 +30,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:mob.png
-
-#begin tileGrass.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:tileGrass.png
 
 #begin purplegon.png
 /importer:TextureImporter
@@ -91,18 +67,6 @@
 /processorParam:TextureFormat=Color
 /build:path_hex.png
 
-#begin photoshopTile.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:photoshopTile.png
-
 #begin mage.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -114,4 +78,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:mage.png
+
+#begin photoshopTile.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:photoshopTile.png
 
