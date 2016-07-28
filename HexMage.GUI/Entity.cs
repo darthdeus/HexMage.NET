@@ -124,7 +124,6 @@ namespace HexMage.GUI {
             }
         }
 
-
         public Entity CreateChild() {
             var entity = new Entity();
             AddChild(entity);
