@@ -8,10 +8,12 @@ using HexMage.GUI.UI;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Components {
     public class GameBoardController : Component {
         private readonly GameInstance _gameInstance;
+        private Entity _popover;
 
         public GameBoardController(GameInstance gameInstance) {
             _gameInstance = gameInstance;
@@ -19,18 +21,21 @@ namespace HexMage.GUI.Components {
 
         public override void Initialize(AssetManager assetManager) {
             AssertNotInitialized();
-            var popover = new VerticalLayout();
+            _popover = new VerticalLayout();
+            _popover.Renderer = new ColorRenderer(Color.LightGray);
+            _popover.Padding = new Vector4(20, 10, 20, 10);
+            _popover.SortOrder = 1000;
             
-            popover.AddChild(new Label("Future popover", assetManager.Font));
+            _popover.AddChild(new Label("Future popover", assetManager.Font));
                         
-            Entity.Scene.AddRootEntity(popover);           
-            popover.InitializeEntity(assetManager);
+            Entity.Scene.AddRootEntity(_popover);           
+            _popover.InitializeEntity(assetManager);
         }
 
         public override void Update(GameTime time) {
             var inputManager = InputManager.Instance;
+            var mouseHex = Camera2D.Instance.MouseHex;
             if (inputManager.JustRightClicked()) {
-                var mouseHex = Camera2D.Instance.MouseHex;
 
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
                     _gameInstance.Map.Toogle(mouseHex);
@@ -45,6 +50,11 @@ namespace HexMage.GUI.Components {
                 _gameInstance.TurnManager.NextMobOrNewTurn();
                 // TODO - fix this, it's ugly
                 _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
+            }
+
+            if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
+                _popover.Active = true;
+                _popover.Position = Camera2D.Instance.HexToPixel(mouseHex) + new Vector2(30, -40);
             }
         }
     }
