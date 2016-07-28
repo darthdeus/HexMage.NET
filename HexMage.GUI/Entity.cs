@@ -64,10 +64,11 @@ namespace HexMage.GUI {
             Components.Add(component);
         }
 
-        public void AddChild(Entity entity) {
+        public T AddChild<T>(T entity) where T : Entity {
             Debug.Assert(entity != this);
             Children.Add(entity);
             entity.Parent = this;
+            return entity;
         }
 
         public Vector2 CachedSize { get; set; }

@@ -4,6 +4,5 @@
     {
         Empty,
         Wall,
-        Player
     }
 }
