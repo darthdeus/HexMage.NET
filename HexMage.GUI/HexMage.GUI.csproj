@@ -43,9 +43,11 @@
     </StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Components\Animation.cs" />
     <Compile Include="Components\GameBoardController.cs" />
     <Compile Include="Components\MobAnimationController.cs" />
     <Compile Include="Components\MobEntity.cs" />
+    <Compile Include="Components\MobStateUpdater.cs" />
     <Compile Include="Renderers\MobRenderer.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="Renderers\GameBoardRenderer.cs" />

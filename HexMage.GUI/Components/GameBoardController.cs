@@ -32,7 +32,7 @@ namespace HexMage.GUI.Components {
                     Position = new Vector2(500, 50)
                 };
 
-                _messageBoxLabel = _messageBox.AddChild(new Label("Message Box", assetManager.Font));                                
+                _messageBoxLabel = _messageBox.AddChild(new Label("Message Box", assetManager.Font));
 
                 Entity.Scene.AddRootEntity(_messageBox);
                 _messageBox.InitializeEntity(assetManager);
@@ -69,18 +69,18 @@ namespace HexMage.GUI.Components {
             foreach (var mob in _gameInstance.MobManager.Mobs) {
                 var mobAnimationController = new MobAnimationController();
 
-                var mobEntity = new MobEntity(mob) {
+                var mobEntity = new MobEntity(mob, _gameInstance) {
                     //Renderer = new SpriteRenderer(assetManager[AssetManager.MobTexture]),
-                    Renderer = new MobRenderer(mob, mobAnimationController),
+                    Renderer = new MobRenderer(_gameInstance, mob, mobAnimationController),
                     SortOrder = Camera2D.SortMobs,
                     Projection = () => Camera2D.Instance.Projection
                 };
                 mob.Metadata = mobEntity;
                 mobEntity.AddComponent(mobAnimationController);
+                mobEntity.AddComponent(new MobStateUpdater(mob));
 
                 Entity.Scene.AddRootEntity(mobEntity);
                 mobEntity.InitializeEntity(assetManager);
-
             }
         }
 
@@ -113,9 +113,13 @@ namespace HexMage.GUI.Components {
                     var mob = _gameInstance.MobManager.AtCoord(mouseHex);
                     if (mob != null) {
                         if (mob == _gameInstance.TurnManager.CurrentMob) {
-                            ShowMessage("You can't target your own minion.");
-                        } else {                            
-                            _gameInstance.SelectedMob = mob;                            
+                            ShowMessage("You can't target yourself.");
+                        } else {
+                            if (mob.Team.Color == _gameInstance.TurnManager.CurrentMob.Team.Color) {
+                                ShowMessage("You can't target your team.");
+                            } else {
+                                _gameInstance.TurnManager.CurrentTarget = mob;
+                            }
                         }
                     }
                 }
@@ -166,10 +170,9 @@ namespace HexMage.GUI.Components {
 
         private void UpdateMobPositions() {
             foreach (var mob in _gameInstance.MobManager.Mobs) {
-                var mobEntity = (MobEntity)mob.Metadata;
+                var mobEntity = (MobEntity) mob.Metadata;
                 mobEntity.Position = Camera2D.Instance.HexToPixel(mob.Coord);
             }
         }
     }
 }
-

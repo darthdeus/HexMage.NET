@@ -14,8 +14,8 @@ namespace HexMage.Benchmarks
             int size = 30;
             var g = new GameInstance(size);
 
-            var t1 = g.MobManager.AddTeam();
-            var t2 = g.MobManager.AddTeam();
+            var t1 = g.MobManager.AddTeam(TeamColor.Red);
+            var t2 = g.MobManager.AddTeam(TeamColor.Blue);
 
             var m1 = Generator.RandomMob(t1, size, _ => true);
             var m2 = Generator.RandomMob(t2, size, c => !c.Equals(m1.Coord));

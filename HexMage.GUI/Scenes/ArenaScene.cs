@@ -15,8 +15,8 @@ namespace HexMage.GUI {
         private VerticalLayout _mobUI;
 
         public ArenaScene(GameManager gameManager) : base(gameManager) {
-            var t1 = _gameInstance.MobManager.AddTeam();
-            var t2 = _gameInstance.MobManager.AddTeam();
+            var t1 = _gameInstance.MobManager.AddTeam(TeamColor.Red);
+            var t2 = _gameInstance.MobManager.AddTeam(TeamColor.Blue);
 
             for (int team = 0; team < 2; team++) {
                 for (int mobI = 0; mobI < 5; mobI++) {

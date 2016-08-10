@@ -6,6 +6,9 @@ namespace HexMage.Simulator
     {
         public MobManager MobManager { get; set; }
         public List<Mob> TurnOrder { get; set; } = new List<Mob>();
+        public Mob CurrentMob => TurnOrder[_current];
+        public Mob CurrentTarget { get; set; }
+
         private int _current = 0;
 
         public TurnManager(MobManager mobManager) {
@@ -18,6 +21,7 @@ namespace HexMage.Simulator
 
         public void StartNextTurn() {
             TurnOrder.Clear();
+            CurrentTarget = null;
 
             foreach (var mob in MobManager.Mobs) {
                 mob.AP = mob.MaxAP;
@@ -30,8 +34,6 @@ namespace HexMage.Simulator
 
             TurnOrder.Sort((a, b) => a.AP.CompareTo(b.AP));
         }
-
-        public Mob CurrentMob => TurnOrder[_current];
 
         public void NextMobOrNewTurn() {
             if (!MoveNext()) {

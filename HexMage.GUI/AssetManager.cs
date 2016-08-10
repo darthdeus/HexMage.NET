@@ -11,6 +11,8 @@ namespace HexMage.GUI {
         public static readonly string MobTexture = "mage";
         public static readonly string EmptyHexTexture = "photoshopTile";
         public static readonly string GrayTexture = "gray";
+        public static readonly string HoverTexture = "hover_hex";
+        public static readonly string TargetTexture = "target_hex";
 
         public static string DarkMage {
             get { throw new NotImplementedException(); }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -27,8 +28,11 @@ namespace HexMage.Simulator
             return Mobs.FirstOrDefault(mob => Equals(mob.Coord, c));
         }
 
-        public Team AddTeam() {
-            var team = new Team();
+        public Team AddTeam(TeamColor color) {
+            if (Teams.Any(t => t.Color == color)) {
+                throw new ArgumentException("Team color is already in use", nameof(color));
+            }
+            var team = new Team(color);
             Teams.Add(team);
             return team;
         }

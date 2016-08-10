@@ -53,6 +53,7 @@ namespace HexMage.GUI {
         public Entity Parent { get; set; }
         public List<Entity> Children { get; } = new List<Entity>();
         protected List<Component> Components { get; } = new List<Component>();
+
         public IRenderer Renderer { get; set; }
 
         public IEnumerable<Entity> ActiveChildren => Children.Where(x => x.Active);

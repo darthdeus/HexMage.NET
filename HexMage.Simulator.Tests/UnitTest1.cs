@@ -26,8 +26,8 @@ namespace HexMage.Simulator.Tests
 
             var mobManager = game.MobManager;
 
-            var t1 = mobManager.AddTeam();
-            var t2 = mobManager.AddTeam();
+            var t1 = mobManager.AddTeam(TeamColor.Red);
+            var t2 = mobManager.AddTeam(TeamColor.Blue);
 
             var m1 = Generator.RandomMob(t1, size, _ => true);
             var m2 = Generator.RandomMob(t2, size, c => !m1.Coord.Equals(c));
