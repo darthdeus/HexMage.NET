@@ -108,6 +108,8 @@ namespace HexMage.GUI {
         protected virtual void Update(GameTime time) {}
 
         public void UpdateEntity(GameTime time) {
+            if (!Active) return;
+
             foreach (var component in Components) {
                 component.Update(time);
             }

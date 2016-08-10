@@ -10,6 +10,8 @@ namespace HexMage.GUI.Components {
         private readonly AxialCoord _source;
         private readonly AxialCoord _destination;
 
+        public event Action TargetHit;
+
         public ProjectileEntity(TimeSpan duration, AxialCoord source, AxialCoord destination) {
             _duration = duration;
             _source = source;
@@ -36,6 +38,7 @@ namespace HexMage.GUI.Components {
             if (percent > 0.99f) {
                 // TODO - destroy the entity and all of its components :)
                 Active = false;
+                TargetHit?.Invoke();
             }
 
             _sourceWorld = Camera2D.Instance.HexToPixel(_source);

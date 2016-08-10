@@ -49,6 +49,7 @@
     <Compile Include="Components\MobAnimationController.cs" />
     <Compile Include="Components\MobEntity.cs" />
     <Compile Include="Components\MobStateUpdater.cs" />
+    <Compile Include="Components\PositionAtMob.cs" />
     <Compile Include="Components\ProjectileEntity.cs" />
     <Compile Include="Renderers\AnimationRenderer.cs" />
     <Compile Include="Renderers\MobRenderer.cs" />

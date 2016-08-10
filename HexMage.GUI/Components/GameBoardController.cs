@@ -141,6 +141,30 @@ namespace HexMage.GUI.Components {
 
                                 fireball.AddComponent(new AnimationController(fireballAnimation));
 
+                                var target = _gameInstance.TurnManager.CurrentTarget;
+
+                                fireball.TargetHit += () => {
+                                    var explosion = new Entity() {
+                                        Projection = () => Camera2D.Instance.Projection,
+                                        SortOrder = Camera2D.SortProjectiles                                        
+                                    };
+
+                                    explosion.AddComponent(new PositionAtMob(target));
+
+                                    var explosionAnimation = new Animation(
+                                        AssetManager.ExplosionSprite,
+                                        TimeSpan.FromMilliseconds(350),
+                                        32,
+                                        4);
+
+                                    explosionAnimation.AnimationDone += () => { explosion.Active = false; };
+
+                                    explosion.Renderer = new AnimationRenderer(explosionAnimation);
+                                    explosion.AddComponent(new AnimationController(explosionAnimation));
+
+                                    Entity.Scene.AddAndInitializeNextFrame(explosion);
+                                };
+
                                 Entity.Scene.AddAndInitializeNextFrame(fireball);
                             }
                         }

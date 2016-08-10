@@ -14,6 +14,7 @@ namespace HexMage.GUI {
         public static readonly string HoverSprite = "hover_hex";
         public static readonly string TargetSprite = "target_hex";
         public static readonly string FireballSprite = "fireball";
+        public static readonly string ExplosionSprite = "explosion";
 
         public static string DarkMage {
             get { throw new NotImplementedException(); }
