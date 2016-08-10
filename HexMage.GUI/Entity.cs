@@ -40,6 +40,8 @@ namespace HexMage.GUI {
         // TODO - remove this
         [Obsolete]
         public ElementMouseState MouseState;
+
+        public float Rotation = 0;
         public Vector2 Position { get; set; }
         public Vector2 RenderPosition { get; set; }
         public Rectangle AABB => new Rectangle(RenderPosition.ToPoint(), CachedSize.ToPoint());

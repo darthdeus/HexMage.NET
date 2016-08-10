@@ -1,4 +1,5 @@
 ﻿using System;
+using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
@@ -15,6 +16,7 @@ namespace HexMage.GUI.Components {
         private VerticalLayout _messageBox;
         private Label _messageBoxLabel;
         private DateTime _displayMessageBoxUntil = DateTime.Now;
+        private AssetManager _assetManager;
 
         public GameBoardController(GameInstance gameInstance) {
             _gameInstance = gameInstance;
@@ -22,6 +24,7 @@ namespace HexMage.GUI.Components {
 
         public override void Initialize(AssetManager assetManager) {
             AssertNotInitialized();
+            _assetManager = assetManager;
 
             {
                 _messageBox = new VerticalLayout {
@@ -119,6 +122,26 @@ namespace HexMage.GUI.Components {
                                 ShowMessage("You can't target your team.");
                             } else {
                                 _gameInstance.TurnManager.CurrentTarget = mob;
+
+                                var fireballAnimation = new Animation(AssetManager.FireballSprite,
+                                    TimeSpan.FromMilliseconds(50),
+                                    32,
+                                    4);
+
+                                fireballAnimation.Origin = new Vector2(16, 16);
+
+                                var fireball = new ProjectileEntity(
+                                    TimeSpan.FromMilliseconds(1500),
+                                    _gameInstance.TurnManager.CurrentMob.Coord,
+                                    _gameInstance.TurnManager.CurrentTarget.Coord) {
+                                        Renderer = new AnimationRenderer(fireballAnimation),
+                                        SortOrder = Camera2D.SortProjectiles,
+                                        Projection = () => Camera2D.Instance.Projection
+                                    };
+
+                                fireball.AddComponent(new AnimationController(fireballAnimation));
+
+                                Entity.Scene.AddAndInitializeNextFrame(fireball);
                             }
                         }
                     }

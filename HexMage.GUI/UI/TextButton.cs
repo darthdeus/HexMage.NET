@@ -43,7 +43,7 @@ namespace HexMage.GUI.UI {
         }
 
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
-            var tex = assetManager[AssetManager.GrayTexture];
+            var tex = assetManager[AssetManager.GraySprite];
 
             var rectBg = new Rectangle(RenderPosition.ToPoint(), CachedSize.ToPoint());
             if (MouseState == ElementMouseState.Pressed) {

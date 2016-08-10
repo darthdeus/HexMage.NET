@@ -6,13 +6,14 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI {
     public class AssetManager {
-        public static readonly string WallTexture = "wall_hex";
-        public static readonly string PathTexture = "path_hex";
-        public static readonly string MobTexture = "mage";
-        public static readonly string EmptyHexTexture = "photoshopTile";
-        public static readonly string GrayTexture = "gray";
-        public static readonly string HoverTexture = "hover_hex";
-        public static readonly string TargetTexture = "target_hex";
+        public static readonly string WallSprite = "wall_hex";
+        public static readonly string PathSprite = "path_hex";
+        public static readonly string MobSprite = "mage";
+        public static readonly string EmptyHexSprite = "photoshopTile";
+        public static readonly string GraySprite = "gray";
+        public static readonly string HoverSprite = "hover_hex";
+        public static readonly string TargetSprite = "target_hex";
+        public static readonly string FireballSprite = "fireball";
 
         public static string DarkMage {
             get { throw new NotImplementedException(); }
@@ -52,7 +53,7 @@ namespace HexMage.GUI {
 
         public void Preload() {
             _font = _contentManager.Load<SpriteFont>(FontName);
-            foreach (var texture in new[] {WallTexture, PathTexture, MobTexture, EmptyHexTexture}) {
+            foreach (var texture in new[] {WallSprite, PathSprite, MobSprite, EmptyHexSprite}) {
                 _textures[texture] = _contentManager.Load<Texture2D>(texture);
             }
         }

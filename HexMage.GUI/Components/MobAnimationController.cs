@@ -1,4 +1,5 @@
-﻿using HexMage.Simulator;
+﻿using System;
+using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.Components {
@@ -7,7 +8,7 @@ namespace HexMage.GUI.Components {
         private Mob _mob;
         private MobRenderer _mobRenderer;
 
-        private double _time;
+        private TimeSpan _time;
         private Animation _animationClicked;
         private Animation _animationIdle;
 
@@ -20,9 +21,9 @@ namespace HexMage.GUI.Components {
             _mob = _mobEntity.Mob;
             _mobRenderer = (MobRenderer) _mobEntity.Renderer;
 
-            _animationIdle = new Animation(AssetManager.DarkMageIdle, 0.5f, 32, 2);
+            _animationIdle = new Animation(AssetManager.DarkMageIdle, TimeSpan.FromMilliseconds(500), 32, 2);
 
-            _animationClicked = new Animation(AssetManager.DarkMageClicked, 0.07f, 32, 14);
+            _animationClicked = new Animation(AssetManager.DarkMageClicked, TimeSpan.FromMilliseconds(70), 32, 14);
             _animationClicked.AnimationDone += () => CurrentAnimation = _animationIdle;
 
             CurrentAnimation = _animationIdle;
@@ -36,17 +37,17 @@ namespace HexMage.GUI.Components {
                 SwitchAnimation(_animationClicked);
             }
 
-            _time += time.ElapsedGameTime.TotalSeconds;
+            _time += time.ElapsedGameTime;
 
             if (_time > CurrentAnimation.FrameTime) {
                 CurrentAnimation.NextFrame();
-                _time = 0;
+                _time = TimeSpan.Zero;
             }
         }
 
         private void SwitchAnimation(Animation newAnimation) {
             if (CurrentAnimation != newAnimation) {
-                _time = 0;
+                _time = TimeSpan.Zero;
                 CurrentAnimation.Reset();
                 newAnimation.Reset();
                 CurrentAnimation = newAnimation;

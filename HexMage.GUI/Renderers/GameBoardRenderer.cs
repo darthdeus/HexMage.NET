@@ -36,8 +36,8 @@ namespace HexMage.GUI.Renderers {
             int minY = Int32.MaxValue;
             int minZ = Int32.MaxValue;
 
-            var hexGreen = _assetManager[AssetManager.EmptyHexTexture];
-            var hexWall = _assetManager[AssetManager.WallTexture];
+            var hexGreen = _assetManager[AssetManager.EmptyHexSprite];
+            var hexWall = _assetManager[AssetManager.WallSprite];
 
             foreach (var coord in _gameInstance.Map.AllCoords) {
                 maxX = Math.Max(maxX, coord.ToCube().X);
@@ -64,7 +64,7 @@ namespace HexMage.GUI.Renderers {
         private void DrawHoverPath() {
             _spriteBatch.Begin(transformMatrix: _camera.Projection);
 
-            var hexPath = _assetManager[AssetManager.PathTexture];
+            var hexPath = _assetManager[AssetManager.PathSprite];
 
             if (_gameInstance.Pathfinder.IsValidCoord(_camera.MouseHex)) {
                 var path = _gameInstance.Pathfinder.PathTo(_camera.MouseHex);

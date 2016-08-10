@@ -9,6 +9,7 @@ namespace HexMage.GUI
     public class Camera2D {
         public static readonly int SortUI = 1000;
         public static readonly int SortMobs = 100;
+        public static readonly int SortProjectiles = 200;
         public static readonly int SortBackground = 10;
 
 

@@ -10,7 +10,7 @@ namespace HexMage.GUI.UI {
         }
 
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
-            batch.Draw(assetManager[AssetManager.GrayTexture], entity.AABB, Color);
+            batch.Draw(assetManager[AssetManager.GraySprite], entity.AABB, Color);
         }
     }
 }

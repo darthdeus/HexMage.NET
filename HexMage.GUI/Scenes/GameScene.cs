@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HexMage.GUI.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -20,6 +21,10 @@ namespace HexMage.GUI {
         protected AssetManager _assetManager => _gameManager.AssetManager;
         protected SpriteBatch _spriteBatch => _gameManager.SpriteBatch;
 
+        private readonly List<Action> _afterUpdateActions = new List<Action>();
+        // Root entities to be initialized on the next frame
+        private readonly List<Entity> _toInitializeEntities = new List<Entity>();
+
         protected GameScene(GameManager gameManager) {
             _gameManager = gameManager;
         }
@@ -34,6 +39,11 @@ namespace HexMage.GUI {
         }
 
         public void UpdateRootEntities(GameTime gameTime) {
+            foreach (var entity in _toInitializeEntities) {
+                AddRootEntity(entity);
+                entity.InitializeEntity(_assetManager);
+            }
+
             foreach (var entity in _rootEntities) {
                 entity.LayoutEntity();
             }
@@ -44,6 +54,11 @@ namespace HexMage.GUI {
             foreach (var entity in _rootEntities) {
                 entity.UpdateEntity(gameTime);
             }
+
+            foreach (var action in _afterUpdateActions) {
+                action.Invoke();
+            }
+            _afterUpdateActions.Clear();
         }
 
         public void RenderRootEntities() {
@@ -95,6 +110,14 @@ namespace HexMage.GUI {
         public void Render(GameTime gameTime) {
             // TODO - figure out if GameTime would be useful to pass here?
             RenderRootEntities();
+        }
+
+        public void AfterUpdate(Action action) {
+            _afterUpdateActions.Add(action);
+        }
+
+        public void AddAndInitializeNextFrame(Entity entity) {
+            _toInitializeEntities.Add(entity);
         }
     }
 }
