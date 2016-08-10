@@ -67,14 +67,16 @@ namespace HexMage.GUI.Components {
             }
 
             foreach (var mob in _gameInstance.MobManager.Mobs) {
+                var mobAnimationController = new MobAnimationController();
+
                 var mobEntity = new MobEntity(mob) {
                     //Renderer = new SpriteRenderer(assetManager[AssetManager.MobTexture]),
-                    Renderer = new MobRenderer(mob),
+                    Renderer = new MobRenderer(mob, mobAnimationController),
                     SortOrder = Camera2D.SortMobs,
                     Projection = () => Camera2D.Instance.Projection
                 };
                 mob.Metadata = mobEntity;
-                mobEntity.AddComponent(new MobAnimationController());
+                mobEntity.AddComponent(mobAnimationController);
 
                 Entity.Scene.AddRootEntity(mobEntity);
                 mobEntity.InitializeEntity(assetManager);
@@ -119,7 +121,7 @@ namespace HexMage.GUI.Components {
                 }
             }
 
-            var position = Camera2D.Instance.HexToPixel(mouseHex) + new Vector2(30, -40);
+            var position = Camera2D.Instance.HexToPixel(mouseHex) + new Vector2(40, -15);
             var sin = (float) Math.Sin(time.TotalGameTime.TotalSeconds*2);
             var offset = sin*sin*new Vector2(0, -3);
 
