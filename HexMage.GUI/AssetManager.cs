@@ -13,6 +13,7 @@ namespace HexMage.GUI
         public static readonly string MobTexture = "mage";
         public static readonly string EmptyHexTexture = "photoshopTile";
         public static readonly string GrayTexture = "gray";
+        public static readonly string DarkMage = "dark-mage";
 
         private static readonly string FontName = "Arial";
 

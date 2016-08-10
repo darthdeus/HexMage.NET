@@ -22,7 +22,6 @@ namespace HexMage.GUI.Renderers {
             
             DrawBackground();
             DrawHoverPath();
-            DrawAllMobs();
             DrawMousePosition();            
         }
 
@@ -77,23 +76,6 @@ namespace HexMage.GUI.Renderers {
             _spriteBatch.End();
         }
 
-        private void DrawAllMobs() {
-            var gray = _assetManager[AssetManager.GrayTexture];
-
-            _spriteBatch.Begin(transformMatrix: _camera.Projection);
-            foreach (var mob in _gameInstance.MobManager.Mobs) {
-                DrawAt(_assetManager[AssetManager.MobTexture], mob.Coord);
-                var location = _camera.HexToPixel(mob.Coord).ToPoint() + new Point(27, 4);
-
-                double hpPercent = (double) mob.HP/mob.MaxHP;
-                int healthbarHeight = 20;
-                _spriteBatch.Draw(gray, new Rectangle(location, new Point(5, healthbarHeight)), Color.DarkGreen);
-                _spriteBatch.Draw(gray, new Rectangle(location, new Point(5, (int) (healthbarHeight*hpPercent))),
-                                  Color.Yellow);
-            }
-            _spriteBatch.End();
-        }
-
         private void DrawMousePosition() {
             _spriteBatch.Begin();
             var mouseTextPos = new Vector2(0, 850);
@@ -111,6 +93,12 @@ namespace HexMage.GUI.Renderers {
 
         private void DrawAt(Texture2D texture, AxialCoord coord, Color color) {
             _spriteBatch.Draw(texture, _camera.HexToPixel(coord), color);
+        }
+    }
+
+    public static class ColorToXNAConverter {
+        public static Microsoft.Xna.Framework.Color ToXnaColor(this HexMage.Simulator.Color color) {
+            return new Microsoft.Xna.Framework.Color(new Vector3((float) color.X, (float) color.Y, (float) color.Z));
         }
     }
 }

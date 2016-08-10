@@ -6,8 +6,12 @@ using Microsoft.Xna.Framework.Input;
 
 namespace HexMage.GUI
 {
-    public class Camera2D
-    {
+    public class Camera2D {
+        public static readonly int SortUI = 1000;
+        public static readonly int SortMobs = 100;
+        public static readonly int SortBackground = 10;
+
+
         public static Camera2D Instance;
 
         private readonly InputManager _inputManager;

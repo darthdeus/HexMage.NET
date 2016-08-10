@@ -44,6 +44,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Components\GameBoardController.cs" />
+    <Compile Include="Components\MobAnimationController.cs" />
+    <Compile Include="Components\MobEntity.cs" />
+    <Compile Include="Renderers\MobRenderer.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="Renderers\GameBoardRenderer.cs" />
     <Compile Include="Scenes\ArenaScene.cs" />

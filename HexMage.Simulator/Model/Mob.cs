@@ -18,6 +18,7 @@ namespace HexMage.Simulator
         public Team Team { get; set; }
         public AxialCoord Coord { get; set; }
         public static int AbilityCount => 6;
+        public object Metadata { get; set; }
 
         public Mob(Team team, int maxHp, int maxAp, List<Ability> abilities) {
             Team = team;

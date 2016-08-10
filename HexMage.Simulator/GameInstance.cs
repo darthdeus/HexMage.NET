@@ -9,6 +9,7 @@ namespace HexMage.Simulator {
         public Pathfinder Pathfinder { get; set; }
         public TurnManager TurnManager { get; set; }
         public int Size { get; set; }
+        public Mob SelectedMob { get; set; }
 
         public GameInstance(int size) {
             Size = size;

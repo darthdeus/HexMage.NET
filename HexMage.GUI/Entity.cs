@@ -145,4 +145,18 @@ namespace HexMage.GUI {
             batch.Draw(Tex, entity.RenderPosition);
         }
     }
+
+    public class AnimatedSpriteRenderer : IRenderer {
+        public readonly Texture2D Tex;
+        private readonly Func<Rectangle> _spriteSelector;
+
+        public AnimatedSpriteRenderer(Texture2D tex, Func<Rectangle> spriteSelector) {
+            Tex = tex;
+            _spriteSelector = spriteSelector;
+        }
+
+        public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
+            batch.Draw(Tex, entity.RenderPosition, _spriteSelector(), Color.White);
+        }
+    }
 }

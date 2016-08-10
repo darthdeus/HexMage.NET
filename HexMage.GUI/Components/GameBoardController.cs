@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
@@ -17,6 +12,9 @@ namespace HexMage.GUI.Components {
         private VerticalLayout _mobPopover;
         private Label _emptyHexLabel;
         private Label _mobHealthLabel;
+        private VerticalLayout _messageBox;
+        private Label _messageBoxLabel;
+        private DateTime _displayMessageBoxUntil = DateTime.Now;
 
         public GameBoardController(GameInstance gameInstance) {
             _gameInstance = gameInstance;
@@ -26,10 +24,25 @@ namespace HexMage.GUI.Components {
             AssertNotInitialized();
 
             {
+                _messageBox = new VerticalLayout {
+                    Renderer = new ColorRenderer(Color.White),
+                    Padding = new Vector4(20, 10, 20, 10),
+                    SortOrder = Camera2D.SortUI,
+                    //Projection = () => Camera2D.Instance.Projection,
+                    Position = new Vector2(500, 50)
+                };
+
+                _messageBoxLabel = _messageBox.AddChild(new Label("Message Box", assetManager.Font));                                
+
+                Entity.Scene.AddRootEntity(_messageBox);
+                _messageBox.InitializeEntity(assetManager);
+            }
+
+            {
                 _emptyHexPopover = new VerticalLayout {
                     Renderer = new ColorRenderer(Color.LightGray),
                     Padding = new Vector4(20, 10, 20, 10),
-                    SortOrder = 1000,
+                    SortOrder = Camera2D.SortUI,
                     Projection = () => Camera2D.Instance.Projection
                 };
 
@@ -43,7 +56,7 @@ namespace HexMage.GUI.Components {
                 _mobPopover = new VerticalLayout {
                     Renderer = new ColorRenderer(Color.LightGray),
                     Padding = new Vector4(20, 10, 20, 10),
-                    SortOrder = 1000,
+                    SortOrder = Camera2D.SortUI,
                     Projection = () => Camera2D.Instance.Projection
                 };
 
@@ -52,6 +65,26 @@ namespace HexMage.GUI.Components {
                 Entity.Scene.AddRootEntity(_mobPopover);
                 _mobPopover.InitializeEntity(assetManager);
             }
+
+            foreach (var mob in _gameInstance.MobManager.Mobs) {
+                var mobEntity = new MobEntity(mob) {
+                    //Renderer = new SpriteRenderer(assetManager[AssetManager.MobTexture]),
+                    Renderer = new MobRenderer(mob),
+                    SortOrder = Camera2D.SortMobs,
+                    Projection = () => Camera2D.Instance.Projection
+                };
+                mob.Metadata = mobEntity;
+                mobEntity.AddComponent(new MobAnimationController());
+
+                Entity.Scene.AddRootEntity(mobEntity);
+                mobEntity.InitializeEntity(assetManager);
+
+            }
+        }
+
+        public void ShowMessage(string message, int displayForSeconds = 5) {
+            _messageBoxLabel.Text = message;
+            _displayMessageBoxUntil = DateTime.Now.Add(TimeSpan.FromSeconds(displayForSeconds));
         }
 
         public override void Update(GameTime time) {
@@ -71,6 +104,19 @@ namespace HexMage.GUI.Components {
                 _gameInstance.TurnManager.NextMobOrNewTurn();
                 // TODO - fix this, it's ugly
                 _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
+            }
+
+            if (inputManager.JustLeftClickReleased()) {
+                if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
+                    var mob = _gameInstance.MobManager.AtCoord(mouseHex);
+                    if (mob != null) {
+                        if (mob == _gameInstance.TurnManager.CurrentMob) {
+                            ShowMessage("You can't target your own minion.");
+                        } else {                            
+                            _gameInstance.SelectedMob = mob;                            
+                        }
+                    }
+                }
             }
 
             var position = Camera2D.Instance.HexToPixel(mouseHex) + new Vector2(30, -40);
@@ -106,6 +152,22 @@ namespace HexMage.GUI.Components {
                 _emptyHexPopover.Active = false;
                 _mobPopover.Active = false;
             }
+
+            if (_displayMessageBoxUntil < DateTime.Now) {
+                _messageBox.Active = false;
+            } else {
+                _messageBox.Active = true;
+            }
+
+            UpdateMobPositions();
+        }
+
+        private void UpdateMobPositions() {
+            foreach (var mob in _gameInstance.MobManager.Mobs) {
+                var mobEntity = (MobEntity)mob.Metadata;
+                mobEntity.Position = Camera2D.Instance.HexToPixel(mob.Coord);
+            }
         }
     }
 }
+
