@@ -12,15 +12,17 @@ namespace HexMage.GUI
         public static readonly int SortProjectiles = 200;
         public static readonly int SortBackground = 10;
 
-
         public static Camera2D Instance;
 
         private readonly InputManager _inputManager;
         private const float ScrollAmount = 0.03f;
         private const float TranslateAmount = 10;
         private int _lastWheel;
-        private Vector3 _translate = Vector3.Zero;
-        private float _zoomLevel = 1.0f;
+        public Vector3 Translate = Vector3.Zero;
+        public float ZoomLevel = 1.0f;
+
+        private Point _lastMousePosition;
+        private bool _dragging = false;
 
         public Camera2D(InputManager inputManager) {
             _inputManager = inputManager;
@@ -30,28 +32,50 @@ namespace HexMage.GUI
             Instance = this;
         }
 
+        public void Reset() {
+            Translate = Vector3.Zero;
+            ZoomLevel = 1.0f;
+        }
+
         public void Update(GameTime gameTime) {
             var scrollOff = Mouse.GetState().ScrollWheelValue;
             var diff = _lastWheel - scrollOff;
             _lastWheel = scrollOff;
 
             if (diff > 0) {
-                _zoomLevel -= ScrollAmount;
+                ZoomLevel -= ScrollAmount;
             } else if (diff < 0) {
-                _zoomLevel += ScrollAmount;
+                ZoomLevel += ScrollAmount;
             }
 
-            _zoomLevel = MathHelper.Clamp(_zoomLevel, 0.3f, 3f);
+            ZoomLevel = MathHelper.Clamp(ZoomLevel, 0.3f, 3f);
 
             var keyboard = Keyboard.GetState();
 
-            if (keyboard.IsKeyDown(Keys.W)) _translate.Y += TranslateAmount;
-            if (keyboard.IsKeyDown(Keys.S)) _translate.Y -= TranslateAmount;
-            if (keyboard.IsKeyDown(Keys.A)) _translate.X += TranslateAmount;
-            if (keyboard.IsKeyDown(Keys.D)) _translate.X -= TranslateAmount;
+            if (keyboard.IsKeyDown(Keys.W)) Translate.Y += TranslateAmount;
+            if (keyboard.IsKeyDown(Keys.S)) Translate.Y -= TranslateAmount;
+            if (keyboard.IsKeyDown(Keys.A)) Translate.X += TranslateAmount;
+            if (keyboard.IsKeyDown(Keys.D)) Translate.X -= TranslateAmount;
+
+            var inputManager = InputManager.Instance;
+            if (inputManager.JustMiddleClicked()) {
+                _dragging = true;
+                _lastMousePosition = inputManager.MousePosition;
+            }
+
+            if (_dragging) {
+                var movement = inputManager.MousePosition - _lastMousePosition;
+                _lastMousePosition = inputManager.MousePosition;
+
+                Translate += new Vector3(movement.ToVector2(), 0);
+            }
+
+            if (inputManager.JustMiddleClickReleased()) {
+                _dragging = false;
+            }
         }
 
-        public Matrix Projection => Matrix.CreateScale(_zoomLevel)*Matrix.CreateTranslation(_translate);
+        public Matrix Projection => Matrix.CreateScale(ZoomLevel)*Matrix.CreateTranslation(Translate);
 
         public Vector2 HexToPixel(AxialCoord coord) {
             int row = coord.Y;

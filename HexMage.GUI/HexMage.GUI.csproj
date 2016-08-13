@@ -7,7 +7,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{EECE0189-FCF4-40CC-AD6A-0BCEC2FAA6E6}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HexMage.GUI</RootNamespace>
     <AssemblyName>HexMage.GUI</AssemblyName>

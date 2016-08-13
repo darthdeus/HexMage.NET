@@ -26,12 +26,12 @@ namespace HexMage.GUI {
                     _gameInstance.MobManager.AddMob(mob);
                 }
             }
-
             _gameInstance.TurnManager.StartNextTurn();
         }
 
-
         public override void Initialize() {
+            Camera2D.Instance.Translate = new Vector3(600, 500, 0);
+
             var gameBoardEntity = CreateRootEntity();
             gameBoardEntity.AddComponent(new GameBoardController(_gameInstance));
             gameBoardEntity.Renderer = new GameBoardRenderer(_gameInstance, _camera);

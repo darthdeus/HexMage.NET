@@ -2,8 +2,7 @@ using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace HexMage.GUI
-{
+namespace HexMage.GUI {
     public class InputManager {
         public static readonly InputManager Instance = new InputManager();
 
@@ -45,10 +44,26 @@ namespace HexMage.GUI
             return _lastMouseState.RightButton == ButtonState.Released &&
                    _currentMouseState.RightButton == ButtonState.Pressed;
         }
+
+        public bool JustRightClickReleased() {
+            return _lastMouseState.RightButton == ButtonState.Pressed &&
+                   _currentMouseState.RightButton == ButtonState.Released;
+        }
+
+        public bool JustMiddleClicked() {
+            return _lastMouseState.MiddleButton == ButtonState.Released &&
+                   _currentMouseState.MiddleButton == ButtonState.Pressed;
+        }
+
+        public bool JustMiddleClickReleased() {
+            return _lastMouseState.MiddleButton == ButtonState.Pressed &&
+                   _currentMouseState.MiddleButton == ButtonState.Released;
+        }
+
+
     }
 
-    public class GameInputManager
-    {
+    public class GameInputManager {
         private GameInstance _game;
         private TurnManager _turnManager;
         private Pathfinder _pathfinder;
