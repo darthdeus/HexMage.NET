@@ -137,6 +137,10 @@ namespace HexMage.GUI {
             AddChild(entity);
             return entity;
         }
+
+        public void RemoveEntity(Entity childEntity) {
+            Children.Remove(childEntity);            
+        }
     }
 
     public class SpriteRenderer : IRenderer {

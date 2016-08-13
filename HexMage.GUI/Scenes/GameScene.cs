@@ -24,6 +24,10 @@ namespace HexMage.GUI {
         private readonly List<Action> _afterUpdateActions = new List<Action>();
         // Root entities to be initialized on the next frame
         private readonly List<Entity> _toInitializeEntities = new List<Entity>();
+        // Entities to be destroyed at the end of the frame
+        private readonly List<Entity> _toDestroyEntities = new List<Entity>();
+
+        private readonly SortedList<DateTime, Action> _delayedActions = new SortedList<DateTime, Action>();
 
         protected GameScene(GameManager gameManager) {
             _gameManager = gameManager;
@@ -44,6 +48,28 @@ namespace HexMage.GUI {
                 entity.InitializeEntity(_assetManager);
             }
 
+            // Entities enqueued to be destroyed in the previous frame are now
+            // removed. Root entities get removed from the list, while nested ones
+            // are detached from their parent and GCd.
+            foreach (var entity in _toDestroyEntities) {
+                if (entity.Parent != null) {
+                    entity.Parent.RemoveEntity(entity);
+                } else {
+                    _rootEntities.Remove(entity);
+                }
+            }
+
+            // Delayed actions which are due are executed at once and removed from the queue.
+            var pendingActions = _delayedActions
+                .TakeWhile(x => x.Key < DateTime.Now)
+                .ToList();
+
+            foreach (var pair in pendingActions) {
+                pair.Value.Invoke();
+                _delayedActions.Remove(pair.Key);
+            }
+
+            // Layout of all root entities is always done before Update() is called
             foreach (var entity in _rootEntities) {
                 entity.LayoutEntity();
             }
@@ -70,7 +96,7 @@ namespace HexMage.GUI {
         }
 
         protected Entity CreateRootEntity() {
-            var entity = new Entity { Scene = this };
+            var entity = new Entity {Scene = this};
             _rootEntities.Add(entity);
             return entity;
         }
@@ -118,6 +144,14 @@ namespace HexMage.GUI {
 
         public void AddAndInitializeNextFrame(Entity entity) {
             _toInitializeEntities.Add(entity);
+        }
+
+        public void DestroyEntity(Entity entity) {
+            _toDestroyEntities.Add(entity);
+        }
+
+        public void DelayFor(TimeSpan delay, Action action) {
+            _delayedActions.Add(DateTime.Now.Add(delay), action);
         }
     }
 }

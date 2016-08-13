@@ -144,9 +144,12 @@ namespace HexMage.GUI.Components {
                                 var target = _gameInstance.TurnManager.CurrentTarget;
 
                                 fireball.TargetHit += () => {
+                                    Entity.Scene.DelayFor(TimeSpan.FromMilliseconds(500), () =>
+                                        ShowMessage("Enemy killed")
+                                    );
                                     var explosion = new Entity() {
                                         Projection = () => Camera2D.Instance.Projection,
-                                        SortOrder = Camera2D.SortProjectiles                                        
+                                        SortOrder = Camera2D.SortProjectiles
                                     };
 
                                     explosion.AddComponent(new PositionAtMob(target));
@@ -157,12 +160,14 @@ namespace HexMage.GUI.Components {
                                         32,
                                         4);
 
-                                    explosionAnimation.AnimationDone += () => { explosion.Active = false; };
+                                    explosionAnimation.AnimationDone += () => { Entity.Scene.DestroyEntity(explosion); };
 
                                     explosion.Renderer = new AnimationRenderer(explosionAnimation);
                                     explosion.AddComponent(new AnimationController(explosionAnimation));
 
                                     Entity.Scene.AddAndInitializeNextFrame(explosion);
+
+                                    Entity.Scene.DestroyEntity(fireball);
                                 };
 
                                 Entity.Scene.AddAndInitializeNextFrame(fireball);
