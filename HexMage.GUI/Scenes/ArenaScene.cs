@@ -27,6 +27,7 @@ namespace HexMage.GUI {
                 }
             }
             _gameInstance.TurnManager.StartNextTurn();
+            _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
         }
 
         public override void Initialize() {
@@ -63,7 +64,25 @@ namespace HexMage.GUI {
                 Padding = new Vector4(10, 10, 10, 10),
                 Renderer = new ColorRenderer(Color.LightCyan)
             };
-            abilityDetail.AddComponent(new ColorChanger(Color.Cyan));
+
+            var changer = new ColorChanger(Color.Cyan);
+            changer.OnHover += () => {
+                if (abilityIndex == turnManager.SelectedAbilityIndex.GetValueOrDefault(-1)) {
+                    return Color.MistyRose;
+                } else {
+                    return Color.Cyan;
+                }
+            };
+
+            changer.RegularColorFunc += () => {
+                if (abilityIndex == turnManager.SelectedAbilityIndex.GetValueOrDefault(-1)) {
+                    return Color.MistyRose;
+                } else {
+                    return Color.LightCyan;
+                }
+            };
+
+            abilityDetail.AddComponent(changer);
 
             var dmgLabel = new Label(_assetManager.Font);
             abilityDetail.AddChild(dmgLabel);
@@ -74,10 +93,16 @@ namespace HexMage.GUI {
             var elementLabel = new Label(_assetManager.Font);
             abilityDetail.AddChild(elementLabel);
 
-            abilityDetail.AddComponent(new AbilityUpdater(turnManager, abilityIndex,
+            var abilityUpdater = new AbilityUpdater(turnManager,
+                abilityIndex,
                 dmgLabel,
                 rangeLabel,
-                elementLabel));
+                elementLabel);
+            abilityDetail.AddComponent(abilityUpdater);
+
+            abilityUpdater.OnClick += index => {
+                turnManager.SelectedAbilityIndex = index;
+            };
 
             return abilityDetail;
         }
@@ -88,8 +113,12 @@ namespace HexMage.GUI {
             private readonly Label _dmgLabel;
             private readonly Label _rangeLabel;
             private readonly Label _elementLabel;
+            private Ability _ability;
 
-            public AbilityUpdater(TurnManager turnManager, int abilityIndex, Label dmgLabel, Label rangeLabel, Label elementLabel) {
+            public event Action<int> OnClick;
+
+            public AbilityUpdater(TurnManager turnManager, int abilityIndex, Label dmgLabel, Label rangeLabel,
+                                  Label elementLabel) {
                 _turnManager = turnManager;
                 _abilityIndex = abilityIndex;
                 _dmgLabel = dmgLabel;
@@ -103,11 +132,21 @@ namespace HexMage.GUI {
                     Debug.Assert(mob.Abilities.Count == Mob.AbilityCount);
                     Debug.Assert(_abilityIndex < mob.Abilities.Count);
 
-                    var ability = mob.Abilities[_abilityIndex];
+                    _ability = mob.Abilities[_abilityIndex];
 
-                    _dmgLabel.Text = $"DMG {ability.Dmg}, Cost {ability.Cost}";
-                    _rangeLabel.Text = $"Range {ability.Range}";
-                    _elementLabel.Text = ability.Element.ToString();
+                    var inputManager = InputManager.Instance;
+                    var aabb = new Rectangle(Entity.RenderPosition.ToPoint(),
+                        Entity.CachedSize.ToPoint());
+
+                    if (inputManager.JustLeftClicked()) {
+                        if (aabb.Contains(inputManager.MousePosition)) {
+                            OnClick?.Invoke(_abilityIndex);
+                        }
+                    }
+                    
+                    _dmgLabel.Text = $"DMG {_ability.Dmg}, Cost {_ability.Cost}";
+                    _rangeLabel.Text = $"Range {_ability.Range}";
+                    _elementLabel.Text = _ability.Element.ToString();
                 }
             }
         }

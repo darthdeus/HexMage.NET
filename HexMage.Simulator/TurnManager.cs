@@ -8,6 +8,7 @@ namespace HexMage.Simulator
         public List<Mob> TurnOrder { get; set; } = new List<Mob>();
         public Mob CurrentMob => TurnOrder[_current];
         public Mob CurrentTarget { get; set; }
+        public int? SelectedAbilityIndex { get; set; }
 
         private int _current = 0;
 
@@ -21,8 +22,7 @@ namespace HexMage.Simulator
 
         public void StartNextTurn() {
             TurnOrder.Clear();
-            CurrentTarget = null;
-
+       
             foreach (var mob in MobManager.Mobs) {
                 mob.AP = mob.MaxAP;
                 if (mob.HP > 0) {
@@ -42,6 +42,8 @@ namespace HexMage.Simulator
         }
 
         public bool MoveNext() {
+            CurrentTarget = null;
+            SelectedAbilityIndex = null;
             if (!IsTurnDone()) _current++;
             return !IsTurnDone();
         }
