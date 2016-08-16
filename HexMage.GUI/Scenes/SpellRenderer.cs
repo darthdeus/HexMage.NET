@@ -14,6 +14,11 @@ namespace HexMage.GUI {
         }
 
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
+            //var effect = assetManager.LoadEffect(AssetManager.ShaderAbility);
+
+            //batch.Begin(effect: effect);
+            batch.Begin();
+
             var mob = _turnManager.CurrentMob;
             if (mob != null) {
                 var ability = mob.Abilities[_abilityIndex];
@@ -29,6 +34,8 @@ namespace HexMage.GUI {
                 Debug.WriteLine("ERROR - Rendering abilities, but no mob is currently active.");
                 batch.Draw(assetManager[AssetManager.NoTexture], entity.RenderPosition);
             }
+
+            batch.End();
         }
 
         private string ElementBg(Ability ability, bool active = false) {

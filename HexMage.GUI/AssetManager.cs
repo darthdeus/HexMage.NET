@@ -32,10 +32,13 @@ namespace HexMage.GUI {
         public static readonly string SpellAirBG = "ability_ui/spell_air_bg";
         public static readonly string SpellAirActiveBG = "ability_ui/spell_air_active_bg";
 
+        public static readonly string ShaderAbility = "shaders/ability_shader";
+
         private static readonly string FontName = "Arial";
 
         private readonly ContentManager _contentManager;
         private readonly Dictionary<string, Texture2D> _textures = new Dictionary<string, Texture2D>();
+        private readonly Dictionary<string, Effect> _effects = new Dictionary<string, Effect>();
         private SpriteFont _font;
 
         public AssetManager(ContentManager contentManager) {
@@ -50,6 +53,15 @@ namespace HexMage.GUI {
                     _textures[name] = _contentManager.Load<Texture2D>(name);
                     return _textures[name];
                 }
+            }
+        }
+
+        public Effect LoadEffect(string name) {
+            if (_effects.ContainsKey(name)) {
+                return _effects[name];
+            } else {
+                _effects[name] = _contentManager.Load<Effect>(name);
+                return _effects[name];
             }
         }
 

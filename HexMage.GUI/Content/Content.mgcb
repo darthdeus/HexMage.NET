@@ -379,3 +379,9 @@
 /processorParam:TextureFormat=Color
 /build:tiles/wall_hex.png
 
+#begin shaders/ability_shader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/ability_shader.fx
+

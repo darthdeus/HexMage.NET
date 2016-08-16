@@ -46,7 +46,8 @@ namespace HexMage.GUI {
             var layout = new HorizontalLayout {
                 Spacing = 40,
                 Position = new Vector2(0, 850),
-                SortOrder = Camera2D.SortUI
+                SortOrder = Camera2D.SortUI,
+                //CustomBatch = true
             };
 
             AddRootEntity(layout);

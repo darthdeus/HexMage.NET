@@ -69,6 +69,10 @@ namespace HexMage.GUI.Components {
                 _mobPopover.InitializeEntity(assetManager);
             }
 
+            CreateMobEntities(assetManager);
+        }
+
+        private void CreateMobEntities(AssetManager assetManager) {
             foreach (var mob in _gameInstance.MobManager.Mobs) {
                 var mobAnimationController = new MobAnimationController();
 
