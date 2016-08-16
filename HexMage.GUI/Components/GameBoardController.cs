@@ -105,13 +105,13 @@ namespace HexMage.GUI.Components {
                 }
             }
 
-            var currentMob = _gameInstance.TurnManager.CurrentMob;
             if (inputManager.IsKeyJustPressed(Keys.Space)) {
                 _gameInstance.TurnManager.NextMobOrNewTurn();
                 // TODO - fix this, it's ugly
-                _gameInstance.Pathfinder.PathfindFrom(currentMob.Coord);
+                _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
             }
 
+            var currentMob = _gameInstance.TurnManager.CurrentMob;
             if (inputManager.JustLeftClickReleased()) {
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
                     var mob = _gameInstance.MobManager.AtCoord(mouseHex);
