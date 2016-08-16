@@ -6,22 +6,31 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI {
     public class AssetManager {
-        public static readonly string WallSprite = "wall_hex";
-        public static readonly string PathSprite = "path_hex";
-        public static readonly string MobSprite = "mage";
-        public static readonly string EmptyHexSprite = "photoshopTile";
-        public static readonly string GraySprite = "gray";
-        public static readonly string HoverSprite = "hover_hex";
-        public static readonly string TargetSprite = "target_hex";
-        public static readonly string FireballSprite = "fireball";
-        public static readonly string ExplosionSprite = "explosion";
+        public static readonly string DarkMageIdle = "mobs/dark-mage-idle";
+        public static readonly string DarkMageClicked = "mobs/dark-mage-clicked";
+        public static readonly string MobSprite = "mobs/mage";
+        public static readonly string FireballSprite = "mobs/fireball";
+        public static readonly string ExplosionSprite = "mobs/explosion";
 
-        public static string DarkMage {
-            get { throw new NotImplementedException(); }
-        }
+        public static readonly string HexWallSprite = "tiles/wall_hex";
+        public static readonly string HexPathSprite = "tiles/path_hex";
+        public static readonly string HexEmptySprite = "tiles/photoshopTile";
+        public static readonly string HexGraySprite = "tiles/gray";
+        public static readonly string HexHoverSprite = "tiles/hover_hex";
+        public static readonly string HexTargetSprite = "tiles/target_hex";
+        public static readonly string HexWithinDistance = "tiles/hex_within_distance";
 
-        public static readonly string DarkMageIdle = "dark-mage-idle";
-        public static readonly string DarkMageClicked = "dark-mage-clicked";
+        public static readonly string NoTexture = "ability_ui/magenta";
+        public static readonly string SpellHighlight = "ability_ui/spell_highlight";
+
+        public static readonly string SpellEarthBG = "ability_ui/spell_earth_bg";
+        public static readonly string SpellEarthActiveBG = "ability_ui/spell_earth_active_bg";
+        public static readonly string SpellFireBG = "ability_ui/spell_fire_bg";
+        public static readonly string SpellFireActiveBG = "ability_ui/spell_fire_active_bg";
+        public static readonly string SpellWaterBG = "ability_ui/spell_water_bg";
+        public static readonly string SpellWaterActiveBG = "ability_ui/spell_water_active_bg";
+        public static readonly string SpellAirBG = "ability_ui/spell_air_bg";
+        public static readonly string SpellAirActiveBG = "ability_ui/spell_air_active_bg";
 
         private static readonly string FontName = "Arial";
 
@@ -54,7 +63,7 @@ namespace HexMage.GUI {
 
         public void Preload() {
             _font = _contentManager.Load<SpriteFont>(FontName);
-            foreach (var texture in new[] {WallSprite, PathSprite, MobSprite, EmptyHexSprite}) {
+            foreach (var texture in new[] {HexWallSprite, HexPathSprite, MobSprite, HexEmptySprite}) {
                 _textures[texture] = _contentManager.Load<Texture2D>(texture);
             }
         }

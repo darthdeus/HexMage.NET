@@ -44,7 +44,7 @@ namespace HexMage.GUI
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             _assetManager.Preload();
-            _assetManager.RegisterTexture(AssetManager.GraySprite,
+            _assetManager.RegisterTexture(AssetManager.HexGraySprite,
                 TextureGenerator.SolidColor(GraphicsDevice, 32, 32, Color.LightGray));
 
             _gameManager = new GameManager(_camera, _inputManager, _assetManager, _spriteBatch);

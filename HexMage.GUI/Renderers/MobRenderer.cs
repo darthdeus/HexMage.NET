@@ -24,18 +24,18 @@ namespace HexMage.GUI.Components {
             var pos = camera.HexToPixel(_mob.Coord);
 
             if (_gameInstance.TurnManager.CurrentMob == _mob) {
-                batch.Draw(assetManager[AssetManager.HoverSprite], pos, Color.White);
+                batch.Draw(assetManager[AssetManager.HexHoverSprite], pos, Color.White);
             }
 
             if (_gameInstance.TurnManager.CurrentTarget == _mob) {
-                batch.Draw(assetManager[AssetManager.TargetSprite], pos, Color.White);
+                batch.Draw(assetManager[AssetManager.HexTargetSprite], pos, Color.White);
             }
 
             var color = _mob.Team.Color == TeamColor.Red ? Color.OrangeRed : Color.Blue;
             _animationController.CurrentAnimation.RenderFrame(mobEntity, pos, color, batch, assetManager);
 
             // TODO - extract this out
-            var gray = assetManager[AssetManager.GraySprite];
+            var gray = assetManager[AssetManager.HexGraySprite];
 
             var hbPos = pos.ToPoint() + new Point(29, 4);
 

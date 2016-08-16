@@ -105,74 +105,28 @@ namespace HexMage.GUI.Components {
                 }
             }
 
+            var currentMob = _gameInstance.TurnManager.CurrentMob;
             if (inputManager.IsKeyJustPressed(Keys.Space)) {
                 _gameInstance.TurnManager.NextMobOrNewTurn();
                 // TODO - fix this, it's ugly
-                _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
+                _gameInstance.Pathfinder.PathfindFrom(currentMob.Coord);
             }
 
             if (inputManager.JustLeftClickReleased()) {
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
                     var mob = _gameInstance.MobManager.AtCoord(mouseHex);
                     if (mob != null) {
-                        if (mob == _gameInstance.TurnManager.CurrentMob) {
+                        if (mob == currentMob) {
                             ShowMessage("You can't target yourself.");
                         } else {
-                            if (mob.Team.Color == _gameInstance.TurnManager.CurrentMob.Team.Color) {
+                            if (mob.Team.Color == currentMob.Team.Color) {
                                 ShowMessage("You can't target your team.");
                             } else {
-                                _gameInstance.TurnManager.CurrentTarget = mob;
-
-                                var fireballAnimation = new Animation(AssetManager.FireballSprite,
-                                    TimeSpan.FromMilliseconds(50),
-                                    32,
-                                    4);
-
-                                fireballAnimation.Origin = new Vector2(16, 16);
-
-                                var fireball = new ProjectileEntity(
-                                    TimeSpan.FromMilliseconds(1500),
-                                    _gameInstance.TurnManager.CurrentMob.Coord,
-                                    _gameInstance.TurnManager.CurrentTarget.Coord) {
-                                        Renderer = new AnimationRenderer(fireballAnimation),
-                                        SortOrder = Camera2D.SortProjectiles,
-                                        Projection = () => Camera2D.Instance.Projection
-                                    };
-
-                                fireball.AddComponent(new AnimationController(fireballAnimation));
-
-                                var target = _gameInstance.TurnManager.CurrentTarget;
-
-                                fireball.TargetHit += () => {
-                                    Entity.Scene.DelayFor(TimeSpan.FromMilliseconds(500), () =>
-                                        ShowMessage("Enemy killed")
-                                    );
-                                    var explosion = new Entity() {
-                                        Projection = () => Camera2D.Instance.Projection,
-                                        SortOrder = Camera2D.SortProjectiles
-                                    };
-
-                                    explosion.AddComponent(new PositionAtMob(target));
-
-                                    var explosionAnimation = new Animation(
-                                        AssetManager.ExplosionSprite,
-                                        TimeSpan.FromMilliseconds(350),
-                                        32,
-                                        4);
-
-                                    explosionAnimation.AnimationDone += () => { Entity.Scene.DestroyEntity(explosion); };
-
-                                    explosion.Renderer = new AnimationRenderer(explosionAnimation);
-                                    explosion.AddComponent(new AnimationController(explosionAnimation));
-
-                                    Entity.Scene.AddAndInitializeNextFrame(explosion);
-
-                                    Entity.Scene.DestroyEntity(fireball);
-                                };
-
-                                Entity.Scene.AddAndInitializeNextFrame(fireball);
+                                AttackMob(mob);
                             }
                         }
+                    } else {
+                        MoveTo(currentMob, mouseHex);
                     }
                 }
             }
@@ -218,6 +172,68 @@ namespace HexMage.GUI.Components {
             }
 
             UpdateMobPositions();
+        }
+
+        private void MoveTo(Mob currentMob, AxialCoord pos) {
+            var distance = currentMob.Coord.Distance(pos);
+            if (distance <= currentMob.AP) {
+                currentMob.AP -= distance;
+                currentMob.Coord = pos;
+                _gameInstance.Pathfinder.PathfindFrom(pos);
+            }
+        }
+
+        private void AttackMob(Mob mob) {
+            _gameInstance.TurnManager.CurrentTarget = mob;
+
+            var fireballAnimation = new Animation(AssetManager.FireballSprite,
+                TimeSpan.FromMilliseconds(50),
+                32,
+                4);
+
+            fireballAnimation.Origin = new Vector2(16, 16);
+
+            var fireball = new ProjectileEntity(
+                TimeSpan.FromMilliseconds(1500),
+                _gameInstance.TurnManager.CurrentMob.Coord,
+                _gameInstance.TurnManager.CurrentTarget.Coord) {
+                    Renderer = new AnimationRenderer(fireballAnimation),
+                    SortOrder = Camera2D.SortProjectiles,
+                    Projection = () => Camera2D.Instance.Projection
+                };
+
+            fireball.AddComponent(new AnimationController(fireballAnimation));
+
+            var target = _gameInstance.TurnManager.CurrentTarget;
+
+            fireball.TargetHit += () => {
+                Entity.Scene.DelayFor(TimeSpan.FromMilliseconds(500), () =>
+                                                                      ShowMessage("Enemy killed")
+                    );
+                var explosion = new Entity() {
+                    Projection = () => Camera2D.Instance.Projection,
+                    SortOrder = Camera2D.SortProjectiles
+                };
+
+                explosion.AddComponent(new PositionAtMob(target));
+
+                var explosionAnimation = new Animation(
+                    AssetManager.ExplosionSprite,
+                    TimeSpan.FromMilliseconds(350),
+                    32,
+                    4);
+
+                explosionAnimation.AnimationDone += () => { Entity.Scene.DestroyEntity(explosion); };
+
+                explosion.Renderer = new AnimationRenderer(explosionAnimation);
+                explosion.AddComponent(new AnimationController(explosionAnimation));
+
+                Entity.Scene.AddAndInitializeNextFrame(explosion);
+
+                Entity.Scene.DestroyEntity(fireball);
+            };
+
+            Entity.Scene.AddAndInitializeNextFrame(fireball);
         }
 
         private void UpdateMobPositions() {

@@ -3,15 +3,16 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.UI {
-    public class HorizontalLayout : Entity
-    {
+    public class HorizontalLayout : Entity {
+        public int Spacing = 0;
+
         protected override void Layout() {
             float offset = 0;
             float maxHeight = 0;
 
             foreach (var element in Children) {
                 element.Position = new Vector2(offset, 0);
-                offset += element.CachedSize.X;
+                offset += element.CachedSize.X + Spacing;
                 maxHeight = Math.Max(maxHeight, element.CachedSize.Y);
             }
 

@@ -19,10 +19,10 @@ namespace HexMage.GUI.Renderers {
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
             _spriteBatch = batch;
             _assetManager = assetManager;
-            
+
             DrawBackground();
             DrawHoverPath();
-            DrawMousePosition();            
+            DrawMousePosition();
         }
 
         private void DrawBackground() {
@@ -36,8 +36,8 @@ namespace HexMage.GUI.Renderers {
             int minY = Int32.MaxValue;
             int minZ = Int32.MaxValue;
 
-            var hexGreen = _assetManager[AssetManager.EmptyHexSprite];
-            var hexWall = _assetManager[AssetManager.WallSprite];
+            var hexGreen = _assetManager[AssetManager.HexEmptySprite];
+            var hexWall = _assetManager[AssetManager.HexWallSprite];
 
             foreach (var coord in _gameInstance.Map.AllCoords) {
                 maxX = Math.Max(maxX, coord.ToCube().X);
@@ -55,22 +55,28 @@ namespace HexMage.GUI.Renderers {
                 }
             }
 
-            _spriteBatch.DrawString(_assetManager.Font, $"{minX},{minY},{minZ}   {maxX},{maxY},{maxZ}",
-                                    new Vector2(0, 50),
-                                    Color.Red);
+            //_spriteBatch.DrawString(_assetManager.Font, $"{minX},{minY},{minZ}   {maxX},{maxY},{maxZ}",
+            //                        new Vector2(0, 50),
+            //                        Color.Red);
             _spriteBatch.End();
         }
 
         private void DrawHoverPath() {
             _spriteBatch.Begin(transformMatrix: _camera.Projection);
 
-            var hexPath = _assetManager[AssetManager.PathSprite];
+            var hexPath = _assetManager[AssetManager.HexPathSprite];
 
             if (_gameInstance.Pathfinder.IsValidCoord(_camera.MouseHex)) {
                 var path = _gameInstance.Pathfinder.PathTo(_camera.MouseHex);
 
+                var currentMob = _gameInstance.TurnManager.CurrentMob;
+
                 foreach (var coord in path) {
-                    DrawAt(hexPath, coord);
+                    if (currentMob.Coord.Distance(coord) <= currentMob.AP) {
+                        DrawAt(_assetManager[AssetManager.HexWithinDistance], coord);
+                    } else {
+                        DrawAt(hexPath, coord);
+                    }
                 }
             }
             _spriteBatch.End();

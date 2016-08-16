@@ -144,14 +144,19 @@ namespace HexMage.GUI {
     }
 
     public class SpriteRenderer : IRenderer {
-        public readonly Texture2D Tex;
+        private readonly Func<Texture2D> _texFunc;
+        public Texture2D Tex;
+
+        public SpriteRenderer(Func<Texture2D> texFunc) {
+            _texFunc = texFunc;
+        }
 
         public SpriteRenderer(Texture2D tex) {
             Tex = tex;
         }
 
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
-            batch.Draw(Tex, entity.RenderPosition);
+            batch.Draw(_texFunc?.Invoke() ?? Tex, entity.RenderPosition);
         }
     }
 
