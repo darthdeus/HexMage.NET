@@ -8,7 +8,6 @@ namespace HexMage.GUI.Components {
         private Camera2D _camera;
         private InputManager _inputManager;
 
-
         public MobStateUpdater(Mob mob) {
             _mob = mob;
         }

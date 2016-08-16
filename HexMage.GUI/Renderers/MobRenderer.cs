@@ -20,8 +20,7 @@ namespace HexMage.GUI.Components {
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
             var mobEntity = (MobEntity)_mob.Metadata;
 
-            var camera = Camera2D.Instance;
-            var pos = camera.HexToPixel(_mob.Coord);
+            var pos = entity.Position;
 
             if (_gameInstance.TurnManager.CurrentMob == _mob) {
                 batch.Draw(assetManager[AssetManager.HexHoverSprite], pos, Color.White);
@@ -42,7 +41,7 @@ namespace HexMage.GUI.Components {
             double hpPercent = (double) _mob.HP/_mob.MaxHP;
             int healthbarHeight = 20;
             batch.Draw(gray, new Rectangle(hbPos, new Point(5, healthbarHeight)), Color.DarkGreen);
-            batch.Draw(gray, new Rectangle(hbPos, new Point(5, (int) (healthbarHeight*hpPercent))),
+            batch.Draw(gray, new Rectangle(hbPos + new Point(5, 0), new Point(5, (int) (healthbarHeight*hpPercent))),
                 Color.Yellow);
         }
 

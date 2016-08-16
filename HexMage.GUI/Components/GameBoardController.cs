@@ -170,13 +170,14 @@ namespace HexMage.GUI.Components {
             } else {
                 _messageBox.Active = true;
             }
-
-            UpdateMobPositions();
         }
 
         private void MoveTo(Mob currentMob, AxialCoord pos) {
             var distance = currentMob.Coord.Distance(pos);
             if (distance <= currentMob.AP) {
+                var mobEntity = (MobEntity) currentMob.Metadata;
+                mobEntity.MoveTo(pos);
+
                 currentMob.AP -= distance;
                 currentMob.Coord = pos;
                 _gameInstance.Pathfinder.PathfindFrom(pos);
@@ -234,13 +235,6 @@ namespace HexMage.GUI.Components {
             };
 
             Entity.Scene.AddAndInitializeNextFrame(fireball);
-        }
-
-        private void UpdateMobPositions() {
-            foreach (var mob in _gameInstance.MobManager.Mobs) {
-                var mobEntity = (MobEntity) mob.Metadata;
-                mobEntity.Position = Camera2D.Instance.HexToPixel(mob.Coord);
-            }
         }
     }
 }
