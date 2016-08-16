@@ -5,6 +5,9 @@ using System.Linq;
 using HexMage.GUI.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using OpenTK;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
+using Vector4 = Microsoft.Xna.Framework.Vector4;
 
 namespace HexMage.GUI {
     public class Component {
@@ -28,7 +31,8 @@ namespace HexMage.GUI {
     }
 
     public class Entity {
-        public Func<Matrix> Projection = () => Matrix.Identity;
+        public Func<Matrix> Transform { get; set; } = () => Matrix.Identity;
+        public Matrix RenderTransform { get; set; }
 
         public bool DebugMode { get; set; } = false;
         public int SortOrder = 0;
@@ -125,7 +129,9 @@ namespace HexMage.GUI {
             RenderPosition = Position
                              + (Parent?.RenderPosition ?? Vector2.Zero);
 
-            if (!CustomBatch) batch.Begin(transformMatrix: Projection());
+            RenderTransform = (Parent?.RenderTransform ?? Matrix.Identity) * Transform();
+
+            if (!CustomBatch) batch.Begin(transformMatrix: RenderTransform);
             Renderer?.Render(this, batch, assetManager);
             if (!CustomBatch) batch.End();
 

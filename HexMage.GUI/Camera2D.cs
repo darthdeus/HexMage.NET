@@ -75,7 +75,7 @@ namespace HexMage.GUI
             }
         }
 
-        public Matrix Projection => Matrix.CreateScale(ZoomLevel)*Matrix.CreateTranslation(Translate);
+        public Matrix Transform => Matrix.CreateScale(ZoomLevel)*Matrix.CreateTranslation(Translate);
 
         public Vector2 HexToPixel(AxialCoord coord) {
             int row = coord.Y;
@@ -88,10 +88,10 @@ namespace HexMage.GUI
         }
 
         public Vector2 MousePixelPos => new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
-        public Vector2 MouseWorldPixelPos => Vector2.Transform(MousePixelPos, Matrix.Invert(Projection));
+        public Vector2 MouseWorldPixelPos => Vector2.Transform(MousePixelPos, Matrix.Invert(Transform));
 
         public AxialCoord PixelToHex(Vector2 pos) {
-            pos = Vector2.Transform(pos, Matrix.Invert(Projection)) - new Vector2(Config.GridSize/2);
+            pos = Vector2.Transform(pos, Matrix.Invert(Transform)) - new Vector2(Config.GridSize/2);
 
             var row = (int) Math.Round(pos.Y/Config.HeightOffset);
             var col = (int) Math.Round(pos.X/Config.GridSize - row/2.0);

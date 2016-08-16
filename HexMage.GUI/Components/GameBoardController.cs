@@ -46,7 +46,7 @@ namespace HexMage.GUI.Components {
                     Renderer = new ColorRenderer(Color.LightGray),
                     Padding = new Vector4(20, 10, 20, 10),
                     SortOrder = Camera2D.SortUI,
-                    Projection = () => Camera2D.Instance.Projection
+                    Transform = () => Camera2D.Instance.Transform
                 };
 
                 _emptyHexLabel = _emptyHexPopover.AddChild(new Label("Just an empty hex", assetManager.Font));
@@ -60,7 +60,7 @@ namespace HexMage.GUI.Components {
                     Renderer = new ColorRenderer(Color.LightGray),
                     Padding = new Vector4(20, 10, 20, 10),
                     SortOrder = Camera2D.SortUI,
-                    Projection = () => Camera2D.Instance.Projection
+                    Transform = () => Camera2D.Instance.Transform
                 };
 
                 _mobHealthLabel = _mobPopover.AddChild(new Label("Mob health", assetManager.Font));
@@ -80,7 +80,7 @@ namespace HexMage.GUI.Components {
                     //Renderer = new SpriteRenderer(assetManager[AssetManager.MobTexture]),
                     Renderer = new MobRenderer(_gameInstance, mob, mobAnimationController),
                     SortOrder = Camera2D.SortMobs,
-                    Projection = () => Camera2D.Instance.Projection
+                    Transform = () => Camera2D.Instance.Transform
                 };
                 mob.Metadata = mobEntity;
                 mobEntity.AddComponent(mobAnimationController);
@@ -204,7 +204,7 @@ namespace HexMage.GUI.Components {
                 _gameInstance.TurnManager.CurrentTarget.Coord) {
                     Renderer = new AnimationRenderer(fireballAnimation),
                     SortOrder = Camera2D.SortProjectiles,
-                    Projection = () => Camera2D.Instance.Projection
+                    Transform = () => Camera2D.Instance.Transform
                 };
 
             fireball.AddComponent(new AnimationController(fireballAnimation));
@@ -216,7 +216,7 @@ namespace HexMage.GUI.Components {
                                                                       ShowMessage("Enemy killed")
                     );
                 var explosion = new Entity() {
-                    Projection = () => Camera2D.Instance.Projection,
+                    Transform = () => Camera2D.Instance.Transform,
                     SortOrder = Camera2D.SortProjectiles
                 };
 

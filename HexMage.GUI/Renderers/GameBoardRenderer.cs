@@ -26,7 +26,7 @@ namespace HexMage.GUI.Renderers {
         }
 
         private void DrawBackground() {
-            _spriteBatch.Begin(transformMatrix: _camera.Projection);
+            _spriteBatch.Begin(transformMatrix: _camera.Transform);
 
             int maxX = Int32.MinValue;
             int maxY = Int32.MinValue;
@@ -62,7 +62,7 @@ namespace HexMage.GUI.Renderers {
         }
 
         private void DrawHoverPath() {
-            _spriteBatch.Begin(transformMatrix: _camera.Projection);
+            _spriteBatch.Begin(transformMatrix: _camera.Transform);
 
             var hexPath = _assetManager[AssetManager.HexPathSprite];
 
