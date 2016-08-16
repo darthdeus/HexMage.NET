@@ -125,8 +125,10 @@ namespace HexMage.GUI {
             RenderPosition = Position
                              + (Parent?.RenderPosition ?? Vector2.Zero);
 
+            if (!CustomBatch) batch.Begin(transformMatrix: Projection());
             Renderer?.Render(this, batch, assetManager);
-            
+            if (!CustomBatch) batch.End();
+
             foreach (var entity in ActiveChildren) {
                 entity.Render(batch, assetManager);
             }

@@ -47,7 +47,6 @@ namespace HexMage.GUI {
                 Spacing = 40,
                 Position = new Vector2(0, 850),
                 SortOrder = Camera2D.SortUI,
-                //CustomBatch = true
             };
 
             AddRootEntity(layout);
@@ -62,7 +61,8 @@ namespace HexMage.GUI {
         private Entity AbilityDetail(TurnManager turnManager, int abilityIndex) {
             var abilityDetail = new VerticalLayout {
                 Padding = new Vector4(10, 10, 10, 10),
-                Renderer = new SpellRenderer(turnManager, abilityIndex)
+                Renderer = new SpellRenderer(turnManager, abilityIndex),
+                CustomBatch = true
             };
 
             var dmgLabel = new Label(_assetManager.Font);
