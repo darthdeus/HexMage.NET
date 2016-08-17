@@ -10,26 +10,6 @@ using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Vector4 = Microsoft.Xna.Framework.Vector4;
 
 namespace HexMage.GUI {
-    public class Component {
-        public bool IsInitialized { get; private set; } = false;
-        public Entity Entity { get; set; }
-        public virtual void Initialize(AssetManager assetManager) {}
-        public virtual void Update(GameTime time) {}
-
-        // TODO - find a better name for this
-        protected void AssertNotInitialized() {
-            if (IsInitialized) {
-                Console.WriteLine($"Component {this} for {Entity} already initialized.");
-            } else {
-                IsInitialized = true;
-            }
-        }
-    }
-
-    public interface IRenderer {
-        void Render(Entity entity, SpriteBatch batch, AssetManager assetManager);
-    }
-
     public class Entity {
         public Func<Matrix> Transform { get; set; } = () => Matrix.Identity;
         public Matrix RenderTransform { get; set; }
@@ -58,6 +38,8 @@ namespace HexMage.GUI {
 
         public Entity Parent { get; set; }
         public List<Entity> Children { get; } = new List<Entity>();
+        public Func<Vector2> SizeFunc { get; set; }
+
         protected List<Component> Components { get; } = new List<Component>();
 
         public IRenderer Renderer { get; set; }
@@ -70,6 +52,13 @@ namespace HexMage.GUI {
 
         public void AddComponent<T>(T component) where T : Component {
             component.Entity = this;
+            Components.Add(component);
+        }
+
+        public void AddComponent(Action<GameTime> componentFunc) {
+            var component = new LambdaComponent(componentFunc) {
+                Entity = this
+            };
             Components.Add(component);
         }
 
@@ -105,8 +94,12 @@ namespace HexMage.GUI {
         }
 
         protected virtual void Layout() {
-            CachedSize = Children.LastOrDefault()?.CachedSize ?? Vector2.Zero;
-            CachedSize += PaddingSizeIncrease;
+            if (SizeFunc != null) {
+                CachedSize = SizeFunc() + PaddingSizeIncrease;
+            } else {
+                CachedSize = Children.LastOrDefault()?.CachedSize ?? Vector2.Zero;
+                CachedSize += PaddingSizeIncrease;
+            }
         }
 
         protected virtual void Update(GameTime time) {}

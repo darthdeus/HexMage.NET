@@ -86,12 +86,6 @@ namespace HexMage.GUI.Components {
                 mobEntity.AddComponent(mobAnimationController);
                 mobEntity.AddComponent(new MobStateUpdater(mob));
 
-                var particles = new ParticleSystem(100, 3, new Vector2(0, -1), 1, _assetManager[AssetManager.ParticleSprite],
-                    0.01f) {
-                        CustomBatch = true
-                    };
-                mobEntity.AddChild(particles);
-
                 Entity.Scene.AddRootEntity(mobEntity);
                 mobEntity.InitializeEntity(assetManager);
             }

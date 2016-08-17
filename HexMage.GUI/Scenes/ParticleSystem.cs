@@ -27,9 +27,17 @@ namespace HexMage.GUI {
         private Random _rnd;
         private float _millisecondTimeout;
         private float _elapsedSinceLastEmit = 0;
+        private readonly Func<Random, Vector2> _offsetFunc;
+        private readonly Func<Random, Vector2> _velocityFunc;
 
-        public ParticleSystem(int particleCount, int perSecond, Vector2 direction, float speed, Texture2D particleSprite,
-                              float ageSpeed) {
+        public Func<Color> ColorFunc;
+
+        public ParticleSystem(int particleCount, int perSecond, Vector2 direction,
+                              float speed, Texture2D particleSprite, float ageSpeed,
+                              Func<Random, Vector2> offsetFunc,
+                              Func<Random, Vector2> velocityFunc) {
+            _offsetFunc = offsetFunc;
+            _velocityFunc = velocityFunc;
             ParticleCount = particleCount;
             PerSecond = perSecond;
             _millisecondTimeout = 1.0f/perSecond;
@@ -64,12 +72,11 @@ namespace HexMage.GUI {
         }
 
         private void EmitParticle() {
-            var offset = new Vector2((float) _rnd.NextDouble(),
-                (float) _rnd.NextDouble());
+            var offset = _offsetFunc.Invoke(_rnd);
 
-            var velocity = Direction*Speed + offset;
+            var velocity = Direction*Speed + _velocityFunc.Invoke(_rnd);
             var particle = new Particle(velocity) {
-                Position = offset * 10
+                Position = offset*10
             };
 
             Particles.Add(particle);

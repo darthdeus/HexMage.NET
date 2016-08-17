@@ -16,10 +16,12 @@ namespace HexMage.GUI {
                 batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null,
                     null, entity.RenderTransform);
 
-                var ageColor = Color.White*(1 - particle.Age)*(1 - particle.Age)*(1 - particle.Age);
-                var rotation = (float) Math.PI * particle.Age;
+                var tintColor = _particleSystem.ColorFunc?.Invoke() ?? Color.White;
+                var ageColor = tintColor*(1 - particle.Age)*(1 - particle.Age)*(1 - particle.Age);
+                var rotation = (float) Math.PI*particle.Age;
+
                 batch.Draw(_particleSystem.ParticleSprite,
-                    particle.Position,
+                    _particleSystem.RenderPosition + particle.Position,
                     null, ageColor, rotation, Vector2.Zero, 1 - particle.Age*particle.Age, SpriteEffects.None, 0);
 
                 batch.End();

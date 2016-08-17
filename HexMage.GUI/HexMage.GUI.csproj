@@ -43,6 +43,7 @@
     </StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Component.cs" />
     <Compile Include="Components\Animation.cs" />
     <Compile Include="Components\AnimationController.cs" />
     <Compile Include="Components\GameBoardController.cs" />
@@ -51,6 +52,8 @@
     <Compile Include="Components\MobStateUpdater.cs" />
     <Compile Include="Components\PositionAtMob.cs" />
     <Compile Include="Components\ProjectileEntity.cs" />
+    <Compile Include="IRenderer.cs" />
+    <Compile Include="LambdaComponent.cs" />
     <Compile Include="Renderers\AnimationRenderer.cs" />
     <Compile Include="Renderers\MobRenderer.cs" />
     <Compile Include="Entity.cs" />

@@ -1,3 +1,4 @@
+using System;
 using HexMage.GUI.Components;
 using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
@@ -59,11 +60,17 @@ namespace HexMage.GUI {
         }
 
         private Entity AbilityDetail(TurnManager turnManager, int abilityIndex) {
-            var abilityDetail = new VerticalLayout {
+            var abilityDetailWrapper = new Entity {
+                SizeFunc = () => new Vector2(120, 80)
+            };
+
+            var abilityDetail = new VerticalLayout() {
                 Padding = new Vector4(10, 10, 10, 10),
                 Renderer = new SpellRenderer(turnManager, abilityIndex),
                 CustomBatch = true
             };
+
+            abilityDetailWrapper.AddChild(abilityDetail);
 
             var dmgLabel = new Label(_assetManager.Font);
             abilityDetail.AddChild(dmgLabel);
@@ -74,6 +81,48 @@ namespace HexMage.GUI {
             var elementLabel = new Label(_assetManager.Font);
             abilityDetail.AddChild(elementLabel);
 
+
+            float speed = 1;
+
+            float horizontalOffset = 6;
+            Func<Random, Vector2> offsetFunc = rnd =>
+                                               new Vector2(
+                                                   (float) rnd.NextDouble()*horizontalOffset*2 - horizontalOffset, 0);
+
+            Func<Random, Vector2> velocityFunc = rnd =>
+                                                 new Vector2((float) rnd.NextDouble(), (float) rnd.NextDouble()*speed);
+
+            var particles = new ParticleSystem(100, 3, new Vector2(0, -1), speed,
+                _assetManager[AssetManager.ParticleSprite],
+                0.01f, offsetFunc, velocityFunc);
+
+            particles.CustomBatch = true;
+            particles.Position = new Vector2(60, 120);
+            particles.ColorFunc = () => {
+                if (turnManager.SelectedAbilityIndex.HasValue) {
+                    int index = turnManager.SelectedAbilityIndex.Value;
+                    switch (turnManager.CurrentMob.Abilities[index].Element) {
+                        case AbilityElement.Earth:
+                            return Color.Orange;
+                        case AbilityElement.Fire:
+                            return Color.Red;
+                        case AbilityElement.Air:
+                            return Color.Gray;
+                        case AbilityElement.Water:
+                            return Color.Blue;
+                        default:
+                            return Color.White;
+                    }
+                } else {
+                    return Color.White;
+                }
+            };
+
+            abilityDetail.AddComponent(_ => { particles.Active = turnManager.SelectedAbilityIndex == abilityIndex; });
+
+            abilityDetailWrapper.AddChild(particles);
+
+
             var abilityUpdater = new AbilityUpdater(turnManager,
                 abilityIndex,
                 dmgLabel,
@@ -81,10 +130,15 @@ namespace HexMage.GUI {
                 elementLabel);
             abilityDetail.AddComponent(abilityUpdater);
 
-            abilityUpdater.OnClick += index => { turnManager.SelectedAbilityIndex = index; };
+            abilityUpdater.OnClick += index => {
+                if (turnManager.SelectedAbilityIndex == index) {
+                    turnManager.SelectedAbilityIndex = null;
+                } else {
+                    turnManager.SelectedAbilityIndex = index;
+                }
+            };
 
-            return abilityDetail;
+            return abilityDetailWrapper;
         }
-
     }
 }
