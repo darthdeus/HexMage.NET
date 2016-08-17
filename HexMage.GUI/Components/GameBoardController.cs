@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
@@ -125,7 +127,7 @@ namespace HexMage.GUI.Components {
                         } else {
                             if (mob.Team.Color == currentMob.Team.Color) {
                                 ShowMessage("You can't target your team.");
-                            } else {
+                            } else if (_gameInstance.TurnManager.SelectedAbilityIndex.HasValue) {
                                 AttackMob(mob);
                             }
                         }
@@ -191,54 +193,66 @@ namespace HexMage.GUI.Components {
         private void AttackMob(Mob mob) {
             _gameInstance.TurnManager.CurrentTarget = mob;
 
-            var fireballAnimation = new Animation(AssetManager.FireballSprite,
-                TimeSpan.FromMilliseconds(50),
-                32,
-                4);
+            var usableAbilities = _gameInstance.UsableAbilities(
+                _gameInstance.TurnManager.CurrentMob,
+                mob);
 
-            fireballAnimation.Origin = new Vector2(16, 16);
+            Debug.Assert(_gameInstance.TurnManager.SelectedAbilityIndex != null,
+                "_gameInstance.TurnManager.SelectedAbilityIndex != null");
 
-            var fireball = new ProjectileEntity(
-                TimeSpan.FromMilliseconds(1500),
-                _gameInstance.TurnManager.CurrentMob.Coord,
-                _gameInstance.TurnManager.CurrentTarget.Coord) {
-                    Renderer = new AnimationRenderer(fireballAnimation),
-                    SortOrder = Camera2D.SortProjectiles,
-                    Transform = () => Camera2D.Instance.Transform
-                };
+            var abilityIndex = _gameInstance.TurnManager.SelectedAbilityIndex.Value;
+            var ability = _gameInstance.TurnManager.CurrentMob.Abilities[abilityIndex];
 
-            fireball.AddComponent(new AnimationController(fireballAnimation));
-
-            var target = _gameInstance.TurnManager.CurrentTarget;
-
-            fireball.TargetHit += () => {
-                Entity.Scene.DelayFor(TimeSpan.FromMilliseconds(500), () =>
-                                                                      ShowMessage("Enemy killed")
-                    );
-                var explosion = new Entity() {
-                    Transform = () => Camera2D.Instance.Transform,
-                    SortOrder = Camera2D.SortProjectiles
-                };
-
-                explosion.AddComponent(new PositionAtMob(target));
-
-                var explosionAnimation = new Animation(
-                    AssetManager.ExplosionSprite,
-                    TimeSpan.FromMilliseconds(350),
+            var usableAbility = usableAbilities.FirstOrDefault(ua => ua.Ability == ability);
+            if (usableAbility != null) {
+                var fireballAnimation = new Animation(AssetManager.FireballSprite,
+                    TimeSpan.FromMilliseconds(50),
                     32,
                     4);
 
-                explosionAnimation.AnimationDone += () => { Entity.Scene.DestroyEntity(explosion); };
+                fireballAnimation.Origin = new Vector2(16, 16);
 
-                explosion.Renderer = new AnimationRenderer(explosionAnimation);
-                explosion.AddComponent(new AnimationController(explosionAnimation));
+                var fireball = new ProjectileEntity(
+                    TimeSpan.FromMilliseconds(1500),
+                    _gameInstance.TurnManager.CurrentMob.Coord,
+                    _gameInstance.TurnManager.CurrentTarget.Coord) {
+                        Renderer = new AnimationRenderer(fireballAnimation),
+                        SortOrder = Camera2D.SortProjectiles,
+                        Transform = () => Camera2D.Instance.Transform
+                    };
 
-                Entity.Scene.AddAndInitializeNextFrame(explosion);
+                fireball.AddComponent(new AnimationController(fireballAnimation));
 
-                Entity.Scene.DestroyEntity(fireball);
-            };
+                var target = _gameInstance.TurnManager.CurrentTarget;
 
-            Entity.Scene.AddAndInitializeNextFrame(fireball);
+                fireball.TargetHit += () => {
+                    usableAbility.Use();
+
+                    var explosion = new Entity() {
+                        Transform = () => Camera2D.Instance.Transform,
+                        SortOrder = Camera2D.SortProjectiles
+                    };
+
+                    explosion.AddComponent(new PositionAtMob(target));
+
+                    var explosionAnimation = new Animation(
+                        AssetManager.ExplosionSprite,
+                        TimeSpan.FromMilliseconds(350),
+                        32,
+                        4);
+
+                    explosionAnimation.AnimationDone += () => { Entity.Scene.DestroyEntity(explosion); };
+
+                    explosion.Renderer = new AnimationRenderer(explosionAnimation);
+                    explosion.AddComponent(new AnimationController(explosionAnimation));
+
+                    Entity.Scene.AddAndInitializeNextFrame(explosion);
+
+                    Entity.Scene.DestroyEntity(fireball);
+                };
+
+                Entity.Scene.AddAndInitializeNextFrame(fireball);
+            }
         }
     }
 }

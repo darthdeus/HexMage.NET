@@ -122,7 +122,6 @@ namespace HexMage.GUI {
 
             abilityDetailWrapper.AddChild(particles);
 
-
             var abilityUpdater = new AbilityUpdater(turnManager,
                 abilityIndex,
                 dmgLabel,
