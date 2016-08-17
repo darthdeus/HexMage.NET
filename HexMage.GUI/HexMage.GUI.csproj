@@ -66,6 +66,8 @@
     <Compile Include="HexMageGame.cs" />
     <Compile Include="ImGui.cs" />
     <Compile Include="InputManager.cs" />
+    <Compile Include="Scenes\ParticleSystem.cs" />
+    <Compile Include="Scenes\ParticleSystemRenderer.cs" />
     <Compile Include="Scenes\SpellRenderer.cs" />
     <Compile Include="UI\ColorChanger.cs" />
     <Compile Include="Scenes\GameScene.cs" />

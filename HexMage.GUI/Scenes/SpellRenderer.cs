@@ -18,8 +18,7 @@ namespace HexMage.GUI {
 
             var time = ((float) DateTime.Now.Millisecond)/1000*2 - 1;
 
-            Console.WriteLine(time);
-            effect.Parameters["Time"].SetValue(time);
+            //effect.Parameters["Time"].SetValue(time);
             batch.Begin(effect: effect);
 
             var mob = _turnManager.CurrentMob;

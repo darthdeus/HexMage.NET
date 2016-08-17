@@ -34,6 +34,8 @@ namespace HexMage.GUI {
 
         public static readonly string ShaderAbility = "shaders/ability_shader";
 
+        public static readonly string ParticleSprite = "particle";
+
         private static readonly string FontName = "Arial";
 
         private readonly ContentManager _contentManager;
