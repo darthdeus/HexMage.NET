@@ -38,7 +38,7 @@ namespace HexMage.GUI {
 
         public Entity Parent { get; set; }
         public List<Entity> Children { get; } = new List<Entity>();
-        public Func<Vector2> SizeFunc { get; set; }
+        public Func<Vector2> SizeFunc { get; set; }        
 
         protected List<Component> Components { get; } = new List<Component>();
 
@@ -141,6 +141,10 @@ namespace HexMage.GUI {
 
         public void RemoveEntity(Entity childEntity) {
             Children.Remove(childEntity);            
+        }
+
+        public void EnqueueClickEvent(ClickEvent clickEvent) {
+            Scene.EnqueueClickEvent(clickEvent);
         }
     }
 

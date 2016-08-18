@@ -5,8 +5,7 @@ using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI {
-    public class AbilityUpdater : Component
-    {
+    public class AbilityUpdater : Component {
         private readonly TurnManager _turnManager;
         private readonly int _abilityIndex;
         private readonly Label _dmgLabel;
@@ -17,8 +16,7 @@ namespace HexMage.GUI {
         public event Action<int> OnClick;
 
         public AbilityUpdater(TurnManager turnManager, int abilityIndex, Label dmgLabel, Label rangeLabel,
-                              Label elementLabel)
-        {
+                              Label elementLabel) {
             _turnManager = turnManager;
             _abilityIndex = abilityIndex;
             _dmgLabel = dmgLabel;
@@ -26,11 +24,9 @@ namespace HexMage.GUI {
             _elementLabel = elementLabel;
         }
 
-        public override void Update(GameTime time)
-        {
+        public override void Update(GameTime time) {
             var mob = _turnManager.CurrentMob;
-            if (mob != null)
-            {
+            if (mob != null) {
                 Debug.Assert(mob.Abilities.Count == Mob.AbilityCount);
                 Debug.Assert(_abilityIndex < mob.Abilities.Count);
 
@@ -40,11 +36,9 @@ namespace HexMage.GUI {
                 var aabb = new Rectangle(Entity.RenderPosition.ToPoint(),
                     Entity.CachedSize.ToPoint());
 
-                if (inputManager.JustLeftClicked())
-                {
-                    if (aabb.Contains(inputManager.MousePosition))
-                    {
-                        OnClick?.Invoke(_abilityIndex);
+                if (inputManager.JustLeftClicked()) {
+                    if (aabb.Contains(inputManager.MousePosition)) {
+                        Entity.EnqueueClickEvent(new ClickEvent(Entity, () => OnClick?.Invoke(_abilityIndex)));
                     }
                 }
 

@@ -37,7 +37,7 @@ namespace HexMage.GUI.UI {
 
                 if (inputManager.JustLeftClickReleased()) {
                     MouseState = ElementMouseState.Clicked;
-                    OnClick?.Invoke(inputManager.MousePosition);
+                    EnqueueClickEvent(new ClickEvent(this, () => OnClick?.Invoke(inputManager.MousePosition)));
                 }
             }
         }

@@ -12,6 +12,16 @@ namespace HexMage.GUI {
         NewScene
     }
 
+    public class ClickEvent {
+        public readonly Entity Target;
+        public readonly Action Event;
+
+        public ClickEvent(Entity target, Action eventAction) {
+            Target = target;
+            Event = eventAction;
+        }
+    }
+
     public abstract class GameScene {
         protected readonly GameManager _gameManager;
         private readonly List<Entity> _rootEntities = new List<Entity>();
@@ -26,6 +36,8 @@ namespace HexMage.GUI {
         private readonly List<Entity> _toInitializeEntities = new List<Entity>();
         // Entities to be destroyed at the end of the frame
         private readonly List<Entity> _toDestroyEntities = new List<Entity>();
+
+        private readonly List<ClickEvent> _clickEvents = new List<ClickEvent>();
 
         private readonly SortedList<DateTime, Action> _delayedActions = new SortedList<DateTime, Action>();
 
@@ -150,6 +162,10 @@ namespace HexMage.GUI {
 
         public void DelayFor(TimeSpan delay, Action action) {
             _delayedActions.Add(DateTime.Now.Add(delay), action);
+        }
+
+        public void EnqueueClickEvent(ClickEvent clickEvent) {
+            _clickEvents.Add(clickEvent);
         }
     }
 }
