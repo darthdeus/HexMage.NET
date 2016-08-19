@@ -44,6 +44,8 @@ namespace HexMage.GUI {
 
         public IRenderer Renderer { get; set; }
 
+        public event Action OnClick;
+
         public IEnumerable<Entity> ActiveChildren => Children.Where(x => x.Active);
 
         public T GetComponent<T>() where T : Component {

@@ -9,8 +9,6 @@ namespace HexMage.GUI.UI {
         public string Text { get; set; }
         public SpriteFont Font { get; set; }
 
-        public event Action<Point> OnClick;
-
         public TextButton(string text, SpriteFont font) {
             Text = text;
             Font = font;
@@ -37,7 +35,7 @@ namespace HexMage.GUI.UI {
 
                 if (inputManager.JustLeftClickReleased()) {
                     MouseState = ElementMouseState.Clicked;
-                    EnqueueClickEvent(new ClickEvent(this, () => OnClick?.Invoke(inputManager.MousePosition)));
+                    EnqueueClickEvent(new ClickEvent(this, OnClick));
                 }
             }
         }
