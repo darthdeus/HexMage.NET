@@ -16,5 +16,9 @@ namespace HexMage.GUI {
                 IsInitialized = true;
             }
         }
+
+        protected void EnqueueClickEvent(Action action) {
+            Entity.EnqueueClickEvent(action);
+        }
     }
 }

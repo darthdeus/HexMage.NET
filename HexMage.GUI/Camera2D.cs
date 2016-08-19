@@ -4,8 +4,7 @@ using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace HexMage.GUI
-{
+namespace HexMage.GUI {
     public class Camera2D {
         public static readonly int SortUI = 1000;
         public static readonly int SortMobs = 100;

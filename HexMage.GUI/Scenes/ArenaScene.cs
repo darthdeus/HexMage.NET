@@ -130,6 +130,8 @@ namespace HexMage.GUI {
             abilityDetail.AddComponent(abilityUpdater);
 
             abilityUpdater.OnClick += index => {
+                Console.WriteLine($"ABILITY EVENT, time {DateTime.Now.Millisecond}");
+
                 if (turnManager.SelectedAbilityIndex == index) {
                     turnManager.SelectedAbilityIndex = null;
                 } else {

@@ -15,11 +15,25 @@ namespace HexMage.GUI {
         public Matrix RenderTransform { get; set; }
 
         public bool DebugMode { get; set; } = false;
-        public int SortOrder = 0;
+
+        private bool _sortOrderSet;
+        private int _sortOrder;
+        public int SortOrder {
+            get { return _sortOrderSet ? _sortOrder : Parent.SortOrder; }
+            set { _sortOrderSet = true;
+                _sortOrder = value;
+            }
+        }
         // Setting this to true will cause the generic render lifecycle to not start
         // a new batch when rendering this entity, but *only* if the entity is root.
         public bool CustomBatch = false;
-        public GameScene Scene { get; set; }
+
+        private GameScene _scene;
+
+        public GameScene Scene {
+            get { return _scene ?? Parent.Scene; }
+            set { _scene = value; }
+        }
 
         // TODO - remove this
         [Obsolete]
@@ -43,8 +57,6 @@ namespace HexMage.GUI {
         protected List<Component> Components { get; } = new List<Component>();
 
         public IRenderer Renderer { get; set; }
-
-        public event Action OnClick;
 
         public IEnumerable<Entity> ActiveChildren => Children.Where(x => x.Active);
 
@@ -145,8 +157,8 @@ namespace HexMage.GUI {
             Children.Remove(childEntity);            
         }
 
-        public void EnqueueClickEvent(ClickEvent clickEvent) {
-            Scene.EnqueueClickEvent(clickEvent);
+        public void EnqueueClickEvent(Action action) {
+            Scene.EnqueueClickEvent(new ClickEvent(this, action));
         }
     }
 

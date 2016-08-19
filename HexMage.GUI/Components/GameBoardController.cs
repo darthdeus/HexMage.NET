@@ -119,22 +119,25 @@ namespace HexMage.GUI.Components {
 
             var currentMob = _gameInstance.TurnManager.CurrentMob;
             if (inputManager.JustLeftClickReleased()) {
-                if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                    var mob = _gameInstance.MobManager.AtCoord(mouseHex);
-                    if (mob != null) {
-                        if (mob == currentMob) {
-                            ShowMessage("You can't target yourself.");
-                        } else {
-                            if (mob.Team.Color == currentMob.Team.Color) {
-                                ShowMessage("You can't target your team.");
-                            } else if (_gameInstance.TurnManager.SelectedAbilityIndex.HasValue) {
-                                AttackMob(mob);
+                EnqueueClickEvent(() => {
+                    Console.WriteLine($"MOB EVENT, time {DateTime.Now.Millisecond}");
+                    if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
+                        var mob = _gameInstance.MobManager.AtCoord(mouseHex);
+                        if (mob != null) {
+                            if (mob == currentMob) {
+                                ShowMessage("You can't target yourself.");
+                            } else {
+                                if (mob.Team.Color == currentMob.Team.Color) {
+                                    ShowMessage("You can't target your team.");
+                                } else if (_gameInstance.TurnManager.SelectedAbilityIndex.HasValue) {
+                                    AttackMob(mob);
+                                }
                             }
+                        } else {
+                            MoveTo(currentMob, mouseHex);
                         }
-                    } else {
-                        MoveTo(currentMob, mouseHex);
                     }
-                }
+                });
             }
 
             var position = Camera2D.Instance.HexToPixel(mouseHex) + new Vector2(40, -15);

@@ -36,9 +36,10 @@ namespace HexMage.GUI {
                 var aabb = new Rectangle(Entity.RenderPosition.ToPoint(),
                     Entity.CachedSize.ToPoint());
 
-                if (inputManager.JustLeftClicked()) {
+                if (inputManager.JustLeftClickReleased()) {
                     if (aabb.Contains(inputManager.MousePosition)) {
-                        Entity.EnqueueClickEvent(new ClickEvent(Entity, () => OnClick?.Invoke(_abilityIndex)));
+                        //OnClick?.Invoke(_abilityIndex);
+                        EnqueueClickEvent(() => OnClick?.Invoke(_abilityIndex));
                     }
                 }
 

@@ -43,7 +43,7 @@
     </StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Component.cs" />
+    <Compile Include="Components\Component.cs" />
     <Compile Include="Components\Animation.cs" />
     <Compile Include="Components\AnimationController.cs" />
     <Compile Include="Components\GameBoardController.cs" />
@@ -52,7 +52,7 @@
     <Compile Include="Components\MobStateUpdater.cs" />
     <Compile Include="Components\PositionAtMob.cs" />
     <Compile Include="Components\ProjectileEntity.cs" />
-    <Compile Include="IRenderer.cs" />
+    <Compile Include="Renderers\IRenderer.cs" />
     <Compile Include="LambdaComponent.cs" />
     <Compile Include="Renderers\AnimationRenderer.cs" />
     <Compile Include="Renderers\MobRenderer.cs" />
@@ -69,17 +69,17 @@
     <Compile Include="HexMageGame.cs" />
     <Compile Include="ImGui.cs" />
     <Compile Include="InputManager.cs" />
-    <Compile Include="Scenes\ParticleSystem.cs" />
-    <Compile Include="Scenes\ParticleSystemRenderer.cs" />
+    <Compile Include="Components\ParticleSystem.cs" />
+    <Compile Include="Renderers\ParticleSystemRenderer.cs" />
     <Compile Include="Scenes\SpellRenderer.cs" />
     <Compile Include="UI\ColorChanger.cs" />
     <Compile Include="Scenes\GameScene.cs" />
     <Compile Include="Scenes\MapSelectionScene.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SceneManager.cs" />
+    <Compile Include="Scenes\SceneManager.cs" />
     <Compile Include="TextureGenerator.cs" />
-    <Compile Include="UI\ColorRenderer.cs" />
+    <Compile Include="Renderers\ColorRenderer.cs" />
     <Compile Include="UI\ElementMouseState.cs" />
     <Compile Include="UI\HorizontalLayout.cs" />
     <Compile Include="UI\Label.cs" />

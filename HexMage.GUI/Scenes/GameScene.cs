@@ -71,6 +71,11 @@ namespace HexMage.GUI {
                 }
             }
 
+            // Handle all click events
+            var clickEvent = _clickEvents.OrderBy(x => x.Target.SortOrder).Reverse().FirstOrDefault();
+            clickEvent?.Event();
+            _clickEvents.Clear();
+
             // Delayed actions which are due are executed at once and removed from the queue.
             var pendingActions = _delayedActions
                 .TakeWhile(x => x.Key < DateTime.Now)

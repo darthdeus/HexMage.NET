@@ -19,7 +19,6 @@ namespace HexMage.GUI.Components {
             _totalFrames = totalFrames;
         }
 
-
         public void NextFrame() {
             _currentFrame++;
             if (_currentFrame == _totalFrames) {
