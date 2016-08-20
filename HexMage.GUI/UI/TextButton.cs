@@ -8,6 +8,7 @@ namespace HexMage.GUI.UI {
     public class TextButton : Entity, IRenderer {
         public string Text { get; set; }
         public SpriteFont Font { get; set; }
+        public ElementMouseState MouseState;
 
         public event Action<TextButton> OnClick;
 

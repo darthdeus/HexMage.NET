@@ -71,12 +71,18 @@ namespace HexMage.GUI.Renderers {
 
                 var currentMob = _gameInstance.TurnManager.CurrentMob;
 
-                foreach (var coord in path) {
-                    if (currentMob.Coord.Distance(coord) <= currentMob.AP) {
-                        DrawAt(_assetManager[AssetManager.HexWithinDistance], coord);
-                    } else {
-                        DrawAt(hexPath, coord);
-                    }
+                //foreach (var coord in path) {
+                //    if (currentMob.Coord.Distance(coord) <= currentMob.AP) {
+                //        DrawAt(_assetManager[AssetManager.HexWithinDistance], coord);
+                //    } else {
+                //        DrawAt(hexPath, coord);
+                //    }
+                //}
+
+                var cubepath = _gameInstance.Map.CubeLinedraw(currentMob.Coord, _camera.MouseHex);
+
+                foreach (var cubeCoord in cubepath) {
+                    DrawAt(_assetManager[AssetManager.HexWithinDistance], cubeCoord);
                 }
             }
             _spriteBatch.End();

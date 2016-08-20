@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace HexMage.Simulator
-{
-    public class Pathfinder
-    {
+namespace HexMage.Simulator {
+    public class Pathfinder {
         private readonly Map _map;
         private readonly MobManager _mobManager;
         public HexMap<Path> Paths { get; set; }

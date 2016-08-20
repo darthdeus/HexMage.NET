@@ -1,9 +1,7 @@
 ﻿using System;
 
-namespace HexMage.Simulator
-{
-    public struct AxialCoord : IEquatable<AxialCoord>
-    {
+namespace HexMage.Simulator {
+    public struct AxialCoord : IEquatable<AxialCoord> {
         public int X { get; set; }
         public int Y { get; set; }
 
@@ -42,13 +40,18 @@ namespace HexMage.Simulator
             return new AxialCoord(a.X - b.X, a.Y - b.Y);
         }
 
+        public static AxialCoord operator *(AxialCoord a, int x) {
+            return new AxialCoord(a.X*x, a.Y*x);
+        }
+
         public CubeCoord ToCube() {
-            return new CubeCoord(X, -X-Y, Y);
+            return new CubeCoord(X, -X - Y, Y);
         }
 
         public static implicit operator CubeCoord(AxialCoord axial) {
             return axial.ToCube();
         }
+
 
         bool IEquatable<AxialCoord>.Equals(AxialCoord other) {
             return X == other.X && Y == other.Y;

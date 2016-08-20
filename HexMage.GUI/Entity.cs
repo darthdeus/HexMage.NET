@@ -35,10 +35,6 @@ namespace HexMage.GUI {
             set { _scene = value; }
         }
 
-        // TODO - remove this
-        [Obsolete]
-        public ElementMouseState MouseState;
-
         public float Rotation = 0;
         public Vector2 Position { get; set; }
         public Vector2 RenderPosition { get; set; }

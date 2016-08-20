@@ -107,7 +107,7 @@ namespace HexMage.GUI.Components {
 
                     // TODO - podivat se na generickou implementaci pathfinderu
                     // TODO - pathfindovani ze zdi najde cesty
-                    _gameInstance.Pathfinder.PathfindFrom(new AxialCoord(0, 0));
+                    _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
                 }
             }
 

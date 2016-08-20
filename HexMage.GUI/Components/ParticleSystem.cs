@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI {
-    public class Particle : Entity {
+    public class Particle {
         public Vector2 Position { get; set; } = Vector2.Zero;
         public Vector2 Velocity { get; set; }
         public float Age { get; set; }
