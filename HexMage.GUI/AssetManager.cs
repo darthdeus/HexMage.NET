@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using HexMage.Simulator;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -9,8 +10,15 @@ namespace HexMage.GUI {
         public static readonly string DarkMageIdle = "mobs/dark-mage-idle";
         public static readonly string DarkMageClicked = "mobs/dark-mage-clicked";
         public static readonly string MobSprite = "mobs/mage";
+
         public static readonly string FireballSprite = "mobs/fireball";
-        public static readonly string ExplosionSprite = "mobs/explosion";
+        public static readonly string FireballExplosionSprite = "mobs/fireball-explosion";
+        public static readonly string FrostboltSprite = "mobs/frostbolt";
+        public static readonly string FrostboltExplosionSprite = "mobs/frostbolt-explosion";
+        public static readonly string EarthboltSprite = "mobs/earthbolt";
+        public static readonly string EarthboltExplosionSprite = "mobs/earthbolt-explosion";
+        public static readonly string LightningSprite = "mobs/lightning";
+        public static readonly string LightningExplosionSprite = "mobs/lightning-explosion";
 
         public static readonly string HexWallSprite = "tiles/wall_hex";
         public static readonly string HexPathSprite = "tiles/path_hex";
@@ -84,6 +92,37 @@ namespace HexMage.GUI {
 
         public void RegisterTexture(string name, Texture2D texture2D) {
             _textures[name] = texture2D;
+        }
+
+        public static string ProjectileSpriteForElement(AbilityElement element) {
+            switch (element) {
+                case AbilityElement.Earth:
+                    return EarthboltSprite;
+                case AbilityElement.Fire:
+                    return FireballSprite;
+                case AbilityElement.Air:
+                    return LightningSprite;
+                case AbilityElement.Water:
+                    return FrostboltSprite;
+            }
+
+            throw new ArgumentException($"Invalid element type {element}", nameof(element));
+        }
+
+
+        public static string ProjectileExplosionSpriteForElement(AbilityElement element) {
+            switch (element) {
+                case AbilityElement.Earth:
+                    return EarthboltExplosionSprite;
+                case AbilityElement.Fire:
+                    return FireballExplosionSprite;
+                case AbilityElement.Air:
+                    return LightningExplosionSprite;
+                case AbilityElement.Water:
+                    return FrostboltExplosionSprite;
+            }
+
+            throw new ArgumentException($"Invalid element type {element}", nameof(element));
         }
     }
 }

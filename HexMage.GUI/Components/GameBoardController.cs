@@ -248,27 +248,29 @@ namespace HexMage.GUI.Components {
 
             var usableAbility = usableAbilities.FirstOrDefault(ua => ua.Ability == ability);
             if (usableAbility != null) {
-                var fireballAnimation = new Animation(AssetManager.FireballSprite,
+                var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
+
+                var projectileAnimation = new Animation(projectileSprite,
                     TimeSpan.FromMilliseconds(50),
                     32,
                     4);
 
-                fireballAnimation.Origin = new Vector2(16, 16);
+                projectileAnimation.Origin = new Vector2(16, 16);
 
-                var fireball = new ProjectileEntity(
+                var projectile = new ProjectileEntity(
                     TimeSpan.FromMilliseconds(1500),
                     _gameInstance.TurnManager.CurrentMob.Coord,
                     _gameInstance.TurnManager.CurrentTarget.Coord) {
-                        Renderer = new AnimationRenderer(fireballAnimation),
+                        Renderer = new AnimationRenderer(projectileAnimation),
                         SortOrder = Camera2D.SortProjectiles,
                         Transform = () => Camera2D.Instance.Transform
                     };
 
-                fireball.AddComponent(new AnimationController(fireballAnimation));
+                projectile.AddComponent(new AnimationController(projectileAnimation));
 
                 var target = _gameInstance.TurnManager.CurrentTarget;
 
-                fireball.TargetHit += () => {
+                projectile.TargetHit += () => {
                     usableAbility.Use();
 
                     var explosion = new Entity() {
@@ -278,8 +280,10 @@ namespace HexMage.GUI.Components {
 
                     explosion.AddComponent(new PositionAtMob(target));
 
+                    var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(ability.Element);
+
                     var explosionAnimation = new Animation(
-                        AssetManager.ExplosionSprite,
+                        explosionSprite,
                         TimeSpan.FromMilliseconds(350),
                         32,
                         4);
@@ -291,10 +295,10 @@ namespace HexMage.GUI.Components {
 
                     Entity.Scene.AddAndInitializeNextFrame(explosion);
 
-                    Entity.Scene.DestroyEntity(fireball);
+                    Entity.Scene.DestroyEntity(projectile);
                 };
 
-                Entity.Scene.AddAndInitializeNextFrame(fireball);
+                Entity.Scene.AddAndInitializeNextFrame(projectile);
             } else {
                 ShowMessage("You can't use the selected ability on that target.");
             }
