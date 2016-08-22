@@ -64,25 +64,36 @@ namespace HexMage.GUI.Renderers {
         private void DrawHoverPath() {
             _spriteBatch.Begin(transformMatrix: _camera.Transform);
 
-            var hexPath = _assetManager[AssetManager.HexPathSprite];
+            var hexUsable = _assetManager[AssetManager.HexWithinDistance];
+            var hexTooFar = _assetManager[AssetManager.HexPathSprite];
 
             if (_gameInstance.Pathfinder.IsValidCoord(_camera.MouseHex)) {
                 var path = _gameInstance.Pathfinder.PathTo(_camera.MouseHex);
 
                 var currentMob = _gameInstance.TurnManager.CurrentMob;
+                var abilityIndex = _gameInstance.TurnManager.SelectedAbilityIndex;
 
-                //foreach (var coord in path) {
-                //    if (currentMob.Coord.Distance(coord) <= currentMob.AP) {
-                //        DrawAt(_assetManager[AssetManager.HexWithinDistance], coord);
-                //    } else {
-                //        DrawAt(hexPath, coord);
-                //    }
-                //}
+                if (abilityIndex.HasValue) {
+                    var cubepath = _gameInstance.Map.CubeLinedraw(currentMob.Coord, _camera.MouseHex);
 
-                var cubepath = _gameInstance.Map.CubeLinedraw(currentMob.Coord, _camera.MouseHex);
+                    int distance = 1;
+                    foreach (var cubeCoord in cubepath) {
+                        if (distance <= currentMob.Abilities[abilityIndex.Value].Range) {
+                            DrawAt(hexUsable, cubeCoord);
+                        } else {
+                            DrawAt(hexTooFar, cubeCoord);
+                        }
 
-                foreach (var cubeCoord in cubepath) {
-                    DrawAt(_assetManager[AssetManager.HexWithinDistance], cubeCoord);
+                        distance++;
+                    }
+                } else {
+                    foreach (var coord in path) {
+                        if (currentMob.Coord.Distance(coord) <= currentMob.AP) {
+                            DrawAt(hexUsable, coord);
+                        } else {
+                            DrawAt(hexTooFar, coord);
+                        }
+                    }
                 }
             }
             _spriteBatch.End();

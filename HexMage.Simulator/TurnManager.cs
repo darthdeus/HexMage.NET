@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 
-namespace HexMage.Simulator
-{
-    public class TurnManager
-    {
+namespace HexMage.Simulator {
+    public class TurnManager {
         public MobManager MobManager { get; set; }
         public List<Mob> TurnOrder { get; set; } = new List<Mob>();
         public Mob CurrentMob => TurnOrder[_current];
@@ -22,7 +20,7 @@ namespace HexMage.Simulator
 
         public void StartNextTurn() {
             TurnOrder.Clear();
-       
+
             foreach (var mob in MobManager.Mobs) {
                 mob.AP = mob.MaxAP;
                 if (mob.HP > 0) {
@@ -46,6 +44,14 @@ namespace HexMage.Simulator
             SelectedAbilityIndex = null;
             if (!IsTurnDone()) _current++;
             return !IsTurnDone();
+        }
+
+        public void ToggleAbilitySelected(int index) {
+            if (SelectedAbilityIndex == index) {
+                SelectedAbilityIndex = null;
+            } else {
+                SelectedAbilityIndex = index;
+            }
         }
     }
 }

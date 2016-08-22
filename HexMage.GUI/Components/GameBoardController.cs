@@ -99,8 +99,11 @@ namespace HexMage.GUI.Components {
         }
 
         public override void Update(GameTime time) {
+            HandleKeyboardAbilitySelect();
+
             var inputManager = InputManager.Instance;
             var mouseHex = Camera2D.Instance.MouseHex;
+
             if (inputManager.JustRightClicked()) {
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
                     _gameInstance.Map.Toogle(mouseHex);
@@ -140,7 +143,8 @@ namespace HexMage.GUI.Components {
                 });
             }
 
-            var position = Camera2D.Instance.HexToPixel(mouseHex) + new Vector2(40, -15);
+            var basicOffset = new Vector2(60, -15);
+            var position = Camera2D.Instance.HexToPixel(mouseHex) + basicOffset;
             var sin = (float) Math.Sin(time.TotalGameTime.TotalSeconds*2);
             var offset = sin*sin*new Vector2(0, -3);
 
@@ -178,6 +182,24 @@ namespace HexMage.GUI.Components {
                 _messageBox.Active = false;
             } else {
                 _messageBox.Active = true;
+            }
+        }
+
+        private void HandleKeyboardAbilitySelect() {
+            var inputManager = InputManager.Instance;
+
+            if (inputManager.IsKeyJustReleased(Keys.D1)) {
+                _gameInstance.TurnManager.ToggleAbilitySelected(0);
+            } else if (inputManager.IsKeyJustReleased(Keys.D2)) {
+                _gameInstance.TurnManager.ToggleAbilitySelected(1);
+            } else if (inputManager.IsKeyJustReleased(Keys.D3)) {
+                _gameInstance.TurnManager.ToggleAbilitySelected(2);
+            } else if (inputManager.IsKeyJustReleased(Keys.D4)) {
+                _gameInstance.TurnManager.ToggleAbilitySelected(3);
+            } else if (inputManager.IsKeyJustReleased(Keys.D5)) {
+                _gameInstance.TurnManager.ToggleAbilitySelected(4);
+            } else if (inputManager.IsKeyJustReleased(Keys.D6)) {
+                _gameInstance.TurnManager.ToggleAbilitySelected(5);
             }
         }
 
