@@ -90,9 +90,9 @@ namespace HexMage.GUI {
                                                    (float) rnd.NextDouble()*horizontalOffset*2 - horizontalOffset, 0);
 
             Func<Random, Vector2> velocityFunc = rnd =>
-                                                 new Vector2((float) rnd.NextDouble(), (float) rnd.NextDouble()*speed);
+                                                 new Vector2((float) rnd.NextDouble() - 0.2f, (float) rnd.NextDouble()*speed - speed/2);
 
-            var particles = new ParticleSystem(100, 3, new Vector2(0, -1), speed,
+            var particles = new ParticleSystem(200, 20, new Vector2(0, -1), speed,
                 _assetManager[AssetManager.ParticleSprite],
                 0.01f, offsetFunc, velocityFunc);
 
