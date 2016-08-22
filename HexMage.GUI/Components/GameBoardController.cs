@@ -120,6 +120,14 @@ namespace HexMage.GUI.Components {
                 _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
             }
 
+            HandleUserTurnInput(inputManager, mouseHex);
+
+            UpdatePopovers(time, mouseHex);
+        }
+
+        private void HandleUserTurnInput(InputManager inputManager, AxialCoord mouseHex) {
+            bool abilitySelected = _gameInstance.TurnManager.SelectedAbilityIndex.HasValue;
+
             var currentMob = _gameInstance.TurnManager.CurrentMob;
             if (inputManager.JustLeftClickReleased()) {
                 EnqueueClickEvent(() => {
@@ -133,16 +141,26 @@ namespace HexMage.GUI.Components {
                                 if (mob.Team.Color == currentMob.Team.Color) {
                                     ShowMessage("You can't target your team.");
                                 } else if (_gameInstance.TurnManager.SelectedAbilityIndex.HasValue) {
-                                    AttackMob(mob);
+                                    if (abilitySelected) {
+                                        AttackMob(mob);
+                                    } else {
+                                        ShowMessage("You can't move here.");
+                                    }
                                 }
                             }
                         } else {
-                            MoveTo(currentMob, mouseHex);
+                            if (abilitySelected) {
+                                ShowMessage("Select an ability to use first.");
+                            } else {
+                                MoveTo(currentMob, mouseHex);
+                            }
                         }
                     }
                 });
             }
+        }
 
+        private void UpdatePopovers(GameTime time, AxialCoord mouseHex) {
             var basicOffset = new Vector2(60, -15);
             var position = Camera2D.Instance.HexToPixel(mouseHex) + basicOffset;
             var sin = (float) Math.Sin(time.TotalGameTime.TotalSeconds*2);
@@ -277,6 +295,8 @@ namespace HexMage.GUI.Components {
                 };
 
                 Entity.Scene.AddAndInitializeNextFrame(fireball);
+            } else {
+                ShowMessage("You can't use the selected ability on that target.");
             }
         }
     }
