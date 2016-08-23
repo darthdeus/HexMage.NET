@@ -13,12 +13,12 @@ namespace HexMage.GUI.Components {
 
         public MobRenderer(GameInstance gameInstance, Mob mob, MobAnimationController animationController) {
             _gameInstance = gameInstance;
-            _mob = mob;            
+            _mob = mob;
             _animationController = animationController;
         }
 
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
-            var mobEntity = (MobEntity)_mob.Metadata;
+            var mobEntity = (MobEntity) _mob.Metadata;
 
             var pos = entity.Position;
 
@@ -41,9 +41,12 @@ namespace HexMage.GUI.Components {
             double hpPercent = (double) _mob.HP/_mob.MaxHP;
             int healthbarHeight = 20;
             batch.Draw(gray, new Rectangle(hbPos, new Point(5, healthbarHeight)), Color.DarkGreen);
-            batch.Draw(gray, new Rectangle(hbPos + new Point(5, 0), new Point(5, (int) (healthbarHeight*hpPercent))),
-                Color.Yellow);
-        }
 
+            var percentageHeight = (int) (healthbarHeight*hpPercent);
+            batch.Draw(gray,
+                       new Rectangle(hbPos + new Point(0, healthbarHeight - percentageHeight),
+                                     new Point(5, percentageHeight)),
+                       Color.LightGreen);
+        }
     }
 }

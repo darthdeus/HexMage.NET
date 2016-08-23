@@ -15,7 +15,7 @@ namespace HexMage.Simulator {
             for (int i = 0; i < Mob.AbilityCount; i++) {
                 abilities.Add(new Ability(_random.Next(1, 10),
                                           _random.Next(3, 7),
-                                          5,
+                                          _random.Next(3, 10),
                                           _random.Next(0, 3),
                                           elements[_random.Next(0, 4)]));
             }
