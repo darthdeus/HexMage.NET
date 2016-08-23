@@ -5,11 +5,13 @@ using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Components {
     public class MobRenderer : IRenderer {
-        // The currently rendered animation frame
-
         private readonly GameInstance _gameInstance;
         private readonly Mob _mob;
         private readonly MobAnimationController _animationController;
+
+        private readonly int _healthbarWidth = (int) (1.0/6*AssetManager.TileSize);
+        private readonly int _healthbarHeight = (int) (5.0/8*AssetManager.TileSize);
+        private readonly Point _healthbarOffset = new Point((int) (9.0/10*AssetManager.TileSize), (int) (1.0/7*AssetManager.TileSize));
 
         public MobRenderer(GameInstance gameInstance, Mob mob, MobAnimationController animationController) {
             _gameInstance = gameInstance;
@@ -33,20 +35,27 @@ namespace HexMage.GUI.Components {
             var color = _mob.Team.Color == TeamColor.Red ? Color.OrangeRed : Color.Blue;
             _animationController.CurrentAnimation.RenderFrame(mobEntity, pos, color, batch, assetManager);
 
-            // TODO - extract this out
+            var hbPos = pos.ToPoint() + _healthbarOffset;
+            DrawHealthbar((double) _mob.HP/_mob.MaxHP,
+                          batch, assetManager, hbPos, Color.DarkGreen, Color.LightGreen);
+
+            var apPos = hbPos + new Point(_healthbarWidth, 0);
+            DrawHealthbar((double) _mob.AP/_mob.MaxAP,
+                          batch, assetManager, apPos, Color.DarkBlue, Color.LightBlue);
+        }
+
+        private void DrawHealthbar(double percentage, SpriteBatch batch, AssetManager assetManager, Point pos,
+                                   Color emptyColor, Color fullColor) {
             var gray = assetManager[AssetManager.HexGraySprite];
 
-            var hbPos = pos.ToPoint() + new Point(29, 4);
 
-            double hpPercent = (double) _mob.HP/_mob.MaxHP;
-            int healthbarHeight = 20;
-            batch.Draw(gray, new Rectangle(hbPos, new Point(5, healthbarHeight)), Color.DarkGreen);
+            batch.Draw(gray, new Rectangle(pos, new Point(_healthbarWidth, _healthbarWidth)), emptyColor);
 
-            var percentageHeight = (int) (healthbarHeight*hpPercent);
+            var percentageHeight = (int) (_healthbarHeight*percentage);
             batch.Draw(gray,
-                       new Rectangle(hbPos + new Point(0, healthbarHeight - percentageHeight),
-                                     new Point(5, percentageHeight)),
-                       Color.LightGreen);
+                       new Rectangle(pos + new Point(0, percentageHeight - percentageHeight),
+                                     new Point(_healthbarWidth, percentageHeight)),
+                       fullColor);
         }
     }
 }

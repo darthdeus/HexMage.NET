@@ -34,11 +34,11 @@ namespace HexMage.GUI {
             var gameBoardEntity = CreateRootEntity();
             gameBoardEntity.AddComponent(new GameBoardController(_gameInstance));
             gameBoardEntity.Renderer = new GameBoardRenderer(_gameInstance, _camera);
-            gameBoardEntity.SortOrder = 1;
+            gameBoardEntity.SortOrder = Camera2D.SortBackground;
             gameBoardEntity.CustomBatch = true;
 
             var uiEntity = BuildUI();
-            uiEntity.SortOrder = 2;
+            uiEntity.SortOrder = Camera2D.SortBackground + 1;
         }
 
         public override void Cleanup() {}

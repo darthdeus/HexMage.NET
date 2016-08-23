@@ -7,6 +7,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI {
     public class AssetManager {
+        public static readonly int TileSize = 32;
+
         public static readonly string DarkMageIdle = "mobs/dark-mage-idle";
         public static readonly string DarkMageClicked = "mobs/dark-mage-clicked";
         public static readonly string MobSprite = "mobs/mage";
@@ -22,7 +24,7 @@ namespace HexMage.GUI {
 
         public static readonly string HexWallSprite = "tiles/wall_hex";
         public static readonly string HexPathSprite = "tiles/path_hex";
-        public static readonly string HexEmptySprite = "tiles/photoshopTile";
+        public static readonly string HexEmptySprite = "tiles/basic_tile";
         public static readonly string HexGraySprite = "tiles/gray";
         public static readonly string HexHoverSprite = "tiles/hover_hex";
         public static readonly string HexTargetSprite = "tiles/target_hex";
@@ -82,7 +84,6 @@ namespace HexMage.GUI {
             }
         }
 
-
         public void Preload() {
             _font = _contentManager.Load<SpriteFont>(FontName);
             foreach (var texture in new[] {HexWallSprite, HexPathSprite, MobSprite, HexEmptySprite}) {
@@ -108,7 +109,6 @@ namespace HexMage.GUI {
 
             throw new ArgumentException($"Invalid element type {element}", nameof(element));
         }
-
 
         public static string ProjectileExplosionSpriteForElement(AbilityElement element) {
             switch (element) {
