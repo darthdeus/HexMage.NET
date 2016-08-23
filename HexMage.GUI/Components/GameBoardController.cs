@@ -33,7 +33,6 @@ namespace HexMage.GUI.Components {
                     Renderer = new ColorRenderer(Color.White),
                     Padding = new Vector4(20, 10, 20, 10),
                     SortOrder = Camera2D.SortUI,
-                    //Projection = () => Camera2D.Instance.Projection,
                     Position = new Vector2(500, 50)
                 };
 
@@ -79,7 +78,6 @@ namespace HexMage.GUI.Components {
                 var mobAnimationController = new MobAnimationController();
 
                 var mobEntity = new MobEntity(mob, _gameInstance) {
-                    //Renderer = new SpriteRenderer(assetManager[AssetManager.MobTexture]),
                     Renderer = new MobRenderer(_gameInstance, mob, mobAnimationController),
                     SortOrder = Camera2D.SortMobs,
                     Transform = () => Camera2D.Instance.Transform
@@ -160,11 +158,13 @@ namespace HexMage.GUI.Components {
             }
         }
 
+        private readonly Vector2 _mouseHoverPopoverOffset = new Vector2(
+            2*AssetManager.TileSize, -0.5f*AssetManager.TileSize);
+
         private void UpdatePopovers(GameTime time, AxialCoord mouseHex) {
-            var basicOffset = new Vector2(60, -15);
-            var position = Camera2D.Instance.HexToPixel(mouseHex) + basicOffset;
-            var sin = (float) Math.Sin(time.TotalGameTime.TotalSeconds*2);
-            var offset = sin*sin*new Vector2(0, -3);
+            var position = Camera2D.Instance.HexToPixel(mouseHex) + _mouseHoverPopoverOffset;
+            var sin = (float) Math.Sin(time.TotalGameTime.TotalSeconds);
+            var offset = sin*sin*new Vector2(0, -5);
 
             _emptyHexPopover.Position = position + offset;
             _mobPopover.Position = position + offset;
@@ -241,7 +241,7 @@ namespace HexMage.GUI.Components {
                 mob);
 
             Debug.Assert(_gameInstance.TurnManager.SelectedAbilityIndex != null,
-                "_gameInstance.TurnManager.SelectedAbilityIndex != null");
+                         "_gameInstance.TurnManager.SelectedAbilityIndex != null");
 
             var abilityIndex = _gameInstance.TurnManager.SelectedAbilityIndex.Value;
             var ability = _gameInstance.TurnManager.CurrentMob.Abilities[abilityIndex];
@@ -251,9 +251,9 @@ namespace HexMage.GUI.Components {
                 var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
 
                 var projectileAnimation = new Animation(projectileSprite,
-                    TimeSpan.FromMilliseconds(50),
-                    32,
-                    4);
+                                                        TimeSpan.FromMilliseconds(50),
+                                                        32,
+                                                        4);
 
                 projectileAnimation.Origin = new Vector2(16, 16);
 
@@ -280,13 +280,18 @@ namespace HexMage.GUI.Components {
 
                     explosion.AddComponent(new PositionAtMob(target));
 
+                    const int animationFrameSize = 32;
+                    const int totalAnimationFrames = 4;
+
+                    Debug.Assert(animationFrameSize == AssetManager.TileSize);
+
                     var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(ability.Element);
 
                     var explosionAnimation = new Animation(
                         explosionSprite,
                         TimeSpan.FromMilliseconds(350),
-                        32,
-                        4);
+                        animationFrameSize,
+                        totalAnimationFrames);
 
                     explosionAnimation.AnimationDone += () => { Entity.Scene.DestroyEntity(explosion); };
 

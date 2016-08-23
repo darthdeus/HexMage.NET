@@ -55,9 +55,6 @@ namespace HexMage.GUI.Renderers {
                 }
             }
 
-            //_spriteBatch.DrawString(_assetManager.Font, $"{minX},{minY},{minZ}   {maxX},{maxY},{maxZ}",
-            //                        new Vector2(0, 50),
-            //                        Color.Red);
             _spriteBatch.End();
         }
 

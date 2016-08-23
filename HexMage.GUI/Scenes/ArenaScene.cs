@@ -10,7 +10,6 @@ using Color = Microsoft.Xna.Framework.Color;
 namespace HexMage.GUI {
     internal class ArenaScene : GameScene {
         private readonly GameInstance _gameInstance = new GameInstance(20);
-        private VerticalLayout _mobUI;
 
         public ArenaScene(GameManager gameManager) : base(gameManager) {
             var t1 = _gameInstance.MobManager.AddTeam(TeamColor.Red);
@@ -19,7 +18,7 @@ namespace HexMage.GUI {
             for (int team = 0; team < 2; team++) {
                 for (int mobI = 0; mobI < 5; mobI++) {
                     var mob = Generator.RandomMob(team%2 == 0 ? t1 : t2, _gameInstance.Size,
-                        c => _gameInstance.MobManager.AtCoord(c) == null);
+                                                  c => _gameInstance.MobManager.AtCoord(c) == null);
 
                     _gameInstance.MobManager.AddMob(mob);
                 }
@@ -82,22 +81,28 @@ namespace HexMage.GUI {
             abilityDetail.AddChild(elementLabel);
 
 
-            float speed = 1;
+            const float speed = 1;
+            const float horizontalOffset = 6;
 
-            float horizontalOffset = 6;
             Func<Random, Vector2> offsetFunc = rnd =>
                                                new Vector2(
                                                    (float) rnd.NextDouble()*horizontalOffset*2 - horizontalOffset, 0);
 
             Func<Random, Vector2> velocityFunc = rnd =>
-                                                 new Vector2((float) rnd.NextDouble() - 0.2f, (float) rnd.NextDouble()*speed - speed/2);
+                                                 new Vector2((float) rnd.NextDouble() - 0.2f,
+                                                             (float) rnd.NextDouble()*speed - speed/2);
 
-            var particles = new ParticleSystem(200, 20, new Vector2(0, -1), speed,
-                _assetManager[AssetManager.ParticleSprite],
-                0.01f, offsetFunc, velocityFunc);
+            const int maximumNumberOfParticles = 200;
+            const int particlesPerSecond = 20;
+
+            var particles = new ParticleSystem(maximumNumberOfParticles, particlesPerSecond,
+                                               new Vector2(0, -1), speed,
+                                               _assetManager[AssetManager.ParticleSprite],
+                                               0.01f, offsetFunc, velocityFunc);
 
             particles.CustomBatch = true;
             particles.Position = new Vector2(60, 120);
+
             particles.ColorFunc = () => {
                 if (turnManager.SelectedAbilityIndex.HasValue) {
                     int index = turnManager.SelectedAbilityIndex.Value;
@@ -123,10 +128,10 @@ namespace HexMage.GUI {
             abilityDetailWrapper.AddChild(particles);
 
             var abilityUpdater = new AbilityUpdater(turnManager,
-                abilityIndex,
-                dmgLabel,
-                rangeLabel,
-                elementLabel);
+                                                    abilityIndex,
+                                                    dmgLabel,
+                                                    rangeLabel,
+                                                    elementLabel);
             abilityDetail.AddComponent(abilityUpdater);
 
             abilityUpdater.OnClick += index => {
