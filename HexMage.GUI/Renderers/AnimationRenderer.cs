@@ -1,8 +1,10 @@
-﻿using HexMage.GUI.Components;
+﻿using System;
+using HexMage.GUI.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI.Renderers {
+    [Obsolete]
     public class AnimationRenderer : IRenderer {
         private readonly Animation _animation;
 
