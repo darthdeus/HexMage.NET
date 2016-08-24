@@ -250,10 +250,11 @@ namespace HexMage.GUI.Components {
             if (usableAbility != null) {
                 var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
 
+                const int numberOfFrames = 4;
                 var projectileAnimation = new Animation(projectileSprite,
                                                         TimeSpan.FromMilliseconds(50),
-                                                        32,
-                                                        4);
+                                                        AssetManager.TileSize,
+                                                        numberOfFrames);
 
                 projectileAnimation.Origin = new Vector2(16, 16);
 
@@ -280,17 +281,14 @@ namespace HexMage.GUI.Components {
 
                     explosion.AddComponent(new PositionAtMob(target));
 
-                    const int animationFrameSize = 32;
                     const int totalAnimationFrames = 4;
-
-                    Debug.Assert(animationFrameSize == AssetManager.TileSize);
 
                     var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(ability.Element);
 
                     var explosionAnimation = new Animation(
                         explosionSprite,
                         TimeSpan.FromMilliseconds(350),
-                        animationFrameSize,
+                        AssetManager.TileSize,
                         totalAnimationFrames);
 
                     explosionAnimation.AnimationDone += () => { Entity.Scene.DestroyEntity(explosion); };

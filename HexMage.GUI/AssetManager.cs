@@ -7,11 +7,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI {
     public class AssetManager {
-        public static readonly int TileSize = 32;
+        public static readonly int TileSize = 64;
 
         public static readonly string DarkMageIdle = "mobs/dark-mage-idle";
         public static readonly string DarkMageClicked = "mobs/dark-mage-clicked";
-        public static readonly string MobSprite = "mobs/mage";
 
         public static readonly string FireballSprite = "mobs/fireball";
         public static readonly string FireballExplosionSprite = "mobs/fireball-explosion";
@@ -86,7 +85,7 @@ namespace HexMage.GUI {
 
         public void Preload() {
             _font = _contentManager.Load<SpriteFont>(FontName);
-            foreach (var texture in new[] {HexWallSprite, HexPathSprite, MobSprite, HexEmptySprite}) {
+            foreach (var texture in new[] {HexWallSprite, HexPathSprite, HexEmptySprite}) {
                 _textures[texture] = _contentManager.Load<Texture2D>(texture);
             }
         }

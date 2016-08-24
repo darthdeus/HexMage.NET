@@ -21,9 +21,13 @@ namespace HexMage.GUI.Components {
             _mob = _mobEntity.Mob;
             _mobRenderer = (MobRenderer) _mobEntity.Renderer;
 
-            _animationIdle = new Animation(AssetManager.DarkMageIdle, TimeSpan.FromMilliseconds(500), 32, 2);
+            const int idleFrameCount = 2;
+            _animationIdle = new Animation(AssetManager.DarkMageIdle, TimeSpan.FromMilliseconds(500),
+                                           AssetManager.TileSize, idleFrameCount);
 
-            _animationClicked = new Animation(AssetManager.DarkMageClicked, TimeSpan.FromMilliseconds(70), 32, 14);
+            const int clickedFrameCount = 14;
+            _animationClicked = new Animation(AssetManager.DarkMageClicked, TimeSpan.FromMilliseconds(70),
+                                              AssetManager.TileSize, clickedFrameCount);
             _animationClicked.AnimationDone += () => CurrentAnimation = _animationIdle;
 
             CurrentAnimation = _animationIdle;
