@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -5,6 +6,12 @@ using Microsoft.Xna.Framework.Input;
 namespace HexMage.GUI {
     public class InputManager {
         public static readonly InputManager Instance = new InputManager();
+
+        private Game _game;
+
+        public void Initialize(Game game) {
+            Instance._game = game;
+        }
 
         private MouseState _lastMouseState;
         private MouseState _currentMouseState;
@@ -31,36 +38,40 @@ namespace HexMage.GUI {
         public Point MousePosition => new Point(Mouse.GetState().X, Mouse.GetState().Y);
 
         public bool JustLeftClicked() {
-            return _lastMouseState.LeftButton == ButtonState.Released &&
+            return _game.IsActive &&
+                   _lastMouseState.LeftButton == ButtonState.Released &&
                    _currentMouseState.LeftButton == ButtonState.Pressed;
         }
 
         public bool JustLeftClickReleased() {
-            return _lastMouseState.LeftButton == ButtonState.Pressed &&
+            return _game.IsActive &&
+                   _lastMouseState.LeftButton == ButtonState.Pressed &&
                    _currentMouseState.LeftButton == ButtonState.Released;
         }
 
         public bool JustRightClicked() {
-            return _lastMouseState.RightButton == ButtonState.Released &&
+            return _game.IsActive &&
+                   _lastMouseState.RightButton == ButtonState.Released &&
                    _currentMouseState.RightButton == ButtonState.Pressed;
         }
 
         public bool JustRightClickReleased() {
-            return _lastMouseState.RightButton == ButtonState.Pressed &&
+            return _game.IsActive &&
+                   _lastMouseState.RightButton == ButtonState.Pressed &&
                    _currentMouseState.RightButton == ButtonState.Released;
         }
 
         public bool JustMiddleClicked() {
-            return _lastMouseState.MiddleButton == ButtonState.Released &&
+            return _game.IsActive &&
+                   _lastMouseState.MiddleButton == ButtonState.Released &&
                    _currentMouseState.MiddleButton == ButtonState.Pressed;
         }
 
         public bool JustMiddleClickReleased() {
-            return _lastMouseState.MiddleButton == ButtonState.Pressed &&
+            return _game.IsActive &&
+                   _lastMouseState.MiddleButton == ButtonState.Pressed &&
                    _currentMouseState.MiddleButton == ButtonState.Released;
         }
-
-
     }
 
     public class GameInputManager {

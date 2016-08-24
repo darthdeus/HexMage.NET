@@ -211,18 +211,6 @@
 /processorParam:TextureFormat=Color
 /build:tiles/hex_within_distance.png
 
-#begin tiles/hover_hex.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:tiles/hover_hex.png
-
 #begin tiles/hover_hex.psd
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -246,18 +234,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:tiles/old_wall_hex.png
-
-#begin tiles/path_hex.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:tiles/path_hex.png
 
 #begin tiles/path_hex.psd
 /importer:TextureImporter
@@ -294,18 +270,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:tiles/purplegon.png
-
-#begin tiles/target_hex.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:tiles/target_hex.png
 
 #begin tiles/target_hex.psd
 /importer:TextureImporter
@@ -444,18 +408,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:mobs/lightning-explosion.png
-
-#begin tiles/basic_tile.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:tiles/basic_tile.png
 
 #begin tiles/basic_tile.psd
 /importer:TextureImporter

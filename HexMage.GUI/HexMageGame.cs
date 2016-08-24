@@ -36,6 +36,7 @@ namespace HexMage.GUI
         protected override void Initialize() {
             // MonoGame doesn't show mouse by default
             IsMouseVisible = true;
+            InputManager.Instance.Initialize(this);
 
             base.Initialize();
         }
