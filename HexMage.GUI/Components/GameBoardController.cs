@@ -47,7 +47,6 @@ namespace HexMage.GUI.Components {
                     Renderer = new ColorRenderer(Color.LightGray),
                     Padding = new Vector4(20, 10, 20, 10),
                     SortOrder = Camera2D.SortUI,
-                    Transform = () => Camera2D.Instance.Transform
                 };
 
                 _emptyHexLabel = _emptyHexPopover.AddChild(new Label("Just an empty hex", assetManager.Font));
@@ -61,7 +60,6 @@ namespace HexMage.GUI.Components {
                     Renderer = new ColorRenderer(Color.LightGray),
                     Padding = new Vector4(20, 10, 20, 10),
                     SortOrder = Camera2D.SortUI,
-                    Transform = () => Camera2D.Instance.Transform
                 };
 
                 _mobHealthLabel = _mobPopover.AddChild(new Label("Mob health", assetManager.Font));
@@ -159,10 +157,11 @@ namespace HexMage.GUI.Components {
         }
 
         private readonly Vector2 _mouseHoverPopoverOffset = new Vector2(
-            2*AssetManager.TileSize, -0.5f*AssetManager.TileSize);
+            0.5f*AssetManager.TileSize, -0.5f*AssetManager.TileSize);
 
         private void UpdatePopovers(GameTime time, AxialCoord mouseHex) {
-            var position = Camera2D.Instance.HexToPixel(mouseHex) + _mouseHoverPopoverOffset;
+            var camera = Camera2D.Instance;
+            var position = camera.MousePixelPos + _mouseHoverPopoverOffset;
             var sin = (float) Math.Sin(time.TotalGameTime.TotalSeconds);
             var offset = sin*sin*new Vector2(0, -5);
 

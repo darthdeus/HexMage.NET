@@ -75,6 +75,7 @@ namespace HexMage.GUI {
         }
 
         public Matrix Transform => Matrix.CreateScale(ZoomLevel)*Matrix.CreateTranslation(Translate);
+        public Matrix TransformWithoutScale => Matrix.CreateTranslation(Translate);
 
         public Vector2 HexToPixel(AxialCoord coord) {
             int row = coord.Y;
