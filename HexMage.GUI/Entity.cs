@@ -38,7 +38,7 @@ namespace HexMage.GUI {
         public float Rotation = 0;
         public Vector2 Position { get; set; }
         public Vector2 RenderPosition { get; set; }
-        public Rectangle AABB => new Rectangle(RenderPosition.ToPoint(), CachedSize.ToPoint());
+        public Rectangle AABB => new Rectangle(RenderPosition.ToPoint(), LayoutSize.ToPoint());
 
         public bool Active = true;
 
@@ -79,7 +79,7 @@ namespace HexMage.GUI {
             return entity;
         }
 
-        public Vector2 CachedSize { get; set; }
+        public Vector2 LayoutSize { get; set; }
 
         public void InitializeEntity(AssetManager assetManager) {
             foreach (var component in Components) {
@@ -105,10 +105,10 @@ namespace HexMage.GUI {
 
         protected virtual void Layout() {
             if (SizeFunc != null) {
-                CachedSize = SizeFunc() + PaddingSizeIncrease;
+                LayoutSize = SizeFunc() + PaddingSizeIncrease;
             } else {
-                CachedSize = Children.LastOrDefault()?.CachedSize ?? Vector2.Zero;
-                CachedSize += PaddingSizeIncrease;
+                LayoutSize = Children.LastOrDefault()?.LayoutSize ?? Vector2.Zero;
+                LayoutSize += PaddingSizeIncrease;
             }
         }
 

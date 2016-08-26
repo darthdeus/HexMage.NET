@@ -26,12 +26,12 @@ namespace HexMage.GUI.UI {
         }
 
         protected override void Layout() {
-            CachedSize = Font.MeasureString(Text);
+            LayoutSize = Font.MeasureString(Text);
         }
 
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
             if (DebugMode) {
-                Console.WriteLine($"RENDER: {this} at {RenderPosition} with size {CachedSize}");
+                Console.WriteLine($"RENDER: {this} at {RenderPosition} with size {LayoutSize}");
             }
             batch.DrawString(Font, Text, RenderPosition, TextColor);
         }

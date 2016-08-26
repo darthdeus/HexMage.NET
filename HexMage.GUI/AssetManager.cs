@@ -4,10 +4,13 @@ using System.Diagnostics;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI {
     public class AssetManager {
         public static readonly int TileSize = 64;
+
+        public static readonly string SolidGrayColor = "color/gray";
 
         public static readonly string DarkMageIdle = "mobs/dark-mage-idle";
         public static readonly string DarkMageClicked = "mobs/dark-mage-clicked";
@@ -24,7 +27,6 @@ namespace HexMage.GUI {
         public static readonly string HexWallSprite = "tiles/wall_hex";
         public static readonly string HexPathSprite = "tiles/path_hex";
         public static readonly string HexEmptySprite = "tiles/basic_tile";
-        public static readonly string HexGraySprite = "tiles/gray";
         public static readonly string HexHoverSprite = "tiles/hover_hex";
         public static readonly string HexTargetSprite = "tiles/target_hex";
         public static readonly string HexWithinDistance = "tiles/hex_within_distance";
@@ -48,12 +50,15 @@ namespace HexMage.GUI {
         private static readonly string FontName = "Arial";
 
         private readonly ContentManager _contentManager;
+        private readonly GraphicsDevice _graphicsDevice;
         private readonly Dictionary<string, Texture2D> _textures = new Dictionary<string, Texture2D>();
+        private readonly Dictionary<Color, Texture2D> _colors = new Dictionary<Color, Texture2D>();
         private readonly Dictionary<string, Effect> _effects = new Dictionary<string, Effect>();
         private SpriteFont _font;
 
-        public AssetManager(ContentManager contentManager) {
+        public AssetManager(ContentManager contentManager, GraphicsDevice graphicsDevice) {
             _contentManager = contentManager;
+            _graphicsDevice = graphicsDevice;
         }
 
         public Texture2D this[string name] {
@@ -80,6 +85,18 @@ namespace HexMage.GUI {
             get {
                 Debug.Assert(_font != null);
                 return _font;
+            }
+        }
+
+        public Texture2D this[Color color] {
+            get {
+                if (_colors.ContainsKey(color)) {
+                    return _colors[color];
+                } else {
+                    _colors[color] = TextureGenerator.SolidColor(_graphicsDevice, AssetManager.TileSize,
+                                                                 AssetManager.TileSize, color);
+                    return _colors[color];
+                }
             }
         }
 

@@ -13,11 +13,11 @@ namespace HexMage.GUI.UI {
                     PaddingOffset.Y);
 
                 element.Position = new Vector2(0, offset) + off;
-                offset += element.CachedSize.Y;
-                maxWidth = Math.Max(maxWidth, element.CachedSize.X);
+                offset += element.LayoutSize.Y;
+                maxWidth = Math.Max(maxWidth, element.LayoutSize.X);
             }
 
-            CachedSize = new Vector2(maxWidth, Children.Sum(x => x.CachedSize.Y))
+            LayoutSize = new Vector2(maxWidth, Children.Sum(x => x.LayoutSize.Y))
                          + PaddingSizeIncrease;
         }
     }

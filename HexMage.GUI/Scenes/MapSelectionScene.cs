@@ -5,14 +5,11 @@ using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI {
     public class MapSelectionScene : GameScene {
-        private ImGui _gui;
-
         public MapSelectionScene(GameManager gameManager) : base(gameManager) {}
 
         public override void Initialize() {
-            _gui = new ImGui(_inputManager, _assetManager.Font);
-            var _rootElement = CreateRootEntity();
-            _rootElement.Position = new Vector2(50, 50);
+            var rootElement = CreateRootEntity(Camera2D.SortUI);
+            rootElement.Position = new Vector2(50, 50);
 
             var btn1 = new TextButton("click!", _assetManager.Font);
             btn1.OnClick += _ => Console.WriteLine("click");
@@ -20,6 +17,15 @@ namespace HexMage.GUI {
             var lbl1 = new Label("label1", _assetManager.Font);
             var lbl2 = new Label("label2", _assetManager.Font);
             var btn2 = new TextButton("me!", _assetManager.Font);
+
+            var slider = new Slider(0, 100, new Point(100, 20));
+            slider.Position = new Vector2(300, 300);
+            
+            var label = new Label(() => $"Value: {slider.Value}", _assetManager.Font);
+            label.Position = new Vector2(300, 280);
+
+            rootElement.AddChild(slider);
+            rootElement.AddChild(label);
 
             var menuBar = new HorizontalLayout();
 
@@ -31,7 +37,7 @@ namespace HexMage.GUI {
             menuBar.AddChild(vertical);
             menuBar.AddChild(btn2);
 
-            _rootElement.AddChild(menuBar);
+            rootElement.AddChild(menuBar);
         }
 
         public override void Cleanup() {}

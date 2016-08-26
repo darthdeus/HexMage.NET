@@ -30,10 +30,9 @@ namespace HexMage.GUI {
         public override void Initialize() {
             Camera2D.Instance.Translate = new Vector3(600, 500, 0);
 
-            var gameBoardEntity = CreateRootEntity();
+            var gameBoardEntity = CreateRootEntity(Camera2D.SortBackground);
             gameBoardEntity.AddComponent(new GameBoardController(_gameInstance));
             gameBoardEntity.Renderer = new GameBoardRenderer(_gameInstance, _camera);
-            gameBoardEntity.SortOrder = Camera2D.SortBackground;
             gameBoardEntity.CustomBatch = true;
 
             var uiEntity = BuildUI();

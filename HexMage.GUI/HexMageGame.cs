@@ -27,7 +27,7 @@ namespace HexMage.GUI
                 PreferredBackBufferHeight = 1024
             };
 
-            _assetManager = new AssetManager(Content);
+            _assetManager = new AssetManager(Content, _graphics.GraphicsDevice);
             _camera = new Camera2D(_inputManager);
 
             Content.RootDirectory = "Content";
@@ -45,11 +45,12 @@ namespace HexMage.GUI
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             _assetManager.Preload();
-            _assetManager.RegisterTexture(AssetManager.HexGraySprite,
+            _assetManager.RegisterTexture(AssetManager.SolidGrayColor,
                 TextureGenerator.SolidColor(GraphicsDevice, 32, 32, Color.LightGray));
 
             _gameManager = new GameManager(_camera, _inputManager, _assetManager, _spriteBatch);
-            _sceneManager = new SceneManager(new ArenaScene(_gameManager));
+            //_sceneManager = new SceneManager(new ArenaScene(_gameManager));
+            _sceneManager = new SceneManager(new MapSelectionScene(_gameManager));
             _sceneManager.Initialize();
         }
 
@@ -65,7 +66,6 @@ namespace HexMage.GUI
 
             base.Update(gameTime);
         }
-
 
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.CornflowerBlue);

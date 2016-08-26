@@ -5,10 +5,10 @@ namespace HexMage.GUI.UI {
     public class Panel : Entity
     {
         protected override void Layout() {
-            var width = Children.Max(x => x.CachedSize.X + x.Position.X);
-            var height = Children.Max(x => x.CachedSize.Y + x.Position.Y);
+            var width = Children.Max(x => x.LayoutSize.X + x.Position.X);
+            var height = Children.Max(x => x.LayoutSize.Y + x.Position.Y);
 
-            CachedSize = new Vector2(width, height);
+            LayoutSize = new Vector2(width, height);
         }
     }
 }

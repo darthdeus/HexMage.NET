@@ -7,7 +7,7 @@ namespace HexMage.GUI.UI {
         }
 
         protected override void Layout() {
-            CachedSize = ((SpriteRenderer) Renderer).Tex.Bounds.Size.ToVector2();
+            LayoutSize = ((SpriteRenderer) Renderer).Tex.Bounds.Size.ToVector2();
         }
     }
 }

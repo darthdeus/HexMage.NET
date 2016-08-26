@@ -46,7 +46,7 @@ namespace HexMage.GUI.Components {
 
         private void DrawHealthbar(double percentage, SpriteBatch batch, AssetManager assetManager, Point pos,
                                    Color emptyColor, Color fullColor) {
-            var gray = assetManager[AssetManager.HexGraySprite];
+            var gray = assetManager[AssetManager.SolidGrayColor];
 
 
             batch.Draw(gray, new Rectangle(pos, new Point(_healthbarWidth, _healthbarWidth)), emptyColor);

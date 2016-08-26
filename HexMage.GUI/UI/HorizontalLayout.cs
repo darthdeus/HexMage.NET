@@ -12,11 +12,11 @@ namespace HexMage.GUI.UI {
 
             foreach (var element in Children) {
                 element.Position = new Vector2(offset, 0);
-                offset += element.CachedSize.X + Spacing;
-                maxHeight = Math.Max(maxHeight, element.CachedSize.Y);
+                offset += element.LayoutSize.X + Spacing;
+                maxHeight = Math.Max(maxHeight, element.LayoutSize.Y);
             }
 
-            CachedSize = new Vector2(Children.Sum(x => x.CachedSize.X), maxHeight);
+            LayoutSize = new Vector2(Children.Sum(x => x.LayoutSize.X), maxHeight);
         }
     }
 }

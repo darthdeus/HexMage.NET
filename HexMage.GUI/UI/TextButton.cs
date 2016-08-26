@@ -19,11 +19,11 @@ namespace HexMage.GUI.UI {
         }
 
         protected override void Layout() {
-            CachedSize = Font.MeasureString(Text) + new Vector2(4);
+            LayoutSize = Font.MeasureString(Text) + new Vector2(4);
         }
 
         protected override void Update(GameTime time) {
-            Debug.Assert(CachedSize != Vector2.Zero);
+            Debug.Assert(LayoutSize != Vector2.Zero);
 
             MouseState = ElementMouseState.Nothing;
 
@@ -44,9 +44,9 @@ namespace HexMage.GUI.UI {
         }
 
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
-            var tex = assetManager[AssetManager.HexGraySprite];
+            var tex = assetManager[AssetManager.SolidGrayColor];
 
-            var rectBg = new Rectangle(RenderPosition.ToPoint(), CachedSize.ToPoint());
+            var rectBg = new Rectangle(RenderPosition.ToPoint(), LayoutSize.ToPoint());
             if (MouseState == ElementMouseState.Pressed) {
                 rectBg.Offset(1, 1);
             }

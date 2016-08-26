@@ -110,8 +110,11 @@ namespace HexMage.GUI {
             }
         }
 
-        protected Entity CreateRootEntity() {
-            var entity = new Entity {Scene = this};
+        protected Entity CreateRootEntity(int sortOrder) {
+            var entity = new Entity {
+                Scene = this,
+                SortOrder = sortOrder
+            };
             _rootEntities.Add(entity);
             return entity;
         }
