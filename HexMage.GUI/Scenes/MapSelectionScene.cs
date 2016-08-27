@@ -11,6 +11,31 @@ namespace HexMage.GUI {
             var rootElement = CreateRootEntity(Camera2D.SortUI);
             rootElement.Position = new Vector2(50, 50);
 
+            var leftColumn = rootElement.CreateChild();
+            var middleColumn = rootElement.CreateChild();
+            var rightColumn = new VerticalLayout();
+
+            rootElement.AddChild(rightColumn);
+
+            leftColumn.Position = new Vector2(40, 40);
+            leftColumn.AddChild(new Label("Seed history:", _assetManager.Font));
+
+            middleColumn.Position = new Vector2(400, 40);
+            var btnStartGame = new TextButton("Start game", _assetManager.Font);
+            btnStartGame.OnClick += _ => {
+                LoadNewScene(new ArenaScene(_gameManager));
+            };
+            middleColumn.AddChild(btnStartGame);
+
+            rightColumn.Position = new Vector2(800, 40);
+            rightColumn.AddChild(new Label("Map seed:", _assetManager.Font));
+            var btnGenerateMap = new TextButton("Generate map", _assetManager.Font);
+            btnGenerateMap.OnClick += _ => {
+                Console.WriteLine("New map generated");
+            };
+
+            rightColumn.AddChild(btnGenerateMap);
+
             var btn1 = new TextButton("click!", _assetManager.Font);
             btn1.OnClick += _ => Console.WriteLine("click");
 

@@ -1,7 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HexMage.Simulator {
+    public struct MapSeed {
+        private readonly Guid _guid;
+
+        public MapSeed(Guid guid) {
+            _guid = guid;
+        }
+
+        // TODO - figure out a better way to seed the random generator
+        public Random Random => new Random(_guid.ToByteArray().Sum(x => (int) x));
+
+        public static MapSeed CreateRandom() {
+            return new MapSeed(Guid.NewGuid());
+        }
+    }
+
+    public class MapGenerator {
+        public Map Generate(int mapSize, MapSeed seed) {
+            var random = seed.Random;
+
+            var map = new Map(mapSize);
+
+            for (int i = 0, total = 0; i < 10 && total < 1000; i++, total++) {
+                var coord = map.AllCoords[random.Next(map.AllCoords.Count)];
+                if (map[coord] == HexType.Empty) {
+                    map[coord] = HexType.Wall;
+                } else {
+                    i++;
+                }
+            }
+
+            return map;
+        }
+    }
+
     public static class Generator {
         private static readonly Random _random = new Random();
 
