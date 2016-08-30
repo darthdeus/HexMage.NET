@@ -8,46 +8,46 @@ using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI {
     public class AssetManager {
-        public static readonly int TileSize = 64;
+        public const int TileSize = 64;
 
-        public static readonly string SolidGrayColor = "color/gray";
+        public const string SolidGrayColor = "color/gray";
 
-        public static readonly string DarkMageIdle = "mobs/dark-mage-idle";
-        public static readonly string DarkMageClicked = "mobs/dark-mage-clicked";
+        public const string DarkMageIdle = "mobs/dark-mage-idle";
+        public const string DarkMageClicked = "mobs/dark-mage-clicked";
 
-        public static readonly string FireballSprite = "mobs/fireball";
-        public static readonly string FireballExplosionSprite = "mobs/fireball-explosion";
-        public static readonly string FrostboltSprite = "mobs/frostbolt";
-        public static readonly string FrostboltExplosionSprite = "mobs/frostbolt-explosion";
-        public static readonly string EarthboltSprite = "mobs/earthbolt";
-        public static readonly string EarthboltExplosionSprite = "mobs/earthbolt-explosion";
-        public static readonly string LightningSprite = "mobs/lightning";
-        public static readonly string LightningExplosionSprite = "mobs/lightning-explosion";
+        public const string FireballSprite = "mobs/fireball";
+        public const string FireballExplosionSprite = "mobs/fireball-explosion";
+        public const string FrostboltSprite = "mobs/frostbolt";
+        public const string FrostboltExplosionSprite = "mobs/frostbolt-explosion";
+        public const string EarthboltSprite = "mobs/earthbolt";
+        public const string EarthboltExplosionSprite = "mobs/earthbolt-explosion";
+        public const string LightningSprite = "mobs/lightning";
+        public const string LightningExplosionSprite = "mobs/lightning-explosion";
 
-        public static readonly string HexWallSprite = "tiles/wall_hex";
-        public static readonly string HexPathSprite = "tiles/path_hex";
-        public static readonly string HexEmptySprite = "tiles/basic_tile";
-        public static readonly string HexHoverSprite = "tiles/hover_hex";
-        public static readonly string HexTargetSprite = "tiles/target_hex";
-        public static readonly string HexWithinDistance = "tiles/hex_within_distance";
+        public const string HexWallSprite = "tiles/wall_hex";
+        public const string HexPathSprite = "tiles/path_hex";
+        public const string HexEmptySprite = "tiles/basic_tile";
+        public const string HexHoverSprite = "tiles/hover_hex";
+        public const string HexTargetSprite = "tiles/target_hex";
+        public const string HexWithinDistance = "tiles/hex_within_distance";
 
-        public static readonly string NoTexture = "ability_ui/magenta";
-        public static readonly string SpellHighlight = "ability_ui/spell_highlight";
+        public const string NoTexture = "ability_ui/magenta";
+        public const string SpellHighlight = "ability_ui/spell_highlight";
 
-        public static readonly string SpellEarthBG = "ability_ui/spell_earth_bg";
-        public static readonly string SpellEarthActiveBG = "ability_ui/spell_earth_active_bg";
-        public static readonly string SpellFireBG = "ability_ui/spell_fire_bg";
-        public static readonly string SpellFireActiveBG = "ability_ui/spell_fire_active_bg";
-        public static readonly string SpellWaterBG = "ability_ui/spell_water_bg";
-        public static readonly string SpellWaterActiveBG = "ability_ui/spell_water_active_bg";
-        public static readonly string SpellAirBG = "ability_ui/spell_air_bg";
-        public static readonly string SpellAirActiveBG = "ability_ui/spell_air_active_bg";
+        public const string SpellEarthBg = "ability_ui/spell_earth_bg";
+        public const string SpellEarthActiveBg = "ability_ui/spell_earth_active_bg";
+        public const string SpellFireBg = "ability_ui/spell_fire_bg";
+        public const string SpellFireActiveBg = "ability_ui/spell_fire_active_bg";
+        public const string SpellWaterBg = "ability_ui/spell_water_bg";
+        public const string SpellWaterActiveBg = "ability_ui/spell_water_active_bg";
+        public const string SpellAirBg = "ability_ui/spell_air_bg";
+        public const string SpellAirActiveBg = "ability_ui/spell_air_active_bg";
 
-        public static readonly string ShaderAbility = "shaders/ability_shader";
+        public const string ShaderAbility = "shaders/ability_shader";
 
-        public static readonly string ParticleSprite = "particle";
+        public const string ParticleSprite = "particle";
 
-        private static readonly string FontName = "Arial";
+        private const string FontName = "Arial";
 
         private readonly ContentManager _contentManager;
         private readonly GraphicsDevice _graphicsDevice;

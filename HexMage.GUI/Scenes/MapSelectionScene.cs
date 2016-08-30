@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using HexMage.GUI.UI;
+using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI {
@@ -23,7 +24,9 @@ namespace HexMage.GUI {
             middleColumn.Position = new Vector2(400, 40);
             var btnStartGame = new TextButton("Start game", _assetManager.Font);
             btnStartGame.OnClick += _ => {
-                LoadNewScene(new ArenaScene(_gameManager));
+                var mapGenerator = new MapGenerator();
+                var map = mapGenerator.Generate(20, MapSeed.CreateRandom());
+                LoadNewScene(new ArenaScene(_gameManager, map));
             };
             middleColumn.AddChild(btnStartGame);
 

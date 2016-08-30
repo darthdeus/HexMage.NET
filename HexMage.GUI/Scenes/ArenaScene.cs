@@ -9,9 +9,11 @@ using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI {
     internal class ArenaScene : GameScene {
-        private readonly GameInstance _gameInstance = new GameInstance(20);
+        private readonly GameInstance _gameInstance;
 
-        public ArenaScene(GameManager gameManager) : base(gameManager) {
+        public ArenaScene(GameManager gameManager, Map map) : base(gameManager) {
+            _gameInstance = new GameInstance(map.Size);
+            _gameInstance.Map = map;
             var t1 = _gameInstance.MobManager.AddTeam(TeamColor.Red);
             var t2 = _gameInstance.MobManager.AddTeam(TeamColor.Blue);
 

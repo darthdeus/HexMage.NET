@@ -43,13 +43,13 @@ namespace HexMage.GUI {
         private string ElementBg(Ability ability, bool active = false) {
             switch (ability.Element) {
                 case AbilityElement.Earth:
-                    return active ? AssetManager.SpellEarthActiveBG : AssetManager.SpellEarthBG;
+                    return active ? AssetManager.SpellEarthActiveBg : AssetManager.SpellEarthBg;
                 case AbilityElement.Fire:
-                    return active ? AssetManager.SpellFireActiveBG : AssetManager.SpellFireBG;
+                    return active ? AssetManager.SpellFireActiveBg : AssetManager.SpellFireBg;
                 case AbilityElement.Air:
-                    return active ? AssetManager.SpellAirActiveBG : AssetManager.SpellAirBG;
+                    return active ? AssetManager.SpellAirActiveBg : AssetManager.SpellAirBg;
                 case AbilityElement.Water:
-                    return active ? AssetManager.SpellWaterActiveBG : AssetManager.SpellWaterBG;
+                    return active ? AssetManager.SpellWaterActiveBg : AssetManager.SpellWaterBg;
                 default:
                     throw new ArgumentException("Invalid ability element", nameof(ability));
             }
