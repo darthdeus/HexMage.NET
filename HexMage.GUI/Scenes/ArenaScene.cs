@@ -134,6 +134,12 @@ namespace HexMage.GUI {
             var elementLabel = new Label(_assetManager.Font);
             abilityDetail.AddChild(elementLabel);
 
+            var cooldownLabel = new Label(_assetManager.Font);
+            abilityDetail.AddChild(cooldownLabel);
+
+            var buffsLabel = new Label(_assetManager.Font);
+            abilityDetail.AddChild(buffsLabel);
+
 
             const float speed = 1;
             const float horizontalOffset = 6;
@@ -185,7 +191,9 @@ namespace HexMage.GUI {
                                                     abilityIndex,
                                                     dmgLabel,
                                                     rangeLabel,
-                                                    elementLabel);
+                                                    elementLabel,
+                                                    cooldownLabel,
+                                                    buffsLabel);
             abilityDetail.AddComponent(abilityUpdater);
 
             abilityUpdater.OnClick += index => {

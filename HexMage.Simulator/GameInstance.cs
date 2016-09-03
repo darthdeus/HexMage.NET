@@ -23,12 +23,14 @@ namespace HexMage.Simulator {
 
 
         public bool IsFinished() {
+            // TODO - why is this still here?
 #if DEBUG
             Debug.Assert(MobManager.Teams.All(team => team.Mobs.Count > 0));
 #endif
             return MobManager.Teams.Any(team => team.Mobs.All(mob => mob.HP == 0));
         }
 
+        // TODO - figure out why this isn't being used
         public void Refresh() {
             Pathfinder.PathfindFrom(TurnManager.CurrentMob.Coord);
         }
