@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using HexMage.GUI.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -85,6 +86,9 @@ namespace HexMage.GUI {
                 pair.Value.Invoke();
                 _delayedActions.Remove(pair.Key);
             }
+
+            // Continuations from await expressions are processed synchronously as well
+            _gameManager.ProcessSynchronizationContextQueue();
 
             // Layout of all root entities is always done before Update() is called
             foreach (var entity in _rootEntities) {

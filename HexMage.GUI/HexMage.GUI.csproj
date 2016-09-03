@@ -7,7 +7,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{EECE0189-FCF4-40CC-AD6A-0BCEC2FAA6E6}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HexMage.GUI</RootNamespace>
     <AssemblyName>HexMage.GUI</AssemblyName>
@@ -71,6 +71,8 @@
     <Compile Include="InputManager.cs" />
     <Compile Include="Components\ParticleSystem.cs" />
     <Compile Include="Renderers\ParticleSystemRenderer.cs" />
+    <Compile Include="Scenes\PlayerController.cs" />
+    <Compile Include="Scenes\SceneSynchronizationContext.cs" />
     <Compile Include="Scenes\SpellRenderer.cs" />
     <Compile Include="UI\ColorChanger.cs" />
     <Compile Include="Scenes\GameScene.cs" />

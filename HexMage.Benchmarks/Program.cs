@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using HexMage.Simulator;
 
 namespace HexMage.Benchmarks
@@ -14,8 +13,10 @@ namespace HexMage.Benchmarks
             int size = 30;
             var g = new GameInstance(size);
 
-            var t1 = g.MobManager.AddTeam(TeamColor.Red);
-            var t2 = g.MobManager.AddTeam(TeamColor.Blue);
+            var pc1 = new AiRandomController();
+
+            var t1 = g.MobManager.AddTeam(TeamColor.Red, pc1);
+            var t2 = g.MobManager.AddTeam(TeamColor.Blue, pc1);
 
             var m1 = Generator.RandomMob(t1, size, _ => true);
             var m2 = Generator.RandomMob(t2, size, c => !c.Equals(m1.Coord));

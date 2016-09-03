@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
@@ -206,17 +208,26 @@ namespace HexMage.GUI.Components {
             var inputManager = InputManager.Instance;
 
             if (inputManager.IsKeyJustReleased(Keys.D1)) {
-                _gameInstance.TurnManager.ToggleAbilitySelected(0);
+                SelectAbility(0);
             } else if (inputManager.IsKeyJustReleased(Keys.D2)) {
-                _gameInstance.TurnManager.ToggleAbilitySelected(1);
+                SelectAbility(1);
             } else if (inputManager.IsKeyJustReleased(Keys.D3)) {
-                _gameInstance.TurnManager.ToggleAbilitySelected(2);
+                SelectAbility(2);
             } else if (inputManager.IsKeyJustReleased(Keys.D4)) {
-                _gameInstance.TurnManager.ToggleAbilitySelected(3);
+                SelectAbility(3);
             } else if (inputManager.IsKeyJustReleased(Keys.D5)) {
-                _gameInstance.TurnManager.ToggleAbilitySelected(4);
+                SelectAbility(4);
             } else if (inputManager.IsKeyJustReleased(Keys.D6)) {
-                _gameInstance.TurnManager.ToggleAbilitySelected(5);
+                SelectAbility(5);
+            }
+        }
+
+        private void SelectAbility(int index) {
+            var currentMob = _gameInstance.TurnManager.CurrentMob;
+            var ability = currentMob.Abilities[index];
+
+            if (_gameInstance.IsAbilityUsable(currentMob, ability)) {
+                _gameInstance.TurnManager.ToggleAbilitySelected(index);
             }
         }
 
@@ -270,8 +281,8 @@ namespace HexMage.GUI.Components {
 
                 var target = _gameInstance.TurnManager.CurrentTarget;
 
-                projectile.TargetHit += () => {
-                    usableAbility.Use();
+                projectile.TargetHit += async () => {
+                    await usableAbility.Use();
 
                     var explosion = new Entity() {
                         Transform = () => Camera2D.Instance.Transform,

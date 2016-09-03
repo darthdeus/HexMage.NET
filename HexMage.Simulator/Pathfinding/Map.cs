@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace HexMage.Simulator {
     public class Map {
         private readonly HexMap<HexType> _hexes;
+        private readonly HexMap<List<Buff>> _buffs;
         public int Size { get; set; }
 
         public List<AxialCoord> AllCoords => _hexes.AllCoords;
@@ -11,6 +12,11 @@ namespace HexMage.Simulator {
         public Map(int size) {
             Size = size;
             _hexes = new HexMap<HexType>(size);
+            _buffs = new HexMap<List<Buff>>(size);
+
+            foreach (var coord in _buffs.AllCoords) {
+                _buffs[coord] = new List<Buff>();
+            }
         }
 
         public HexType this[AxialCoord c] {
@@ -24,6 +30,10 @@ namespace HexMage.Simulator {
             } else {
                 this[coord] = HexType.Empty;
             }
+        }
+
+        public List<Buff> BuffsAt(AxialCoord coord) {
+            return _buffs[coord];
         }
 
         public int CubeDistance(CubeCoord a, CubeCoord b) {

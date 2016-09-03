@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AiRandomController.cs" />
     <Compile Include="AI\IPlayer.cs" />
     <Compile Include="Pathfinding\Map.cs" />
     <Compile Include="Model\UsableAbility.cs" />

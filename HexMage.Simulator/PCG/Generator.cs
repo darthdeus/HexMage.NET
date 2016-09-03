@@ -48,14 +48,20 @@ namespace HexMage.Simulator {
             };
 
             for (int i = 0; i < Mob.AbilityCount; i++) {
+                var buffs = RandomBuffs();
+
+                var areaBuffs = RandomAreaBuffs();
+
                 abilities.Add(new Ability(_random.Next(1, 10),
                                           _random.Next(3, 7),
                                           _random.Next(3, 10),
                                           _random.Next(0, 3),
-                                          elements[_random.Next(0, 4)]));
+                                          elements[_random.Next(0, 4)],
+                                          buffs,
+                                          areaBuffs));
             }
 
-            var mob = new Mob(team, 10, 10, abilities);
+            var mob = new Mob(team, 10, 10, 3, abilities);
             team.Mobs.Add(mob);
 
             while (true) {
@@ -72,6 +78,32 @@ namespace HexMage.Simulator {
             }
 
             return mob;
+        }
+
+        public static List<Buff> RandomBuffs() {
+            var result = new List<Buff>();
+
+            int count = _random.Next(2);
+            for (int i = 0; i < count; i++) {
+                result.Add(RandomBuff());
+            }
+
+            return result;
+        }
+
+        public static Buff RandomBuff() {
+            return new Buff(_random.Next(-2, 1), _random.Next(-1, 1), _random.Next(3));
+        }
+
+        public static List<AreaBuff> RandomAreaBuffs() {
+            var result = new List<AreaBuff>();
+
+            int count = _random.Next(2);
+            for (int i = 0; i < count; i++) {
+                result.Add(new AreaBuff(_random.Next(4), RandomBuff()));
+            }
+
+            return result;
         }
     }
 }

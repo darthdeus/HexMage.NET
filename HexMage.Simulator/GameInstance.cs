@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HexMage.Simulator {
     public class GameInstance {
@@ -16,7 +18,7 @@ namespace HexMage.Simulator {
             MobManager = new MobManager();
             Map = new Map(size);
             Pathfinder = new Pathfinder(Map, MobManager);
-            TurnManager = new TurnManager(MobManager);
+            TurnManager = new TurnManager(MobManager, Map);
         }
 
 
@@ -31,21 +33,28 @@ namespace HexMage.Simulator {
             Pathfinder.PathfindFrom(TurnManager.CurrentMob.Coord);
         }
 
+        [Obsolete]
         public IList<Ability> UsableAbilities(Mob mob) {
-            return mob.Abilities.Where(ability => ability.Cost <= mob.AP).ToList();
+            return mob.Abilities.Where(ability => IsAbilityUsable(mob, ability)).ToList();
+        }
+
+        public bool IsAbilityUsable(Mob mob, Ability ability) {
+            return mob.AP >= ability.Cost && ability.CurrentCooldown == 0;
         }
 
         public IList<UsableAbility> UsableAbilities(Mob mob, Mob target) {
             int distance = Pathfinder.Distance(target.Coord);
 
             return mob.Abilities
-                .Where(ability => ability.Range >= distance && mob.AP >= ability.Cost)
-                .Select(ability => new UsableAbility(mob, target, ability))
+                .Select((ability, i) => new UsableAbility(mob, target, ability, i))
+                .Where(ua => ua.Ability.Range >= distance && IsAbilityUsable(mob, ua.Ability))
                 .ToList();
         }
 
         public IList<Mob> PossibleTargets(Mob mob) {
-            int maxRange = mob.Abilities.Max(ability => ability.Range);
+            int maxRange = mob.Abilities
+                .Where(ability => IsAbilityUsable(mob, ability))
+                .Max(ability => ability.Range);
 
             return MobManager
                 .Mobs

@@ -5,10 +5,12 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI {
     public class SpellRenderer : IRenderer {
+        private readonly GameInstance _gameInstance;
         private readonly TurnManager _turnManager;
         private readonly int _abilityIndex;
 
-        public SpellRenderer(TurnManager turnManager, int abilityIndex) {
+        public SpellRenderer(GameInstance gameInstance, TurnManager turnManager, int abilityIndex) {
+            _gameInstance = gameInstance;
             _turnManager = turnManager;
             _abilityIndex = abilityIndex;
         }
@@ -26,6 +28,10 @@ namespace HexMage.GUI {
                 var ability = mob.Abilities[_abilityIndex];
 
                 var isActive = _turnManager.SelectedAbilityIndex == _abilityIndex;
+
+                if (_gameInstance.IsAbilityUsable(mob, ability)) {
+                    isActive = true;
+                }
 
                 batch.Draw(assetManager[ElementBg(ability, isActive)], entity.RenderPosition);
 

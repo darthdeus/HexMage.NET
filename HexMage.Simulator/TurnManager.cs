@@ -2,6 +2,7 @@
 
 namespace HexMage.Simulator {
     public class TurnManager {
+        private readonly Map _map;
         public MobManager MobManager { get; set; }
         public List<Mob> TurnOrder { get; set; } = new List<Mob>();
         public Mob CurrentMob => TurnOrder[_current];
@@ -10,7 +11,8 @@ namespace HexMage.Simulator {
 
         private int _current = 0;
 
-        public TurnManager(MobManager mobManager) {
+        public TurnManager(MobManager mobManager, Map map) {
+            _map = map;
             MobManager = mobManager;
         }
 
@@ -27,6 +29,8 @@ namespace HexMage.Simulator {
                     TurnOrder.Add(mob);
                 }
             }
+
+            MobManager.ApplyDots(_map);
 
             _current = 0;
 

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI {
@@ -47,5 +48,6 @@ namespace HexMage.GUI {
             Debug.Assert(_scenes.Count > 0);
             _scenes.Peek().Render(gameTime);
         }
+
     }
 }
