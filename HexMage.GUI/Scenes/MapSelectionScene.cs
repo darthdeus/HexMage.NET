@@ -25,7 +25,7 @@ namespace HexMage.GUI {
             var btnStartGame = new TextButton("Start game", _assetManager.Font);
             btnStartGame.OnClick += _ => {
                 var mapGenerator = new MapGenerator();
-                var map = mapGenerator.Generate(20, MapSeed.CreateRandom());
+                var map = mapGenerator.Generate(5, MapSeed.CreateRandom());
                 LoadNewScene(new ArenaScene(_gameManager, map));
             };
             middleColumn.AddChild(btnStartGame);

@@ -48,15 +48,16 @@ namespace HexMage.Simulator {
             };
 
             for (int i = 0; i < Mob.AbilityCount; i++) {
-                var buffs = RandomBuffs();
+                var element = elements[_random.Next(0, 4)];
+                var buffs = RandomBuffs(element);
 
-                var areaBuffs = RandomAreaBuffs();
+                var areaBuffs = RandomAreaBuffs(element);
 
                 abilities.Add(new Ability(_random.Next(1, 10),
                                           _random.Next(3, 7),
                                           _random.Next(3, 10),
                                           _random.Next(0, 3),
-                                          elements[_random.Next(0, 4)],
+                                          element,
                                           buffs,
                                           areaBuffs));
             }
@@ -80,27 +81,27 @@ namespace HexMage.Simulator {
             return mob;
         }
 
-        public static List<Buff> RandomBuffs() {
+        public static List<Buff> RandomBuffs(AbilityElement element){
             var result = new List<Buff>();
 
             int count = _random.Next(2);
             for (int i = 0; i < count; i++) {
-                result.Add(RandomBuff());
+                result.Add(RandomBuff(element));
             }
 
             return result;
         }
 
-        public static Buff RandomBuff() {
-            return new Buff(_random.Next(-2, 1), _random.Next(-1, 1), _random.Next(3));
+        public static Buff RandomBuff(AbilityElement element) {
+            return new Buff(element, _random.Next(-2, 1), _random.Next(-1, 1), _random.Next(1, 3));
         }
 
-        public static List<AreaBuff> RandomAreaBuffs() {
+        public static List<AreaBuff> RandomAreaBuffs(AbilityElement element) {
             var result = new List<AreaBuff>();
 
             int count = _random.Next(2);
             for (int i = 0; i < count; i++) {
-                result.Add(new AreaBuff(_random.Next(4), RandomBuff()));
+                result.Add(new AreaBuff(_random.Next(4), RandomBuff(element)));
             }
 
             return result;

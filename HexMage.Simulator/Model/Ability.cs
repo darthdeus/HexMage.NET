@@ -1,21 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.CodeDom;
+using System.Collections.Generic;
 
 namespace HexMage.Simulator {
+    // TODO - rename
     public enum AbilityElement {
         Earth,
         Fire,
         Air,
         Water
-    }
-
-    public class AreaBuff {
-        public int Radius { get; set; }
-        public Buff Effect { get; set; }
-
-        public AreaBuff(int radius, Buff effect) {
-            Radius = radius;
-            Effect = effect;
-        }
     }
 
     public class Ability {
@@ -41,6 +34,25 @@ namespace HexMage.Simulator {
             Buffs = buffs;
             AreaBuffs = areaBuffs;
             CurrentCooldown = 0;
+        }
+
+        public Buff ElementalEffect {
+            get {
+                switch (Element) {
+                    case AbilityElement.Earth:
+                        return new Buff(AbilityElement.Earth, 0, 0, 1, 0.5f);
+                    case AbilityElement.Fire:
+                        return new Buff(AbilityElement.Fire, -1, 0, 2);
+                    case AbilityElement.Air:
+                        return new Buff(AbilityElement.Air, 0, 0, 1, 2f);
+                    case AbilityElement.Water:
+                        return new Buff(AbilityElement.Water, 0, 0, 1, 1, new List<AbilityElement>() {
+                                            AbilityElement.Air
+                                        });
+                    default:
+                        throw new InvalidOperationException("Invalid element type");
+                }
+            }
         }
     }
 }

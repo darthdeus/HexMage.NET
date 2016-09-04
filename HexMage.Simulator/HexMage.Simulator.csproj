@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="AiRandomController.cs" />
     <Compile Include="AI\IPlayer.cs" />
+    <Compile Include="Model\AreaBuff.cs" />
     <Compile Include="Pathfinding\Map.cs" />
     <Compile Include="Model\UsableAbility.cs" />
     <Compile Include="Utils\Color.cs" />

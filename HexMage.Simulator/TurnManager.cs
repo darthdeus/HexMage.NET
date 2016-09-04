@@ -31,6 +31,7 @@ namespace HexMage.Simulator {
             }
 
             MobManager.ApplyDots(_map);
+            MobManager.LowerCooldowns();
 
             _current = 0;
 

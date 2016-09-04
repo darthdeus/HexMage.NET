@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using HexMage.GUI.Renderers;
@@ -190,7 +191,15 @@ namespace HexMage.GUI.Components {
                     }
                 } else {
                     _mobPopover.Active = true;
-                    _mobHealthLabel.Text = $"HP {mob.HP}/{mob.MaxHP}\nAP {mob.AP}/{mob.MaxAP}";
+                    var mobTextBuilder = new StringBuilder();
+                    mobTextBuilder.AppendLine($"HP {mob.HP}/{mob.MaxHP}\nAP {mob.AP}/{mob.MaxAP}");
+
+                    mobTextBuilder.AppendLine("Buffs:");
+                    foreach (var buff in mob.Buffs) {
+                        mobTextBuilder.AppendLine($"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns {buff.MoveSpeedModifier}spd");
+                    }
+
+                    _mobHealthLabel.Text = mobTextBuilder.ToString();
                 }
             } else {
                 _emptyHexPopover.Active = false;

@@ -47,7 +47,7 @@ namespace HexMage.GUI {
             var t2 = _gameInstance.MobManager.AddTeam(TeamColor.Blue, new AiRandomController());
 
             for (int team = 0; team < 2; team++) {
-                for (int mobI = 0; mobI < 5; mobI++) {
+                for (int mobI = 0; mobI < 2; mobI++) {
                     var mob = Generator.RandomMob(team%2 == 0 ? t1 : t2, _gameInstance.Size,
                                                   c => _gameInstance.MobManager.AtCoord(c) == null);
 

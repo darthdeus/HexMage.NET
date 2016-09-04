@@ -63,5 +63,13 @@ namespace HexMage.Simulator
             mob.HP += buff.HpChange;
             buff.Lifetime--;
         }
+
+        public void LowerCooldowns() {
+            foreach (var mob in Mobs) {
+                foreach (var ability in mob.Abilities) {
+                    if (ability.CurrentCooldown > 0) ability.CurrentCooldown--;
+                }
+            }
+        }
     }
 }
