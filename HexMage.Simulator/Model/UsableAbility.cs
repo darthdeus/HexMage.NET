@@ -18,7 +18,7 @@ namespace HexMage.Simulator {
             Index = index;
         }
 
-        public async Task<DefenseDesire> Use() {
+        public async Task<DefenseDesire> Use(Map map) {
             Debug.Assert(Ability.CurrentCooldown == 0, "Trying to use an ability with non-zero cooldown.");
 
             Ability.CurrentCooldown = Ability.Cooldown;
@@ -29,47 +29,17 @@ namespace HexMage.Simulator {
                     _target.AP -= _target.DefenseCost;
                     return DefenseDesire.Block;
                 } else {
-                    TargetHit();
+                    TargetHit(map);
 
                     return DefenseDesire.Pass;
                 }
             } else {
-                TargetHit();
+                TargetHit(map);
                 return DefenseDesire.Pass;
             }
         }
 
-        public AbilityElement BonusElement(AbilityElement element) {
-            switch (element) {
-                case AbilityElement.Earth:
-                    return AbilityElement.Fire;
-                case AbilityElement.Fire:
-                    return AbilityElement.Air;
-                case AbilityElement.Air:
-                    return AbilityElement.Water;
-                case AbilityElement.Water:
-                    return AbilityElement.Earth;
-                default:
-                    throw new InvalidOperationException("Invalid element type");
-            }
-        }
-
-        public AbilityElement OppositeElement(AbilityElement element) {
-            switch (element) {
-                case AbilityElement.Earth:
-                    return AbilityElement.Air;
-                case AbilityElement.Fire:
-                    return AbilityElement.Water;
-                case AbilityElement.Air:
-                    return AbilityElement.Earth;
-                case AbilityElement.Water:
-                    return AbilityElement.Fire;
-                default:
-                    throw new InvalidOperationException("Invalid element type");
-            }
-        }
-
-        private void TargetHit() {
+        private void TargetHit(Map map) {
             var elements = _target.Buffs.Select(b => b.Element).Distinct();
 
             AbilityElement opposite = OppositeElement(Ability.Element);
@@ -89,8 +59,50 @@ namespace HexMage.Simulator {
                 _target.Buffs.Add(abilityBuff.Clone());
             }
 
+            foreach (var areaBuff in Ability.AreaBuffs) {
+                var affectedArea = map.AllCoords.Where(x => map.CubeDistance(x, _target.Coord) <= areaBuff.Radius);
+                foreach (var coord in affectedArea) {
+                    map.BuffsAt(coord).Add(areaBuff.Effect);
+                }
+            }
+
             // TODO - handle negative AP
             _mob.AP -= Ability.Cost;
         }
+
+        private AbilityElement BonusElement(AbilityElement element)
+        {
+            switch (element)
+            {
+                case AbilityElement.Earth:
+                    return AbilityElement.Fire;
+                case AbilityElement.Fire:
+                    return AbilityElement.Air;
+                case AbilityElement.Air:
+                    return AbilityElement.Water;
+                case AbilityElement.Water:
+                    return AbilityElement.Earth;
+                default:
+                    throw new InvalidOperationException("Invalid element type");
+            }
+        }
+
+        private AbilityElement OppositeElement(AbilityElement element)
+        {
+            switch (element)
+            {
+                case AbilityElement.Earth:
+                    return AbilityElement.Air;
+                case AbilityElement.Fire:
+                    return AbilityElement.Water;
+                case AbilityElement.Air:
+                    return AbilityElement.Earth;
+                case AbilityElement.Water:
+                    return AbilityElement.Fire;
+                default:
+                    throw new InvalidOperationException("Invalid element type");
+            }
+        }
+
     }
 }

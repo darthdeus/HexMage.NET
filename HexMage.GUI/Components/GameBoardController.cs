@@ -178,18 +178,32 @@ namespace HexMage.GUI.Components {
                 var mob = _gameInstance.MobManager.AtCoord(mouseHex);
 
                 if (mob == null) {
-                    switch (_gameInstance.Map[mouseHex]) {
+                    var map = _gameInstance.Map;
+
+                    var labelText = new StringBuilder();
+
+                    switch (map[mouseHex]) {
                         case HexType.Empty:
                             _emptyHexPopover.Active = true;
-                            _emptyHexLabel.Text = "Just an empty hex.";
+                            labelText.AppendLine("Empty hex");
+                            labelText.AppendLine();
                             break;
 
                         case HexType.Wall:
                             _emptyHexPopover.Active = true;
-                            _emptyHexLabel.Text = "Indestructible wall";
+                            labelText.AppendLine("Indestructible wall");
+                            labelText.AppendLine();
                             break;
                     }
-                } else {
+                    var buffs = map.BuffsAt(mouseHex);
+
+                    foreach (var buff in buffs) {
+                        labelText.AppendLine($"{buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");
+                    }
+
+                    _emptyHexLabel.Text = labelText.ToString();
+                }
+                else {
                     _mobPopover.Active = true;
                     var mobTextBuilder = new StringBuilder();
                     mobTextBuilder.AppendLine($"HP {mob.HP}/{mob.MaxHP}\nAP {mob.AP}/{mob.MaxAP}");
@@ -291,7 +305,7 @@ namespace HexMage.GUI.Components {
                 var target = _gameInstance.TurnManager.CurrentTarget;
 
                 projectile.TargetHit += async () => {
-                    await usableAbility.Use();
+                    await usableAbility.Use(_gameInstance.Map);
 
                     var explosion = new Entity() {
                         Transform = () => Camera2D.Instance.Transform,

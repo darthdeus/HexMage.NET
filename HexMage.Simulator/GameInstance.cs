@@ -41,7 +41,8 @@ namespace HexMage.Simulator {
         }
 
         public bool IsAbilityUsable(Mob mob, Ability ability) {
-            return mob.AP >= ability.Cost && ability.CurrentCooldown == 0;
+            var isElementdisabled = mob.Buffs.SelectMany(b => b.DisabledElements).Distinct().Contains(ability.Element);
+            return !isElementdisabled && mob.AP >= ability.Cost && ability.CurrentCooldown == 0;
         }
 
         public IList<UsableAbility> UsableAbilities(Mob mob, Mob target) {

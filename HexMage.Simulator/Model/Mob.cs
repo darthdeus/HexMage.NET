@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace HexMage.Simulator
-{
+namespace HexMage.Simulator {
     public class Buff {
         public AbilityElement Element { get; set; }
         public int HpChange { get; set; }
@@ -12,16 +11,14 @@ namespace HexMage.Simulator
         public float MoveSpeedModifier { get; set; }
         public List<AbilityElement> DisabledElements { get; set; }
 
-        public Buff(AbilityElement element, int hpChange, int apChange, int lifetime):
-            this(element, hpChange, apChange, lifetime, 1, new List<AbilityElement>()){
-        }
+        public Buff(AbilityElement element, int hpChange, int apChange, int lifetime) :
+            this(element, hpChange, apChange, lifetime, 1, new List<AbilityElement>()) {}
 
         public Buff(AbilityElement element, int hpChange, int apChange, int lifetime, float moveSpeedModifier) :
-          this(element, hpChange, apChange, lifetime, moveSpeedModifier, new List<AbilityElement>())
-        {
-        }
+            this(element, hpChange, apChange, lifetime, moveSpeedModifier, new List<AbilityElement>()) {}
 
-        public Buff(AbilityElement element, int hpChange, int apChange, int lifetime, float moveSpeedModifier, List<AbilityElement> disabledElements) {
+        public Buff(AbilityElement element, int hpChange, int apChange, int lifetime, float moveSpeedModifier,
+                    List<AbilityElement> disabledElements) {
             Element = element;
             HpChange = hpChange;
             ApChange = apChange;
@@ -37,8 +34,7 @@ namespace HexMage.Simulator
         }
     }
 
-    public class Mob
-    {
+    public class Mob {
         public static readonly int NumberOfAbilities = 6;
 
         private static int _lastId = 0;

@@ -39,7 +39,9 @@ namespace HexMage.GUI.Renderers {
             var hexGreen = _assetManager[AssetManager.HexEmptySprite];
             var hexWall = _assetManager[AssetManager.HexWallSprite];
 
-            foreach (var coord in _gameInstance.Map.AllCoords) {
+            var map = _gameInstance.Map;
+
+            foreach (var coord in map.AllCoords) {
                 maxX = Math.Max(maxX, coord.ToCube().X);
                 maxY = Math.Max(maxY, coord.ToCube().Y);
                 maxZ = Math.Max(maxZ, coord.ToCube().Z);
@@ -53,9 +55,32 @@ namespace HexMage.GUI.Renderers {
                 } else {
                     DrawAt(hexWall, coord);
                 }
+
+                var hexBuffs = map.BuffsAt(coord);
+
+                if (hexBuffs.Count > 0) {
+                    foreach (var buff in hexBuffs) {
+                        DrawAt(_assetManager[AssetManager.HexHoverSprite], coord, ElementColor(buff.Element));
+                    }
+                }
             }
 
             _spriteBatch.End();
+        }
+
+        private Color ElementColor(AbilityElement element) {
+            switch (element) {
+                case AbilityElement.Earth:
+                    return Color.Brown;
+                case AbilityElement.Fire:
+                    return Color.Red;
+                case AbilityElement.Air:
+                    return Color.LightGray;
+                case AbilityElement.Water:
+                    return Color.LightBlue;
+                default:
+                    throw new InvalidOperationException("Invalid element type.");
+            }
         }
 
         private void DrawHoverPath() {
