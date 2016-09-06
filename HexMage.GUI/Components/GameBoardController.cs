@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -114,7 +115,12 @@ namespace HexMage.GUI.Components {
             }
 
             if (inputManager.IsKeyJustPressed(Keys.Space)) {
-                _gameInstance.TurnManager.NextMobOrNewTurn();
+                var turnEndResult = _gameInstance.TurnManager.NextMobOrNewTurn();
+
+                if (turnEndResult == TurnEndResult.NextTurn) {
+                    ShowMessage("Starting new turn!");
+                }
+
                 // TODO - fix this, it's ugly
                 _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
             }
@@ -195,7 +201,9 @@ namespace HexMage.GUI.Components {
                             labelText.AppendLine();
                             break;
                     }
+
                     var buffs = map.BuffsAt(mouseHex);
+                    Debug.Assert(buffs != null, "Buffs can't be null since we're only using valid map coords (and those are all initialized).");
 
                     foreach (var buff in buffs) {
                         labelText.AppendLine($"{buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");
@@ -206,10 +214,18 @@ namespace HexMage.GUI.Components {
                 else {
                     _mobPopover.Active = true;
                     var mobTextBuilder = new StringBuilder();
-                    mobTextBuilder.AppendLine($"HP {mob.HP}/{mob.MaxHP}\nAP {mob.AP}/{mob.MaxAP}");
+                    mobTextBuilder.AppendLine($"HP {mob.Hp}/{mob.MaxHp}\nAP {mob.Ap}/{mob.MaxAp}");
 
                     mobTextBuilder.AppendLine("Buffs:");
                     foreach (var buff in mob.Buffs) {
+                        mobTextBuilder.AppendLine($"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns {buff.MoveSpeedModifier}spd");
+                    }
+
+                    mobTextBuilder.AppendLine();
+                    mobTextBuilder.AppendLine("Area buffs:");
+
+                    var areaBuffs = _gameInstance.Map.BuffsAt(mob.Coord);
+                    foreach (var buff in areaBuffs) {
                         mobTextBuilder.AppendLine($"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns {buff.MoveSpeedModifier}spd");
                     }
 
@@ -249,18 +265,18 @@ namespace HexMage.GUI.Components {
             var currentMob = _gameInstance.TurnManager.CurrentMob;
             var ability = currentMob.Abilities[index];
 
-            if (_gameInstance.IsAbilityUsable(currentMob, ability)) {
+            if (_gameInstance.IsAbilityUsable(currentMob, ability) || _gameInstance.TurnManager.SelectedAbilityIndex.HasValue) {
                 _gameInstance.TurnManager.ToggleAbilitySelected(index);
             }
         }
 
         private void MoveTo(Mob currentMob, AxialCoord pos) {
             var distance = currentMob.Coord.Distance(pos);
-            if (distance <= currentMob.AP) {
+            if (distance <= currentMob.Ap) {
                 var mobEntity = (MobEntity) currentMob.Metadata;
                 mobEntity.MoveTo(pos);
 
-                currentMob.AP -= distance;
+                currentMob.Ap -= distance;
                 currentMob.Coord = pos;
                 _gameInstance.Pathfinder.PathfindFrom(pos);
             }

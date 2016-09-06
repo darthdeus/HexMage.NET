@@ -6,6 +6,7 @@ namespace HexMage.Simulator {
         private readonly HexMap<HexType> _hexes;
         private readonly HexMap<List<Buff>> _buffs;
         public int Size { get; set; }
+        public Guid Guid = System.Guid.NewGuid();
 
         public List<AxialCoord> AllCoords => _hexes.AllCoords;
 

@@ -1,6 +1,11 @@
 ﻿using System.Collections.Generic;
 
 namespace HexMage.Simulator {
+    public enum TurnEndResult {
+        NextMob,
+        NextTurn
+    }
+
     public class TurnManager {
         private readonly Map _map;
         public MobManager MobManager { get; set; }
@@ -24,8 +29,8 @@ namespace HexMage.Simulator {
             TurnOrder.Clear();
 
             foreach (var mob in MobManager.Mobs) {
-                mob.AP = mob.MaxAP;
-                if (mob.HP > 0) {
+                mob.Ap = mob.MaxAp;
+                if (mob.Hp > 0) {
                     TurnOrder.Add(mob);
                 }
             }
@@ -35,12 +40,15 @@ namespace HexMage.Simulator {
 
             _current = 0;
 
-            TurnOrder.Sort((a, b) => a.AP.CompareTo(b.AP));
+            TurnOrder.Sort((a, b) => a.Ap.CompareTo(b.Ap));
         }
 
-        public void NextMobOrNewTurn() {
+        public TurnEndResult NextMobOrNewTurn() {
             if (!MoveNext()) {
                 StartNextTurn();
+                return TurnEndResult.NextTurn;
+            } else {
+                return TurnEndResult.NextMob;
             }
         }
 

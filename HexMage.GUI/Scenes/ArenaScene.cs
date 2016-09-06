@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HexMage.GUI.Components;
@@ -8,7 +7,6 @@ using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI {
@@ -32,8 +30,7 @@ namespace HexMage.GUI {
         public bool HoveringOverUi { get; private set; } = false;
 
         public ArenaScene(GameManager gameManager, Map map) : base(gameManager) {
-            _gameInstance = new GameInstance(map.Size);
-            _gameInstance.Map = map;
+            _gameInstance = new GameInstance(map.Size, map);
 
               _defenseModal = new VerticalLayout() {
                 SortOrder = Camera2D.SortUI,

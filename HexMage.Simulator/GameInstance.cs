@@ -13,10 +13,13 @@ namespace HexMage.Simulator {
         public int Size { get; set; }
         public Mob SelectedMob { get; set; }
 
-        public GameInstance(int size) {
+        public GameInstance(int size): this(size, new Map(size)) {
+        }
+
+        public GameInstance(int size, Map map) {
             Size = size;
             MobManager = new MobManager();
-            Map = new Map(size);
+            Map = map;
             Pathfinder = new Pathfinder(Map, MobManager);
             TurnManager = new TurnManager(MobManager, Map);
         }
@@ -27,7 +30,7 @@ namespace HexMage.Simulator {
 #if DEBUG
             Debug.Assert(MobManager.Teams.All(team => team.Mobs.Count > 0));
 #endif
-            return MobManager.Teams.Any(team => team.Mobs.All(mob => mob.HP == 0));
+            return MobManager.Teams.Any(team => team.Mobs.All(mob => mob.Hp == 0));
         }
 
         // TODO - figure out why this isn't being used
@@ -42,7 +45,7 @@ namespace HexMage.Simulator {
 
         public bool IsAbilityUsable(Mob mob, Ability ability) {
             var isElementdisabled = mob.Buffs.SelectMany(b => b.DisabledElements).Distinct().Contains(ability.Element);
-            return !isElementdisabled && mob.AP >= ability.Cost && ability.CurrentCooldown == 0;
+            return !isElementdisabled && mob.Ap >= ability.Cost && ability.CurrentCooldown == 0;
         }
 
         public IList<UsableAbility> UsableAbilities(Mob mob, Mob target) {

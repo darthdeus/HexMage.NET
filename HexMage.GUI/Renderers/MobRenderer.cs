@@ -36,11 +36,11 @@ namespace HexMage.GUI.Components {
             _animationController.CurrentAnimation.RenderFrame(mobEntity, pos, color, batch, assetManager);
 
             var hbPos = pos.ToPoint() + _healthbarOffset;
-            DrawHealthbar((double) _mob.HP/_mob.MaxHP,
+            DrawHealthbar((double) _mob.Hp/_mob.MaxHp,
                           batch, assetManager, hbPos, Color.DarkGreen, Color.LightGreen);
 
             var apPos = hbPos + new Point(_healthbarWidth, 0);
-            DrawHealthbar((double) _mob.AP/_mob.MaxAP,
+            DrawHealthbar((double) _mob.Ap/_mob.MaxAp,
                           batch, assetManager, apPos, Color.DarkBlue, Color.LightBlue);
         }
 

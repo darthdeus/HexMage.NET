@@ -22,11 +22,11 @@ namespace HexMage.Simulator {
             Debug.Assert(Ability.CurrentCooldown == 0, "Trying to use an ability with non-zero cooldown.");
 
             Ability.CurrentCooldown = Ability.Cooldown;
-            if (_target.AP >= _target.DefenseCost) {
+            if (_target.Ap >= _target.DefenseCost) {
                 var res = await _target.Team.Controller.RequestDesireToDefend(_target, Ability);
 
                 if (res == DefenseDesire.Block) {
-                    _target.AP -= _target.DefenseCost;
+                    _target.Ap -= _target.DefenseCost;
                     return DefenseDesire.Block;
                 } else {
                     TargetHit(map);
@@ -51,7 +51,7 @@ namespace HexMage.Simulator {
             bool bonusDmg = elements.Contains(BonusElement(Ability.Element));
             int modifier = bonusDmg ? 2 : 1;
 
-            _target.HP = Math.Max(0, _target.HP - Ability.Dmg * modifier);
+            _target.Hp = Math.Max(0, _target.Hp - Ability.Dmg * modifier);
 
             _target.Buffs.Add(Ability.ElementalEffect);
             foreach (var abilityBuff in Ability.Buffs) {
@@ -61,13 +61,14 @@ namespace HexMage.Simulator {
 
             foreach (var areaBuff in Ability.AreaBuffs) {
                 var affectedArea = map.AllCoords.Where(x => map.CubeDistance(x, _target.Coord) <= areaBuff.Radius);
+                Console.WriteLine($"Applying buffs at {map.Guid}");
                 foreach (var coord in affectedArea) {
-                    map.BuffsAt(coord).Add(areaBuff.Effect);
+                    map.BuffsAt(coord).Add(areaBuff.Effect.Clone());
                 }
             }
 
             // TODO - handle negative AP
-            _mob.AP -= Ability.Cost;
+            _mob.Ap -= Ability.Cost;
         }
 
         private AbilityElement BonusElement(AbilityElement element)

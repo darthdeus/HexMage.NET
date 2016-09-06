@@ -32,18 +32,22 @@ namespace HexMage.Simulator {
         public Buff Clone() {
             return (Buff) MemberwiseClone();
         }
+
+        public override string ToString() {
+            return $"{nameof(Element)}: {Element}, {nameof(HpChange)}: {HpChange}, {nameof(ApChange)}: {ApChange}, {nameof(Lifetime)}: {Lifetime}, {nameof(MoveSpeedModifier)}: {MoveSpeedModifier}";
+        }
     }
 
     public class Mob {
         public static readonly int NumberOfAbilities = 6;
 
         private static int _lastId = 0;
-        public int ID { get; set; }
+        public int Id { get; set; }
 
-        public int HP { get; set; }
-        public int AP { get; set; }
-        public int MaxHP { get; set; }
-        public int MaxAP { get; set; }
+        public int Hp { get; set; }
+        public int Ap { get; set; }
+        public int MaxHp { get; set; }
+        public int MaxAp { get; set; }
         public int DefenseCost { get; set; }
 
         public List<Ability> Abilities { get; set; }
@@ -56,20 +60,20 @@ namespace HexMage.Simulator {
 
         public Mob(Team team, int maxHp, int maxAp, int defenseCost, List<Ability> abilities) {
             Team = team;
-            MaxHP = maxHp;
-            MaxAP = maxAp;
+            MaxHp = maxHp;
+            MaxAp = maxAp;
             DefenseCost = defenseCost;
             Abilities = abilities;
-            HP = maxHp;
-            AP = maxAp;
+            Hp = maxHp;
+            Ap = maxAp;
             Coord = new AxialCoord(0, 0);
-            ID = _lastId++;
+            Id = _lastId++;
 
             team.Mobs.Add(this);
         }
 
         public override string ToString() {
-            return $"{HP}/{MaxHP} {AP}/{MaxAP}";
+            return $"{Hp}/{MaxHp} {Ap}/{MaxAp}";
         }
     }
 }

@@ -48,7 +48,7 @@ namespace HexMage.Simulator {
         public void MoveAsFarAsPossible(Mob mob, IList<AxialCoord> path) {
             int i = path.Count - 1;
 
-            while (mob.AP > 0 && i > 0) {
+            while (mob.Ap > 0 && i > 0) {
                 _mobManager.MoveMob(mob, path[i]);
                 i--;
             }
@@ -137,7 +137,8 @@ namespace HexMage.Simulator {
         }
 
         public bool IsValidCoord(AxialCoord c) {
-            return c.Abs().Max() < Size && c.Min() > -Size && c.ToCube().Sum() == 0;
+            //return _map.AllCoords.Contains(c);
+            return c.ToCube().Sum() == 0 && _map.CubeDistance(new CubeCoord(0, 0, 0), c) <= _map.Size;
             //return c.Abs().Max() < Size && c.Min() >= 0;
         }
     }

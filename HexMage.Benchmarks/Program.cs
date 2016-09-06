@@ -38,7 +38,7 @@ namespace HexMage.Benchmarks
             s.Start();
             while (iterations < 10000000) {
                 foreach (var mob in mobManager.Mobs) {
-                    mob.HP = mob.MaxHP;
+                    mob.Hp = mob.MaxHp;
                 }
 
                 while (!g.IsFinished()) {
