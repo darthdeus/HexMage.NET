@@ -61,7 +61,8 @@ namespace HexMage.Benchmarks
                             var abilities = g.UsableAbilities(mob, target);
 
                             if (abilities.Count > 0) {
-                                abilities.First().Use();
+#warning Change this to await the defense query
+                                abilities.First().Use(map);
                             } else {
                                 var path = pathfinder.PathTo(target.Coord);
 

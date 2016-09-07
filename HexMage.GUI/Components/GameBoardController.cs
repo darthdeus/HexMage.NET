@@ -215,6 +215,8 @@ namespace HexMage.GUI.Components {
                     _mobPopover.Active = true;
                     var mobTextBuilder = new StringBuilder();
                     mobTextBuilder.AppendLine($"HP {mob.Hp}/{mob.MaxHp}\nAP {mob.Ap}/{mob.MaxAp}");
+                    mobTextBuilder.AppendLine($"Iniciative: {mob.Iniciative}");
+                    mobTextBuilder.AppendLine();
 
                     mobTextBuilder.AppendLine("Buffs:");
                     foreach (var buff in mob.Buffs) {
@@ -269,9 +271,9 @@ namespace HexMage.GUI.Components {
                 _gameInstance.TurnManager.ToggleAbilitySelected(index);
             }
         }
-
-        private void MoveTo(Mob currentMob, AxialCoord pos) {
-            var distance = currentMob.Coord.Distance(pos);
+        
+        private void MoveTo(Mob currentMob, AxialCoord pos) { 
+            int distance = currentMob.Coord.ModifiedDistance(currentMob, pos);
             if (distance <= currentMob.Ap) {
                 var mobEntity = (MobEntity) currentMob.Metadata;
                 mobEntity.MoveTo(pos);
@@ -322,6 +324,7 @@ namespace HexMage.GUI.Components {
 
                 projectile.TargetHit += async () => {
                     await usableAbility.Use(_gameInstance.Map);
+                    _gameInstance.TurnManager.UnselectAbility();
 
                     var explosion = new Entity() {
                         Transform = () => Camera2D.Instance.Transform,

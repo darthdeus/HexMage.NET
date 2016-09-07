@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace HexMage.Simulator {
@@ -34,7 +35,8 @@ namespace HexMage.Simulator {
         }
 
         public override string ToString() {
-            return $"{nameof(Element)}: {Element}, {nameof(HpChange)}: {HpChange}, {nameof(ApChange)}: {ApChange}, {nameof(Lifetime)}: {Lifetime}, {nameof(MoveSpeedModifier)}: {MoveSpeedModifier}";
+            return
+                $"{nameof(Element)}: {Element}, {nameof(HpChange)}: {HpChange}, {nameof(ApChange)}: {ApChange}, {nameof(Lifetime)}: {Lifetime}, {nameof(MoveSpeedModifier)}: {MoveSpeedModifier}";
         }
     }
 
@@ -49,6 +51,7 @@ namespace HexMage.Simulator {
         public int MaxHp { get; set; }
         public int MaxAp { get; set; }
         public int DefenseCost { get; set; }
+        public int Iniciative { get; set; }
 
         public List<Ability> Abilities { get; set; }
         public Team Team { get; set; }
@@ -58,11 +61,12 @@ namespace HexMage.Simulator {
         // TODO - should this maybe just be internal?
         public List<Buff> Buffs { get; set; } = new List<Buff>();
 
-        public Mob(Team team, int maxHp, int maxAp, int defenseCost, List<Ability> abilities) {
+        public Mob(Team team, int maxHp, int maxAp, int defenseCost, int iniciative, List<Ability> abilities) {
             Team = team;
             MaxHp = maxHp;
             MaxAp = maxAp;
             DefenseCost = defenseCost;
+            Iniciative = iniciative;
             Abilities = abilities;
             Hp = maxHp;
             Ap = maxAp;
@@ -74,6 +78,13 @@ namespace HexMage.Simulator {
 
         public override string ToString() {
             return $"{Hp}/{MaxHp} {Ap}/{MaxAp}";
+        }
+
+        public float SpeedModifier => Buffs.Select(b => b.MoveSpeedModifier)
+                                           .Aggregate(1.0f, (a, m) => a*(1/m));
+
+        public int ModifiedDistance(int distance) {
+            return (int) Math.Round(distance*SpeedModifier);
         }
     }
 }

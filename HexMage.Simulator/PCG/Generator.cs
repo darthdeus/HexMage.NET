@@ -62,7 +62,9 @@ namespace HexMage.Simulator {
                                           areaBuffs));
             }
 
-            var mob = new Mob(team, 10, 10, 3, abilities);
+            int iniciative = _random.Next(10);
+
+            var mob = new Mob(team, 10, 10, 3, iniciative, abilities);
             team.Mobs.Add(mob);
 
             while (true) {

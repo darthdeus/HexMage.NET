@@ -40,7 +40,7 @@ namespace HexMage.Simulator {
 
             _current = 0;
 
-            TurnOrder.Sort((a, b) => a.Ap.CompareTo(b.Ap));
+            TurnOrder.Sort((a, b) => a.Iniciative.CompareTo(b.Iniciative));
         }
 
         public TurnEndResult NextMobOrNewTurn() {
@@ -65,6 +65,10 @@ namespace HexMage.Simulator {
             } else {
                 SelectedAbilityIndex = index;
             }
+        }
+
+        public void UnselectAbility() {
+            SelectedAbilityIndex = null;
         }
     }
 }

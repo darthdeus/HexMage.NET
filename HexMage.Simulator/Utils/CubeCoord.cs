@@ -38,6 +38,14 @@ namespace HexMage.Simulator
             return X == other.X && Y == other.Y && Z == other.Z;
         }
 
+        public static bool operator ==(CubeCoord left, CubeCoord right) {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(CubeCoord left, CubeCoord right) {
+            return !left.Equals(right);
+        }
+
         public override bool Equals(object obj) {
             if (ReferenceEquals(null, obj)) return false;
             return obj is CubeCoord && Equals((CubeCoord) obj);

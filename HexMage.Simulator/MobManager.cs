@@ -61,14 +61,9 @@ namespace HexMage.Simulator {
                 }
             }
 
-            Console.WriteLine($"Starting buff update on map {map.Guid}");
             // TODO - store these in a list instead so that the whole map doesn't have to be iterated each turn
             foreach (var coord in map.AllCoords) {
-                Console.WriteLine("\tUpdating buffs");
                 var buffs = map.BuffsAt(coord);
-                if (buffs.Count > 0) {
-                    Console.WriteLine($"There are non-zero buffs {buffs.Count}");
-                }
                 foreach (var buff in buffs) {
                     buff.Lifetime--;
                     Debug.Assert(buff.Lifetime >= 0, "Buff lifetime should never be negative, as they're removed when they reach zero.");
@@ -79,7 +74,6 @@ namespace HexMage.Simulator {
         }
 
         public void ApplyBuff(Mob mob, Buff buff, LifetimeChange lifetimeChange) {
-            Console.WriteLine($"Applying {buff}");
             mob.Ap += buff.ApChange;
             mob.Hp += buff.HpChange;
             if (lifetimeChange == LifetimeChange.UpdateLifetime) {

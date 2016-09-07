@@ -110,7 +110,7 @@ namespace HexMage.GUI.Renderers {
                     }
                 } else {
                     foreach (var coord in path) {
-                        if (currentMob.Coord.Distance(coord) <= currentMob.Ap) {
+                        if (currentMob.Coord.ModifiedDistance(currentMob, coord) <= currentMob.Ap) {
                             DrawAt(hexUsable, coord);
                         } else {
                             DrawAt(hexTooFar, coord);
