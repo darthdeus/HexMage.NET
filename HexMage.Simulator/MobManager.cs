@@ -55,7 +55,6 @@ namespace HexMage.Simulator {
 
                 var buffs = map.BuffsAt(mob.Coord);
 
-                Console.WriteLine("Area");
                 foreach (var buff in buffs) {
                     ApplyBuff(mob, buff, LifetimeChange.KeepLifetime);
                 }

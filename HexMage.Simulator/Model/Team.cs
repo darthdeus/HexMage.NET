@@ -12,7 +12,7 @@ namespace HexMage.Simulator
     }
     public class Team
     {
-        public int ID { get; set; }
+        public int Id { get; set; }
         public TeamColor Color { get; private set; }
         public List<Mob> Mobs { get; set; } = new List<Mob>();
         public IPlayer Player { get; set; }

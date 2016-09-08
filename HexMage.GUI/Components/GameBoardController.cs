@@ -162,6 +162,13 @@ namespace HexMage.GUI.Components {
                         }
                     }
                 });
+            } else if (inputManager.IsKeyJustReleased(Keys.R)) {
+                var mob = _gameInstance.TurnManager.CurrentMob;
+                var targets = _gameInstance.PossibleTargets(mob);
+
+                if (targets.Count > 0) {
+                    
+                }
             }
         }
 

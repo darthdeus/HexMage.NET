@@ -53,20 +53,20 @@ namespace HexMage.GUI {
                 _elementLabel.Text = _ability.Element.ToString();
 
                 if (_ability.CurrentCooldown == 0) {
-                    _cooldownLabel.Text = "Not on cooldown";
-                } else {
                     _cooldownLabel.Text = $"Cooldown: {_ability.Cooldown} turns";
+                } else {
+                    _cooldownLabel.Text = $"Again in {_ability.CurrentCooldown} turns";
                 }
 
                 var buffTextBuilder = new StringBuilder();
 
                 foreach (var buff in _ability.Buffs) {
-                    buffTextBuilder.AppendLine($"Buff {buff.HpChange}/{buff.ApChange} over {buff.Lifetime} turns");
+                    buffTextBuilder.AppendLine($"Buff {buff.HpChange}/{buff.ApChange}\nover {buff.Lifetime} turns");
                 }
 
                 foreach (var areaBuff in _ability.AreaBuffs) {
                     buffTextBuilder.AppendLine(
-                        $"Area buff {areaBuff.Effect.HpChange}/{areaBuff.Effect.ApChange} over {areaBuff.Effect.Lifetime}, radius {areaBuff.Radius}");
+                        $"Area buff {areaBuff.Effect.HpChange}/{areaBuff.Effect.ApChange}\nover {areaBuff.Effect.Lifetime}, radius {areaBuff.Radius}");
                 }
 
                 _buffsLabel.Text = buffTextBuilder.ToString();

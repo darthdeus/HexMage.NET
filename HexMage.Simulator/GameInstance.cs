@@ -24,7 +24,6 @@ namespace HexMage.Simulator {
             TurnManager = new TurnManager(MobManager, Map);
         }
 
-
         public bool IsFinished() {
             // TODO - why is this still here?
 #if DEBUG
@@ -44,12 +43,14 @@ namespace HexMage.Simulator {
         }
 
         public bool IsAbilityUsable(Mob mob, Ability ability) {
+            // TODO - handle visibiliy
             var isElementdisabled = mob.Buffs.SelectMany(b => b.DisabledElements).Distinct().Contains(ability.Element);
             return !isElementdisabled && mob.Ap >= ability.Cost && ability.CurrentCooldown == 0;
         }
 
         public IList<UsableAbility> UsableAbilities(Mob mob, Mob target) {
             int distance = Pathfinder.Distance(target.Coord);
+            // TODO - handle visibiliy
 
             return mob.Abilities
                 .Select((ability, i) => new UsableAbility(mob, target, ability, i))
