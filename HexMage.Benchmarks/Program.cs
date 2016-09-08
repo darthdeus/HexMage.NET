@@ -13,7 +13,7 @@ namespace HexMage.Benchmarks
             int size = 30;
             var g = new GameInstance(size);
 
-            var pc1 = new AiRandomController();
+            var pc1 = new AiRandomController(g);
 
             var t1 = g.MobManager.AddTeam(TeamColor.Red, pc1);
             var t2 = g.MobManager.AddTeam(TeamColor.Blue, pc1);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Timers;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
@@ -24,6 +25,9 @@ namespace HexMage.GUI.Components {
         private Vector2 _sourceWorld;
         private Vector2 _dstWorld;
         private Vector2 _directionWorld;
+        private readonly TaskCompletionSource<bool> _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public Task Task => _tcs.Task;
 
         protected override void Update(GameTime time) {
             base.Update(time);
@@ -38,6 +42,7 @@ namespace HexMage.GUI.Components {
             if (percent > 0.99f) {
                 // TODO - destroy the entity and all of its components :)
                 Active = false;
+                _tcs.SetResult(true);
                 TargetHit?.Invoke();
             }
 

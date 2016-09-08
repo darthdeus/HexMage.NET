@@ -26,7 +26,7 @@ namespace HexMage.Simulator.Tests
 
             var mobManager = game.MobManager;
 
-            var pc1 = new AiRandomController();
+            var pc1 = new AiRandomController(game);
 
             var t1 = mobManager.AddTeam(TeamColor.Red, pc1);
             var t2 = mobManager.AddTeam(TeamColor.Blue, pc1);

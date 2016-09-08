@@ -2,18 +2,20 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
+using HexMage.Simulator;
 
 namespace HexMage.GUI {
     public class SceneSynchronizationContext : SynchronizationContext {
         ConcurrentQueue<KeyValuePair<SendOrPostCallback, object>> _queue = new ConcurrentQueue<KeyValuePair<SendOrPostCallback, object>>();
 
         public override void Send(SendOrPostCallback d, object state) {
-            Console.WriteLine("Sending");
+            Utils.ThreadLog("Sending");
             base.Send(d, state);
         }
 
         public override void Post(SendOrPostCallback d, object state) {
-            Console.WriteLine("Posting callback");
+            //Console.WriteLine("Posting callback");
+            Utils.ThreadLog("Posting callback");
             _queue.Enqueue(new KeyValuePair<SendOrPostCallback, object>(d, state));
         }
 

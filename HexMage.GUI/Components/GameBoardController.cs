@@ -13,8 +13,9 @@ using Microsoft.Xna.Framework.Input;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Components {
-    public class GameBoardController : Component {
+    public class GameBoardController : Component, IGameEventSubscriber {
         private readonly GameInstance _gameInstance;
+        private readonly GameEventHub _eventHub;
         private Entity _emptyHexPopover;
         private VerticalLayout _mobPopover;
         private Label _emptyHexLabel;
@@ -24,8 +25,9 @@ namespace HexMage.GUI.Components {
         private DateTime _displayMessageBoxUntil = DateTime.Now;
         private AssetManager _assetManager;
 
-        public GameBoardController(GameInstance gameInstance) {
+        public GameBoardController(GameInstance gameInstance, GameEventHub eventHub) {
             _gameInstance = gameInstance;
+            _eventHub = eventHub;
         }
 
         public override void Initialize(AssetManager assetManager) {
@@ -73,6 +75,11 @@ namespace HexMage.GUI.Components {
             }
 
             CreateMobEntities(assetManager);
+
+#warning TODO - run async and check thread
+            _eventHub.MainLoop(_gameInstance).ContinueWith(t => {
+                                                               Utils.ThreadLog($"Fauled: {t.IsFaulted}, Complete: {t.IsCompleted}");
+                                                           }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private void CreateMobEntities(AssetManager assetManager) {
@@ -115,6 +122,10 @@ namespace HexMage.GUI.Components {
             }
 
             if (inputManager.IsKeyJustPressed(Keys.Space)) {
+                var pc = _gameInstance.TurnManager.CurrentMob.Team.Controller as PlayerController;
+                if (pc != null) {
+                    pc.PlayerEndedTurn();
+                }
                 var turnEndResult = _gameInstance.TurnManager.NextMobOrNewTurn();
 
                 if (turnEndResult == TurnEndResult.NextTurn) {
@@ -136,39 +147,35 @@ namespace HexMage.GUI.Components {
             var currentMob = _gameInstance.TurnManager.CurrentMob;
             if (inputManager.JustLeftClickReleased()) {
                 EnqueueClickEvent(() => {
-                    Console.WriteLine($"MOB EVENT, time {DateTime.Now.Millisecond}");
-                    if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                        var mob = _gameInstance.MobManager.AtCoord(mouseHex);
-                        if (mob != null) {
-                            if (mob == currentMob) {
-                                ShowMessage("You can't target yourself.");
-                            } else {
-                                if (mob.Team.Color == currentMob.Team.Color) {
-                                    ShowMessage("You can't target your team.");
-                                } else if (_gameInstance.TurnManager.SelectedAbilityIndex.HasValue) {
-                                    if (abilitySelected) {
-                                        AttackMob(mob);
-                                    } else {
-                                        ShowMessage("You can't move here.");
-                                    }
-                                }
-                            }
-                        } else {
-                            if (abilitySelected) {
-                                ShowMessage("Select an ability to use first.");
-                            } else {
-                                MoveTo(currentMob, mouseHex);
-                            }
-                        }
-                    }
-                });
+                                      Console.WriteLine($"MOB EVENT, time {DateTime.Now.Millisecond}");
+                                      if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
+                                          var mob = _gameInstance.MobManager.AtCoord(mouseHex);
+                                          if (mob != null) {
+                                              if (mob == currentMob) {
+                                                  ShowMessage("You can't target yourself.");
+                                              } else {
+                                                  if (mob.Team.Color == currentMob.Team.Color) {
+                                                      ShowMessage("You can't target your team.");
+                                                  } else if (_gameInstance.TurnManager.SelectedAbilityIndex.HasValue) {
+                                                      if (abilitySelected) {
+                                                          AttackMob(mob);
+                                                      } else {
+                                                          ShowMessage("You can't move here.");
+                                                      }
+                                                  }
+                                              }
+                                          } else {
+                                              if (abilitySelected) {
+                                                  ShowMessage("Select an ability to use first.");
+                                              } else {
+                                                  MoveTo(currentMob, mouseHex);
+                                              }
+                                          }
+                                      }
+                                  });
             } else if (inputManager.IsKeyJustReleased(Keys.R)) {
                 var mob = _gameInstance.TurnManager.CurrentMob;
-                var targets = _gameInstance.PossibleTargets(mob);
-
-                if (targets.Count > 0) {
-                    
-                }
+                mob.Team.Controller.RandomAction(_eventHub);
             }
         }
 
@@ -210,15 +217,15 @@ namespace HexMage.GUI.Components {
                     }
 
                     var buffs = map.BuffsAt(mouseHex);
-                    Debug.Assert(buffs != null, "Buffs can't be null since we're only using valid map coords (and those are all initialized).");
+                    Debug.Assert(buffs != null,
+                                 "Buffs can't be null since we're only using valid map coords (and those are all initialized).");
 
                     foreach (var buff in buffs) {
                         labelText.AppendLine($"{buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");
                     }
 
                     _emptyHexLabel.Text = labelText.ToString();
-                }
-                else {
+                } else {
                     _mobPopover.Active = true;
                     var mobTextBuilder = new StringBuilder();
                     mobTextBuilder.AppendLine($"HP {mob.Hp}/{mob.MaxHp}\nAP {mob.Ap}/{mob.MaxAp}");
@@ -227,7 +234,8 @@ namespace HexMage.GUI.Components {
 
                     mobTextBuilder.AppendLine("Buffs:");
                     foreach (var buff in mob.Buffs) {
-                        mobTextBuilder.AppendLine($"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns {buff.MoveSpeedModifier}spd");
+                        mobTextBuilder.AppendLine(
+                            $"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns {buff.MoveSpeedModifier}spd");
                     }
 
                     mobTextBuilder.AppendLine();
@@ -235,7 +243,8 @@ namespace HexMage.GUI.Components {
 
                     var areaBuffs = _gameInstance.Map.BuffsAt(mob.Coord);
                     foreach (var buff in areaBuffs) {
-                        mobTextBuilder.AppendLine($"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns {buff.MoveSpeedModifier}spd");
+                        mobTextBuilder.AppendLine(
+                            $"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns {buff.MoveSpeedModifier}spd");
                     }
 
                     _mobHealthLabel.Text = mobTextBuilder.ToString();
@@ -274,12 +283,13 @@ namespace HexMage.GUI.Components {
             var currentMob = _gameInstance.TurnManager.CurrentMob;
             var ability = currentMob.Abilities[index];
 
-            if (_gameInstance.IsAbilityUsable(currentMob, ability) || _gameInstance.TurnManager.SelectedAbilityIndex.HasValue) {
+            if (_gameInstance.IsAbilityUsable(currentMob, ability) ||
+                _gameInstance.TurnManager.SelectedAbilityIndex.HasValue) {
                 _gameInstance.TurnManager.ToggleAbilitySelected(index);
             }
         }
-        
-        private void MoveTo(Mob currentMob, AxialCoord pos) { 
+
+        private void MoveTo(Mob currentMob, AxialCoord pos) {
             int distance = currentMob.Coord.ModifiedDistance(currentMob, pos);
             if (distance <= currentMob.Ap) {
                 var mobEntity = (MobEntity) currentMob.Metadata;
@@ -290,6 +300,13 @@ namespace HexMage.GUI.Components {
                 _gameInstance.Pathfinder.PathfindFrom(pos);
             }
         }
+
+        //public async void UseAbility(Mob mob, Mob target) {
+        //    var ability = mob.Abilities[0];
+        //    await AbilityUsedEvent(mob, target, ability);
+
+        //}        
+
 
         private void AttackMob(Mob mob) {
             _gameInstance.TurnManager.CurrentTarget = mob;
@@ -306,64 +323,72 @@ namespace HexMage.GUI.Components {
 
             var usableAbility = usableAbilities.FirstOrDefault(ua => ua.Ability == ability);
             if (usableAbility != null) {
-                var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
-
-                const int numberOfFrames = 4;
-                var projectileAnimation = new Animation(projectileSprite,
-                                                        TimeSpan.FromMilliseconds(50),
-                                                        AssetManager.TileSize,
-                                                        numberOfFrames);
-
-                projectileAnimation.Origin = new Vector2(16, 16);
-
-                var projectile = new ProjectileEntity(
-                    TimeSpan.FromMilliseconds(1500),
-                    _gameInstance.TurnManager.CurrentMob.Coord,
-                    _gameInstance.TurnManager.CurrentTarget.Coord) {
-                        Renderer = new AnimationRenderer(projectileAnimation),
-                        SortOrder = Camera2D.SortProjectiles,
-                        Transform = () => Camera2D.Instance.Transform
-                    };
-
-                projectile.AddComponent(new AnimationController(projectileAnimation));
-
-                var target = _gameInstance.TurnManager.CurrentTarget;
-
-                projectile.TargetHit += async () => {
-                    await usableAbility.Use(_gameInstance.Map);
-                    _gameInstance.TurnManager.UnselectAbility();
-
-                    var explosion = new Entity() {
-                        Transform = () => Camera2D.Instance.Transform,
-                        SortOrder = Camera2D.SortProjectiles
-                    };
-
-                    explosion.AddComponent(new PositionAtMob(target));
-
-                    const int totalAnimationFrames = 4;
-
-                    var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(ability.Element);
-
-                    var explosionAnimation = new Animation(
-                        explosionSprite,
-                        TimeSpan.FromMilliseconds(350),
-                        AssetManager.TileSize,
-                        totalAnimationFrames);
-
-                    explosionAnimation.AnimationDone += () => { Entity.Scene.DestroyEntity(explosion); };
-
-                    explosion.Renderer = new AnimationRenderer(explosionAnimation);
-                    explosion.AddComponent(new AnimationController(explosionAnimation));
-
-                    Entity.Scene.AddAndInitializeNextFrame(explosion);
-
-                    Entity.Scene.DestroyEntity(projectile);
-                };
-
-                Entity.Scene.AddAndInitializeNextFrame(projectile);
+                AbilityUsed(_gameInstance.TurnManager.CurrentMob, _gameInstance.TurnManager.CurrentTarget, ability);
             } else {
                 ShowMessage("You can't use the selected ability on that target.");
             }
+        }
+
+        public async Task AbilityUsed(Mob mob, Mob target, Ability ability) {
+            var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
+
+            const int numberOfFrames = 4;
+            var projectileAnimation = new Animation(projectileSprite,
+                                                    TimeSpan.FromMilliseconds(50),
+                                                    AssetManager.TileSize,
+                                                    numberOfFrames);
+
+            projectileAnimation.Origin = new Vector2(16, 16);
+
+            var projectile = new ProjectileEntity(
+                TimeSpan.FromMilliseconds(1500),
+                _gameInstance.TurnManager.CurrentMob.Coord,
+                _gameInstance.TurnManager.CurrentTarget.Coord) {
+                Renderer = new AnimationRenderer(projectileAnimation),
+                SortOrder = Camera2D.SortProjectiles,
+                Transform = () => Camera2D.Instance.Transform
+            };
+
+            projectile.AddComponent(new AnimationController(projectileAnimation));
+
+            Entity.Scene.AddAndInitializeNextFrame(projectile);
+
+            Utils.ThreadLog("Awaiting until the projectile hits.");
+
+            await projectile.Task;
+
+            Utils.ThreadLog("Projectile continuation hit");
+
+            //projectile.TargetHit += async () => {
+            //    await ability.Use(_gameInstance.Map);
+            //    _gameInstance.TurnManager.UnselectAbility();
+
+            var explosion = new Entity() {
+                Transform = () => Camera2D.Instance.Transform,
+                SortOrder = Camera2D.SortProjectiles
+            };
+
+            explosion.AddComponent(new PositionAtMob(target));
+
+            const int totalAnimationFrames = 4;
+
+            var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(ability.Element);
+
+            var explosionAnimation = new Animation(
+                explosionSprite,
+                TimeSpan.FromMilliseconds(350),
+                AssetManager.TileSize,
+                totalAnimationFrames);
+
+            explosionAnimation.AnimationDone += () => { Entity.Scene.DestroyEntity(explosion); };
+
+            explosion.Renderer = new AnimationRenderer(explosionAnimation);
+            explosion.AddComponent(new AnimationController(explosionAnimation));
+
+            Entity.Scene.AddAndInitializeNextFrame(explosion);
+
+            Entity.Scene.DestroyEntity(projectile);
+            //};
         }
     }
 }

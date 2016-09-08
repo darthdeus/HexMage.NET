@@ -59,6 +59,7 @@ namespace HexMage.Simulator {
         }
 
         public IList<Mob> PossibleTargets(Mob mob) {
+#warning Handle when there are no usable abilities
             int maxRange = mob.Abilities
                 .Where(ability => IsAbilityUsable(mob, ability))
                 .Max(ability => ability.Range);

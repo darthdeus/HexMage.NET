@@ -28,10 +28,11 @@ namespace HexMage.GUI {
         private readonly GameInstance _gameInstance;
         private readonly Entity _defenseModal;
         public bool HoveringOverUi { get; private set; } = false;
+        private readonly GameEventHub _gameEventHub;
 
         public ArenaScene(GameManager gameManager, Map map) : base(gameManager) {
             _gameInstance = new GameInstance(map.Size, map);
-
+            
               _defenseModal = new VerticalLayout() {
                 SortOrder = Camera2D.SortUI,
                 Padding = new Vector4(20),
@@ -40,8 +41,13 @@ namespace HexMage.GUI {
                 Active = false
             };
 
+            var aiController = new AiRandomController(_gameInstance);
+
             var t1 = _gameInstance.MobManager.AddTeam(TeamColor.Red, new PlayerController(this, _gameInstance));
-            var t2 = _gameInstance.MobManager.AddTeam(TeamColor.Blue, new AiRandomController());
+            var t2 = _gameInstance.MobManager.AddTeam(TeamColor.Blue, aiController);
+
+            _gameEventHub = new GameEventHub();
+            _gameEventHub.AddSubscriber(aiController);
 
             for (int team = 0; team < 2; team++) {
                 for (int mobI = 0; mobI < 2; mobI++) {
@@ -80,9 +86,12 @@ namespace HexMage.GUI {
             _defenseModal.InitializeEntity(_assetManager);
 
             var gameBoardEntity = CreateRootEntity(Camera2D.SortBackground);
-            gameBoardEntity.AddComponent(new GameBoardController(_gameInstance));
+            var gameBoardController = new GameBoardController(_gameInstance, _gameEventHub);
+            gameBoardEntity.AddComponent(gameBoardController);
             gameBoardEntity.Renderer = new GameBoardRenderer(_gameInstance, _camera);
             gameBoardEntity.CustomBatch = true;
+
+            _gameEventHub.AddSubscriber(gameBoardController);
 
             var uiEntity = BuildUi();
             uiEntity.SortOrder = Camera2D.SortBackground + 1;
@@ -211,7 +220,7 @@ namespace HexMage.GUI {
         }
 
         private TaskCompletionSource<DefenseDesire> _defenseDesireSource;
-        
+
         public Task<DefenseDesire> RequestDesireToDefend(Mob mob, Ability ability) {
             _defenseModal.Active = true;
             _defenseDesireSource = new TaskCompletionSource<DefenseDesire>();
