@@ -27,6 +27,7 @@ namespace HexMage.Simulator {
         }
 
         public Task BoardcastAbilityUsed(Mob mob, Mob target, Ability ability) {
+            Utils.ThreadLog($"[EventHub] waiting for {_subscribers.Count} subscribers");
             return Task.WhenAll(_subscribers.Select(x => x.AbilityUsed(mob, target, ability)));
         }
     }
@@ -61,7 +62,13 @@ namespace HexMage.Simulator {
 
                 var usableAbilities = _gameInstance.UsableAbilities(mob, target);
                 if (usableAbilities.Count > 0) {
-                    usableAbilities.First().Use(_gameInstance.Map);
+                    var ua = usableAbilities.First();
+
+                    Utils.ThreadLog("Broadcasting used ability");
+                    await eventHub.BoardcastAbilityUsed(mob, target, ua.Ability);
+
+                    Utils.ThreadLog("Using ability");
+                    await ua.Use(_gameInstance.Map);
                 } else {
                     var path = pathfinder.PathTo(target.Coord);
                     pathfinder.MoveAsFarAsPossible(mob, path);

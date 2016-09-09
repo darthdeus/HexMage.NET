@@ -15,9 +15,11 @@ namespace HexMage.GUI {
             return _arenaScene.RequestDesireToDefend(mob, ability);
         }
 
-        TaskCompletionSource<bool> _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        private TaskCompletionSource<bool> _tcs;
 
         public Task<bool> PlayTurn(GameEventHub eventHub) {
+#warning TOOD - je tohle spravne?
+            _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             Utils.ThreadLog("Player turn failing");
             return _tcs.Task;
         }

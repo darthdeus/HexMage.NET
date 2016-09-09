@@ -307,7 +307,6 @@ namespace HexMage.GUI.Components {
 
         //}        
 
-
         private void AttackMob(Mob mob) {
             _gameInstance.TurnManager.CurrentTarget = mob;
 
@@ -330,6 +329,7 @@ namespace HexMage.GUI.Components {
         }
 
         public async Task AbilityUsed(Mob mob, Mob target, Ability ability) {
+            Utils.ThreadLog("[GameBoardController] AbilityUsed called");
             var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
 
             const int numberOfFrames = 4;
@@ -342,8 +342,8 @@ namespace HexMage.GUI.Components {
 
             var projectile = new ProjectileEntity(
                 TimeSpan.FromMilliseconds(1500),
-                _gameInstance.TurnManager.CurrentMob.Coord,
-                _gameInstance.TurnManager.CurrentTarget.Coord) {
+                mob.Coord,
+                target.Coord) {
                 Renderer = new AnimationRenderer(projectileAnimation),
                 SortOrder = Camera2D.SortProjectiles,
                 Transform = () => Camera2D.Instance.Transform
@@ -353,11 +353,7 @@ namespace HexMage.GUI.Components {
 
             Entity.Scene.AddAndInitializeNextFrame(projectile);
 
-            Utils.ThreadLog("Awaiting until the projectile hits.");
-
             await projectile.Task;
-
-            Utils.ThreadLog("Projectile continuation hit");
 
             //projectile.TargetHit += async () => {
             //    await ability.Use(_gameInstance.Map);

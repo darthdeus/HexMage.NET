@@ -47,7 +47,7 @@ namespace HexMage.GUI {
             var t2 = _gameInstance.MobManager.AddTeam(TeamColor.Blue, aiController);
 
             _gameEventHub = new GameEventHub();
-            _gameEventHub.AddSubscriber(aiController);
+            //_gameEventHub.AddSubscriber(aiController);
 
             for (int team = 0; team < 2; team++) {
                 for (int mobI = 0; mobI < 2; mobI++) {
