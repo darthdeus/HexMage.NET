@@ -1,4 +1,5 @@
 ﻿using System;
+using HexMage.GUI.Components;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -7,12 +8,14 @@ using Color = Microsoft.Xna.Framework.Color;
 namespace HexMage.GUI.Renderers {
     public class GameBoardRenderer : IRenderer {
         private readonly GameInstance _gameInstance;
+        private readonly GameBoardController _gameBoardController;
         private readonly Camera2D _camera;
         private SpriteBatch _spriteBatch;
         private AssetManager _assetManager;
 
-        public GameBoardRenderer(GameInstance gameInstance, Camera2D camera) {
+        public GameBoardRenderer(GameInstance gameInstance, GameBoardController gameBoardController, Camera2D camera) {
             _gameInstance = gameInstance;
+            _gameBoardController = gameBoardController;
             _camera = camera;
         }
 
@@ -93,7 +96,7 @@ namespace HexMage.GUI.Renderers {
                 var path = _gameInstance.Pathfinder.PathTo(_camera.MouseHex);
 
                 var currentMob = _gameInstance.TurnManager.CurrentMob;
-                var abilityIndex = _gameInstance.TurnManager.SelectedAbilityIndex;
+                var abilityIndex = _gameBoardController.SelectedAbilityIndex;
 
                 if (abilityIndex.HasValue) {
                     var cubepath = _gameInstance.Map.CubeLinedraw(currentMob.Coord, _camera.MouseHex);

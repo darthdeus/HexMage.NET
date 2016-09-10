@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Threading.Tasks;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 
@@ -21,6 +23,7 @@ namespace HexMage.GUI.Components {
             var camera = Camera2D.Instance;
 
             if (_animateMovement) {
+                Debug.Assert(_tcs != null, "MobEntity.TaskCompletionSource hasn't been properly initialized.");
                 var sourcePos = camera.HexToPixel(_source);
                 var destinationPos = camera.HexToPixel(_destination);
 
@@ -30,6 +33,8 @@ namespace HexMage.GUI.Components {
                 if (_moveProgress >= 1.0f) {
                     _moveProgress = 1.0f;
                     _animateMovement = false;
+                    _tcs.SetResult(true);
+                    _tcs = null;
                 }
 
                 Position = sourcePos + _moveProgress*(destinationPos - sourcePos);
@@ -38,12 +43,18 @@ namespace HexMage.GUI.Components {
             }
         }
 
-        public void MoveTo(AxialCoord coord) {
-            
+        private TaskCompletionSource<bool> _tcs;
+
+        public Task<bool> MoveTo(AxialCoord coord) {
+            Debug.Assert(_tcs == null, "_tcs != null when trying to re-initialize it.");
+
+            _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             _moveProgress = 0.0f;
             _destination = coord;
             _source = Mob.Coord;
             _animateMovement = true;
+
+            return _tcs.Task;
         }
     }
 }

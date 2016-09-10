@@ -32,11 +32,6 @@ namespace HexMage.Simulator {
             return MobManager.Teams.Any(team => team.Mobs.All(mob => mob.Hp == 0));
         }
 
-        // TODO - figure out why this isn't being used
-        public void Refresh() {
-            Pathfinder.PathfindFrom(TurnManager.CurrentMob.Coord);
-        }
-
         [Obsolete]
         public IList<Ability> UsableAbilities(Mob mob) {
             return mob.Abilities.Where(ability => IsAbilityUsable(mob, ability)).ToList();

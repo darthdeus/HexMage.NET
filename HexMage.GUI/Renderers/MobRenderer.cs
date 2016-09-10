@@ -28,10 +28,6 @@ namespace HexMage.GUI.Components {
                 batch.Draw(assetManager[AssetManager.HexHoverSprite], pos, Color.White);
             }
 
-            if (_gameInstance.TurnManager.CurrentTarget == _mob) {
-                batch.Draw(assetManager[AssetManager.HexTargetSprite], pos, Color.White);
-            }
-
             var color = _mob.Team.Color == TeamColor.Red ? Color.OrangeRed : Color.Blue;
             _animationController.CurrentAnimation.RenderFrame(mobEntity, pos, color, batch, assetManager);
 

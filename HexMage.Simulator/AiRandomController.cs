@@ -6,13 +6,18 @@ using HexMage.Simulator;
 
 namespace HexMage.Simulator {
     public class GameEventHub {
+        private readonly GameInstance _gameInstance;
         private readonly List<IGameEventSubscriber> _subscribers = new List<IGameEventSubscriber>();
 
-        public async Task<bool> MainLoop(GameInstance gameInstance) {
-            var turnManager = gameInstance.TurnManager;
+        public GameEventHub(GameInstance gameInstance) {
+            _gameInstance = gameInstance;
+        }
+
+        public async Task<bool> MainLoop() {
+            var turnManager = _gameInstance.TurnManager;
 
             Utils.ThreadLog("[EventHub] Starting Main Loop");
-            while (!gameInstance.IsFinished()) {
+            while (!_gameInstance.IsFinished()) {
                 Utils.ThreadLog("[EventHub] Main Loop Iteration");
                 var action = turnManager.CurrentMob.Team.Controller.PlayTurn(this);
                 await action;
@@ -26,14 +31,26 @@ namespace HexMage.Simulator {
             _subscribers.Add(subscriber);
         }
 
-        public Task BoardcastAbilityUsed(Mob mob, Mob target, Ability ability) {
+        public async Task BroadcastMobMoved(Mob mob, AxialCoord coord) {
+            await Task.WhenAll(_subscribers.Select(x => x.EventMobMoved(mob, coord)));
+
+#warning TODO - assert
+            currentMob.Ap -= distance;
+            currentMob.Coord = pos;
+            _gameInstance.Pathfinder.PathfindFrom(pos);
+        }
+
+        public async Task BoardcastAbilityUsed(Mob mob, Mob target, UsableAbility ability) {
             Utils.ThreadLog($"[EventHub] waiting for {_subscribers.Count} subscribers");
-            return Task.WhenAll(_subscribers.Select(x => x.AbilityUsed(mob, target, ability)));
+            await Task.WhenAll(_subscribers.Select(x => x.EventAbilityUsed(mob, target, ability)));
+
+            await ability.Use(_gameInstance.Map);
         }
     }
 
     public interface IGameEventSubscriber {
-        Task AbilityUsed(Mob mob, Mob target, Ability ability);
+        Task<bool> EventAbilityUsed(Mob mob, Mob target, UsableAbility ability);
+        Task<bool> EventMobMoved(Mob mob, AxialCoord pos);
     }
 
 
@@ -65,7 +82,7 @@ namespace HexMage.Simulator {
                     var ua = usableAbilities.First();
 
                     Utils.ThreadLog("Broadcasting used ability");
-                    await eventHub.BoardcastAbilityUsed(mob, target, ua.Ability);
+                    await eventHub.BoardcastAbilityUsed(mob, target, ua);
 
                     Utils.ThreadLog("Using ability");
                     await ua.Use(_gameInstance.Map);
@@ -88,8 +105,14 @@ namespace HexMage.Simulator {
             throw new NotImplementedException();
         }
 
-        public Task AbilityUsed(Mob mob, Mob target, Ability ability) {
-            return Task.CompletedTask;
+        public Task<bool> EventAbilityUsed(Mob mob, Mob target, UsableAbility ability) {
+            throw new NotImplementedException();
+            return Task<bool>.FromResult(true);
+        }
+
+        public Task<bool> EventMobMoved(Mob mob, AxialCoord pos) {
+            throw new NotImplementedException();
+            return Task<bool>.FromResult(true);
         }
     }
 }

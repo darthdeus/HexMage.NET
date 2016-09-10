@@ -1,16 +1,19 @@
 using System;
 using System.Diagnostics;
+using HexMage.GUI.Components;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI {
     public class SpellRenderer : IRenderer {
         private readonly GameInstance _gameInstance;
+        private readonly GameBoardController _gameBoardController;
         private readonly TurnManager _turnManager;
         private readonly int _abilityIndex;
 
-        public SpellRenderer(GameInstance gameInstance, TurnManager turnManager, int abilityIndex) {
+        public SpellRenderer(GameInstance gameInstance, GameBoardController gameBoardController, TurnManager turnManager, int abilityIndex) {
             _gameInstance = gameInstance;
+            _gameBoardController = gameBoardController;
             _turnManager = turnManager;
             _abilityIndex = abilityIndex;
         }
@@ -27,7 +30,7 @@ namespace HexMage.GUI {
             if (mob != null) {
                 var ability = mob.Abilities[_abilityIndex];
 
-                var isActive = _turnManager.SelectedAbilityIndex == _abilityIndex;
+                var isActive = _gameBoardController.SelectedAbilityIndex == _abilityIndex;
 
                 if (_gameInstance.IsAbilityUsable(mob, ability)) {
                     isActive = true;

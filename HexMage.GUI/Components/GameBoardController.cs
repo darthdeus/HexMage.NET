@@ -25,6 +25,8 @@ namespace HexMage.GUI.Components {
         private DateTime _displayMessageBoxUntil = DateTime.Now;
         private AssetManager _assetManager;
 
+        public int? SelectedAbilityIndex;
+
         public GameBoardController(GameInstance gameInstance, GameEventHub eventHub) {
             _gameInstance = gameInstance;
             _eventHub = eventHub;
@@ -34,52 +36,13 @@ namespace HexMage.GUI.Components {
             AssertNotInitialized();
             _assetManager = assetManager;
 
-            {
-                _messageBox = new VerticalLayout {
-                    Renderer = new ColorRenderer(Color.White),
-                    Padding = new Vector4(20, 10, 20, 10),
-                    SortOrder = Camera2D.SortUI,
-                    Position = new Vector2(500, 50)
-                };
-
-                _messageBoxLabel = _messageBox.AddChild(new Label("Message Box", assetManager.Font));
-
-                Entity.Scene.AddRootEntity(_messageBox);
-                _messageBox.InitializeEntity(assetManager);
-            }
-
-            {
-                _emptyHexPopover = new VerticalLayout {
-                    Renderer = new ColorRenderer(Color.LightGray),
-                    Padding = new Vector4(20, 10, 20, 10),
-                    SortOrder = Camera2D.SortUI,
-                };
-
-                _emptyHexLabel = _emptyHexPopover.AddChild(new Label("Just an empty hex", assetManager.Font));
-
-                Entity.Scene.AddRootEntity(_emptyHexPopover);
-                _emptyHexPopover.InitializeEntity(assetManager);
-            }
-
-            {
-                _mobPopover = new VerticalLayout {
-                    Renderer = new ColorRenderer(Color.LightGray),
-                    Padding = new Vector4(20, 10, 20, 10),
-                    SortOrder = Camera2D.SortUI,
-                };
-
-                _mobHealthLabel = _mobPopover.AddChild(new Label("Mob health", assetManager.Font));
-
-                Entity.Scene.AddRootEntity(_mobPopover);
-                _mobPopover.InitializeEntity(assetManager);
-            }
-
+            BuildPopovers();
             CreateMobEntities(assetManager);
 
 #warning TODO - run async and check thread
-            _eventHub.MainLoop(_gameInstance).ContinueWith(t => {
-                                                               Utils.ThreadLog($"Fauled: {t.IsFaulted}, Complete: {t.IsCompleted}");
-                                                           }, TaskScheduler.FromCurrentSynchronizationContext());
+            _eventHub.MainLoop(_gameInstance)
+                     .ContinueWith(t => { Utils.ThreadLog($"Fauled: {t.IsFaulted}, Complete: {t.IsCompleted}"); },
+                                   TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private void CreateMobEntities(AssetManager assetManager) {
@@ -122,7 +85,7 @@ namespace HexMage.GUI.Components {
             }
 
             if (inputManager.IsKeyJustPressed(Keys.Space)) {
-                var pc = _gameInstance.TurnManager.CurrentMob.Team.Controller as PlayerController;
+                var pc = _gameInstance.TurnManager.CurrentController as PlayerController;
                 if (pc != null) {
                     pc.PlayerEndedTurn();
                 }
@@ -136,43 +99,14 @@ namespace HexMage.GUI.Components {
                 _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
             }
 
-            HandleUserTurnInput(inputManager, mouseHex);
+            HandleUserTurnInput(inputManager);
 
             UpdatePopovers(time, mouseHex);
         }
 
-        private void HandleUserTurnInput(InputManager inputManager, AxialCoord mouseHex) {
-            bool abilitySelected = _gameInstance.TurnManager.SelectedAbilityIndex.HasValue;
-
-            var currentMob = _gameInstance.TurnManager.CurrentMob;
+        private void HandleUserTurnInput(InputManager inputManager) {
             if (inputManager.JustLeftClickReleased()) {
-                EnqueueClickEvent(() => {
-                                      Console.WriteLine($"MOB EVENT, time {DateTime.Now.Millisecond}");
-                                      if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                                          var mob = _gameInstance.MobManager.AtCoord(mouseHex);
-                                          if (mob != null) {
-                                              if (mob == currentMob) {
-                                                  ShowMessage("You can't target yourself.");
-                                              } else {
-                                                  if (mob.Team.Color == currentMob.Team.Color) {
-                                                      ShowMessage("You can't target your team.");
-                                                  } else if (_gameInstance.TurnManager.SelectedAbilityIndex.HasValue) {
-                                                      if (abilitySelected) {
-                                                          AttackMob(mob);
-                                                      } else {
-                                                          ShowMessage("You can't move here.");
-                                                      }
-                                                  }
-                                              }
-                                          } else {
-                                              if (abilitySelected) {
-                                                  ShowMessage("Select an ability to use first.");
-                                              } else {
-                                                  MoveTo(currentMob, mouseHex);
-                                              }
-                                          }
-                                      }
-                                  });
+                EnqueueClickEvent(HandleLeftClick);
             } else if (inputManager.IsKeyJustReleased(Keys.R)) {
                 var mob = _gameInstance.TurnManager.CurrentMob;
                 mob.Team.Controller.RandomAction(_eventHub);
@@ -181,6 +115,184 @@ namespace HexMage.GUI.Components {
 
         private readonly Vector2 _mouseHoverPopoverOffset = new Vector2(
             0.5f*AssetManager.TileSize, -0.5f*AssetManager.TileSize);
+
+        private void HandleKeyboardAbilitySelect() {
+            var inputManager = InputManager.Instance;
+
+            if (inputManager.IsKeyJustReleased(Keys.D1)) {
+                SelectAbility(0);
+            } else if (inputManager.IsKeyJustReleased(Keys.D2)) {
+                SelectAbility(1);
+            } else if (inputManager.IsKeyJustReleased(Keys.D3)) {
+                SelectAbility(2);
+            } else if (inputManager.IsKeyJustReleased(Keys.D4)) {
+                SelectAbility(3);
+            } else if (inputManager.IsKeyJustReleased(Keys.D5)) {
+                SelectAbility(4);
+            } else if (inputManager.IsKeyJustReleased(Keys.D6)) {
+                SelectAbility(5);
+            }
+        }
+
+        private void SelectAbility(int index) {
+            var currentMob = _gameInstance.TurnManager.CurrentMob;
+            var ability = currentMob.Abilities[index];
+
+            if (_gameInstance.IsAbilityUsable(currentMob, ability) ||
+                SelectedAbilityIndex.HasValue) {
+                ToggleAbilitySelected(index);
+            }
+        }
+
+        public async Task<bool> EventAbilityUsed(Mob mob, Mob target, UsableAbility usableAbility) {
+            var ability = usableAbility.Ability;
+            Utils.ThreadLog("[GameBoardController] EventAbilityUsed called");
+            var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
+
+            var projectileAnimation = new Animation(projectileSprite,
+                                                    TimeSpan.FromMilliseconds(50),
+                                                    AssetManager.TileSize,
+                                                    totalFrames: 4);
+
+            projectileAnimation.Origin = new Vector2(16, 16);
+
+            var projectile = new ProjectileEntity(
+                TimeSpan.FromMilliseconds(1500),
+                mob.Coord,
+                target.Coord) {
+                Renderer = new AnimationRenderer(projectileAnimation),
+                SortOrder = Camera2D.SortProjectiles,
+                Transform = () => Camera2D.Instance.Transform
+            };
+
+            projectile.AddComponent(new AnimationController(projectileAnimation));
+
+            Entity.Scene.AddAndInitializeNextFrame(projectile);
+
+            await projectile.Task;
+
+            //projectile.TargetHit += async () => {
+            //    await ability.Use(_gameInstance.Map);
+            //    _gameInstance.TurnManager.UnselectAbility();
+
+            var explosion = new Entity() {
+                Transform = () => Camera2D.Instance.Transform,
+                SortOrder = Camera2D.SortProjectiles
+            };
+
+            explosion.AddComponent(new PositionAtMob(target));
+
+            var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(ability.Element);
+
+            var explosionAnimation = new Animation(
+                explosionSprite,
+                TimeSpan.FromMilliseconds(350),
+                AssetManager.TileSize,
+                totalFrames: 4);
+
+            explosionAnimation.AnimationDone += () => { Entity.Scene.DestroyEntity(explosion); };
+
+            explosion.Renderer = new AnimationRenderer(explosionAnimation);
+            explosion.AddComponent(new AnimationController(explosionAnimation));
+
+            Entity.Scene.AddAndInitializeNextFrame(explosion);
+
+            Entity.Scene.DestroyEntity(projectile);
+
+            return true;
+        }
+
+        public async Task<bool> EventMobMoved(Mob mob, AxialCoord pos) {
+            Debug.Assert(mob.Metadata != null, "Trying to move a mob without an associated entity.");
+            var entity = (MobEntity) mob.Metadata;
+
+            var result = await entity.MoveTo(pos);
+
+            int distance = mob.Coord.ModifiedDistance(mob, pos);
+
+            Debug.Assert(mob.Ap >= distance,
+                         $"Trying to move a mob further than his AP ... Distance: {distance}, AP: {mob.Ap}");
+
+            mob.Ap -= distance;
+            mob.Coord = pos;
+            // TODO - does this belong here?
+            _gameInstance.Pathfinder.PathfindFrom(pos);
+
+            return result;
+        }
+
+        private void MoveTo(Mob currentMob, AxialCoord pos) {
+            int distance = currentMob.Coord.ModifiedDistance(currentMob, pos);
+            if (distance <= currentMob.Ap) {
+                var mobEntity = (MobEntity) currentMob.Metadata;
+                mobEntity.MoveTo(pos);
+
+#warning TODO - clean this up
+                //currentMob.Ap -= distance;
+                //currentMob.Coord = pos;
+                //_gameInstance.Pathfinder.PathfindFrom(pos);
+            }
+        }
+
+        private void AttackMob(Mob target) {
+            var usableAbilities = _gameInstance.UsableAbilities(
+                _gameInstance.TurnManager.CurrentMob,
+                target);
+
+            Debug.Assert(SelectedAbilityIndex != null,
+                         "_gameInstance.TurnManager.SelectedAbilityIndex != null");
+
+            var abilityIndex = SelectedAbilityIndex.Value;
+            var ability = _gameInstance.TurnManager.CurrentMob.Abilities[abilityIndex];
+
+            var usableAbility = usableAbilities.FirstOrDefault(ua => ua.Ability == ability);
+            if (usableAbility != null) {
+                //AbilityUsed(_gameInstance.TurnManager.CurrentMob, currentTarget, ability);
+            } else {
+                ShowMessage("You can't use the selected ability on that target.");
+            }
+        }
+
+        public void ToggleAbilitySelected(int index) {
+            if (SelectedAbilityIndex == index) {
+                SelectedAbilityIndex = null;
+            } else {
+                SelectedAbilityIndex = index;
+            }
+        }
+
+        private void HandleLeftClick() {
+            bool abilitySelected = SelectedAbilityIndex.HasValue;
+
+            var mouseHex = Camera2D.Instance.MouseHex;
+            var currentMob = _gameInstance.TurnManager.CurrentMob;
+
+            if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
+                var mob = _gameInstance.MobManager.AtCoord(mouseHex);
+                if (mob != null) {
+                    if (mob == currentMob) {
+                        ShowMessage("You can't target yourself.");
+                    } else {
+                        if (mob.Team.Color == currentMob.Team.Color) {
+                            ShowMessage("You can't target your team.");
+                        } else if (SelectedAbilityIndex.HasValue) {
+                            if (abilitySelected) {
+                                AttackMob(mob);
+                            } else {
+                                ShowMessage("You can't move here.");
+                            }
+                        }
+                    }
+                } else {
+                    if (abilitySelected) {
+                        ShowMessage("Select an ability to use first.");
+                    } else {
+                        MoveTo(currentMob, mouseHex);
+                    }
+                }
+            }
+        }
+
 
         private void UpdatePopovers(GameTime time, AxialCoord mouseHex) {
             var camera = Camera2D.Instance;
@@ -261,130 +373,46 @@ namespace HexMage.GUI.Components {
             }
         }
 
-        private void HandleKeyboardAbilitySelect() {
-            var inputManager = InputManager.Instance;
+        private void BuildPopovers() {            
+            {
+                _messageBox = new VerticalLayout {
+                    Renderer = new ColorRenderer(Color.White),
+                    Padding = new Vector4(20, 10, 20, 10),
+                    SortOrder = Camera2D.SortUI,
+                    Position = new Vector2(500, 50)
+                };
 
-            if (inputManager.IsKeyJustReleased(Keys.D1)) {
-                SelectAbility(0);
-            } else if (inputManager.IsKeyJustReleased(Keys.D2)) {
-                SelectAbility(1);
-            } else if (inputManager.IsKeyJustReleased(Keys.D3)) {
-                SelectAbility(2);
-            } else if (inputManager.IsKeyJustReleased(Keys.D4)) {
-                SelectAbility(3);
-            } else if (inputManager.IsKeyJustReleased(Keys.D5)) {
-                SelectAbility(4);
-            } else if (inputManager.IsKeyJustReleased(Keys.D6)) {
-                SelectAbility(5);
+                _messageBoxLabel = _messageBox.AddChild(new Label("Message Box", _assetManager.Font));
+
+                Entity.Scene.AddRootEntity(_messageBox);
+                _messageBox.InitializeEntity(_assetManager);
             }
-        }
 
-        private void SelectAbility(int index) {
-            var currentMob = _gameInstance.TurnManager.CurrentMob;
-            var ability = currentMob.Abilities[index];
+            {
+                _emptyHexPopover = new VerticalLayout {
+                    Renderer = new ColorRenderer(Color.LightGray),
+                    Padding = new Vector4(20, 10, 20, 10),
+                    SortOrder = Camera2D.SortUI,
+                };
 
-            if (_gameInstance.IsAbilityUsable(currentMob, ability) ||
-                _gameInstance.TurnManager.SelectedAbilityIndex.HasValue) {
-                _gameInstance.TurnManager.ToggleAbilitySelected(index);
+                _emptyHexLabel = _emptyHexPopover.AddChild(new Label("Just an empty hex", _assetManager.Font));
+
+                Entity.Scene.AddRootEntity(_emptyHexPopover);
+                _emptyHexPopover.InitializeEntity(_assetManager);
             }
-        }
 
-        private void MoveTo(Mob currentMob, AxialCoord pos) {
-            int distance = currentMob.Coord.ModifiedDistance(currentMob, pos);
-            if (distance <= currentMob.Ap) {
-                var mobEntity = (MobEntity) currentMob.Metadata;
-                mobEntity.MoveTo(pos);
+            {
+                _mobPopover = new VerticalLayout {
+                    Renderer = new ColorRenderer(Color.LightGray),
+                    Padding = new Vector4(20, 10, 20, 10),
+                    SortOrder = Camera2D.SortUI,
+                };
 
-                currentMob.Ap -= distance;
-                currentMob.Coord = pos;
-                _gameInstance.Pathfinder.PathfindFrom(pos);
+                _mobHealthLabel = _mobPopover.AddChild(new Label("Mob health", _assetManager.Font));
+
+                Entity.Scene.AddRootEntity(_mobPopover);
+                _mobPopover.InitializeEntity(_assetManager);
             }
-        }
-
-        //public async void UseAbility(Mob mob, Mob target) {
-        //    var ability = mob.Abilities[0];
-        //    await AbilityUsedEvent(mob, target, ability);
-
-        //}        
-
-        private void AttackMob(Mob mob) {
-            _gameInstance.TurnManager.CurrentTarget = mob;
-
-            var usableAbilities = _gameInstance.UsableAbilities(
-                _gameInstance.TurnManager.CurrentMob,
-                mob);
-
-            Debug.Assert(_gameInstance.TurnManager.SelectedAbilityIndex != null,
-                         "_gameInstance.TurnManager.SelectedAbilityIndex != null");
-
-            var abilityIndex = _gameInstance.TurnManager.SelectedAbilityIndex.Value;
-            var ability = _gameInstance.TurnManager.CurrentMob.Abilities[abilityIndex];
-
-            var usableAbility = usableAbilities.FirstOrDefault(ua => ua.Ability == ability);
-            if (usableAbility != null) {
-                AbilityUsed(_gameInstance.TurnManager.CurrentMob, _gameInstance.TurnManager.CurrentTarget, ability);
-            } else {
-                ShowMessage("You can't use the selected ability on that target.");
-            }
-        }
-
-        public async Task AbilityUsed(Mob mob, Mob target, Ability ability) {
-            Utils.ThreadLog("[GameBoardController] AbilityUsed called");
-            var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
-
-            const int numberOfFrames = 4;
-            var projectileAnimation = new Animation(projectileSprite,
-                                                    TimeSpan.FromMilliseconds(50),
-                                                    AssetManager.TileSize,
-                                                    numberOfFrames);
-
-            projectileAnimation.Origin = new Vector2(16, 16);
-
-            var projectile = new ProjectileEntity(
-                TimeSpan.FromMilliseconds(1500),
-                mob.Coord,
-                target.Coord) {
-                Renderer = new AnimationRenderer(projectileAnimation),
-                SortOrder = Camera2D.SortProjectiles,
-                Transform = () => Camera2D.Instance.Transform
-            };
-
-            projectile.AddComponent(new AnimationController(projectileAnimation));
-
-            Entity.Scene.AddAndInitializeNextFrame(projectile);
-
-            await projectile.Task;
-
-            //projectile.TargetHit += async () => {
-            //    await ability.Use(_gameInstance.Map);
-            //    _gameInstance.TurnManager.UnselectAbility();
-
-            var explosion = new Entity() {
-                Transform = () => Camera2D.Instance.Transform,
-                SortOrder = Camera2D.SortProjectiles
-            };
-
-            explosion.AddComponent(new PositionAtMob(target));
-
-            const int totalAnimationFrames = 4;
-
-            var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(ability.Element);
-
-            var explosionAnimation = new Animation(
-                explosionSprite,
-                TimeSpan.FromMilliseconds(350),
-                AssetManager.TileSize,
-                totalAnimationFrames);
-
-            explosionAnimation.AnimationDone += () => { Entity.Scene.DestroyEntity(explosion); };
-
-            explosion.Renderer = new AnimationRenderer(explosionAnimation);
-            explosion.AddComponent(new AnimationController(explosionAnimation));
-
-            Entity.Scene.AddAndInitializeNextFrame(explosion);
-
-            Entity.Scene.DestroyEntity(projectile);
-            //};
         }
     }
 }

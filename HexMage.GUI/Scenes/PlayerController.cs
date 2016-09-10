@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Threading.Tasks;
 using HexMage.Simulator;
 
@@ -25,6 +26,7 @@ namespace HexMage.GUI {
         }
 
         public void PlayerEndedTurn() {
+            Debug.Assert(_tcs != null, "PlayerController.TaskCompletionSource wasn't properly initialized.");
             _tcs.SetResult(true);
         }
 

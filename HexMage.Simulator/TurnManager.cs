@@ -11,8 +11,9 @@ namespace HexMage.Simulator {
         public MobManager MobManager { get; set; }
         public List<Mob> TurnOrder { get; set; } = new List<Mob>();
         public Mob CurrentMob => TurnOrder[_current];
-        public Mob CurrentTarget { get; set; }
-        public int? SelectedAbilityIndex { get; set; }
+        public IMobController CurrentController => CurrentMob.Team.Controller;
+        //public Mob CurrentTarget { get; set; }
+        //public int? SelectedAbilityIndex { get; set; }
 
         private int _current = 0;
 
@@ -53,22 +54,9 @@ namespace HexMage.Simulator {
         }
 
         public bool MoveNext() {
-            CurrentTarget = null;
-            SelectedAbilityIndex = null;
             if (!IsTurnDone()) _current++;
             return !IsTurnDone();
         }
 
-        public void ToggleAbilitySelected(int index) {
-            if (SelectedAbilityIndex == index) {
-                SelectedAbilityIndex = null;
-            } else {
-                SelectedAbilityIndex = index;
-            }
-        }
-
-        public void UnselectAbility() {
-            SelectedAbilityIndex = null;
-        }
     }
 }

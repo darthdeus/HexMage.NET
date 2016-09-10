@@ -87,8 +87,9 @@ namespace HexMage.GUI {
 
             var gameBoardEntity = CreateRootEntity(Camera2D.SortBackground);
             var gameBoardController = new GameBoardController(_gameInstance, _gameEventHub);
+            _gameBoardController = gameBoardController;
             gameBoardEntity.AddComponent(gameBoardController);
-            gameBoardEntity.Renderer = new GameBoardRenderer(_gameInstance, _camera);
+            gameBoardEntity.Renderer = new GameBoardRenderer(_gameInstance, gameBoardController, _camera);
             gameBoardEntity.CustomBatch = true;
 
             _gameEventHub.AddSubscriber(gameBoardController);
@@ -125,7 +126,7 @@ namespace HexMage.GUI {
 
             var abilityDetail = new VerticalLayout() {
                 Padding = new Vector4(10, 10, 10, 10),
-                Renderer = new SpellRenderer(_gameInstance, turnManager, abilityIndex),
+                Renderer = new SpellRenderer(_gameInstance, _gameBoardController, turnManager, abilityIndex),
                 CustomBatch = true
             };
 
@@ -170,8 +171,8 @@ namespace HexMage.GUI {
             particles.Position = new Vector2(60, 120);
 
             particles.ColorFunc = () => {
-                if (turnManager.SelectedAbilityIndex.HasValue) {
-                    int index = turnManager.SelectedAbilityIndex.Value;
+                if (_gameBoardController.SelectedAbilityIndex.HasValue) {
+                    int index = _gameBoardController.SelectedAbilityIndex.Value;
                     switch (turnManager.CurrentMob.Abilities[index].Element) {
                         case AbilityElement.Earth:
                             return Color.Orange;
@@ -189,7 +190,7 @@ namespace HexMage.GUI {
                 }
             };
 
-            abilityDetail.AddComponent(_ => { particles.Active = turnManager.SelectedAbilityIndex == abilityIndex; });
+            abilityDetail.AddComponent(_ => { particles.Active = _gameBoardController.SelectedAbilityIndex == abilityIndex; });
 
             abilityDetailWrapper.AddChild(particles);
 
@@ -205,7 +206,7 @@ namespace HexMage.GUI {
             abilityUpdater.OnClick += index => {
                 Console.WriteLine($"ABILITY EVENT, time {DateTime.Now.Millisecond}");
 
-                turnManager.ToggleAbilitySelected(index);
+                _gameBoardController.ToggleAbilitySelected(index);
             };
 
             return abilityDetailWrapper;
@@ -220,6 +221,7 @@ namespace HexMage.GUI {
         }
 
         private TaskCompletionSource<DefenseDesire> _defenseDesireSource;
+        private GameBoardController _gameBoardController;
 
         public Task<DefenseDesire> RequestDesireToDefend(Mob mob, Ability ability) {
             _defenseModal.Active = true;
