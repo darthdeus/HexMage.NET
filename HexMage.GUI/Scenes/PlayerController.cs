@@ -20,14 +20,15 @@ namespace HexMage.GUI {
 
         public Task<bool> PlayTurn(GameEventHub eventHub) {
 #warning TOOD - je tohle spravne?
+            Debug.Assert(_tcs == null);            
             _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-            Utils.ThreadLog("Player turn failing");
             return _tcs.Task;
         }
 
         public void PlayerEndedTurn() {
             Debug.Assert(_tcs != null, "PlayerController.TaskCompletionSource wasn't properly initialized.");
             _tcs.SetResult(true);
+            _tcs = null;
         }
 
         public Task<bool> RandomAction(GameEventHub eventHub) {

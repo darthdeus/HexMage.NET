@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using HexMage.Simulator;
 
-namespace HexMage.Benchmarks
-{
-    class Program
-    {
-        static void Main(string[] args) {
-            int size = 30;
+namespace HexMage.Benchmarks {
+    internal class Program {
+        private static void Main(string[] args) {
+            var size = 30;
             var g = new GameInstance(size);
 
             var pc1 = new AiRandomController(g);
@@ -34,7 +30,7 @@ namespace HexMage.Benchmarks
             var map = g.Map;
 
             var s = new Stopwatch();
-            int iterations = 0;
+            var iterations = 0;
             s.Start();
             while (iterations < 10000000) {
                 foreach (var mob in mobManager.Mobs) {
@@ -49,38 +45,33 @@ namespace HexMage.Benchmarks
                         Console.WriteLine("Done {0} iterations", iterations);
                     }
 
-                    if (turnManager.IsTurnDone()) {
-                        //Console.WriteLine("Starting next turn");
-                        turnManager.NextMobOrNewTurn(pathfinder);
-                    } else {
-                        var mob = turnManager.CurrentMob;
-                        var targets = g.PossibleTargets(mob);
+                    var mob = turnManager.CurrentMob;
+                    var targets = g.PossibleTargets(mob);
 
-                        if (targets.Count > 0) {
-                            var target = targets.First();
-                            var abilities = g.UsableAbilities(mob, target);
+                    if (targets.Count > 0) {
+                        var target = targets.First();
+                        var abilities = g.UsableAbilities(mob, target);
 
-                            if (abilities.Count > 0) {
+                        if (abilities.Count > 0) {
 #warning Change this to await the defense query
-                                abilities.First().Use(map);
-                            } else {
-                                var path = pathfinder.PathTo(target.Coord);
-
-                                pathfinder.MoveAsFarAsPossible(mob, path);
-                            }
+                            abilities.First().Use(map);
                         } else {
-                            Console.WriteLine("No enemies in range, moving closer");
-                            var enemies = g.Enemies(mob);
+                            var path = pathfinder.PathTo(target.Coord);
 
-                            Debug.Assert(enemies.Count > 0);
-
-                            var enemy = enemies.First();
-                            var path = pathfinder.PathTo(enemy.Coord);
                             pathfinder.MoveAsFarAsPossible(mob, path);
                         }
+                    } else {
+                        Console.WriteLine("No enemies in range, moving closer");
+                        var enemies = g.Enemies(mob);
 
-                        turnManager.NextMobOrNewTurn(pathfinder);
+                        Debug.Assert(enemies.Count > 0);
+
+                        var enemy = enemies.First();
+                        var path = pathfinder.PathTo(enemy.Coord);
+                        pathfinder.MoveAsFarAsPossible(mob, path);
                     }
+
+                    turnManager.NextMobOrNewTurn(pathfinder);
                 }
 
                 //Console.WriteLine("Starting a new game");

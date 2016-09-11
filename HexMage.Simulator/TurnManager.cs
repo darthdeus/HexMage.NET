@@ -23,10 +23,6 @@ namespace HexMage.Simulator {
             MobManager = mobManager;
         }
 
-        public bool IsTurnDone() {
-            return _current - 1 >= TurnOrder.Count;
-        }
-
         public void StartNextTurn(Pathfinder pathfinder) {
             TurnOrder.Clear();
 
@@ -47,24 +43,17 @@ namespace HexMage.Simulator {
         }
 
         public TurnEndResult NextMobOrNewTurn(Pathfinder pathfinder) {
-            if (!MoveNext(pathfinder)) {
-                StartNextTurn(pathfinder);
+            if (_current >= TurnOrder.Count - 1) {
                 Utils.ThreadLog("Starting next turn");
+                StartNextTurn(pathfinder);
                 return TurnEndResult.NextTurn;
             } else {
-                return TurnEndResult.NextMob;
-            }
-        }
-
-        private bool MoveNext(Pathfinder pathfinder) {
-            if (!IsTurnDone()) {
+                Utils.ThreadLog("Moving to next mob (same turn)");
                 _current++;
                 Debug.Assert(_current < TurnOrder.Count);
+                pathfinder.PathfindFrom(CurrentMob.Coord);
+                return TurnEndResult.NextMob;
             }
-
-            pathfinder.PathfindFrom(CurrentMob.Coord);
-
-            return !IsTurnDone();
         }
     }
 }
