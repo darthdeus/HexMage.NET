@@ -11,7 +11,7 @@ namespace HexMage.Simulator {
         public List<Team> Teams { get; set; } = new List<Team>();
 
         public bool MoveMob(Mob mob, AxialCoord to) {
-            Debug.Assert(mob.Coord.Distance(to) == 1);
+            Debug.Assert(mob.Coord.ModifiedDistance(mob, to) == 1);
 
             if (mob.Ap > 0) {
                 mob.Coord = to;

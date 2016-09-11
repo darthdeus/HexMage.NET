@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace HexMage.Simulator {
     public enum TurnEndResult {
@@ -23,10 +24,10 @@ namespace HexMage.Simulator {
         }
 
         public bool IsTurnDone() {
-            return _current >= TurnOrder.Count;
+            return _current - 1 >= TurnOrder.Count;
         }
 
-        public void StartNextTurn() {
+        public void StartNextTurn(Pathfinder pathfinder) {
             TurnOrder.Clear();
 
             foreach (var mob in MobManager.Mobs) {
@@ -42,21 +43,28 @@ namespace HexMage.Simulator {
             _current = 0;
 
             TurnOrder.Sort((a, b) => a.Iniciative.CompareTo(b.Iniciative));
+            pathfinder.PathfindFrom(CurrentMob.Coord);
         }
 
-        public TurnEndResult NextMobOrNewTurn() {
-            if (!MoveNext()) {
-                StartNextTurn();
+        public TurnEndResult NextMobOrNewTurn(Pathfinder pathfinder) {
+            if (!MoveNext(pathfinder)) {
+                StartNextTurn(pathfinder);
+                Utils.ThreadLog("Starting next turn");
                 return TurnEndResult.NextTurn;
             } else {
                 return TurnEndResult.NextMob;
             }
         }
 
-        public bool MoveNext() {
-            if (!IsTurnDone()) _current++;
+        private bool MoveNext(Pathfinder pathfinder) {
+            if (!IsTurnDone()) {
+                _current++;
+                Debug.Assert(_current < TurnOrder.Count);
+            }
+
+            pathfinder.PathfindFrom(CurrentMob.Coord);
+
             return !IsTurnDone();
         }
-
     }
 }

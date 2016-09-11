@@ -40,9 +40,19 @@ namespace HexMage.GUI.Components {
             CreateMobEntities(assetManager);
 
 #warning TODO - run async and check thread
-            _eventHub.MainLoop(_gameInstance)
-                     .ContinueWith(t => { Utils.ThreadLog($"Fauled: {t.IsFaulted}, Complete: {t.IsCompleted}"); },
-                                   TaskScheduler.FromCurrentSynchronizationContext());
+            _eventHub.MainLoop()
+                     .ContinueWith(t => {
+                                       Utils.ThreadLog($"Faulted: {t.IsFaulted}, Complete: {t.IsCompleted}");
+
+                                       if (t.IsFaulted) {
+                                           Console.WriteLine(t.Exception);
+                                       }
+                                       if (!t.IsCompleted) {
+                                           t.Wait();
+                                           Utils.ThreadLog($"!!! MainLoop finished !!! Faulted: {t.IsFaulted}"); 
+                                       }
+                                   },
+                                   TaskContinuationOptions.LongRunning);
         }
 
         private void CreateMobEntities(AssetManager assetManager) {
@@ -88,15 +98,8 @@ namespace HexMage.GUI.Components {
                 var pc = _gameInstance.TurnManager.CurrentController as PlayerController;
                 if (pc != null) {
                     pc.PlayerEndedTurn();
-                }
-                var turnEndResult = _gameInstance.TurnManager.NextMobOrNewTurn();
-
-                if (turnEndResult == TurnEndResult.NextTurn) {
                     ShowMessage("Starting new turn!");
-                }
-
-                // TODO - fix this, it's ugly
-                _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
+                }                
             }
 
             HandleUserTurnInput(inputManager);
@@ -107,9 +110,8 @@ namespace HexMage.GUI.Components {
         private void HandleUserTurnInput(InputManager inputManager) {
             if (inputManager.JustLeftClickReleased()) {
                 EnqueueClickEvent(HandleLeftClick);
-            } else if (inputManager.IsKeyJustReleased(Keys.R)) {
-                var mob = _gameInstance.TurnManager.CurrentMob;
-                mob.Team.Controller.RandomAction(_eventHub);
+            } else if (inputManager.IsKeyJustReleased(Keys.R)) {                
+                _gameInstance.TurnManager.CurrentController.RandomAction(_eventHub);
             }
         }
 
@@ -222,6 +224,7 @@ namespace HexMage.GUI.Components {
         }
 
         private void MoveTo(Mob currentMob, AxialCoord pos) {
+            // TODO - check if this takes obstacles into account
             int distance = currentMob.Coord.ModifiedDistance(currentMob, pos);
             if (distance <= currentMob.Ap) {
                 var mobEntity = (MobEntity) currentMob.Metadata;

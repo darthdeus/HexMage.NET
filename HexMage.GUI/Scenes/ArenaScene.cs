@@ -46,7 +46,7 @@ namespace HexMage.GUI {
             var t1 = _gameInstance.MobManager.AddTeam(TeamColor.Red, new PlayerController(this, _gameInstance));
             var t2 = _gameInstance.MobManager.AddTeam(TeamColor.Blue, aiController);
 
-            _gameEventHub = new GameEventHub();
+            _gameEventHub = new GameEventHub(_gameInstance);
             //_gameEventHub.AddSubscriber(aiController);
 
             for (int team = 0; team < 2; team++) {
@@ -57,7 +57,7 @@ namespace HexMage.GUI {
                     _gameInstance.MobManager.AddMob(mob);
                 }
             }
-            _gameInstance.TurnManager.StartNextTurn();
+            _gameInstance.TurnManager.StartNextTurn(_gameInstance.Pathfinder);
             _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
         }
 

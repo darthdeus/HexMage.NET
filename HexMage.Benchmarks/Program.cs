@@ -51,7 +51,7 @@ namespace HexMage.Benchmarks
 
                     if (turnManager.IsTurnDone()) {
                         //Console.WriteLine("Starting next turn");
-                        turnManager.StartNextTurn();
+                        turnManager.NextMobOrNewTurn(pathfinder);
                     } else {
                         var mob = turnManager.CurrentMob;
                         var targets = g.PossibleTargets(mob);
@@ -79,9 +79,7 @@ namespace HexMage.Benchmarks
                             pathfinder.MoveAsFarAsPossible(mob, path);
                         }
 
-                        if (turnManager.MoveNext()) {
-                            //pathfinder.PathfindFrom(turnManager.CurrentMob().Coord, map, mobManager);
-                        }
+                        turnManager.NextMobOrNewTurn(pathfinder);
                     }
                 }
 

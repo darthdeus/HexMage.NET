@@ -42,7 +42,10 @@
   <ItemGroup>
     <Compile Include="AiRandomController.cs" />
     <Compile Include="AI\IPlayer.cs" />
+    <Compile Include="GameEventHub.cs" />
+    <Compile Include="IGameEventSubscriber.cs" />
     <Compile Include="Model\AreaBuff.cs" />
+    <Compile Include="Model\IMobController.cs" />
     <Compile Include="Pathfinding\Map.cs" />
     <Compile Include="Model\UsableAbility.cs" />
     <Compile Include="Utils.cs" />

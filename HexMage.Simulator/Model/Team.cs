@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace HexMage.Simulator
 {
@@ -27,11 +26,5 @@ namespace HexMage.Simulator
     public enum DefenseDesire {
         Block,
         Pass
-    }
-
-    public interface IMobController {
-        Task<DefenseDesire> RequestDesireToDefend(Mob mob, Ability ability);
-        Task<bool> PlayTurn(GameEventHub eventHub);
-        Task<bool> RandomAction(GameEventHub eventHub);
     }
 }

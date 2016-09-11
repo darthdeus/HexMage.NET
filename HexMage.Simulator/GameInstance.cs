@@ -13,8 +13,7 @@ namespace HexMage.Simulator {
         public int Size { get; set; }
         public Mob SelectedMob { get; set; }
 
-        public GameInstance(int size): this(size, new Map(size)) {
-        }
+        public GameInstance(int size) : this(size, new Map(size)) {}
 
         public GameInstance(int size, Map map) {
             Size = size;
@@ -39,7 +38,10 @@ namespace HexMage.Simulator {
 
         public bool IsAbilityUsable(Mob mob, Ability ability) {
             // TODO - handle visibiliy
-            var isElementdisabled = mob.Buffs.SelectMany(b => b.DisabledElements).Distinct().Contains(ability.Element);
+            var isElementdisabled = mob.Buffs
+                                       .SelectMany(b => b.DisabledElements)
+                                       .Distinct().Contains(ability.Element);
+
             return !isElementdisabled && mob.Ap >= ability.Cost && ability.CurrentCooldown == 0;
         }
 
@@ -48,20 +50,25 @@ namespace HexMage.Simulator {
             // TODO - handle visibiliy
 
             return mob.Abilities
-                .Select((ability, i) => new UsableAbility(mob, target, ability, i))
-                .Where(ua => ua.Ability.Range >= distance && IsAbilityUsable(mob, ua.Ability))
-                .ToList();
+                      .Select((ability, i) => new UsableAbility(mob, target, ability, i))
+                      .Where(ua => ua.Ability.Range >= distance && IsAbilityUsable(mob, ua.Ability))
+                      .ToList();
         }
 
         public IList<Mob> PossibleTargets(Mob mob) {
-#warning Handle when there are no usable abilities
-            int maxRange = mob.Abilities
-                .Where(ability => IsAbilityUsable(mob, ability))
-                .Max(ability => ability.Range);
+            var usableAbilities = mob.Abilities.Where(ability => IsAbilityUsable(mob, ability)).ToList();
+
+            if (usableAbilities.Count == 0) {
+                return new List<Mob>();
+            }
+
+            int maxRange = usableAbilities.Max(ability => ability.Range);
 
             return MobManager
                 .Mobs
-                .Where(m => m != mob && Pathfinder.Distance(m.Coord) <= maxRange)
+                .Where(m => m != mob
+                            && Pathfinder.Distance(m.Coord) <= maxRange
+                            && m.Team != mob.Team)
                 .ToList();
         }
 
