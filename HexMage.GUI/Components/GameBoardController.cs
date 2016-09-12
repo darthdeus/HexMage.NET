@@ -49,7 +49,7 @@ namespace HexMage.GUI.Components {
                                        }
                                        if (!t.IsCompleted) {
                                            t.Wait();
-                                           Utils.ThreadLog($"!!! MainLoop finished !!! Faulted: {t.IsFaulted}"); 
+                                           Utils.ThreadLog($"!!! MainLoop finished !!! Faulted: {t.IsFaulted}");
                                        }
                                    },
                                    TaskContinuationOptions.LongRunning);
@@ -84,25 +84,25 @@ namespace HexMage.GUI.Components {
             var inputManager = InputManager.Instance;
             var mouseHex = Camera2D.Instance.MouseHex;
 
-            if (inputManager.JustRightClicked()) {
-                if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                    _gameInstance.Map.Toogle(mouseHex);
+            var controller = _gameInstance.TurnManager.CurrentController as PlayerController;
+            if (controller != null) {
+                if (inputManager.JustRightClicked()) {
+                    if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
+                        _gameInstance.Map.Toogle(mouseHex);
 
-                    // TODO - podivat se na generickou implementaci pathfinderu
-                    // TODO - pathfindovani ze zdi najde cesty
-                    _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
+                        // TODO - podivat se na generickou implementaci pathfinderu
+                        // TODO - pathfindovani ze zdi najde cesty
+                        _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
+                    }
                 }
-            }
 
-            if (inputManager.IsKeyJustPressed(Keys.Space)) {
-                var pc = _gameInstance.TurnManager.CurrentController as PlayerController;
-                if (pc != null) {
-                    pc.PlayerEndedTurn();
+                if (inputManager.IsKeyJustPressed(Keys.Space)) {
+                    controller.PlayerEndedTurn();
                     ShowMessage("Starting new turn!");
-                }                
-            }
+                }
 
-            HandleUserTurnInput(inputManager);
+                HandleUserTurnInput(inputManager);
+            }
 
             UpdatePopovers(time, mouseHex);
         }
@@ -110,7 +110,7 @@ namespace HexMage.GUI.Components {
         private void HandleUserTurnInput(InputManager inputManager) {
             if (inputManager.JustLeftClickReleased()) {
                 EnqueueClickEvent(HandleLeftClick);
-            } else if (inputManager.IsKeyJustReleased(Keys.R)) {                
+            } else if (inputManager.IsKeyJustReleased(Keys.R)) {
                 _gameInstance.TurnManager.CurrentController.RandomAction(_eventHub);
             }
         }
@@ -376,7 +376,7 @@ namespace HexMage.GUI.Components {
             }
         }
 
-        private void BuildPopovers() {            
+        private void BuildPopovers() {
             {
                 _messageBox = new VerticalLayout {
                     Renderer = new ColorRenderer(Color.White),
