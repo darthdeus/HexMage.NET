@@ -210,31 +210,7 @@ namespace HexMage.GUI.Components {
 
             var result = await entity.MoveTo(pos);
 
-            int distance = mob.Coord.ModifiedDistance(mob, pos);
-
-            Debug.Assert(mob.Ap >= distance,
-                         $"Trying to move a mob further than his AP ... Distance: {distance}, AP: {mob.Ap}");
-
-            mob.Ap -= distance;
-            mob.Coord = pos;
-            // TODO - does this belong here?
-            _gameInstance.Pathfinder.PathfindFrom(pos);
-
             return result;
-        }
-
-        private void MoveTo(Mob currentMob, AxialCoord pos) {
-            // TODO - check if this takes obstacles into account
-            int distance = currentMob.Coord.ModifiedDistance(currentMob, pos);
-            if (distance <= currentMob.Ap) {
-                var mobEntity = (MobEntity) currentMob.Metadata;
-                mobEntity.MoveTo(pos);
-
-#warning TODO - clean this up
-                //currentMob.Ap -= distance;
-                //currentMob.Coord = pos;
-                //_gameInstance.Pathfinder.PathfindFrom(pos);
-            }
         }
 
         private void AttackMob(Mob target) {
@@ -290,7 +266,7 @@ namespace HexMage.GUI.Components {
                     if (abilitySelected) {
                         ShowMessage("Select an ability to use first.");
                     } else {
-                        MoveTo(currentMob, mouseHex);
+                        _eventHub.BroadcastMobMoved(currentMob, mouseHex);
                     }
                 }
             }
