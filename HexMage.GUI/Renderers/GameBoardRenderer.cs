@@ -24,8 +24,14 @@ namespace HexMage.GUI.Renderers {
             _assetManager = assetManager;
 
             DrawBackground();
-            DrawHoverPath();
-            DrawMousePosition();
+            if (_gameInstance.TurnManager.CurrentController is PlayerController) {
+                DrawHoverPath();
+            } else {
+                var hexTooFar = _assetManager[AssetManager.HexPathSprite];
+                _spriteBatch.Begin(transformMatrix: _camera.Transform);
+                DrawAt(hexTooFar, Camera2D.Instance.MouseHex);
+                _spriteBatch.End();
+            }
         }
 
         private void DrawBackground() {
@@ -121,17 +127,6 @@ namespace HexMage.GUI.Renderers {
                     }
                 }
             }
-            _spriteBatch.End();
-        }
-
-        private void DrawMousePosition() {
-            _spriteBatch.Begin();
-            var mouseTextPos = new Vector2(0, 850);
-
-            var mousePos = _camera.MouseWorldPixelPos;
-
-            string str = $"{mousePos} - {_camera.MouseHex}";
-            _spriteBatch.DrawString(_assetManager.Font, str, mouseTextPos, Color.Black);
             _spriteBatch.End();
         }
 
