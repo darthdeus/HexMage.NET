@@ -32,7 +32,8 @@ namespace HexMage.GUI {
         }
 
         public Task<bool> RandomAction(GameEventHub eventHub) {
-            throw new System.NotImplementedException();
+#warning TODO - perhaps there's a better way to handle this?
+            return new AiRandomController(_gameInstance).PlayTurn(eventHub);
         }
     }
 }
