@@ -28,9 +28,12 @@ namespace HexMage.GUI.Renderers {
                 DrawHoverPath();
             } else {
                 var hexTooFar = _assetManager[AssetManager.HexPathSprite];
-                _spriteBatch.Begin(transformMatrix: _camera.Transform);
-                DrawAt(hexTooFar, Camera2D.Instance.MouseHex);
-                _spriteBatch.End();
+                var mouseHex = Camera2D.Instance.MouseHex;
+                if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
+                    _spriteBatch.Begin(transformMatrix: _camera.Transform);
+                    DrawAt(hexTooFar, mouseHex);
+                    _spriteBatch.End();
+                }
             }
         }
 

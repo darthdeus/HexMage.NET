@@ -64,6 +64,14 @@ namespace HexMage.GUI {
         public override void Initialize() {
             Camera2D.Instance.Translate = new Vector3(600, 500, 0);
 
+            _logBox = LogBox.Instance;
+            _logBox.SortOrder = Camera2D.SortUI;
+            _logBox.Log("ArenaScene", "hello");
+            _logBox.Log(LogSeverity.Error, "ArenaScene", "world");
+            _logBox.Log("ArenaScene", "hello!");
+
+            AddAndInitializeRootEntity(_logBox, _assetManager);
+
             var buttons = new Panel();
 
             var btnYes = new TextButton("Yes", _assetManager.Font) {
@@ -82,8 +90,7 @@ namespace HexMage.GUI {
             _defenseModal.AddChild(new Label("Do you want to defend?", _assetManager.Font));
             _defenseModal.AddChild(buttons);
 
-            AddRootEntity(_defenseModal);
-            _defenseModal.InitializeEntity(_assetManager);
+            AddAndInitializeRootEntity(_defenseModal, _assetManager);
 
             var gameBoardEntity = CreateRootEntity(Camera2D.SortBackground);
             var gameBoardController = new GameBoardController(_gameInstance, _gameEventHub);
@@ -222,6 +229,7 @@ namespace HexMage.GUI {
 
         private TaskCompletionSource<DefenseDesire> _defenseDesireSource;
         private GameBoardController _gameBoardController;
+        private LogBox _logBox;
 
         public Task<DefenseDesire> RequestDesireToDefend(Mob mob, Ability ability) {
             _defenseModal.Active = true;

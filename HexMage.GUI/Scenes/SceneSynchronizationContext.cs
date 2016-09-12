@@ -6,16 +6,16 @@ using HexMage.Simulator;
 
 namespace HexMage.GUI {
     public class SceneSynchronizationContext : SynchronizationContext {
-        ConcurrentQueue<KeyValuePair<SendOrPostCallback, object>> _queue = new ConcurrentQueue<KeyValuePair<SendOrPostCallback, object>>();
+        ConcurrentQueue<KeyValuePair<SendOrPostCallback, object>> _queue = new ConcurrentQueue<KeyValuePair<SendOrPostCallback, object>>();        
 
         public override void Send(SendOrPostCallback d, object state) {
-            Utils.ThreadLog("Sending");
+            Utils.Log(LogSeverity.Error, nameof(SceneSynchronizationContext), "Sending callback, this is highly unexpected");
+
             base.Send(d, state);
         }
 
         public override void Post(SendOrPostCallback d, object state) {
-            //Console.WriteLine("Posting callback");
-            Utils.ThreadLog("Posting callback");
+            Utils.Log(LogSeverity.Info, nameof(SceneSynchronizationContext), "Posting callback");
             _queue.Enqueue(new KeyValuePair<SendOrPostCallback, object>(d, state));
         }
 

@@ -14,16 +14,16 @@ namespace HexMage.Simulator {
 
         public async Task<bool> MainLoop() {
             var turnManager = _gameInstance.TurnManager;
-
-            Utils.ThreadLog("[EventHub] Starting Main Loop");
+            
+            Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Starting Main Loop");
             while (!_gameInstance.IsFinished()) {
-                Utils.ThreadLog("[EventHub] Main Loop Iteration");
+                Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Main Loop Iteration");
                 var action = turnManager.CurrentMob.Team.Controller.PlayTurn(this);
                 await action;
 
                 turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder);
             }
-            Utils.ThreadLog("[EventHub] Main Loop DONE");
+            Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Main Loop DONE");
 
             return true;
         }
@@ -44,7 +44,7 @@ namespace HexMage.Simulator {
         }
 
         public async Task BoardcastAbilityUsed(Mob mob, Mob target, UsableAbility ability) {
-            Utils.ThreadLog($"[EventHub] waiting for {_subscribers.Count} subscribers");
+            Utils.Log(LogSeverity.Info, nameof(GameEventHub), $"waiting for {_subscribers.Count} subscribers");
             await Task.WhenAll(_subscribers.Select(x => x.EventAbilityUsed(mob, target, ability)));
 
             await ability.Use(_gameInstance.Map);

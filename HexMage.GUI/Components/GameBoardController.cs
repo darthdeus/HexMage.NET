@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -42,14 +43,16 @@ namespace HexMage.GUI.Components {
 #warning TODO - run async and check thread
             _eventHub.MainLoop()
                      .ContinueWith(t => {
-                                       Utils.ThreadLog($"Faulted: {t.IsFaulted}, Complete: {t.IsCompleted}");
+                                       Utils.Log(LogSeverity.Warning, nameof(GameBoardController),
+                                                 $"Faulted: {t.IsFaulted}, Complete: {t.IsCompleted}");
 
                                        if (t.IsFaulted) {
                                            Console.WriteLine(t.Exception);
                                        }
                                        if (!t.IsCompleted) {
                                            t.Wait();
-                                           Utils.ThreadLog($"!!! MainLoop finished !!! Faulted: {t.IsFaulted}");
+                                           Utils.Log(LogSeverity.Warning, nameof(GameBoardController),
+                                                     $"!!! MainLoop finished !!! Faulted: {t.IsFaulted}");
                                        }
                                    },
                                    TaskContinuationOptions.LongRunning);
@@ -148,7 +151,8 @@ namespace HexMage.GUI.Components {
 
         public async Task<bool> EventAbilityUsed(Mob mob, Mob target, UsableAbility usableAbility) {
             var ability = usableAbility.Ability;
-            Utils.ThreadLog("[GameBoardController] EventAbilityUsed called");
+            LogBox.Instance.Log(LogSeverity.Info, nameof(GameBoardController), "EventAbilityUsed");
+            //Utils.ThreadLog("[GameBoardController] EventAbilityUsed called");
             var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
 
             var projectileAnimation = new Animation(projectileSprite,

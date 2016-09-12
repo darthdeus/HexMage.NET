@@ -13,10 +13,11 @@ namespace HexMage.GUI {
     public class Entity {
         public Func<Matrix> Transform { get; set; } = () => Matrix.Identity;
         public Matrix RenderTransform { get; set; }
+        public bool Hidden { get; set; } = false;
 
         public bool DebugMode { get; set; } = false;
 
-        private bool _sortOrderSet;
+        internal bool _sortOrderSet;
         private int _sortOrder;
         public int SortOrder {
             get { return _sortOrderSet ? _sortOrder : Parent.SortOrder; }

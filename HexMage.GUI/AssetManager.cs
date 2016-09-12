@@ -83,7 +83,7 @@ namespace HexMage.GUI {
 
         public SpriteFont Font {
             get {
-                Debug.Assert(_font != null);
+                Debug.Assert(_font != null, "Accessing AssetManager's Font before it's initialized");
                 return _font;
             }
         }

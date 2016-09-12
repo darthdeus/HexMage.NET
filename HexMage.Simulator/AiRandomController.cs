@@ -31,7 +31,7 @@ namespace HexMage.Simulator {
                 if (usableAbilities.Count > 0) {
                     var ua = usableAbilities.First();
 
-                    Utils.ThreadLog("Broadcasting used ability");
+                    Utils.Log(LogSeverity.Info, nameof(AiRandomController), "Broadcasting used ability");
                     await eventHub.BoardcastAbilityUsed(mob, target, ua);
                 } else {
                     var path = pathfinder.PathTo(target.Coord);

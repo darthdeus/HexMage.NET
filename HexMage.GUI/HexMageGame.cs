@@ -1,4 +1,5 @@
-﻿using HexMage.Simulator;
+﻿using HexMage.GUI.UI;
+using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -38,6 +39,7 @@ namespace HexMage.GUI
             IsMouseVisible = true;
             InputManager.Instance.Initialize(this);
 
+
             base.Initialize();
         }
 
@@ -47,6 +49,9 @@ namespace HexMage.GUI
             _assetManager.Preload();
             _assetManager.RegisterTexture(AssetManager.SolidGrayColor,
                 TextureGenerator.SolidColor(GraphicsDevice, 32, 32, Color.LightGray));
+
+            LogBox.Initialize(_assetManager.Font, 1000);
+            Utils.RegisterLogger(LogBox.Instance);
 
             _gameManager = new GameManager(_camera, _inputManager, _assetManager, _spriteBatch);
             //_sceneManager = new SceneManager(new ArenaScene(_gameManager));

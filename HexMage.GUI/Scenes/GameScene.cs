@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using HexMage.GUI.Components;
@@ -109,7 +110,7 @@ namespace HexMage.GUI {
         }
 
         public void RenderRootEntities() {
-            foreach (var entity in _rootEntities.OrderBy(x => x.SortOrder).Where(x => x.Active)) {
+            foreach (var entity in _rootEntities.OrderBy(x => x.SortOrder).Where(x => x.Active && !x.Hidden)) {
                 entity.Render(_spriteBatch, _assetManager);
             }
         }
@@ -126,8 +127,14 @@ namespace HexMage.GUI {
         public abstract void Cleanup();
 
         public void AddRootEntity(Entity entity) {
+            Debug.Assert(entity._sortOrderSet, "Root entities must have their SortOrder set, as they can't inherit it from their parent.");
             _rootEntities.Add(entity);
             entity.Scene = this;
+        }
+
+        public void AddAndInitializeRootEntity(Entity entity, AssetManager assetManager) {
+            AddRootEntity(entity);
+            entity.InitializeEntity(assetManager);
         }
 
         private GameScene _newScene = null;
