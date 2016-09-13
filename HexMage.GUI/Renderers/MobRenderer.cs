@@ -1,9 +1,11 @@
+using HexMage.GUI.Components;
+using HexMage.GUI.Core;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
 
-namespace HexMage.GUI.Components {
+namespace HexMage.GUI.Renderers {
     public class MobRenderer : IRenderer {
         private readonly GameInstance _gameInstance;
         private readonly Mob _mob;

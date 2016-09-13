@@ -1,9 +1,10 @@
 using System;
-using HexMage.GUI.UI;
+using HexMage.GUI.Core;
+using HexMage.GUI.Renderers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace HexMage.GUI {
+namespace HexMage.GUI.Components {
     public class ColorChanger : Component {
         private readonly Color _hoverColor;
         private ColorRenderer _renderer;

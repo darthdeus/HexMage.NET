@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using HexMage.GUI.Core;
+using HexMage.GUI.Renderers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;

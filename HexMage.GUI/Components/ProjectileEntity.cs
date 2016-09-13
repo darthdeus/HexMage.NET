@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Timers;
+using HexMage.GUI.Core;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

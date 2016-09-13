@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 
-namespace HexMage.GUI {
+namespace HexMage.GUI.Scenes {
     public class MapSelectionScene : GameScene {
         public MapSelectionScene(GameManager gameManager) : base(gameManager) {}
 

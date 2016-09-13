@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace HexMage.Simulator {
     public enum LogSeverity
@@ -39,7 +40,7 @@ namespace HexMage.Simulator {
         }
     }
 
-    public class Utils {
+    public static class Utils {
         private static readonly List<ILogger> _loggers = new List<ILogger>();
 
         public static void RegisterLogger(ILogger logger) {
@@ -49,6 +50,14 @@ namespace HexMage.Simulator {
         public static void Log(LogSeverity logLevel, string owner, string message) {
             foreach (var logger in _loggers) {
                 logger.Log(logLevel, owner, message);
+            }
+        }
+
+        public static void LogContinuation<T>(Task<T> task) {
+            if (task.IsFaulted) {
+                Log(LogSeverity.Error, nameof(task), $"Task {task} failed.");
+            } else {
+                Log(LogSeverity.Info, nameof(task), $"Task {task} complete, result: {task.Result}");
             }
         }
     }

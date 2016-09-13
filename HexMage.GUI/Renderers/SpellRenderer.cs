@@ -1,10 +1,11 @@
 using System;
 using System.Diagnostics;
 using HexMage.GUI.Components;
+using HexMage.GUI.Core;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace HexMage.GUI {
+namespace HexMage.GUI.Renderers {
     public class SpellRenderer : IRenderer {
         private readonly GameInstance _gameInstance;
         private readonly GameBoardController _gameBoardController;

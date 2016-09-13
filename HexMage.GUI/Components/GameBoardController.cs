@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
+using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
 using HexMage.Simulator;

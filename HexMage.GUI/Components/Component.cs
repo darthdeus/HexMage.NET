@@ -1,7 +1,8 @@
 ﻿using System;
+using HexMage.GUI.Core;
 using Microsoft.Xna.Framework;
 
-namespace HexMage.GUI {
+namespace HexMage.GUI.Components {
     public class Component {
         public bool IsInitialized { get; private set; } = false;
         public Entity Entity { get; set; }

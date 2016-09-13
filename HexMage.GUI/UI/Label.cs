@@ -1,4 +1,7 @@
 ﻿using System;
+using HexMage.GUI.Components;
+using HexMage.GUI.Core;
+using HexMage.GUI.Renderers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

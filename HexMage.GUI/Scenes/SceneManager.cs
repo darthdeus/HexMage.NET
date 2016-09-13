@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
 using Microsoft.Xna.Framework;
 
-namespace HexMage.GUI {
+namespace HexMage.GUI.Scenes {
     class SceneManager {
         private readonly Stack<GameScene> _scenes = new Stack<GameScene>();
 

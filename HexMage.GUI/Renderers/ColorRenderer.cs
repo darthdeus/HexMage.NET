@@ -1,7 +1,8 @@
+using HexMage.GUI.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace HexMage.GUI.UI {
+namespace HexMage.GUI.Renderers {
     public class ColorRenderer : IRenderer {
         public Color Color { get; set; }
 

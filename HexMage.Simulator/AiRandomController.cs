@@ -43,9 +43,7 @@ namespace HexMage.Simulator {
                     var path = pathfinder.PathTo(enemies.First().Coord);
                     pathfinder.MoveAsFarAsPossible(mob, path);
                 } else {
-                    // Do nothing
-#warning FIX ME
-                    Console.WriteLine("No possible action");
+                    Utils.Log(LogSeverity.Info, nameof(AiRandomController), "No possible action");
                 }
             }
 

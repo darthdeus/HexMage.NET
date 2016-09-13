@@ -1,8 +1,9 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
+using HexMage.GUI.Scenes;
 using HexMage.Simulator;
 
-namespace HexMage.GUI {
+namespace HexMage.GUI.Core {
     internal class PlayerController : IMobController {
         private readonly ArenaScene _arenaScene;
         private readonly GameInstance _gameInstance;

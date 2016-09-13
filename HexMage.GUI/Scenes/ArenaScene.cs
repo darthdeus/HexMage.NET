@@ -3,27 +3,14 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using HexMage.GUI.Components;
+using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 using Color = Microsoft.Xna.Framework.Color;
 
-namespace HexMage.GUI {
-    internal class HoverUpdater : Component {
-        private readonly Action<bool> _action;
-
-        public HoverUpdater(Action<bool> action) {
-            _action = action;
-        }
-
-        public override void Update(GameTime time) {
-            base.Update(time);
-
-            _action(Entity.AABB.Contains(InputManager.Instance.MousePosition));
-        }
-    }
-
+namespace HexMage.GUI.Scenes {
     internal class ArenaScene : GameScene {
         private readonly GameInstance _gameInstance;
         private readonly Entity _defenseModal;

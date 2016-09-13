@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using HexMage.GUI.Core;
 using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.UI {

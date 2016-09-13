@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
-using HexMage.GUI.Components;
+using HexMage.GUI.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace HexMage.GUI {
+namespace HexMage.GUI.Scenes {
     public enum SceneUpdateResult {
         Terminate,
         Continue,

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using HexMage.GUI.Core;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI.UI {
     public class SpriteElement : Entity {

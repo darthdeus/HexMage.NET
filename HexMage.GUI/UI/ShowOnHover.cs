@@ -1,3 +1,5 @@
+using HexMage.GUI.Components;
+using HexMage.GUI.Core;
 using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.UI {

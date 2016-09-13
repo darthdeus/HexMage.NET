@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using HexMage.GUI.UI;
+using HexMage.GUI.Components;
+using HexMage.GUI.Renderers;
+using HexMage.GUI.Scenes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using OpenTK;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Vector4 = Microsoft.Xna.Framework.Vector4;
 
-namespace HexMage.GUI {
+namespace HexMage.GUI.Core {
     public class Entity {
         public Func<Matrix> Transform { get; set; } = () => Matrix.Identity;
         public Matrix RenderTransform { get; set; }

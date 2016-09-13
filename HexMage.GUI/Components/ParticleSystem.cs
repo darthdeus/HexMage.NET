@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using HexMage.GUI.Core;
+using HexMage.GUI.Renderers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace HexMage.GUI {
+namespace HexMage.GUI.Components {
     public class Particle {
         public Vector2 Position { get; set; } = Vector2.Zero;
         public Vector2 Velocity { get; set; }

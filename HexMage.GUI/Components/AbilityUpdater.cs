@@ -5,7 +5,7 @@ using HexMage.GUI.UI;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 
-namespace HexMage.GUI {
+namespace HexMage.GUI.Components {
     public class AbilityUpdater : Component {
         private readonly TurnManager _turnManager;
         private readonly int _abilityIndex;

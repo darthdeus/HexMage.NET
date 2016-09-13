@@ -1,9 +1,11 @@
 using System;
 using System.Linq;
+using HexMage.GUI.Components;
+using HexMage.GUI.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace HexMage.GUI {
+namespace HexMage.GUI.Renderers {
     public class ParticleSystemRenderer : IRenderer {
         private readonly ParticleSystem _particleSystem;
 
