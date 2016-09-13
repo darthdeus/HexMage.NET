@@ -6,8 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace HexMage.Simulator {
-    public enum LogSeverity
-    {
+    public enum LogSeverity {
         Debug,
         Info,
         Warning,
@@ -53,11 +52,19 @@ namespace HexMage.Simulator {
             }
         }
 
-        public static void LogContinuation<T>(Task<T> task) {
+        public static void LogContinuation(Task task) {
             if (task.IsFaulted) {
                 Log(LogSeverity.Error, nameof(task), $"Task {task} failed.");
             } else {
-                Log(LogSeverity.Info, nameof(task), $"Task {task} complete, result: {task.Result}");
+                Log(LogSeverity.Info, nameof(task), $"Task {task} complete");
+            }
+        }
+
+        public static void LogContinuation<T>(Task<T> task) {
+            if (task.IsFaulted) {
+                Log(LogSeverity.Error, nameof(task), $"Task<T> {task} failed.");
+            } else {
+                Log(LogSeverity.Info, nameof(task), $"Task<T> {task} complete, result: {task.Result}");
             }
         }
     }

@@ -38,6 +38,7 @@ namespace HexMage.Simulator {
             int distance = mob.Coord.ModifiedDistance(mob, pos);
 
             Debug.Assert(distance <= mob.Ap, "Trying to move a mob that doesn't have enough AP.");
+            Debug.Assert(_gameInstance.Map[pos] == HexType.Empty, "Trying to move a mob into a wall.");
             mob.Ap -= distance;
             mob.Coord = pos;
             _gameInstance.Pathfinder.PathfindFrom(pos);

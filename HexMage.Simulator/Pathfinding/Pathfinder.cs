@@ -96,7 +96,7 @@ namespace HexMage.Simulator {
                 iterations++;
 
                 if (iterations > Size*Size*10 || queue.Count > 1000) {
-                    Console.WriteLine("CHYBA, PATHFINDING SE ZASEKL");
+                    Utils.Log(LogSeverity.Error, nameof(Pathfinder), "Pathfinder stuck when calculating a path.");
                 }
 
                 // TODO - opet, nema byt Y a X?
@@ -118,10 +118,10 @@ namespace HexMage.Simulator {
 
                         bool notClosed = n.State != VertexState.Closed;
                         bool noWall = _map[neighbour] != HexType.Wall;
-                        bool noMob = _mobManager.AtCoord(neighbour) == null;
+                        bool noMob = _mobManager.AtCoord(neighbour) == null || neighbour == start;
 
                         //if (notClosed && noWall && noMob) {
-                        if (notClosed && noWall) {
+                        if (notClosed && noWall && noMob) {
                             if (n.State == VertexState.Unvisited || n.Distance > p.Distance + 1) {
                                 n.Distance = p.Distance + 1;
                                 n.Source = current;

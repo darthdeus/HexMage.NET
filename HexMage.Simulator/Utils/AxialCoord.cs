@@ -56,9 +56,16 @@ namespace HexMage.Simulator {
             return axial.ToCube();
         }
 
-
         bool IEquatable<AxialCoord>.Equals(AxialCoord other) {
             return X == other.X && Y == other.Y;
+        }
+
+        public static bool operator ==(AxialCoord left, AxialCoord right) {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(AxialCoord left, AxialCoord right) {
+            return !left.Equals(right);
         }
 
         public override string ToString() {

@@ -19,8 +19,8 @@ namespace HexMage.GUI.Scenes {
 
         public ArenaScene(GameManager gameManager, Map map) : base(gameManager) {
             _gameInstance = new GameInstance(map.Size, map);
-            
-              _defenseModal = new VerticalLayout() {
+
+            _defenseModal = new VerticalLayout() {
                 SortOrder = Camera2D.SortUI,
                 Padding = new Vector4(20),
                 Renderer = new ColorRenderer(Color.LightGray),
@@ -34,12 +34,14 @@ namespace HexMage.GUI.Scenes {
             var t2 = _gameInstance.MobManager.AddTeam(TeamColor.Blue, aiController);
 
             _gameEventHub = new GameEventHub(_gameInstance);
-            //_gameEventHub.AddSubscriber(aiController);
 
             for (int team = 0; team < 2; team++) {
                 for (int mobI = 0; mobI < 2; mobI++) {
                     var mob = Generator.RandomMob(team%2 == 0 ? t1 : t2, _gameInstance.Size,
-                                                  c => _gameInstance.MobManager.AtCoord(c) == null);
+                                                  c =>
+                                                      _gameInstance.Pathfinder.IsValidCoord(c) &&
+                                                      _gameInstance.MobManager.AtCoord(c) == null &&
+                                                      _gameInstance.Map[c] == HexType.Empty);
 
                     _gameInstance.MobManager.AddMob(mob);
                 }
@@ -94,8 +96,7 @@ namespace HexMage.GUI.Scenes {
 
 
         // TODO - sort out where else cleanup needs to be called
-        public override void Cleanup() {            
-        }
+        public override void Cleanup() {}
 
         private Entity BuildUi() {
             var layout = new HorizontalLayout {
@@ -146,12 +147,12 @@ namespace HexMage.GUI.Scenes {
             const float horizontalOffset = 6;
 
             Func<Random, Vector2> offsetFunc = rnd =>
-                                               new Vector2(
-                                                   (float) rnd.NextDouble()*horizontalOffset*2 - horizontalOffset, 0);
+                new Vector2(
+                    (float) rnd.NextDouble()*horizontalOffset*2 - horizontalOffset, 0);
 
             Func<Random, Vector2> velocityFunc = rnd =>
-                                                 new Vector2((float) rnd.NextDouble() - 0.2f,
-                                                             (float) rnd.NextDouble()*speed - speed/2);
+                new Vector2((float) rnd.NextDouble() - 0.2f,
+                            (float) rnd.NextDouble()*speed - speed/2);
 
             const int maximumNumberOfParticles = 200;
             const int particlesPerSecond = 20;
@@ -184,7 +185,8 @@ namespace HexMage.GUI.Scenes {
                 }
             };
 
-            abilityDetail.AddComponent(_ => { particles.Active = _gameBoardController.SelectedAbilityIndex == abilityIndex; });
+            abilityDetail.AddComponent(
+                _ => { particles.Active = _gameBoardController.SelectedAbilityIndex == abilityIndex; });
 
             abilityDetailWrapper.AddChild(particles);
 

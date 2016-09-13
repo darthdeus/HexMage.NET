@@ -266,9 +266,16 @@ namespace HexMage.GUI.Components {
                     }
                 } else {
                     if (abilitySelected) {
-                        ShowMessage("Select an ability to use first.");
+                        ShowMessage("You can't cast spells on the ground.");
                     } else {
-                        _eventHub.BroadcastMobMoved(currentMob, mouseHex);
+                        if (_gameInstance.Map[mouseHex] == HexType.Empty) {
+                            // TODO - check console to see if this task ends when it should
+                            _eventHub.BroadcastMobMoved(currentMob, mouseHex)
+                                     .ContinueWith((t, o) => Utils.LogContinuation(t), TaskContinuationOptions.LongRunning,
+                                                   TaskScheduler.Default);
+                        } else {
+                            ShowMessage("You can't walk into a wall.");
+                        }
                     }
                 }
             }
