@@ -13,7 +13,9 @@ namespace HexMage.GUI.Renderers {
 
         private readonly int _healthbarWidth = (int) (1.0/6*AssetManager.TileSize);
         private readonly int _healthbarHeight = (int) (5.0/8*AssetManager.TileSize);
-        private readonly Point _healthbarOffset = new Point((int) (9.0/10*AssetManager.TileSize), (int) (1.0/7*AssetManager.TileSize));
+
+        private readonly Point _healthbarOffset = new Point((int) (9.0/10*AssetManager.TileSize),
+                                                            (int) (1.0/7*AssetManager.TileSize));
 
         public MobRenderer(GameInstance gameInstance, Mob mob, MobAnimationController animationController) {
             _gameInstance = gameInstance;
@@ -46,12 +48,11 @@ namespace HexMage.GUI.Renderers {
                                    Color emptyColor, Color fullColor) {
             var gray = assetManager[AssetManager.SolidGrayColor];
 
-
-            batch.Draw(gray, new Rectangle(pos, new Point(_healthbarWidth, _healthbarWidth)), emptyColor);
+            batch.Draw(gray, new Rectangle(pos, new Point(_healthbarWidth, _healthbarHeight)), emptyColor);
 
             var percentageHeight = (int) (_healthbarHeight*percentage);
             batch.Draw(gray,
-                       new Rectangle(pos + new Point(0, percentageHeight - percentageHeight),
+                       new Rectangle(pos + new Point(0, _healthbarHeight - percentageHeight),
                                      new Point(_healthbarWidth, percentageHeight)),
                        fullColor);
         }
