@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using HexMage.Simulator;
 
@@ -15,7 +16,8 @@ namespace HexMage.GUI {
         }
 
         public override void Post(SendOrPostCallback d, object state) {
-            Utils.Log(LogSeverity.Info, nameof(SceneSynchronizationContext), "Posting callback");
+#warning TODO - figure out if there's a way to perserve logging while keeping it possible to post callbacks directly (without causing inifinite recursion)
+            //Utils.Log(LogSeverity.Info, nameof(SceneSynchronizationContext), "Posting callback");
             _queue.Enqueue(new KeyValuePair<SendOrPostCallback, object>(d, state));
         }
 

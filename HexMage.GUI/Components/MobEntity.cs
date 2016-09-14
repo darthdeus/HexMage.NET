@@ -47,6 +47,7 @@ namespace HexMage.GUI.Components {
         private TaskCompletionSource<bool> _tcs;
 
         public Task<bool> MoveTo(AxialCoord coord) {
+            Debug.Assert(!_animateMovement, "Movement already in progress, can't move until it finishes.");
             Debug.Assert(_tcs == null, "_tcs != null when trying to re-initialize it.");
 
             _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
