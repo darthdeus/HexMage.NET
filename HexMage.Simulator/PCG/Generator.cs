@@ -95,7 +95,15 @@ namespace HexMage.Simulator {
         }
 
         public static Buff RandomBuff(AbilityElement element) {
-            return new Buff(element, _random.Next(-2, 1), _random.Next(-1, 1), _random.Next(1, 3));
+            var hpChange = _random.Next(-2, 1);
+            var apChange = _random.Next(-1, 1);
+            var lifetime = _random.Next(1, 3);
+
+            while (hpChange == 0 && apChange == 0) {
+                hpChange = _random.Next(-2, 1);
+                apChange = _random.Next(-1, 1);
+            }
+            return new Buff(element, hpChange, apChange, lifetime);
         }
 
         public static List<AreaBuff> RandomAreaBuffs(AbilityElement element) {
