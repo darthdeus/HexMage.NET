@@ -118,7 +118,8 @@ namespace HexMage.Simulator {
 
                         bool notClosed = n.State != VertexState.Closed;
                         bool noWall = _map[neighbour] != HexType.Wall;
-                        bool noMob = _mobManager.AtCoord(neighbour) == null || neighbour == start;
+#warning TODO - fix pathfinder so that it doesn't walk into mobs but still allows abilities to target them
+                        bool noMob = true || _mobManager.AtCoord(neighbour) == null || neighbour == start;
 
                         //if (notClosed && noWall && noMob) {
                         if (notClosed && noWall && noMob) {

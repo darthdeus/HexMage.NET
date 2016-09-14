@@ -52,7 +52,7 @@ namespace HexMage.Simulator {
             }
         }
 
-        public static void LogContinuation(Task task) {
+        public static void LogContinuation(this Task task) {
             if (task.IsFaulted) {
                 Log(LogSeverity.Error, nameof(task), $"Task {task} failed.");
             } else {
@@ -60,12 +60,12 @@ namespace HexMage.Simulator {
             }
         }
 
-        public static void LogContinuation<T>(Task<T> task) {
+        public static void LogContinuation<T>(this Task<T> task) {
             if (task.IsFaulted) {
                 Log(LogSeverity.Error, nameof(task), $"Task<T> {task} failed.");
             } else {
                 Log(LogSeverity.Info, nameof(task), $"Task<T> {task} complete, result: {task.Result}");
             }
-        }
+        }        
     }
 }

@@ -44,7 +44,7 @@ namespace HexMage.Simulator {
             _gameInstance.Pathfinder.PathfindFrom(pos);
         }
 
-        public async Task BoardcastAbilityUsed(Mob mob, Mob target, UsableAbility ability) {
+        public async Task BroadcastAbilityUsed(Mob mob, Mob target, UsableAbility ability) {
             Utils.Log(LogSeverity.Info, nameof(GameEventHub), $"waiting for {_subscribers.Count} subscribers");
             await Task.WhenAll(_subscribers.Select(x => x.EventAbilityUsed(mob, target, ability)));
 

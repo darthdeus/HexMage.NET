@@ -228,6 +228,8 @@ namespace HexMage.GUI.Components {
 
             var usableAbility = usableAbilities.FirstOrDefault(ua => ua.Ability == ability);
             if (usableAbility != null) {
+                _eventHub.BroadcastAbilityUsed(_gameInstance.TurnManager.CurrentMob, target, usableAbility)
+                    .LogContinuation();
                 //AbilityUsed(_gameInstance.TurnManager.CurrentMob, currentTarget, ability);
             } else {
                 ShowMessage("You can't use the selected ability on that target.");
