@@ -29,7 +29,7 @@ namespace HexMage.GUI.Components {
                 var destinationPos = camera.HexToPixel(_destination);
 
                 // TODO - do this using proper fixed timestep, rather than per-frame percentage
-                _moveProgress += 0.03f;
+                _moveProgress += 0.06f;
 
                 if (_moveProgress >= 1.0f) {
                     _moveProgress = 1.0f;
@@ -45,7 +45,20 @@ namespace HexMage.GUI.Components {
         }
 
         private TaskCompletionSource<bool> _tcs;
+                                 
+        public Task<bool> MoveTo(AxialCoord source, AxialCoord destination)
+        {
+            Debug.Assert(!_animateMovement, "Movement already in progress, can't move until it finishes.");
+            Debug.Assert(_tcs == null, "_tcs != null when trying to re-initialize it.");
 
+            _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            _moveProgress = 0.0f;
+            _destination = destination;
+            _source = source;
+            _animateMovement = true;
+
+            return _tcs.Task;
+        }
         public Task<bool> MoveTo(AxialCoord coord) {
             Debug.Assert(!_animateMovement, "Movement already in progress, can't move until it finishes.");
             Debug.Assert(_tcs == null, "_tcs != null when trying to re-initialize it.");

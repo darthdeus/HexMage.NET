@@ -87,6 +87,11 @@ namespace HexMage.GUI {
             return new Vector2(x, y);
         }
 
+        public Vector2 HexToPixelWorld(AxialCoord coord) {
+            var screenSpace = HexToPixel(coord);
+            return Vector2.Transform(screenSpace, Transform);
+        }
+
         public Vector2 MousePixelPos => new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
         public Vector2 MouseWorldPixelPos => Vector2.Transform(MousePixelPos, Matrix.Invert(Transform));
 
