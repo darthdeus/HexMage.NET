@@ -119,6 +119,10 @@ namespace HexMage.GUI.Components {
         private readonly Vector2 _mouseHoverPopoverOffset = new Vector2(
             0.5f*AssetManager.TileSize, -0.5f*AssetManager.TileSize);
 
+        private VerticalLayout _usedAbilityPopover;
+        private Vector4 _popoverPadding;
+        private Label _usedAbilityLabel;
+
         private void HandleKeyboardAbilitySelect() {
             var inputManager = InputManager.Instance;
 
@@ -149,8 +153,14 @@ namespace HexMage.GUI.Components {
 
         public async Task<bool> EventAbilityUsed(Mob mob, Mob target, UsableAbility usableAbility) {
             var ability = usableAbility.Ability;
+            // TODO - use the more general logger instead
             LogBox.Instance.Log(LogSeverity.Info, nameof(GameBoardController), "EventAbilityUsed");
-            //Utils.ThreadLog("[GameBoardController] EventAbilityUsed called");
+
+            UpdateUsedAbility(usableAbility.Ability);
+
+            _usedAbilityPopover.Active = true;
+            Entity.Scene.DelayFor(TimeSpan.FromSeconds(5), () => { _usedAbilityPopover.Active = false; });
+
             var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
 
             var projectileAnimation = new Animation(projectileSprite,
@@ -229,8 +239,7 @@ namespace HexMage.GUI.Components {
             var usableAbility = usableAbilities.FirstOrDefault(ua => ua.Ability == ability);
             if (usableAbility != null) {
                 _eventHub.BroadcastAbilityUsed(_gameInstance.TurnManager.CurrentMob, target, usableAbility)
-                    .LogContinuation();
-                //AbilityUsed(_gameInstance.TurnManager.CurrentMob, currentTarget, ability);
+                         .LogContinuation();
             } else {
                 ShowMessage("You can't use the selected ability on that target.");
             }
@@ -273,7 +282,8 @@ namespace HexMage.GUI.Components {
                         if (_gameInstance.Map[mouseHex] == HexType.Empty) {
                             // TODO - check console to see if this task ends when it should
                             _eventHub.BroadcastMobMoved(currentMob, mouseHex)
-                                     .ContinueWith((t, o) => Utils.LogContinuation(t), TaskContinuationOptions.LongRunning,
+                                     .ContinueWith((t, o) => Utils.LogContinuation(t),
+                                                   TaskContinuationOptions.LongRunning,
                                                    TaskScheduler.Default);
                         } else {
                             ShowMessage("You can't walk into a wall.");
@@ -283,6 +293,7 @@ namespace HexMage.GUI.Components {
             }
         }
 
+        private readonly Vector2 _usedAbilityOffset = new Vector2(40, -20);
 
         private void UpdatePopovers(GameTime time, AxialCoord mouseHex) {
             var camera = Camera2D.Instance;
@@ -295,6 +306,9 @@ namespace HexMage.GUI.Components {
 
             _emptyHexPopover.Active = false;
             _mobPopover.Active = false;
+
+            var mobPixel = camera.HexToPixel(_gameInstance.TurnManager.CurrentMob.Coord);
+            _usedAbilityPopover.Position = _usedAbilityOffset;
 
             if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
                 var mob = _gameInstance.MobManager.AtCoord(mouseHex);
@@ -364,45 +378,65 @@ namespace HexMage.GUI.Components {
         }
 
         private void BuildPopovers() {
+            _popoverPadding = new Vector4(20, 10, 20, 10);
+
             {
                 _messageBox = new VerticalLayout {
                     Renderer = new ColorRenderer(Color.White),
-                    Padding = new Vector4(20, 10, 20, 10),
+                    Padding = _popoverPadding,
                     SortOrder = Camera2D.SortUI,
                     Position = new Vector2(500, 50)
                 };
 
                 _messageBoxLabel = _messageBox.AddChild(new Label("Message Box", _assetManager.Font));
 
-                Entity.Scene.AddRootEntity(_messageBox);
-                _messageBox.InitializeEntity(_assetManager);
+                Entity.Scene.AddAndInitializeRootEntity(_messageBox, _assetManager);
             }
 
             {
                 _emptyHexPopover = new VerticalLayout {
                     Renderer = new ColorRenderer(Color.LightGray),
-                    Padding = new Vector4(20, 10, 20, 10),
+                    Padding = _popoverPadding,
                     SortOrder = Camera2D.SortUI,
                 };
 
                 _emptyHexLabel = _emptyHexPopover.AddChild(new Label("Just an empty hex", _assetManager.Font));
 
-                Entity.Scene.AddRootEntity(_emptyHexPopover);
-                _emptyHexPopover.InitializeEntity(_assetManager);
+                Entity.Scene.AddAndInitializeRootEntity(_emptyHexPopover, _assetManager);
             }
 
             {
                 _mobPopover = new VerticalLayout {
                     Renderer = new ColorRenderer(Color.LightGray),
-                    Padding = new Vector4(20, 10, 20, 10),
+                    Padding = _popoverPadding,
                     SortOrder = Camera2D.SortUI,
                 };
 
                 _mobHealthLabel = _mobPopover.AddChild(new Label("Mob health", _assetManager.Font));
 
-                Entity.Scene.AddRootEntity(_mobPopover);
-                _mobPopover.InitializeEntity(_assetManager);
+                Entity.Scene.AddAndInitializeRootEntity(_mobPopover, _assetManager);
             }
+
+            {
+                _usedAbilityPopover = new VerticalLayout {
+                    Renderer = new ColorRenderer(Color.LightGray),
+                    Padding = _popoverPadding,
+                    SortOrder = Camera2D.SortUI,
+                };
+
+                _usedAbilityLabel = _usedAbilityPopover.AddChild(new Label("Used ability popover", _assetManager.Font));
+
+                Entity.Scene.AddAndInitializeRootEntity(_usedAbilityPopover, _assetManager);
+            }
+        }
+
+
+        private void UpdateUsedAbility(Ability ability) {
+            var builder = new StringBuilder();
+
+            builder.AppendLine($"{ability.Dmg}DMG cost {ability.Cost}");
+
+            _usedAbilityLabel.Text = builder.ToString();
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using HexMage.GUI.Core;
+using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -84,6 +85,7 @@ namespace HexMage.GUI.Scenes {
 
             foreach (var pair in pendingActions) {
                 pair.Value.Invoke();
+                Utils.Log(LogSeverity.Debug, nameof(GameScene) + "/DelayedActions", "Executing a delayed action");
                 _delayedActions.Remove(pair.Key);
             }
 

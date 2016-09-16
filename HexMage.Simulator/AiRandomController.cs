@@ -32,7 +32,7 @@ namespace HexMage.Simulator {
                     var ua = usableAbilities.First();
 
                     Utils.Log(LogSeverity.Info, nameof(AiRandomController), "Broadcasting used ability");
-                    await eventHub.BoardcastAbilityUsed(mob, target, ua);
+                    await eventHub.BroadcastAbilityUsed(mob, target, ua);
                 } else {
                     var path = pathfinder.PathTo(target.Coord);
                     pathfinder.MoveAsFarAsPossible(mob, path);

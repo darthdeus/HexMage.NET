@@ -128,13 +128,14 @@ namespace HexMage.GUI.UI {
         }
 
         public void Log(LogSeverity logLevel, string owner, string message) {
-            SynchronizationContext.Current.Post(_ => {
-                                                    var tid = Thread.CurrentThread.ManagedThreadId;
-                                                    var entry = new LogEntry(logLevel, owner, tid, message,
-                                                                             _assetManager);
-                                                    _log.Add(entry);
-                                                    _childrenPlaceholder.AddChild(entry);
-                                                }, null);
+            //Debug.Assert(SynchronizationContext.Current != null, "LogBox requires SynchronizationContext.Current to be set.");
+            GameManager.CurrentSynchronizationContext.Post(_ => {
+                                                               var tid = Thread.CurrentThread.ManagedThreadId;
+                                                               var entry = new LogEntry(logLevel, owner, tid, message,
+                                                                                        _assetManager);
+                                                               _log.Add(entry);
+                                                               _childrenPlaceholder.AddChild(entry);
+                                                           }, null);
         }
 
         protected override void Update(GameTime time) {

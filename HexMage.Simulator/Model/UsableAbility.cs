@@ -61,7 +61,7 @@ namespace HexMage.Simulator {
 
             foreach (var areaBuff in Ability.AreaBuffs) {
                 var affectedArea = map.AllCoords.Where(x => map.CubeDistance(x, _target.Coord) <= areaBuff.Radius);
-                Console.WriteLine($"Applying buffs at {map.Guid}");
+                Utils.Log(LogSeverity.Debug, nameof(UsableAbility), $"Applying buffs at {map.Guid}");
                 foreach (var coord in affectedArea) {
                     map.BuffsAt(coord).Add(areaBuff.Effect.Clone());
                 }
