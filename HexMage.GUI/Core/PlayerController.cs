@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using HexMage.GUI.Scenes;
 using HexMage.Simulator;
+using HexMage.Simulator.Model;
 
 namespace HexMage.GUI.Core {
     internal class PlayerController : IMobController {

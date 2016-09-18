@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public struct MapSeed {
@@ -40,6 +41,10 @@ namespace HexMage.Simulator {
     public static class Generator {
         private static readonly Random _random = new Random();
 
+        public static Mob RandomMob(Team team, int size) {
+            return RandomMob(team, size, _ => true);
+        }
+
         public static Mob RandomMob(Team team, int size, Predicate<AxialCoord> isCoordAvailable) {
             var abilities = new List<Ability>();
 
@@ -65,7 +70,6 @@ namespace HexMage.Simulator {
             int iniciative = _random.Next(10);
 
             var mob = new Mob(team, 10, 10, 3, iniciative, abilities);
-            team.Mobs.Add(mob);
 
             while (true) {
                 var x = _random.Next(-size, size);

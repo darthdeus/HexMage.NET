@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
-    public class MobManager {
+    public class MobManager : IDeepCopyable<MobManager> {
         // TODO - combine this into the property
         private readonly List<Mob> _mobs = new List<Mob>();
         public IEnumerable<Mob> Mobs => _mobs;
+        // TODO - this shound't be public as a List<T>
         public List<Team> Teams { get; set; } = new List<Team>();
 
         public bool MoveMob(Mob mob, AxialCoord to) {
@@ -31,7 +33,7 @@ namespace HexMage.Simulator {
             if (Teams.Any(t => t.Color == color)) {
                 throw new ArgumentException("Team color is already in use", nameof(color));
             }
-            var team = new Team(color, controller);
+            var team = new Team(color, controller, this);
             Teams.Add(team);
             return team;
         }
@@ -65,7 +67,8 @@ namespace HexMage.Simulator {
                 var buffs = map.BuffsAt(coord);
                 foreach (var buff in buffs) {
                     buff.Lifetime--;
-                    Debug.Assert(buff.Lifetime >= 0, "Buff lifetime should never be negative, as they're removed when they reach zero.");
+                    Debug.Assert(buff.Lifetime >= 0,
+                                 "Buff lifetime should never be negative, as they're removed when they reach zero.");
                 }
 
                 buffs.RemoveAll(x => x.Lifetime == 0);
@@ -86,6 +89,21 @@ namespace HexMage.Simulator {
                     if (ability.CurrentCooldown > 0) ability.CurrentCooldown--;
                 }
             }
+        }
+
+        public MobManager DeepCopy() {
+            var mobManagerCopy = new MobManager();
+
+            foreach (var team in Teams) {
+                var teamCopy = team.DeepCopy(mobManagerCopy);
+                mobManagerCopy.Teams.Add(teamCopy);
+
+                foreach (var origMob in team.Mobs) {
+                    mobManagerCopy._mobs.Add(origMob.DeepCopy(teamCopy));
+                }
+            }
+
+            return mobManagerCopy;
         }
     }
 }

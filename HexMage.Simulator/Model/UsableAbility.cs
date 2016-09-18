@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public class UsableAbility {

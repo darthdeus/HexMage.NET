@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public class Pathfinder {

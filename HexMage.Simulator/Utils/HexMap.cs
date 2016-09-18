@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace HexMage.Simulator
-{
-    public class HexMap<T>
-    {
+namespace HexMage.Simulator {
+    public class HexMap<T> : IDeepCopyable<HexMap<T>> {
         private readonly T[,] _data;
 
         private readonly int _size;
@@ -66,6 +64,16 @@ namespace HexMage.Simulator
                     }
                 }
             }
+        }
+
+        public HexMap<T> DeepCopy() {
+            var copy = new HexMap<T>(_size);
+
+            foreach (var coord in AllCoords) {
+                copy[coord] = this[coord];
+            }
+
+            return copy;
         }
     }
 }

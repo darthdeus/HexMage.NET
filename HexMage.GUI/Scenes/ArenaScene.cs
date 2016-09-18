@@ -7,6 +7,7 @@ using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
+using HexMage.Simulator.Model;
 using Microsoft.Xna.Framework;
 using Color = Microsoft.Xna.Framework.Color;
 
@@ -16,9 +17,12 @@ namespace HexMage.GUI.Scenes {
         private readonly Entity _defenseModal;
         public bool HoveringOverUi { get; private set; } = false;
         private readonly GameEventHub _gameEventHub;
+        private readonly ReplayRecorder _replayRecorder;
 
         public ArenaScene(GameManager gameManager, Map map) : base(gameManager) {
             _gameInstance = new GameInstance(map.Size, map);
+
+            _replayRecorder = new ReplayRecorder();
 
             _defenseModal = new VerticalLayout() {
                 SortOrder = Camera2D.SortUI,
@@ -89,6 +93,7 @@ namespace HexMage.GUI.Scenes {
             gameBoardEntity.CustomBatch = true;
 
             _gameEventHub.AddSubscriber(gameBoardController);
+            _gameEventHub.AddSubscriber(_replayRecorder);
 
             var uiEntity = BuildUi();
             uiEntity.SortOrder = Camera2D.SortBackground + 1;

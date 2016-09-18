@@ -1,4 +1,5 @@
 ﻿using System;
+using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public struct AxialCoord : IEquatable<AxialCoord> {

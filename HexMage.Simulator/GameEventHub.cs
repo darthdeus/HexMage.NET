@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public class GameEventHub {

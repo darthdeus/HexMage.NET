@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     // TODO - rename
@@ -11,7 +12,7 @@ namespace HexMage.Simulator {
         Water
     }
 
-    public class Ability {
+    public class Ability : IDeepCopyable<Ability> {
         public int Dmg { get; set; }
         public int Cost { get; set; }
         public int Range { get; set; }
@@ -53,6 +54,20 @@ namespace HexMage.Simulator {
                         throw new InvalidOperationException("Invalid element type");
                 }
             }
+        }
+
+        public Ability DeepCopy() {
+            var buffsCopy = new List<Buff>();
+            foreach (var buff in Buffs) {
+                buffsCopy.Add(buff.DeepCopy());
+            }
+            var areaBuffsCopy = new List<AreaBuff>();
+            foreach (var areaBuff in AreaBuffs) {
+                areaBuffsCopy.Add(areaBuff.DeepCopy());
+            }
+
+            var copy = new Ability(Dmg, Cost, Range, Cooldown, Element, buffsCopy, areaBuffsCopy);
+            return copy;
         }
     }
 }

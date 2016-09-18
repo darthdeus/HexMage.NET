@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public interface IMobController {

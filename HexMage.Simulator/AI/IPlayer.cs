@@ -1,4 +1,6 @@
-﻿namespace HexMage.Simulator
+﻿using HexMage.Simulator.Model;
+
+namespace HexMage.Simulator
 {
     public interface IPlayer
     {

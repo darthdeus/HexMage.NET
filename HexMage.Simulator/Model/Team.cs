@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator
 {
@@ -11,15 +13,19 @@ namespace HexMage.Simulator
     }
     public class Team
     {
-        public int Id { get; set; }
+        private readonly MobManager _mobManager;
         public TeamColor Color { get; private set; }
-        public List<Mob> Mobs { get; set; } = new List<Mob>();
-        public IPlayer Player { get; set; }
+        public IEnumerable<Mob> Mobs => _mobManager.Mobs.Where(mob => mob.Team == this);
         public IMobController Controller { get; set; }
 
-        public Team(TeamColor color, IMobController controller) {
+        public Team(TeamColor color, IMobController controller, MobManager mobManager) {
+            _mobManager = mobManager;
             Color = color;
             Controller = controller;
+        }
+
+        public Team DeepCopy(MobManager mobManagerCopy) {
+            return new Team(Color, Controller, mobManagerCopy);
         }
     }
 

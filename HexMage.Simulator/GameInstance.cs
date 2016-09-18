@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
-    public class GameInstance {
+    public class GameInstance : IDeepCopyable<GameInstance> {
         public Map Map { get; set; }
         public MobManager MobManager { get; set; }
         public Pathfinder Pathfinder { get; set; }
         public TurnManager TurnManager { get; set; }
         public int Size { get; set; }
-        public Mob SelectedMob { get; set; }
 
         public GameInstance(int size) : this(size, new Map(size)) {}
 
@@ -23,10 +23,19 @@ namespace HexMage.Simulator {
             TurnManager = new TurnManager(MobManager, Map);
         }
 
+        public GameInstance(int size, Map map, MobManager mobManager, Pathfinder pathfinder, TurnManager turnManager) {
+            Size = size;
+            MobManager = mobManager;
+            Map = map;
+            Pathfinder = pathfinder;
+            TurnManager = turnManager;
+        }
+
+
         public bool IsFinished() {
             // TODO - why is this still here?
 #if DEBUG
-            Debug.Assert(MobManager.Teams.All(team => team.Mobs.Count > 0));
+            Debug.Assert(MobManager.Teams.All(team => team.Mobs.Any()));
 #endif
             return MobManager.Teams.Any(team => team.Mobs.All(mob => mob.Hp == 0));
         }
@@ -74,6 +83,13 @@ namespace HexMage.Simulator {
 
         public IList<Mob> Enemies(Mob mob) {
             return MobManager.Mobs.Where(enemy => !enemy.Team.Equals(mob.Team)).ToList();
+        }
+
+        public GameInstance DeepCopy() {
+            var mapCopy = Map.DeepCopy();
+            var mobManagerCopy = MobManager.DeepCopy();
+            return new GameInstance(Size, mapCopy, mobManagerCopy, new Pathfinder(mapCopy, mobManagerCopy),
+                                    new TurnManager(mobManagerCopy, mapCopy));
         }
     }
 }

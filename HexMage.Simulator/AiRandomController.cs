@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using HexMage.Simulator;
+using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public class AiRandomController : IMobController, IGameEventSubscriber {

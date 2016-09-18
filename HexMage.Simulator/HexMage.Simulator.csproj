@@ -43,9 +43,12 @@
     <Compile Include="AiRandomController.cs" />
     <Compile Include="AI\IPlayer.cs" />
     <Compile Include="GameEventHub.cs" />
+    <Compile Include="IDeepCopyable.cs" />
     <Compile Include="IGameEventSubscriber.cs" />
     <Compile Include="Model\AreaBuff.cs" />
+    <Compile Include="Model\Buff.cs" />
     <Compile Include="Model\IMobController.cs" />
+    <Compile Include="Model\ReplayRecorder.cs" />
     <Compile Include="Pathfinding\Map.cs" />
     <Compile Include="Model\UsableAbility.cs" />
     <Compile Include="Utils.cs" />

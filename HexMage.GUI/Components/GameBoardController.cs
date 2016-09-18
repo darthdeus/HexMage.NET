@@ -7,6 +7,7 @@ using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
+using HexMage.Simulator.Model;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Color = Microsoft.Xna.Framework.Color;
@@ -367,7 +368,6 @@ namespace HexMage.GUI.Components {
                 };
 
                 _messageBoxLabel = _messageBox.AddChild(new Label("Message Box", _assetManager.Font));
-
                 Entity.Scene.AddAndInitializeRootEntity(_messageBox, _assetManager);
             }
 
@@ -379,7 +379,6 @@ namespace HexMage.GUI.Components {
                 };
 
                 _emptyHexLabel = _emptyHexPopover.AddChild(new Label("Just an empty hex", _assetManager.Font));
-
                 Entity.Scene.AddAndInitializeRootEntity(_emptyHexPopover, _assetManager);
             }
 
@@ -391,7 +390,6 @@ namespace HexMage.GUI.Components {
                 };
 
                 _mobHealthLabel = _mobPopover.AddChild(new Label("Mob health", _assetManager.Font));
-
                 Entity.Scene.AddAndInitializeRootEntity(_mobPopover, _assetManager);
             }
 
@@ -399,11 +397,11 @@ namespace HexMage.GUI.Components {
                 _usedAbilityPopover = new VerticalLayout {
                     Renderer = new ColorRenderer(Color.LightGray),
                     Padding = _popoverPadding,
-                    SortOrder = Camera2D.SortUI
+                    SortOrder = Camera2D.SortUI,
+                    Hidden = true
                 };
 
                 _usedAbilityLabel = _usedAbilityPopover.AddChild(new Label("Used ability popover", _assetManager.Font));
-
                 Entity.Scene.AddAndInitializeRootEntity(_usedAbilityPopover, _assetManager);
             }
         }
