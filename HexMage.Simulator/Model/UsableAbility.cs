@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
-using HexMage.Simulator.Model;
 
-namespace HexMage.Simulator {
+namespace HexMage.Simulator.Model {
     public class UsableAbility {
         public readonly int Index;
         public readonly Ability Ability;
@@ -22,22 +20,26 @@ namespace HexMage.Simulator {
         public async Task<DefenseDesire> Use(Map map) {
             Debug.Assert(Ability.CurrentCooldown == 0, "Trying to use an ability with non-zero cooldown.");
 
+            DefenseDesire result;
+
             Ability.CurrentCooldown = Ability.Cooldown;
             if (_target.Ap >= _target.DefenseCost) {
                 var res = await _target.Team.Controller.RequestDesireToDefend(_target, Ability);
 
                 if (res == DefenseDesire.Block) {
                     _target.Ap -= _target.DefenseCost;
-                    return DefenseDesire.Block;
+                    result = DefenseDesire.Block;
                 } else {
                     TargetHit(map);
 
-                    return DefenseDesire.Pass;
+                    result = DefenseDesire.Pass;
                 }
             } else {
                 TargetHit(map);
-                return DefenseDesire.Pass;
+                result = DefenseDesire.Pass;
             }
+
+            return result;
         }
 
         private void TargetHit(Map map) {
@@ -57,14 +59,14 @@ namespace HexMage.Simulator {
             _target.Buffs.Add(Ability.ElementalEffect);
             foreach (var abilityBuff in Ability.Buffs) {
                 // TODO - handle lifetimes
-                _target.Buffs.Add(abilityBuff.Clone());
+                _target.Buffs.Add(abilityBuff.DeepCopy());
             }
 
             foreach (var areaBuff in Ability.AreaBuffs) {
                 var affectedArea = map.AllCoords.Where(x => map.CubeDistance(x, _target.Coord) <= areaBuff.Radius);
                 Utils.Log(LogSeverity.Debug, nameof(UsableAbility), $"Applying buffs at {map.Guid}");
                 foreach (var coord in affectedArea) {
-                    map.BuffsAt(coord).Add(areaBuff.Effect.Clone());
+                    map.BuffsAt(coord).Add(areaBuff.Effect.DeepCopy());
                 }
             }
 

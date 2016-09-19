@@ -26,12 +26,6 @@ namespace HexMage.Simulator.Model {
             DisabledElements = disabledElements;
         }
 
-        // TODO - maybe replace with struct instead?
-        [Obsolete]
-        public Buff Clone() {
-            return (Buff) MemberwiseClone();
-        }
-
         public Buff DeepCopy() {
             var disabledElementsCopy = new List<AbilityElement>();
 

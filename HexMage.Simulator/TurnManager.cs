@@ -14,8 +14,6 @@ namespace HexMage.Simulator {
         public List<Mob> TurnOrder { get; set; } = new List<Mob>();
         public Mob CurrentMob => TurnOrder[_current];
         public IMobController CurrentController => CurrentMob.Team.Controller;
-        //public Mob CurrentTarget { get; set; }
-        //public int? SelectedAbilityIndex { get; set; }
 
         private int _current = 0;
 
@@ -27,11 +25,9 @@ namespace HexMage.Simulator {
         public void StartNextTurn(Pathfinder pathfinder) {
             TurnOrder.Clear();
 
-            foreach (var mob in MobManager.Mobs) {
+            foreach (var mob in MobManager.AliveMobs) {
                 mob.Ap = mob.MaxAp;
-                if (mob.Hp > 0) {
-                    TurnOrder.Add(mob);
-                }
+                TurnOrder.Add(mob);
             }
 
             MobManager.ApplyDots(_map);

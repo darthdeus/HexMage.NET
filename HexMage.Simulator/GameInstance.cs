@@ -74,7 +74,7 @@ namespace HexMage.Simulator {
             int maxRange = usableAbilities.Max(ability => ability.Range);
 
             return MobManager
-                .Mobs
+                .AliveMobs
                 .Where(m => m != mob
                             && Pathfinder.Distance(m.Coord) <= maxRange
                             && m.Team != mob.Team)

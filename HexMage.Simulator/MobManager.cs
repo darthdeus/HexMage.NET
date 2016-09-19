@@ -9,6 +9,7 @@ namespace HexMage.Simulator {
         // TODO - combine this into the property
         private readonly List<Mob> _mobs = new List<Mob>();
         public IEnumerable<Mob> Mobs => _mobs;
+        public IEnumerable<Mob> AliveMobs => Mobs.Where(m => m.Hp > 0);
         // TODO - this shound't be public as a List<T>
         public List<Team> Teams { get; set; } = new List<Team>();
 
