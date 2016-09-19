@@ -95,38 +95,53 @@ namespace HexMage.GUI.Scenes {
             _gameEventHub.AddSubscriber(gameBoardController);
             _gameEventHub.AddSubscriber(_replayRecorder);
 
-            var uiEntity = BuildUi();
-            uiEntity.SortOrder = Camera2D.SortBackground + 1;
+            BuildUi();
         }
-
 
         // TODO - sort out where else cleanup needs to be called
         public override void Cleanup() {}
 
-        private Entity BuildUi() {
-            var layout = new HorizontalLayout {
-                Spacing = 40,
-                Position = new Vector2(0, 850),
-                SortOrder = Camera2D.SortUI,
+        private void BuildUi() {
+            const int abilitySpacing = 40;
+            var currentLayout = new VerticalLayout {
+                Spacing = abilitySpacing,
+                Position = new Vector2(0, 0),
+                SortOrder = Camera2D.SortUI + 1
             };
 
-            AddRootEntity(layout);
+            AddAndInitializeRootEntity(currentLayout, _assetManager);
+
+            var hoverLayout = new VerticalLayout {
+                Spacing = abilitySpacing,
+                Position = new Vector2(1140, 0),
+                SortOrder = Camera2D.SortUI + 1
+            };
+            AddAndInitializeRootEntity(hoverLayout, _assetManager);
+
+            Func<Mob> currentMobFunc = () => _gameInstance.TurnManager.CurrentMob;
+            Func<Mob> hoverMobFunc = () => {
+                var mouseHex = Camera2D.Instance.MouseHex;
+                if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
+                    return _gameInstance.MobManager.AtCoord(mouseHex);
+                } else {
+                    return null;
+                }
+            };
 
             for (int i = 0; i < Mob.NumberOfAbilities; i++) {
-                layout.AddChild(AbilityDetail(_gameInstance.TurnManager, i));
+                currentLayout.AddChild(AbilityDetail(currentMobFunc, i));
+                hoverLayout.AddChild(AbilityDetail(hoverMobFunc, i));
             }
-
-            return layout;
         }
 
-        private Entity AbilityDetail(TurnManager turnManager, int abilityIndex) {
+        private Entity AbilityDetail(Func<Mob> mobFunc, int abilityIndex) {
             var abilityDetailWrapper = new Entity {
                 SizeFunc = () => new Vector2(120, 80)
             };
 
-            var abilityDetail = new VerticalLayout() {
+            var abilityDetail = new VerticalLayout {
                 Padding = new Vector4(10, 10, 10, 10),
-                Renderer = new SpellRenderer(_gameInstance, _gameBoardController, turnManager, abilityIndex),
+                Renderer = new SpellRenderer(_gameInstance, _gameBoardController, mobFunc, abilityIndex),
                 CustomBatch = true
             };
 
@@ -173,7 +188,7 @@ namespace HexMage.GUI.Scenes {
             particles.ColorFunc = () => {
                 if (_gameBoardController.SelectedAbilityIndex.HasValue) {
                     int index = _gameBoardController.SelectedAbilityIndex.Value;
-                    switch (turnManager.CurrentMob.Abilities[index].Element) {
+                    switch (mobFunc().Abilities[index].Element) {
                         case AbilityElement.Earth:
                             return Color.Orange;
                         case AbilityElement.Fire:
@@ -195,7 +210,7 @@ namespace HexMage.GUI.Scenes {
 
             abilityDetailWrapper.AddChild(particles);
 
-            var abilityUpdater = new AbilityUpdater(turnManager,
+            var abilityUpdater = new AbilityUpdater(mobFunc,
                                                     abilityIndex,
                                                     dmgLabel,
                                                     rangeLabel,

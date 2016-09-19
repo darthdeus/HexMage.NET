@@ -3,19 +3,20 @@ using System.Diagnostics;
 using HexMage.GUI.Components;
 using HexMage.GUI.Core;
 using HexMage.Simulator;
+using HexMage.Simulator.Model;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI.Renderers {
     public class SpellRenderer : IRenderer {
         private readonly GameInstance _gameInstance;
         private readonly GameBoardController _gameBoardController;
-        private readonly TurnManager _turnManager;
+        private readonly Func<Mob> _mobFunc;
         private readonly int _abilityIndex;
 
-        public SpellRenderer(GameInstance gameInstance, GameBoardController gameBoardController, TurnManager turnManager, int abilityIndex) {
+        public SpellRenderer(GameInstance gameInstance, GameBoardController gameBoardController, Func<Mob> mobFunc , int abilityIndex) {
             _gameInstance = gameInstance;
             _gameBoardController = gameBoardController;
-            _turnManager = turnManager;
+            _mobFunc = mobFunc;
             _abilityIndex = abilityIndex;
         }
 
@@ -27,7 +28,7 @@ namespace HexMage.GUI.Renderers {
             //effect.Parameters["Time"].SetValue(time);
             batch.Begin(effect: effect);
 
-            var mob = _turnManager.CurrentMob;
+            var mob = _mobFunc();
             if (mob != null) {
                 var ability = mob.Abilities[_abilityIndex];
 

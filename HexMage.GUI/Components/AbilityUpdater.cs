@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.Components {
     public class AbilityUpdater : Component {
-        private readonly TurnManager _turnManager;
+        private readonly Func<Mob> _mobFunc;
         private readonly int _abilityIndex;
         private readonly Label _dmgLabel;
         private readonly Label _rangeLabel;
@@ -19,9 +19,9 @@ namespace HexMage.GUI.Components {
 
         public event Action<int> OnClick;
 
-        public AbilityUpdater(TurnManager turnManager, int abilityIndex, Label dmgLabel, Label rangeLabel,
+        public AbilityUpdater(Func<Mob> mobFunc, int abilityIndex, Label dmgLabel, Label rangeLabel,
                               Label elementLabel, Label cooldownLabel, Label buffsLabel) {
-            _turnManager = turnManager;
+            _mobFunc = mobFunc;
             _abilityIndex = abilityIndex;
             _dmgLabel = dmgLabel;
             _rangeLabel = rangeLabel;
@@ -31,7 +31,7 @@ namespace HexMage.GUI.Components {
         }
 
         public override void Update(GameTime time) {
-            var mob = _turnManager.CurrentMob;
+            var mob = _mobFunc();
             if (mob != null) {
                 Debug.Assert(mob.Abilities.Count == Mob.AbilityCount);
                 Debug.Assert(_abilityIndex < mob.Abilities.Count);

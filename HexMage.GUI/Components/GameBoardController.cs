@@ -54,9 +54,9 @@ namespace HexMage.GUI.Components {
             var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
 
             var projectileAnimation = new Animation(projectileSprite,
-                TimeSpan.FromMilliseconds(50),
-                AssetManager.TileSize,
-                4);
+                                                    TimeSpan.FromMilliseconds(50),
+                                                    AssetManager.TileSize,
+                                                    4);
 
             projectileAnimation.Origin = new Vector2(16, 16);
 
@@ -129,18 +129,18 @@ namespace HexMage.GUI.Components {
 
 #warning TODO - run async and check thread
             _eventHub.MainLoop()
-                .ContinueWith(t => {
-                        Utils.Log(LogSeverity.Warning, nameof(GameBoardController),
-                            $"Faulted: {t.IsFaulted}, Complete: {t.IsCompleted}");
+                     .ContinueWith(t => {
+                                       Utils.Log(LogSeverity.Warning, nameof(GameBoardController),
+                                                 $"Faulted: {t.IsFaulted}, Complete: {t.IsCompleted}");
 
-                        if (t.IsFaulted) Console.WriteLine(t.Exception);
-                        if (!t.IsCompleted) {
-                            t.Wait();
-                            Utils.Log(LogSeverity.Warning, nameof(GameBoardController),
-                                $"!!! MainLoop finished !!! Faulted: {t.IsFaulted}");
-                        }
-                    },
-                    TaskContinuationOptions.LongRunning);
+                                       if (t.IsFaulted) Console.WriteLine(t.Exception);
+                                       if (!t.IsCompleted) {
+                                           t.Wait();
+                                           Utils.Log(LogSeverity.Warning, nameof(GameBoardController),
+                                                     $"!!! MainLoop finished !!! Faulted: {t.IsFaulted}");
+                                       }
+                                   },
+                                   TaskContinuationOptions.LongRunning);
         }
 
         private void CreateMobEntities(AssetManager assetManager) {
@@ -225,7 +225,7 @@ namespace HexMage.GUI.Components {
                 target);
 
             Debug.Assert(SelectedAbilityIndex != null,
-                "_gameInstance.TurnManager.SelectedAbilityIndex != null");
+                         "_gameInstance.TurnManager.SelectedAbilityIndex != null");
 
             var abilityIndex = SelectedAbilityIndex.Value;
             var ability = _gameInstance.TurnManager.CurrentMob.Abilities[abilityIndex];
@@ -233,7 +233,7 @@ namespace HexMage.GUI.Components {
             var usableAbility = usableAbilities.FirstOrDefault(ua => ua.Ability == ability);
             if (usableAbility != null)
                 _eventHub.BroadcastAbilityUsed(_gameInstance.TurnManager.CurrentMob, target, usableAbility)
-                    .LogContinuation();
+                         .LogContinuation();
             else ShowMessage("You can't use the selected ability on that target.");
         }
 
@@ -254,10 +254,19 @@ namespace HexMage.GUI.Components {
                     if (mob == currentMob) {
                         ShowMessage("You can't target yourself.");
                     } else {
-                        if (mob.Team.Color == currentMob.Team.Color) ShowMessage("You can't target your team.");
-                        else if (SelectedAbilityIndex.HasValue)
-                            if (abilitySelected) AttackMob(mob);
-                            else ShowMessage("You can't move here.");
+                        if (mob.Hp == 0) {
+                            ShowMessage("This mob is already dead.");
+                        } else {
+                            if (mob.Team.Color == currentMob.Team.Color) {
+                                ShowMessage("You can't target your team.");
+                            } else if (SelectedAbilityIndex.HasValue) {
+                                if (abilitySelected) {
+                                    AttackMob(mob);
+                                } else {
+                                    ShowMessage("You can't move here.");
+                                }
+                            }
+                        }
                     }
                 } else {
                     if (abilitySelected) {
@@ -266,12 +275,14 @@ namespace HexMage.GUI.Components {
                         if (_gameInstance.Map[mouseHex] == HexType.Empty) {
                             var distance = currentMob.Coord.ModifiedDistance(currentMob, mouseHex);
 
-                            if (distance > currentMob.Ap) ShowMessage("You don't have enough AP.");
-                            else
+                            if (distance > currentMob.Ap) {
+                                ShowMessage("You don't have enough AP.");
+                            } else {
                                 _eventHub.BroadcastMobMoved(currentMob, mouseHex)
-                                    .ContinueWith((t, o) => t.LogContinuation(),
-                                        TaskContinuationOptions.LongRunning,
-                                        TaskScheduler.Default);
+                                         .ContinueWith((t, o) => t.LogContinuation(),
+                                                       TaskContinuationOptions.LongRunning,
+                                                       TaskScheduler.Default);
+                            }
                         } else {
                             ShowMessage("You can't walk into a wall.");
                         }
@@ -319,7 +330,7 @@ namespace HexMage.GUI.Components {
 
                     var buffs = map.BuffsAt(mouseHex);
                     Debug.Assert(buffs != null,
-                        "Buffs can't be null since we're only using valid map coords (and those are all initialized).");
+                                 "Buffs can't be null since we're only using valid map coords (and those are all initialized).");
 
                     foreach (var buff in buffs)
                         labelText.AppendLine($"{buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");

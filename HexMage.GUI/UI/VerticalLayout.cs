@@ -5,6 +5,8 @@ using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.UI {
     public class VerticalLayout : Entity {
+        public int Spacing = 0;
+
         protected override void Layout() {
             float offset = 0;
             float maxWidth = 0;
@@ -14,7 +16,7 @@ namespace HexMage.GUI.UI {
                     PaddingOffset.Y);
 
                 element.Position = new Vector2(0, offset) + off;
-                offset += element.LayoutSize.Y;
+                offset += element.LayoutSize.Y + Spacing;
                 maxWidth = Math.Max(maxWidth, element.LayoutSize.X);
             }
 
