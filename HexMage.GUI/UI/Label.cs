@@ -25,6 +25,7 @@ namespace HexMage.GUI.UI {
         public Label(Func<string> textFunc, SpriteFont font) {
             Font = font;
             Renderer = this;
+#warning TODO - replace with lambda component
             AddComponent(new TextSetter(this, textFunc));
         }
 
@@ -34,6 +35,7 @@ namespace HexMage.GUI.UI {
 
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
             if (DebugMode) {
+#warning TODO - replace with loggin
                 Console.WriteLine($"RENDER: {this} at {RenderPosition} with size {LayoutSize}");
             }
             batch.DrawString(Font, Text, RenderPosition, TextColor);

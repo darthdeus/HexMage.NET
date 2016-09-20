@@ -7,6 +7,35 @@ using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Renderers {
+    public class MapPreviewRenderer : IRenderer {
+        private Func<Map> _mapFunc;
+        private readonly float _scale;
+        private Camera2D _camera;
+
+        public MapPreviewRenderer(Func<Map> mapFunc, float scale) {
+            _mapFunc = mapFunc;
+            _scale = scale;
+            _camera = Camera2D.Instance;
+        }
+
+        public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
+            var hexEmpty = assetManager[AssetManager.HexEmptySprite];
+            var hexWall = assetManager[AssetManager.HexWallSprite];
+
+            var map = _mapFunc();
+
+            foreach (var coord in map.AllCoords) {
+                var pixelCoord = _camera.HexToPixel(coord, _scale) + entity.RenderPosition;
+
+                if (map[coord] == HexType.Empty) {
+                    batch.Draw(hexEmpty, pixelCoord, scale: new Vector2(_scale));
+                } else {
+                    batch.Draw(hexWall, pixelCoord, scale: new Vector2(_scale));
+                }
+            }
+        }
+    }
+
     public class GameBoardRenderer : IRenderer {
         private readonly GameInstance _gameInstance;
         private readonly GameBoardController _gameBoardController;
@@ -41,28 +70,12 @@ namespace HexMage.GUI.Renderers {
         private void DrawBackground() {
             _spriteBatch.Begin(transformMatrix: _camera.Transform);
 
-            int maxX = Int32.MinValue;
-            int maxY = Int32.MinValue;
-            int maxZ = Int32.MinValue;
-
-            int minX = Int32.MaxValue;
-            int minY = Int32.MaxValue;
-            int minZ = Int32.MaxValue;
-
             var hexGreen = _assetManager[AssetManager.HexEmptySprite];
             var hexWall = _assetManager[AssetManager.HexWallSprite];
 
             var map = _gameInstance.Map;
 
             foreach (var coord in map.AllCoords) {
-                maxX = Math.Max(maxX, coord.ToCube().X);
-                maxY = Math.Max(maxY, coord.ToCube().Y);
-                maxZ = Math.Max(maxZ, coord.ToCube().Z);
-
-                minX = Math.Min(minX, coord.ToCube().X);
-                minY = Math.Min(minY, coord.ToCube().Y);
-                minZ = Math.Min(minZ, coord.ToCube().Z);
-
                 if (_gameInstance.Map[coord] == HexType.Empty) {
                     DrawAt(hexGreen, coord);
                 } else {

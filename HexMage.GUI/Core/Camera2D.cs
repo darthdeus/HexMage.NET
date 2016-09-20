@@ -78,11 +78,15 @@ namespace HexMage.GUI {
         public Matrix TransformWithoutScale => Matrix.CreateTranslation(Translate);
 
         public Vector2 HexToPixel(AxialCoord coord) {
+            return HexToPixel(coord, 1.0f);
+        }
+
+        public Vector2 HexToPixel(AxialCoord coord, float scale) {
             int row = coord.Y;
             int col = coord.X;
 
-            var x = (int) (Config.GridSize*(col + row/2.0));
-            var y = (int) (row*Config.HeightOffset);
+            var x = (int) (Config.GridSize*scale*(col + row/2.0));
+            var y = (int) (row*Config.HeightOffset*scale);
 
             return new Vector2(x, y);
         }

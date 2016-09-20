@@ -17,6 +17,8 @@ namespace HexMage.GUI.Core {
         public bool Hidden { get; set; } = false;
 
         public bool DebugMode { get; set; } = false;
+        // Arbitrary metadata that can be stored with an entity
+        public object Metadata { get; set; }
 
         internal bool _sortOrderSet;
         private int _sortOrder;
@@ -140,7 +142,7 @@ namespace HexMage.GUI.Core {
             Renderer?.Render(this, batch, assetManager);
             if (!CustomBatch) batch.End();
 
-            foreach (var entity in ActiveChildren) {
+            foreach (var entity in ActiveChildren.Where(x => !x.Hidden)) {
                 entity.Render(batch, assetManager);
             }
         }

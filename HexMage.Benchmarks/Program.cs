@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using HexMage.Simulator;
+using HexMage.Simulator.PCG;
 
 namespace HexMage.Benchmarks {
     internal class Program {

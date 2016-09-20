@@ -67,7 +67,6 @@
     <Compile Include="Core\FrameCounter.cs" />
     <Compile Include="Core\GameManager.cs" />
     <Compile Include="HexMageGame.cs" />
-    <Compile Include="ImGui.cs" />
     <Compile Include="InputManager.cs" />
     <Compile Include="Components\ParticleSystem.cs" />
     <Compile Include="Renderers\ParticleSystemRenderer.cs" />

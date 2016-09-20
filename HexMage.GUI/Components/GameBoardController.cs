@@ -75,10 +75,6 @@ namespace HexMage.GUI.Components {
 
             await projectile.Task;
 
-            //projectile.TargetHit += async () => {
-            //    await ability.Use(_gameInstance.Map);
-            //    _gameInstance.TurnManager.UnselectAbility();
-
             var explosion = new Entity {
                 Transform = () => Camera2D.Instance.Transform,
                 SortOrder = Camera2D.SortProjectiles

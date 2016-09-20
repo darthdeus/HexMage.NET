@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace HexMage.GUI.UI {
     public class TextButton : Entity, IRenderer {
-        public string Text { get; set; }
+        public string Text { get; set; } = "";
         public SpriteFont Font { get; set; }
         public ElementMouseState MouseState;
 
@@ -18,6 +18,12 @@ namespace HexMage.GUI.UI {
             Text = text;
             Font = font;
             Renderer = this;
+        }
+
+        public TextButton(Func<string> textFunc, SpriteFont font) {
+            Font = font;
+            Renderer = this;
+            AddComponent(_ => Text = textFunc() ?? "");
         }
 
         protected override void Layout() {

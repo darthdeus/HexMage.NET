@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using HexMage.Simulator.PCG;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HexMage.Simulator.Tests

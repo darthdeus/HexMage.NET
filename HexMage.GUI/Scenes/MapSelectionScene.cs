@@ -1,70 +1,119 @@
 ﻿using System;
+using System.Collections.Generic;
+using HexMage.GUI.Components;
+using HexMage.GUI.Core;
+using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
+using HexMage.Simulator.PCG;
 using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.Scenes {
     public class MapSelectionScene : GameScene {
-        public MapSelectionScene(GameManager gameManager) : base(gameManager) {}
+        private const int DefaultMapSize = 7;
+        private const int MinSize = 4;
+        private const int MaxSize = 12;
+        private int? _selectedSize;
+
+        private MapGenerator _mapGenerator = new MapGenerator();
+        private MapSeed _currentSeed = MapSeed.CreateRandom();
+
+        private Map _currentMap;
+        private VerticalLayout _seedHistory;
+
+        public MapSelectionScene(GameManager gameManager) : base(gameManager) {
+            _currentMap = _mapGenerator.Generate(DefaultMapSize, _currentSeed);
+        }
 
         public override void Initialize() {
             var rootElement = CreateRootEntity(Camera2D.SortUI);
             rootElement.Position = new Vector2(50, 50);
 
-            var leftColumn = rootElement.CreateChild();
+            var leftColumn = rootElement.AddChild(new VerticalLayout {Spacing = 5});
             var middleColumn = rootElement.CreateChild();
-            var rightColumn = new VerticalLayout();
-
-            rootElement.AddChild(rightColumn);
 
             leftColumn.Position = new Vector2(40, 40);
+
+            var seedLabel = new Label("Map seed:", _assetManager.Font);
+            seedLabel.AddComponent(_ => seedLabel.Text = $"Map seed: {_currentSeed.ToString()}");
+            leftColumn.AddChild(seedLabel);
+
+            var btnGenerateMap = new TextButton("Generate new map", _assetManager.Font);
+            btnGenerateMap.OnClick += BtnGenerateMapOnOnClick;
+            leftColumn.AddChild(btnGenerateMap);
+
             leftColumn.AddChild(new Label("Seed history:", _assetManager.Font));
 
-            middleColumn.Position = new Vector2(400, 40);
-            var btnStartGame = new TextButton("Start game", _assetManager.Font);
-            btnStartGame.OnClick += _ => {
-                var mapGenerator = new MapGenerator();
-                var map = mapGenerator.Generate(5, MapSeed.CreateRandom());
-                LoadNewScene(new ArenaScene(_gameManager, map));
+            _seedHistory = new VerticalLayout {
+                Spacing = 3
             };
+            leftColumn.AddChild(_seedHistory);
+
+            middleColumn.Position = new Vector2(400, 40);
+            var btnStartGame = new TextButton("Start game using current map", _assetManager.Font);
+            btnStartGame.OnClick += _ => { LoadNewScene(new ArenaScene(_gameManager, _currentMap.DeepCopy())); };
             middleColumn.AddChild(btnStartGame);
 
-            rightColumn.Position = new Vector2(800, 40);
-            rightColumn.AddChild(new Label("Map seed:", _assetManager.Font));
-            var btnGenerateMap = new TextButton("Generate map", _assetManager.Font);
-            btnGenerateMap.OnClick += _ => {
-                Console.WriteLine("New map generated");
+            var sizeSlider = new Slider(MinSize, MaxSize, new Point(100, 20));
+            sizeSlider.OnChange += size => {
+                _selectedSize = size;
+                GenerateMap();
             };
 
-            rightColumn.AddChild(btnGenerateMap);
-
-            var btn1 = new TextButton("click!", _assetManager.Font);
-            btn1.OnClick += _ => Console.WriteLine("click");
-
-            var lbl1 = new Label("label1", _assetManager.Font);
-            var lbl2 = new Label("label2", _assetManager.Font);
-            var btn2 = new TextButton("me!", _assetManager.Font);
-
-            var slider = new Slider(0, 100, new Point(100, 20));
-            slider.Position = new Vector2(300, 300);
+            var sizeSliderLayout = new VerticalLayout {
+                Spacing = 5,
+                Position = new Vector2(300, 0)
+            };
             
-            var label = new Label(() => $"Value: {slider.Value}", _assetManager.Font);
-            label.Position = new Vector2(300, 280);
+            sizeSliderLayout.AddChild(new Label("Change map size:", _assetManager.Font));
+            sizeSliderLayout.AddChild(sizeSlider);
 
-            rootElement.AddChild(slider);
-            rootElement.AddChild(label);
+            middleColumn.AddChild(sizeSliderLayout);
+
+            var mapPreview = new Entity {
+                Renderer = new MapPreviewRenderer(() => _currentMap, 0.55f)
+            };
+
+            Action positionUpdater =
+                () => mapPreview.Position = new Vector2(30 + 10*(_selectedSize ?? MinSize), 120 + 30*(_selectedSize ?? MinSize));
+
+            positionUpdater();
+
+            mapPreview.AddComponent(_ => positionUpdater());
+
+            middleColumn.AddChild(mapPreview);
 
             var menuBar = new HorizontalLayout();
 
-            var vertical = new VerticalLayout();
-            vertical.AddChild(lbl1);
-            vertical.AddChild(lbl2);
-
-            menuBar.AddChild(btn1);
-            menuBar.AddChild(vertical);
-            menuBar.AddChild(btn2);
 
             rootElement.AddChild(menuBar);
+        }
+
+        private void BtnGenerateMapOnOnClick(TextButton btn) {
+            var item = new HorizontalLayout {
+                Spacing = 3,
+                Metadata = _currentSeed
+            };
+
+            var selectButton = new TextButton(_currentSeed.ToString(), _assetManager.Font);
+            selectButton.OnClick += e => {
+                _currentSeed = (MapSeed) item.Metadata;
+                GenerateMap();
+            };
+
+            var removeButton = new TextButton("x", _assetManager.Font);
+            removeButton.OnClick += e => _seedHistory.RemoveEntity(item);
+
+            item.AddChild(selectButton);
+            item.AddChild(removeButton);
+
+            _seedHistory.AddChild(item);
+            _currentSeed = MapSeed.CreateRandom();
+            GenerateMap();
+        }
+
+        private void GenerateMap() {
+            _currentMap = _mapGenerator.Generate(_selectedSize ?? DefaultMapSize, _currentSeed);
         }
 
         public override void Cleanup() {}

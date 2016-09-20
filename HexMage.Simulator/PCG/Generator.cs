@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HexMage.Simulator.Model;
 
-namespace HexMage.Simulator {
+namespace HexMage.Simulator.PCG {
     public struct MapSeed {
         private readonly Guid _guid;
 
@@ -16,6 +16,10 @@ namespace HexMage.Simulator {
 
         public static MapSeed CreateRandom() {
             return new MapSeed(Guid.NewGuid());
+        }
+
+        public override string ToString() {
+            return _guid.ToString();
         }
     }
 

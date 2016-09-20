@@ -40,7 +40,7 @@ namespace HexMage.GUI.Components {
 
                 var inputManager = InputManager.Instance;
                 var aabb = new Rectangle(Entity.RenderPosition.ToPoint(),
-                    Entity.LayoutSize.ToPoint());
+                                         Entity.LayoutSize.ToPoint());
 
                 if (inputManager.JustLeftClickReleased()) {
                     if (aabb.Contains(inputManager.MousePosition)) {

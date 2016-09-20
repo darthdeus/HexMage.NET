@@ -111,7 +111,10 @@ namespace HexMage.GUI.Scenes {
         }
 
         public void RenderRootEntities() {
-            foreach (var entity in _rootEntities.OrderBy(x => x.SortOrder).Where(x => x.Active && !x.Hidden)) {
+            var renderEntities = _rootEntities.Where(x => x.Active && !x.Hidden)
+                                              .OrderBy(x => x.SortOrder);
+
+            foreach (var entity in renderEntities) {
                 entity.Render(_spriteBatch, _assetManager);
             }
         }
@@ -128,7 +131,8 @@ namespace HexMage.GUI.Scenes {
         public abstract void Cleanup();
 
         public void AddRootEntity(Entity entity) {
-            Debug.Assert(entity._sortOrderSet, "Root entities must have their SortOrder set, as they can't inherit it from their parent.");
+            Debug.Assert(entity._sortOrderSet,
+                         "Root entities must have their SortOrder set, as they can't inherit it from their parent.");
             _rootEntities.Add(entity);
             entity.Scene = this;
         }

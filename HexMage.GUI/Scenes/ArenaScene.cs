@@ -8,6 +8,7 @@ using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
 using HexMage.Simulator.Model;
+using HexMage.Simulator.PCG;
 using Microsoft.Xna.Framework;
 using Color = Microsoft.Xna.Framework.Color;
 
@@ -24,7 +25,7 @@ namespace HexMage.GUI.Scenes {
 
             _replayRecorder = new ReplayRecorder();
 
-            _defenseModal = new VerticalLayout() {
+            _defenseModal = new VerticalLayout {
                 SortOrder = Camera2D.SortUI,
                 Padding = new Vector4(20),
                 Renderer = new ColorRenderer(Color.LightGray),
@@ -58,10 +59,8 @@ namespace HexMage.GUI.Scenes {
             Camera2D.Instance.Translate = new Vector3(600, 500, 0);
 
             _logBox = LogBox.Instance;
-            _logBox.SortOrder = Camera2D.SortUI;
-            _logBox.Log("ArenaScene", "hello");
-            _logBox.Log(LogSeverity.Error, "ArenaScene", "world");
-            _logBox.Log("ArenaScene", "hello!");
+            _logBox.Hidden = true;
+            _logBox.SortOrder = Camera2D.SortUI + 100;
 
             AddAndInitializeRootEntity(_logBox, _assetManager);
 
@@ -98,11 +97,16 @@ namespace HexMage.GUI.Scenes {
             BuildUi();
         }
 
+        private enum ParticleEffectSettings {
+            HighlightParticles,
+            NoParticles
+        }
+
         // TODO - sort out where else cleanup needs to be called
         public override void Cleanup() {}
 
         private void BuildUi() {
-            const int abilitySpacing = 40;
+            const int abilitySpacing = 70;
             var currentLayout = new VerticalLayout {
                 Spacing = abilitySpacing,
                 Position = new Vector2(0, 0),
@@ -113,7 +117,7 @@ namespace HexMage.GUI.Scenes {
 
             var hoverLayout = new VerticalLayout {
                 Spacing = abilitySpacing,
-                Position = new Vector2(1140, 0),
+                Position = new Vector2(1130, 0),
                 SortOrder = Camera2D.SortUI + 1
             };
             AddAndInitializeRootEntity(hoverLayout, _assetManager);
@@ -129,15 +133,18 @@ namespace HexMage.GUI.Scenes {
             };
 
             for (int i = 0; i < Mob.NumberOfAbilities; i++) {
-                currentLayout.AddChild(AbilityDetail(currentMobFunc, i));
-                hoverLayout.AddChild(AbilityDetail(hoverMobFunc, i));
+                currentLayout.AddChild(AbilityDetail(currentMobFunc, i, ParticleEffectSettings.HighlightParticles));
+                hoverLayout.AddChild(AbilityDetail(hoverMobFunc, i, ParticleEffectSettings.NoParticles));
             }
         }
 
-        private Entity AbilityDetail(Func<Mob> mobFunc, int abilityIndex) {
+        private Entity AbilityDetail(Func<Mob> mobFunc, int abilityIndex, ParticleEffectSettings particleEffectSettings) {
             var abilityDetailWrapper = new Entity {
                 SizeFunc = () => new Vector2(120, 80)
             };
+
+            abilityDetailWrapper.Hidden = true;
+            abilityDetailWrapper.AddComponent(_ => { abilityDetailWrapper.Hidden = mobFunc() == null; });
 
             var abilityDetail = new VerticalLayout {
                 Padding = new Vector4(10, 10, 10, 10),
@@ -177,38 +184,30 @@ namespace HexMage.GUI.Scenes {
             const int maximumNumberOfParticles = 200;
             const int particlesPerSecond = 20;
 
-            var particles = new ParticleSystem(maximumNumberOfParticles, particlesPerSecond,
-                                               new Vector2(0, -1), speed,
-                                               _assetManager[AssetManager.ParticleSprite],
-                                               0.01f, offsetFunc, velocityFunc);
+            if (particleEffectSettings == ParticleEffectSettings.HighlightParticles) {
+                var particles = new ParticleSystem(maximumNumberOfParticles, particlesPerSecond,
+                                                   new Vector2(0, -1), speed,
+                                                   _assetManager[AssetManager.ParticleSprite],
+                                                   0.01f, offsetFunc, velocityFunc);
 
-            particles.CustomBatch = true;
-            particles.Position = new Vector2(60, 120);
+                particles.CustomBatch = true;
+                particles.Position = new Vector2(60, 120);
 
-            particles.ColorFunc = () => {
-                if (_gameBoardController.SelectedAbilityIndex.HasValue) {
-                    int index = _gameBoardController.SelectedAbilityIndex.Value;
-                    switch (mobFunc().Abilities[index].Element) {
-                        case AbilityElement.Earth:
-                            return Color.Orange;
-                        case AbilityElement.Fire:
-                            return Color.Red;
-                        case AbilityElement.Air:
-                            return Color.Gray;
-                        case AbilityElement.Water:
-                            return Color.Blue;
-                        default:
-                            return Color.White;
+                particles.ColorFunc = () => {
+                    var mob = mobFunc();
+                    if (_gameBoardController.SelectedAbilityIndex.HasValue && mob != null) {
+                        int index = _gameBoardController.SelectedAbilityIndex.Value;
+                        return ElementColor(mob.Abilities[index].Element);
+                    } else {
+                        return Color.White;
                     }
-                } else {
-                    return Color.White;
-                }
-            };
+                };
 
-            abilityDetail.AddComponent(
-                _ => { particles.Active = _gameBoardController.SelectedAbilityIndex == abilityIndex; });
+                abilityDetail.AddComponent(
+                    _ => { particles.Active = _gameBoardController.SelectedAbilityIndex == abilityIndex; });
 
-            abilityDetailWrapper.AddChild(particles);
+                abilityDetailWrapper.AddChild(particles);
+            }
 
             var abilityUpdater = new AbilityUpdater(mobFunc,
                                                     abilityIndex,
@@ -245,6 +244,21 @@ namespace HexMage.GUI.Scenes {
             _defenseDesireSource = new TaskCompletionSource<DefenseDesire>();
 
             return _defenseDesireSource.Task;
+        }
+
+        private Color ElementColor(AbilityElement element) {
+            switch (element) {
+                case AbilityElement.Earth:
+                    return Color.Orange;
+                case AbilityElement.Fire:
+                    return Color.Red;
+                case AbilityElement.Air:
+                    return Color.Gray;
+                case AbilityElement.Water:
+                    return Color.Blue;
+                default:
+                    throw new ArgumentException("Invalid element", nameof(element));
+            }
         }
     }
 }

@@ -25,7 +25,7 @@ namespace HexMage.GUI.UI {
         private bool _hovering = false;
 
         public event Action<int> OnChange;
-        public int Value => (int) ((_max - _min)*_value);
+        public int Value => _min + (int) ((_max - _min)*_value);
 
         public Slider(int min, int max, Point size) {
             _min = min;
