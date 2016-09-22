@@ -17,6 +17,12 @@ namespace HexMage.Simulator {
         void Log(LogSeverity logLevel, string owner, string message);
     }
 
+    public class StdoutLogger : ILogger {
+        public void Log(LogSeverity logLevel, string owner, string message) {
+            Console.WriteLine($"[{logLevel}][TID#{Thread.CurrentThread.ManagedThreadId}][{owner}] {message}");
+        }
+    }
+
     public class FileLogger : ILogger {
         private string _filename;
 
@@ -66,6 +72,6 @@ namespace HexMage.Simulator {
             } else {
                 Log(LogSeverity.Info, nameof(task), $"Task<T> {task} complete, result: {task.Result}");
             }
-        }        
+        }
     }
 }

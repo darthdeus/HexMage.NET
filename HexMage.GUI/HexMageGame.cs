@@ -40,7 +40,6 @@ namespace HexMage.GUI
             IsMouseVisible = true;
             InputManager.Instance.Initialize(this);
 
-
             base.Initialize();
         }
 
@@ -53,6 +52,7 @@ namespace HexMage.GUI
 
             LogBox.Initialize(_assetManager.Font, 1000, _assetManager);
             Utils.RegisterLogger(LogBox.Instance);
+            Utils.RegisterLogger(new StdoutLogger());
 
             _gameManager = new GameManager(_camera, _inputManager, _assetManager, _spriteBatch);
             //_sceneManager = new SceneManager(new ArenaScene(_gameManager));

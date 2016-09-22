@@ -14,7 +14,12 @@ namespace HexMage.Simulator {
         public List<Team> Teams { get; set; } = new List<Team>();
 
         public bool MoveMob(Mob mob, AxialCoord to) {
-            Debug.Assert(mob.Coord.ModifiedDistance(mob, to) == 1);
+            if (mob.Coord == to) {
+                Utils.Log(LogSeverity.Debug, nameof(MobManager), "MoveMob failed trying to move zero distance.");
+                return false;
+            }
+            Debug.Assert(mob.Coord != to, "Trying to move zero distance.");
+            Debug.Assert(mob.Coord.Distance(to) == 1, "Trying to walk more than 1 hex");
 
             if (mob.Ap > 0) {
                 mob.Coord = to;

@@ -45,6 +45,21 @@ namespace HexMage.Simulator.PCG {
     public static class Generator {
         private static readonly Random _random = new Random();
 
+        public static GameInstance RandomGame(int size, MapSeed seed, int teamSize, Func<GameInstance, IMobController> controllerFunc) {
+            var map = new MapGenerator().Generate(size, seed);
+            var game = new GameInstance(map);
+
+            var t1 = game.MobManager.AddTeam(TeamColor.Red, controllerFunc(game));
+            var t2 = game.MobManager.AddTeam(TeamColor.Blue, controllerFunc(game));
+
+            for (int i = 0; i < teamSize; i++) {
+                game.MobManager.AddMob(RandomMob(t1, size, c => game.MobManager.AtCoord(c) == null));
+                game.MobManager.AddMob(RandomMob(t2, size, c => game.MobManager.AtCoord(c) == null));
+            }
+
+            return game;
+        }
+
         public static Mob RandomMob(Team team, int size) {
             return RandomMob(team, size, _ => true);
         }

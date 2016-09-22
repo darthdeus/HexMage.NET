@@ -15,6 +15,8 @@ namespace HexMage.Simulator {
 
         public async Task<bool> MainLoop() {
             var turnManager = _gameInstance.TurnManager;
+
+            turnManager.StartNextTurn(_gameInstance.Pathfinder);
             
             Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Starting Main Loop");
             while (!_gameInstance.IsFinished()) {

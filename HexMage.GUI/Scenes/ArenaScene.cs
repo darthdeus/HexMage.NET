@@ -21,7 +21,7 @@ namespace HexMage.GUI.Scenes {
         private readonly ReplayRecorder _replayRecorder;
 
         public ArenaScene(GameManager gameManager, Map map) : base(gameManager) {
-            _gameInstance = new GameInstance(map.Size, map);
+            _gameInstance = new GameInstance(map);
 
             _replayRecorder = new ReplayRecorder();
 
@@ -33,10 +33,11 @@ namespace HexMage.GUI.Scenes {
                 Active = false
             };
 
-            var aiController = new AiRandomController(_gameInstance);
+            //var aiController = new AiRandomController(_gameInstance);
 
-            var t1 = _gameInstance.MobManager.AddTeam(TeamColor.Red, new PlayerController(this, _gameInstance));
-            var t2 = _gameInstance.MobManager.AddTeam(TeamColor.Blue, aiController);
+            //var t1 = _gameInstance.MobManager.AddTeam(TeamColor.Red, new PlayerController(this, _gameInstance));
+            var t1 = _gameInstance.MobManager.AddTeam(TeamColor.Red, new AiRandomController(_gameInstance));
+            var t2 = _gameInstance.MobManager.AddTeam(TeamColor.Blue, new AiRandomController(_gameInstance));
 
             _gameEventHub = new GameEventHub(_gameInstance);
 
@@ -52,7 +53,6 @@ namespace HexMage.GUI.Scenes {
                 }
             }
             _gameInstance.TurnManager.StartNextTurn(_gameInstance.Pathfinder);
-            _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
         }
 
         public override void Initialize() {

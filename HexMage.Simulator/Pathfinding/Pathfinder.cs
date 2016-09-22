@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
@@ -44,6 +45,24 @@ namespace HexMage.Simulator {
 
             Debug.Assert(iterations > 0);
             return result;
+        }
+
+        public AxialCoord FurthestPointToTarget(Mob mob, AxialCoord target) {
+            var path = PathTo(target);
+            return FurthestPointOnPath(mob, path);
+        }
+
+        public AxialCoord FurthestPointOnPath(Mob mob, IList<AxialCoord> path) {
+            int currentAp = mob.Ap;
+            for (int i = path.Count - 1; i >= 0; i--) {
+                if (currentAp == 0) {
+                    return path[i];
+                }
+
+                currentAp--;
+            }
+
+            throw new InvalidOperationException("Trying to move on an empty path, which is invalid.");
         }
 
         public void MoveAsFarAsPossible(Mob mob, IList<AxialCoord> path) {

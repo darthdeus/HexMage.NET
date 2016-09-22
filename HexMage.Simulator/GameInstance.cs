@@ -13,10 +13,10 @@ namespace HexMage.Simulator {
         public TurnManager TurnManager { get; set; }
         public int Size { get; set; }
 
-        public GameInstance(int size) : this(size, new Map(size)) {}
+        public GameInstance(int size) : this(new Map(size)) {}
 
-        public GameInstance(int size, Map map) {
-            Size = size;
+        public GameInstance(Map map) {
+            Size = map.Size;
             MobManager = new MobManager();
             Map = map;
             Pathfinder = new Pathfinder(Map, MobManager);

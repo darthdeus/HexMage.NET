@@ -35,14 +35,15 @@ namespace HexMage.Simulator {
                     Utils.Log(LogSeverity.Info, nameof(AiRandomController), "Broadcasting used ability");
                     await eventHub.BroadcastAbilityUsed(mob, target, ua);
                 } else {
-                    var path = pathfinder.PathTo(target.Coord);
-                    pathfinder.MoveAsFarAsPossible(mob, path);
+                    var moveTarget = pathfinder.FurthestPointToTarget(mob, target.Coord);
+                    await eventHub.BroadcastMobMoved(mob, moveTarget);
                 }
             } else {
                 var enemies = _gameInstance.Enemies(mob);
                 if (enemies.Count > 0) {
-                    var path = pathfinder.PathTo(enemies.First().Coord);
-                    pathfinder.MoveAsFarAsPossible(mob, path);
+                    var target = enemies.First();
+                    var moveTarget = pathfinder.FurthestPointToTarget(mob, target.Coord);
+                    await eventHub.BroadcastMobMoved(mob, moveTarget);
                 } else {
                     Utils.Log(LogSeverity.Info, nameof(AiRandomController), "No possible action");
                 }
