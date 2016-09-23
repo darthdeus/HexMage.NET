@@ -30,9 +30,6 @@ namespace HexMage.GUI.Components {
         private Label _mobHealthLabel;
         private VerticalLayout _mobPopover;
         private Vector4 _popoverPadding;
-        private Label _usedAbilityLabel;
-
-        private VerticalLayout _usedAbilityPopover;
 
         public int? SelectedAbilityIndex;
 
@@ -43,13 +40,11 @@ namespace HexMage.GUI.Components {
 
         public async Task<bool> EventAbilityUsed(Mob mob, Mob target, UsableAbility usableAbility) {
             var ability = usableAbility.Ability;
-            // TODO - use the more general logger instead
-            LogBox.Instance.Log(LogSeverity.Info, nameof(GameBoardController), "EventAbilityUsed");
 
-            UpdateUsedAbility(usableAbility.Ability);
+            Utils.Log(LogSeverity.Info, nameof(GameBoardController), "EventAbilityUsed");
 
-            _usedAbilityPopover.Active = true;
-            Entity.Scene.DelayFor(TimeSpan.FromSeconds(5), () => { _usedAbilityPopover.Active = false; });
+            BuildUsedAbilityPopover(mob, usableAbility.Ability)
+                .LogContinuation();
 
             var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
 
@@ -125,18 +120,8 @@ namespace HexMage.GUI.Components {
 
 #warning TODO - run async and check thread
             _eventHub.MainLoop()
-                     .ContinueWith(t => {
-                                       Utils.Log(LogSeverity.Warning, nameof(GameBoardController),
-                                                 $"Faulted: {t.IsFaulted}, Complete: {t.IsCompleted}");
-
-                                       if (t.IsFaulted) Console.WriteLine(t.Exception);
-                                       if (!t.IsCompleted) {
-                                           t.Wait();
-                                           Utils.Log(LogSeverity.Warning, nameof(GameBoardController),
-                                                     $"!!! MainLoop finished !!! Faulted: {t.IsFaulted}");
-                                       }
-                                   },
-                                   TaskContinuationOptions.LongRunning);
+                     .ContinueWith(t => { ShowMessage("Game complete, restarting in 5 seconds."); })
+                     .LogContinuation();
         }
 
         private void CreateMobEntities(AssetManager assetManager) {
@@ -157,9 +142,11 @@ namespace HexMage.GUI.Components {
             }
         }
 
-        public void ShowMessage(string message, int displayForSeconds = 5) {
+        public Task ShowMessage(string message, int displayForSeconds = 5) {
             _messageBoxLabel.Text = message;
             _displayMessageBoxUntil = DateTime.Now.Add(TimeSpan.FromSeconds(displayForSeconds));
+
+            return Task.Delay(TimeSpan.FromSeconds(displayForSeconds));
         }
 
         public override void Update(GameTime time) {
@@ -299,9 +286,6 @@ namespace HexMage.GUI.Components {
             _emptyHexPopover.Active = false;
             _mobPopover.Active = false;
 
-            var mobPixel = camera.HexToPixelWorld(_gameInstance.TurnManager.CurrentMob.Coord);
-            _usedAbilityPopover.Position = _usedAbilityOffset + mobPixel;
-
             if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
                 var mob = _gameInstance.MobManager.AtCoord(mouseHex);
 
@@ -359,8 +343,7 @@ namespace HexMage.GUI.Components {
                 _mobPopover.Active = false;
             }
 
-            if (_displayMessageBoxUntil < DateTime.Now) _messageBox.Active = false;
-            else _messageBox.Active = true;
+            _messageBox.Active = _displayMessageBoxUntil >= DateTime.Now;
         }
 
         private void BuildPopovers() {
@@ -399,27 +382,31 @@ namespace HexMage.GUI.Components {
                 _mobHealthLabel = _mobPopover.AddChild(new Label("Mob health", _assetManager.Font));
                 Entity.Scene.AddAndInitializeRootEntity(_mobPopover, _assetManager);
             }
-
-            {
-                _usedAbilityPopover = new VerticalLayout {
-                    Renderer = new ColorRenderer(Color.LightGray),
-                    Padding = _popoverPadding,
-                    SortOrder = Camera2D.SortUI,
-                    Hidden = true
-                };
-
-                _usedAbilityLabel = _usedAbilityPopover.AddChild(new Label("Used ability popover", _assetManager.Font));
-                Entity.Scene.AddAndInitializeRootEntity(_usedAbilityPopover, _assetManager);
-            }
         }
 
+        private readonly TimeSpan _abilityPopoverDisplayTime = TimeSpan.FromSeconds(5);
 
-        private void UpdateUsedAbility(Ability ability) {
-            var builder = new StringBuilder();
+        private async Task BuildUsedAbilityPopover(Mob mob, Ability ability) {
+            var result = new VerticalLayout {
+                Renderer = new ColorRenderer(Color.LightGray),
+                Padding = _popoverPadding,
+                SortOrder = Camera2D.SortUI + 1000,
+                Hidden = false
+            };
 
-            builder.AppendLine($"{ability.Dmg}DMG cost {ability.Cost}");
+            var camera = Camera2D.Instance;
 
-            _usedAbilityLabel.Text = builder.ToString();
+            result.AddComponent(
+                () => { result.Position = camera.HexToPixelWorld(mob.Coord) + _usedAbilityOffset; });
+
+            string labelText = $"{ability.Dmg}DMG cost {ability.Cost}";
+            result.AddChild(new Label(labelText, _assetManager.Font));
+
+            Entity.Scene.AddAndInitializeRootEntity(result, _assetManager);
+
+            await Task.Delay(_abilityPopoverDisplayTime);
+
+            Entity.Scene.DestroyEntity(result);
         }
     }
 }

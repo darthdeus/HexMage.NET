@@ -3,9 +3,30 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 using HexMage.Simulator;
 
 namespace HexMage.GUI {
+    public static class TaskHelper {
+        public static Task ContinueOnGuiThread(this Task task, Action continuation) {
+            return task.ContinueWith(_ => continuation(), TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        public static Task ContinueOnGuiThread<T>(this Task<T> task, Action continuation) {
+            return task.ContinueWith(_ => continuation(), TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        public static Task ContinueOnGuiThread(this Task task, Action<Task> continuation)
+        {
+            return task.ContinueWith(continuation, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        public static Task ContinueOnGuiThread<T>(this Task<T> task, Action<Task<T>> continuation)
+        {
+            return task.ContinueWith(continuation, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+    }
+
     public class SceneSynchronizationContext : SynchronizationContext {
         ConcurrentQueue<KeyValuePair<SendOrPostCallback, object>> _queue = new ConcurrentQueue<KeyValuePair<SendOrPostCallback, object>>();        
 

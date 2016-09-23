@@ -22,12 +22,15 @@ namespace HexMage.GUI.Core {
 
         internal bool _sortOrderSet;
         private int _sortOrder;
+
         public int SortOrder {
             get { return _sortOrderSet ? _sortOrder : Parent.SortOrder; }
-            set { _sortOrderSet = true;
+            set {
+                _sortOrderSet = true;
                 _sortOrder = value;
             }
         }
+
         // Setting this to true will cause the generic render lifecycle to not start
         // a new batch when rendering this entity, but *only* if the entity is root.
         public bool CustomBatch = false;
@@ -52,7 +55,7 @@ namespace HexMage.GUI.Core {
 
         public Entity Parent { get; set; }
         public List<Entity> Children { get; } = new List<Entity>();
-        public Func<Vector2> SizeFunc { get; set; }        
+        public Func<Vector2> SizeFunc { get; set; }
 
         protected List<Component> Components { get; } = new List<Component>();
 
@@ -71,6 +74,13 @@ namespace HexMage.GUI.Core {
 
         public void AddComponent(Action<GameTime> componentFunc) {
             var component = new LambdaComponent(componentFunc) {
+                Entity = this
+            };
+            Components.Add(component);
+        }
+
+        public void AddComponent(Action componentFunc) {
+            var component = new LambdaComponent(t => componentFunc()) {
                 Entity = this
             };
             Components.Add(component);
@@ -136,7 +146,7 @@ namespace HexMage.GUI.Core {
             RenderPosition = Position
                              + (Parent?.RenderPosition ?? Vector2.Zero);
 
-            RenderTransform = (Parent?.RenderTransform ?? Matrix.Identity) * Transform();
+            RenderTransform = (Parent?.RenderTransform ?? Matrix.Identity)*Transform();
 
             if (!CustomBatch) batch.Begin(transformMatrix: RenderTransform);
             Renderer?.Render(this, batch, assetManager);
@@ -154,7 +164,7 @@ namespace HexMage.GUI.Core {
         }
 
         public void RemoveEntity(Entity childEntity) {
-            Children.Remove(childEntity);            
+            Children.Remove(childEntity);
         }
 
         public void EnqueueClickEvent(Action action) {

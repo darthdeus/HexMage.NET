@@ -51,6 +51,7 @@ namespace HexMage.GUI
                 TextureGenerator.SolidColor(GraphicsDevice, 32, 32, Color.LightGray));
 
             LogBox.Initialize(_assetManager.Font, 1000, _assetManager);
+            Utils.InitializeLoggerMainThread();          
             Utils.RegisterLogger(LogBox.Instance);
             Utils.RegisterLogger(new StdoutLogger());
 
@@ -67,7 +68,6 @@ namespace HexMage.GUI
                 Exit();
             }
             _camera.Update(gameTime);
-
             _sceneManager.Update(gameTime);
 
             base.Update(gameTime);

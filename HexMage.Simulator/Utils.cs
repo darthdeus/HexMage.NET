@@ -19,7 +19,37 @@ namespace HexMage.Simulator {
 
     public class StdoutLogger : ILogger {
         public void Log(LogSeverity logLevel, string owner, string message) {
-            Console.WriteLine($"[{logLevel}][TID#{Thread.CurrentThread.ManagedThreadId}][{owner}] {message}");
+            Console.ForegroundColor = LogLevelColor(logLevel);
+            Console.Write($"[{logLevel}]");
+
+            int currentThread = Thread.CurrentThread.ManagedThreadId;
+            if (Utils.MainThreadId != currentThread) {
+                Console.ForegroundColor = ConsoleColor.Red;
+            } else {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+            }
+
+            Console.Write($"[{Thread.CurrentThread.ManagedThreadId}]");
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.Write($"[{owner}]");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(message);
+        }
+
+
+        private ConsoleColor LogLevelColor(LogSeverity logLevel) {
+            switch (logLevel) {
+                case LogSeverity.Debug:
+                    return ConsoleColor.Blue;
+                case LogSeverity.Info:
+                    return ConsoleColor.Green;
+                case LogSeverity.Warning:
+                    return ConsoleColor.Yellow;
+                case LogSeverity.Error:
+                    return ConsoleColor.Red;
+                default:
+                    throw new InvalidOperationException($"Invalid log level '{logLevel}'");
+            }
         }
     }
 
@@ -47,6 +77,11 @@ namespace HexMage.Simulator {
 
     public static class Utils {
         private static readonly List<ILogger> _loggers = new List<ILogger>();
+        public static int MainThreadId = -1;
+
+        public static void InitializeLoggerMainThread() {
+            MainThreadId = Thread.CurrentThread.ManagedThreadId;
+        }
 
         public static void RegisterLogger(ILogger logger) {
             _loggers.Add(logger);
@@ -58,20 +93,34 @@ namespace HexMage.Simulator {
             }
         }
 
-        public static void LogContinuation(this Task task) {
+        public static void LogTask(this Task task) {
             if (task.IsFaulted) {
                 Log(LogSeverity.Error, nameof(task), $"Task {task} failed.");
+                Debug.Assert(task.Exception != null, "Task failed without an exception.");
+                throw task.Exception;
             } else {
-                Log(LogSeverity.Info, nameof(task), $"Task {task} complete");
+                Log(LogSeverity.Info, nameof(task), $"Task {task} complete: {task.IsCompleted}");
             }
         }
 
-        public static void LogContinuation<T>(this Task<T> task) {
+        public static void LogTask<T>(this Task<T> task) {
             if (task.IsFaulted) {
                 Log(LogSeverity.Error, nameof(task), $"Task<T> {task} failed.");
+                Debug.Assert(task.Exception != null, "Task failed without an exception.");
+                throw task.Exception;
             } else {
-                Log(LogSeverity.Info, nameof(task), $"Task<T> {task} complete, result: {task.Result}");
+                Log(LogSeverity.Info, nameof(task),
+                    $"Task<T> {task} complete: {task.IsCompleted}, result: {task.Result}");
             }
+        }
+
+
+        public static void LogContinuation(this Task task) {
+            task.ContinueWith(t => { task.LogTask(); }, TaskContinuationOptions.LongRunning);
+        }
+
+        public static void LogContinuation<T>(this Task<T> task) {
+            task.ContinueWith(t => { task.LogTask(); }, TaskContinuationOptions.LongRunning);
         }
     }
 }

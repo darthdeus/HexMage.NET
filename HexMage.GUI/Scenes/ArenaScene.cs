@@ -34,6 +34,7 @@ namespace HexMage.GUI.Scenes {
             };
 
             var t1 = _gameInstance.MobManager.AddTeam(TeamColor.Red, new AiRandomController(_gameInstance));
+            //var t1 = _gameInstance.MobManager.AddTeam(TeamColor.Red, new PlayerController(this, _gameInstance));
             var t2 = _gameInstance.MobManager.AddTeam(TeamColor.Blue, new AiRandomController(_gameInstance));
 
             _gameEventHub = new GameEventHub(_gameInstance);

@@ -60,7 +60,8 @@ namespace HexMage.GUI.UI {
             float ownerWidth = font.MeasureString(ownerMsg).X;
 
             batch.DrawString(font, logLevelMsg, pos, LogLevelColor(LogLevel));
-            batch.DrawString(font, tidMsg, pos + new Vector2(levelWidth + separatorSize, 0), Color.Yellow);
+            var tidColor = Utils.MainThreadId == ThreadId ? Color.Yellow : Color.Red;
+            batch.DrawString(font, tidMsg, pos + new Vector2(levelWidth + separatorSize, 0), tidColor);
             batch.DrawString(font, $"[{Owner}]",
                              pos + new Vector2(levelWidth + tidWidth + 2*separatorSize, 0),
                              Color.Pink);
