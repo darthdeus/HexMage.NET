@@ -33,9 +33,6 @@ namespace HexMage.GUI.Scenes {
                 Active = false
             };
 
-            //var aiController = new AiRandomController(_gameInstance);
-
-            //var t1 = _gameInstance.MobManager.AddTeam(TeamColor.Red, new PlayerController(this, _gameInstance));
             var t1 = _gameInstance.MobManager.AddTeam(TeamColor.Red, new AiRandomController(_gameInstance));
             var t2 = _gameInstance.MobManager.AddTeam(TeamColor.Blue, new AiRandomController(_gameInstance));
 
@@ -106,6 +103,14 @@ namespace HexMage.GUI.Scenes {
         public override void Cleanup() {}
 
         private void BuildUi() {
+            Func<string> gameStateTextFunc = () => _gameInstance.IsFinished() ? "Game finished" : "Game in progress";
+            var gameStateLabel = new Label(gameStateTextFunc, _assetManager.Font) {
+                SortOrder = Camera2D.SortUI,
+                Position = new Vector2(400, 50)
+            };
+
+            AddAndInitializeRootEntity(gameStateLabel, _assetManager);
+
             const int abilitySpacing = 70;
             var currentLayout = new VerticalLayout {
                 Spacing = abilitySpacing,

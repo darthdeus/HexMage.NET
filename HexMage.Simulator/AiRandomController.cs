@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
 using HexMage.Simulator;
@@ -31,8 +32,6 @@ namespace HexMage.Simulator {
                 var usableAbilities = _gameInstance.UsableAbilities(mob, target);
                 if (usableAbilities.Count > 0) {
                     var ua = usableAbilities.First();
-
-                    Utils.Log(LogSeverity.Info, nameof(AiRandomController), "Broadcasting used ability");
                     await eventHub.BroadcastAbilityUsed(mob, target, ua);
                 } else {
                     var moveTarget = pathfinder.FurthestPointToTarget(mob, target.Coord);
