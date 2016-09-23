@@ -47,8 +47,11 @@ namespace HexMage.Simulator {
             return result;
         }
 
-        public AxialCoord FurthestPointToTarget(Mob mob, AxialCoord target) {
-            var path = PathTo(target);
+        public AxialCoord FurthestPointToTarget(Mob mob, Mob target) {
+            var path = PathTo(target.Coord);
+            Debug.Assert(path.Count > 1, "Calculating a path while standing next to an enemy.");
+
+            path.RemoveAt(path.Count - 1);
             return FurthestPointOnPath(mob, path);
         }
 

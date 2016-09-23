@@ -50,7 +50,7 @@ namespace HexMage.GUI
             _assetManager.RegisterTexture(AssetManager.SolidGrayColor,
                 TextureGenerator.SolidColor(GraphicsDevice, 32, 32, Color.LightGray));
 
-            LogBox.Initialize(_assetManager.Font, 1000, _assetManager);
+            LogBox.Initialize(_assetManager.Font, 1200, _assetManager);
             Utils.InitializeLoggerMainThread();          
             Utils.RegisterLogger(LogBox.Instance);
             Utils.RegisterLogger(new StdoutLogger());

@@ -34,15 +34,25 @@ namespace HexMage.Simulator {
                     var ua = usableAbilities.First();
                     await eventHub.BroadcastAbilityUsed(mob, target, ua);
                 } else {
-                    var moveTarget = pathfinder.FurthestPointToTarget(mob, target.Coord);
-                    await eventHub.BroadcastMobMoved(mob, moveTarget);
+                    var moveTarget = pathfinder.FurthestPointToTarget(mob, target);
+
+                    if (pathfinder.Distance(moveTarget) > 0) {
+                        await eventHub.BroadcastMobMoved(mob, moveTarget);
+                    } else {
+                        Utils.Log(LogSeverity.Debug, nameof(AiRandomController), "Move failed since target is too close");
+                    }
                 }
             } else {
                 var enemies = _gameInstance.Enemies(mob);
                 if (enemies.Count > 0) {
                     var target = enemies.First();
-                    var moveTarget = pathfinder.FurthestPointToTarget(mob, target.Coord);
-                    await eventHub.BroadcastMobMoved(mob, moveTarget);
+                    var moveTarget = pathfinder.FurthestPointToTarget(mob, target);
+
+                    if (pathfinder.Distance(moveTarget) > 0) {
+                        await eventHub.BroadcastMobMoved(mob, moveTarget);
+                    } else {
+                        Utils.Log(LogSeverity.Debug, nameof(AiRandomController), "Move failed since target is too close");
+                    }
                 } else {
                     Utils.Log(LogSeverity.Info, nameof(AiRandomController), "No possible action");
                 }
@@ -57,6 +67,10 @@ namespace HexMage.Simulator {
         }
 
         public Task<bool> EventMobMoved(Mob mob, AxialCoord pos) {
+            return Task.FromResult(true);
+        }
+
+        public Task<bool> EventDefenseDesireAcquired(Mob mob, DefenseDesire defenseDesireResult) {
             return Task.FromResult(true);
         }
     }

@@ -111,6 +111,11 @@ namespace HexMage.GUI.Components {
             return true;
         }
 
+        public Task<bool> EventDefenseDesireAcquired(Mob mob, DefenseDesire defenseDesireResult) {
+            ShowMessage($"{nameof(GameBoardController)} got defense {defenseDesireResult}");
+            return Task.FromResult(true);
+        }
+
         public override void Initialize(AssetManager assetManager) {
             AssertNotInitialized();
             _assetManager = assetManager;
@@ -118,10 +123,11 @@ namespace HexMage.GUI.Components {
             BuildPopovers();
             CreateMobEntities(assetManager);
 
-#warning TODO - run async and check thread
             _eventHub.MainLoop()
-                     .ContinueWith(t => { ShowMessage("Game complete, restarting in 5 seconds."); })
-                     .LogContinuation();
+                     .ContinueWith(t => {
+                                       t.LogTask();
+                                       ShowMessage("Game complete, restarting in 5 seconds.");
+                                   });
         }
 
         private void CreateMobEntities(AssetManager assetManager) {
@@ -384,7 +390,7 @@ namespace HexMage.GUI.Components {
             }
         }
 
-        private readonly TimeSpan _abilityPopoverDisplayTime = TimeSpan.FromSeconds(5);
+        private readonly TimeSpan _abilityPopoverDisplayTime = TimeSpan.FromSeconds(3);
 
         private async Task BuildUsedAbilityPopover(Mob mob, Ability ability) {
             var result = new VerticalLayout {

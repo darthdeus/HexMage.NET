@@ -34,6 +34,10 @@ namespace HexMage.Simulator {
             Console.Write($"[{owner}]");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(message);
+
+            if (logLevel == LogSeverity.Error) {
+                Console.WriteLine(new StackTrace());
+            }
         }
 
 
@@ -59,7 +63,6 @@ namespace HexMage.Simulator {
         public FileLogger(string filename) {
             _filename = filename;
         }
-
 
         public void Log(LogSeverity logLevel, string owner, string message) {
             if (logLevel == LogSeverity.Error) {
@@ -97,9 +100,12 @@ namespace HexMage.Simulator {
             if (task.IsFaulted) {
                 Log(LogSeverity.Error, nameof(task), $"Task {task} failed.");
                 Debug.Assert(task.Exception != null, "Task failed without an exception.");
+
+#warning TODO - jak spravne vyhodit exception do GUI threadu?
+                SynchronizationContext.Current.Post(_ => { throw task.Exception; }, null);
                 throw task.Exception;
             } else {
-                Log(LogSeverity.Info, nameof(task), $"Task {task} complete: {task.IsCompleted}");
+                Log(LogSeverity.Info, nameof(task), $"Task {task} complete: {task.IsCompleted}, faulted: {task.IsFaulted}");
             }
         }
 
@@ -107,10 +113,14 @@ namespace HexMage.Simulator {
             if (task.IsFaulted) {
                 Log(LogSeverity.Error, nameof(task), $"Task<T> {task} failed.");
                 Debug.Assert(task.Exception != null, "Task failed without an exception.");
+
+#warning TODO - jak spravne vyhodit exception do GUI threadu?
+                SynchronizationContext.Current.Post(_ => { throw task.Exception; }, null);
                 throw task.Exception;
-            } else {
+            }
+            else {
                 Log(LogSeverity.Info, nameof(task),
-                    $"Task<T> {task} complete: {task.IsCompleted}, result: {task.Result}");
+                    $"Task<T> {task} complete: {task.IsCompleted}, result: {task.Result}, faulted: {task.IsFaulted}");
             }
         }
 

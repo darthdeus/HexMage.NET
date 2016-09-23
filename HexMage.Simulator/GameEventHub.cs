@@ -26,6 +26,10 @@ namespace HexMage.Simulator {
 
                 turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder);
             }
+
+            var allmobs = _gameInstance.MobManager.Mobs.ToList();
+            var t1mobs = _gameInstance.MobManager.Teams.ToList()[0].Mobs.ToList();
+            var t2mobs = _gameInstance.MobManager.Teams.ToList()[1].Mobs.ToList();
             Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Main Loop DONE");
 
             return true;
@@ -42,6 +46,8 @@ namespace HexMage.Simulator {
 
             Debug.Assert(distance <= mob.Ap, "Trying to move a mob that doesn't have enough AP.");
             Debug.Assert(_gameInstance.Map[pos] == HexType.Empty, "Trying to move a mob into a wall.");
+            Debug.Assert(_gameInstance.MobManager.AtCoord(pos) == null, "Trying to move into a mob.");
+
             mob.Ap -= distance;
             mob.Coord = pos;
             _gameInstance.Pathfinder.PathfindFrom(pos);
@@ -49,9 +55,28 @@ namespace HexMage.Simulator {
 
         public async Task BroadcastAbilityUsed(Mob mob, Mob target, UsableAbility ability) {
             Utils.Log(LogSeverity.Info, nameof(GameEventHub), $"waiting for {_subscribers.Count} subscribers");
+
+#warning TODO - nepredavat UsableAbility ale Ability
             await Task.WhenAll(_subscribers.Select(x => x.EventAbilityUsed(mob, target, ability)));
 
-            await ability.Use(_gameInstance.Map);
+            var defenseDesireResult = await ability.Use(_gameInstance.Map);
+
+            await BroadcastDefenseDesire(target, defenseDesireResult);
+        }
+
+        public async Task BroadcastAbilityUsedWithDefense(Mob mob, Mob target, UsableAbility ability,
+                                                          DefenseDesire defenseDesire) {
+
+#warning TODO - nepredavat UsableAbility ale Ability
+            await Task.WhenAll(_subscribers.Select(x => x.EventAbilityUsed(mob, target, ability)));
+
+            ability.UseWithDefenseResult(_gameInstance.Map, defenseDesire);
+
+            await BroadcastDefenseDesire(target, defenseDesire);
+        }
+
+        public async Task BroadcastDefenseDesire(Mob mob, DefenseDesire defenseDesireResult) {
+            await Task.WhenAll(_subscribers.Select(x => x.EventDefenseDesireAcquired(mob, defenseDesireResult)));
         }
     }
 }

@@ -42,6 +42,19 @@ namespace HexMage.Simulator.Model {
             return result;
         }
 
+        public void UseWithDefenseResult(Map map, DefenseDesire defenseDesire) {
+            switch (defenseDesire) {
+                case DefenseDesire.Block:
+                    _target.Ap -= _target.DefenseCost;
+                    break;
+                case DefenseDesire.Pass:
+                    TargetHit(map);
+                    break;
+                default:
+                    throw new ArgumentException($"Invalid DefenseDesire value {defenseDesire}", nameof(defenseDesire));
+            }
+        }
+
         private void TargetHit(Map map) {
             var elements = _target.Buffs.Select(b => b.Element).Distinct();
 
@@ -54,7 +67,7 @@ namespace HexMage.Simulator.Model {
             bool bonusDmg = elements.Contains(BonusElement(Ability.Element));
             int modifier = bonusDmg ? 2 : 1;
 
-            _target.Hp = Math.Max(0, _target.Hp - Ability.Dmg * modifier);
+            _target.Hp = Math.Max(0, _target.Hp - Ability.Dmg*modifier);
 
             _target.Buffs.Add(Ability.ElementalEffect);
             foreach (var abilityBuff in Ability.Buffs) {
@@ -74,10 +87,8 @@ namespace HexMage.Simulator.Model {
             _mob.Ap -= Ability.Cost;
         }
 
-        private AbilityElement BonusElement(AbilityElement element)
-        {
-            switch (element)
-            {
+        private AbilityElement BonusElement(AbilityElement element) {
+            switch (element) {
                 case AbilityElement.Earth:
                     return AbilityElement.Fire;
                 case AbilityElement.Fire:
@@ -91,10 +102,8 @@ namespace HexMage.Simulator.Model {
             }
         }
 
-        private AbilityElement OppositeElement(AbilityElement element)
-        {
-            switch (element)
-            {
+        private AbilityElement OppositeElement(AbilityElement element) {
+            switch (element) {
                 case AbilityElement.Earth:
                     return AbilityElement.Air;
                 case AbilityElement.Fire:
@@ -107,6 +116,5 @@ namespace HexMage.Simulator.Model {
                     throw new InvalidOperationException("Invalid element type");
             }
         }
-
     }
 }

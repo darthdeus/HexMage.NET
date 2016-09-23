@@ -28,7 +28,7 @@ namespace HexMage.GUI {
     }
 
     public class SceneSynchronizationContext : SynchronizationContext {
-        ConcurrentQueue<KeyValuePair<SendOrPostCallback, object>> _queue = new ConcurrentQueue<KeyValuePair<SendOrPostCallback, object>>();        
+        ConcurrentQueue<KeyValuePair<SendOrPostCallback, object>> _queue = new ConcurrentQueue<KeyValuePair<SendOrPostCallback, object>>();
 
         public override void Send(SendOrPostCallback d, object state) {
             Utils.Log(LogSeverity.Error, nameof(SceneSynchronizationContext), "Sending callback, this is highly unexpected");

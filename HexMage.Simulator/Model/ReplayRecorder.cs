@@ -61,5 +61,10 @@ namespace HexMage.Simulator {
             Actions.Add(ReplayAction.CreateMobMoved(mob, pos));
             return Task.FromResult(true);
         }
+
+        public Task<bool> EventDefenseDesireAcquired(Mob mob, DefenseDesire defenseDesireResult) {
+#warning TODO - record defense desire result
+            return Task.FromResult(true);
+        }
     }
 }
