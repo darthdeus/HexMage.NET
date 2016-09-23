@@ -53,7 +53,7 @@ namespace HexMage.GUI.Components {
                                                     AssetManager.TileSize,
                                                     4);
 
-            projectileAnimation.Origin = new Vector2(16, 16);
+            projectileAnimation.Origin = new Vector2(AssetManager.TileSize/2, AssetManager.TileSize/2);
 
             var projectile = new ProjectileEntity(
                 TimeSpan.FromMilliseconds(1500),
