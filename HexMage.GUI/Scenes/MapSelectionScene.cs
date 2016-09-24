@@ -51,7 +51,7 @@ namespace HexMage.GUI.Scenes {
 
             middleColumn.Position = new Vector2(400, 40);
             var btnStartGame = new TextButton("Start game using current map", _assetManager.Font);
-            btnStartGame.OnClick += _ => { LoadNewScene(new ArenaScene(_gameManager, _currentMap.DeepCopy())); };
+            btnStartGame.OnClick += _ => { LoadNewScene(new TeamSelectionScene(_gameManager, _currentMap.DeepCopy())); };
             middleColumn.AddChild(btnStartGame);
 
             var sizeSlider = new Slider(MinSize, MaxSize, new Point(100, 20));
