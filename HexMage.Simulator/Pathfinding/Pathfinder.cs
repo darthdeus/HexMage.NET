@@ -49,7 +49,7 @@ namespace HexMage.Simulator {
 
         public AxialCoord FurthestPointToTarget(Mob mob, Mob target) {
             var path = PathTo(target.Coord);
-            Debug.Assert(path.Count > 1, "Calculating a path while standing next to an enemy.");
+            Debug.Assert(path.Count > 0, "Calculating a path while standing next to an enemy.");
 
             path.RemoveAt(path.Count - 1);
             return FurthestPointOnPath(mob, path);
@@ -79,6 +79,12 @@ namespace HexMage.Simulator {
 
         public int Distance(AxialCoord c) {
             return Paths[c].Distance;
+        }
+
+        public void PathfindFromCurrentMob(TurnManager turnManager) {
+            if (turnManager.CurrentMob != null) {
+                PathfindFrom(turnManager.CurrentMob.Coord);
+            }
         }
 
         public void PathfindFrom(AxialCoord start) {
@@ -134,6 +140,9 @@ namespace HexMage.Simulator {
                     AxialCoord neighbour = current + diff;
 
                     if (IsValidCoord(neighbour)) {
+                        // We can immediately skip the starting position to avoid further complicated checks
+                        if (neighbour == start) continue;
+
                         Path n = Paths[neighbour];
 
                         // TODO - this is not right
@@ -141,8 +150,7 @@ namespace HexMage.Simulator {
 
                         bool notClosed = n.State != VertexState.Closed;
                         bool noWall = _map[neighbour] != HexType.Wall;
-#warning TODO - fix pathfinder so that it doesn't walk into mobs but still allows abilities to target them
-                        bool noMob = true || _mobManager.AtCoord(neighbour) == null || neighbour == start;
+                        bool noMob = _mobManager.AtCoord(neighbour) == null;
 
                         //if (notClosed && noWall && noMob) {
                         if (notClosed && noWall && noMob) {

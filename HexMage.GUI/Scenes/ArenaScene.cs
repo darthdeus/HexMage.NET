@@ -33,9 +33,10 @@ namespace HexMage.GUI.Scenes {
                 Active = false
             };
 
-            var t1 = _gameInstance.MobManager.AddTeam(TeamColor.Red, new AiRandomController(_gameInstance));
-            //var t1 = _gameInstance.MobManager.AddTeam(TeamColor.Red, new PlayerController(this, _gameInstance));
-            var t2 = _gameInstance.MobManager.AddTeam(TeamColor.Blue, new AiRandomController(_gameInstance));
+            //var t1 = _gameInstance.MobManager.AddTeam(TeamColor.Red, new AiRandomController(_gameInstance));
+            var t1 = _gameInstance.MobManager.AddTeam(TeamColor.Red, new PlayerController(this, _gameInstance));
+            var t2 = _gameInstance.MobManager.AddTeam(TeamColor.Blue, new PlayerController(this, _gameInstance));
+            //var t2 = _gameInstance.MobManager.AddTeam(TeamColor.Blue, new AiRandomController(_gameInstance));
 
             _gameEventHub = new GameEventHub(_gameInstance);
 
@@ -83,7 +84,7 @@ namespace HexMage.GUI.Scenes {
             AddAndInitializeRootEntity(_defenseModal, _assetManager);
 
             var gameBoardEntity = CreateRootEntity(Camera2D.SortBackground);
-            var gameBoardController = new GameBoardController(_gameInstance, _gameEventHub);
+            var gameBoardController = new GameBoardController(_gameInstance, _gameEventHub, _replayRecorder);
             _gameBoardController = gameBoardController;
             gameBoardEntity.AddComponent(gameBoardController);
             gameBoardEntity.Renderer = new GameBoardRenderer(_gameInstance, gameBoardController, _camera);

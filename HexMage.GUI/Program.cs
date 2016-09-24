@@ -18,10 +18,7 @@ namespace HexMage.GUI {
         }
 
         [STAThread]
-        static void Main() {                    
-            var tester = new AiTester();
-            //tester.Run(10, 100);
-
+        static void Main() {
             using (var game = new HexMageGame())
                 game.Run();
         }

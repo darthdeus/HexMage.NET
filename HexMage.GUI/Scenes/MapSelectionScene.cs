@@ -116,37 +116,6 @@ namespace HexMage.GUI.Scenes {
             _currentMap = _mapGenerator.Generate(_selectedSize ?? DefaultMapSize, _currentSeed);
         }
 
-        public override void Cleanup() {}
-
-        // TODO - remove this
-
-        //public override SceneUpdateResult Update(GameTime gameTime, ref GameScene newScene) {
-        //    if (_gui.Button("Start game", new Point(20, 20))) {
-        //        newScene = new ArenaScene(_gameManager);
-        //        return SceneUpdateResult.NewScene;
-        //    } else {
-        //        return SceneUpdateResult.Continue;
-        //    }
-        //}
-
-        //public override void Render(GameTime gameTime) {
-        //    var mages = new Entity();
-
-        //    var entity = mages.CreateChild();
-        //    entity.Renderer = new SpriteRenderer(_assetManager[AssetManager.MobTexture]);
-        //    entity.Position = new Vector2(150, 150);
-
-        //    var second = entity.CreateChild();
-        //    second.Renderer = new SpriteRenderer(_assetManager[AssetManager.MobTexture]);
-        //    second.Position = new Vector2(5, 5);
-
-        //    _spriteBatch.Begin();
-        //    mages.Render(_spriteBatch, _assetManager);
-        //    _rootElement.Render(_spriteBatch, _assetManager);
-        //    _spriteBatch.End();
-        //    Console.WriteLine();
-
-        //    _gui.Draw(_assetManager[AssetManager.GrayTexture], _spriteBatch);
-        //}
+        public override void Cleanup() {}        
     }
 }

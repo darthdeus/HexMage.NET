@@ -47,16 +47,24 @@ namespace HexMage.Simulator {
 
         public bool IsAbilityUsable(Mob mob, Ability ability) {
             // TODO - handle visibiliy
-            var isElementdisabled = mob.Buffs
+            var isElementDisabled = mob.Buffs
                                        .SelectMany(b => b.DisabledElements)
-                                       .Distinct().Contains(ability.Element);
+                                       .Distinct()
+                                       .Contains(ability.Element);
 
-            return !isElementdisabled && mob.Ap >= ability.Cost && ability.CurrentCooldown == 0;
+            return !isElementDisabled && mob.Ap >= ability.Cost && ability.CurrentCooldown == 0;
         }
 
         public IList<UsableAbility> UsableAbilities(Mob mob, Mob target) {
-            int distance = Pathfinder.Distance(target.Coord);
-            // TODO - handle visibiliy
+            var line = Map.CubeLinedraw(mob.Coord, target.Coord);
+            int distance = line.Count - 1;
+
+            var obstructed = line.Any(c => Map[c] == HexType.Wall);
+
+            if (obstructed) {
+                Utils.Log(LogSeverity.Debug, nameof(GameInstance), "Path obstructed, no usable abilities.");
+                return new List<UsableAbility>();
+            }
 
             return mob.Abilities
                       .Select((ability, i) => new UsableAbility(mob, target, ability, i))

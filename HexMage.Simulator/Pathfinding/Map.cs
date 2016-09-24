@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
@@ -66,12 +67,21 @@ namespace HexMage.Simulator {
         public List<CubeCoord> CubeLinedraw(CubeCoord a, CubeCoord b) {
             var result = new List<CubeCoord>();
 
+            if (a == b) {
+                return result;
+            }
+
             var N = CubeDistance(a, b);
             for (int i = 0; i < N + 1; i++) {
-                result.Add(CubeLerp(a, b, 1.0f/N*i));
+                result.Add(CubeLerp(a, b, ((float) i)/N));
+                //Utils.Log(LogSeverity.Debug, nameof(Map), $"Lerping {a} and {b} with {i}/{N}");
             }
 
             return result;
+        }
+
+        public bool IsVisible(CubeCoord a, CubeCoord b) {
+            return CubeLinedraw(a, b).All(c => this[c] == HexType.Empty);
         }
 
         public Map DeepCopy() {

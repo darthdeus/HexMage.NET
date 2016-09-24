@@ -15,6 +15,7 @@ using Color = Microsoft.Xna.Framework.Color;
 namespace HexMage.GUI.Components {
     public class GameBoardController : Component, IGameEventSubscriber {
         private readonly GameEventHub _eventHub;
+        private readonly ReplayRecorder _replayRecorder;
         private readonly GameInstance _gameInstance;
 
         private readonly Vector2 _mouseHoverPopoverOffset = new Vector2(
@@ -33,9 +34,10 @@ namespace HexMage.GUI.Components {
 
         public int? SelectedAbilityIndex;
 
-        public GameBoardController(GameInstance gameInstance, GameEventHub eventHub) {
+        public GameBoardController(GameInstance gameInstance, GameEventHub eventHub, ReplayRecorder replayRecorder) {
             _gameInstance = gameInstance;
             _eventHub = eventHub;
+            _replayRecorder = replayRecorder;
         }
 
         public async Task<bool> EventAbilityUsed(Mob mob, Mob target, UsableAbility usableAbility) {
@@ -127,6 +129,7 @@ namespace HexMage.GUI.Components {
                      .ContinueWith(t => {
                                        t.LogTask();
                                        ShowMessage("Game complete, restarting in 5 seconds.");
+#warning TODO - actually restart the game
                                    });
         }
 
@@ -158,8 +161,14 @@ namespace HexMage.GUI.Components {
         public override void Update(GameTime time) {
             HandleKeyboardAbilitySelect();
 
+            UnselectAbilityIfNeeded();
+            
             var inputManager = InputManager.Instance;
             var mouseHex = Camera2D.Instance.MouseHex;
+
+            if (inputManager.IsKeyJustPressed(Keys.P)) {
+                _replayRecorder.DumpReplay(Console.Out);
+            }
 
             var controller = _gameInstance.TurnManager.CurrentController as PlayerController;
             if (controller != null) {
@@ -169,7 +178,7 @@ namespace HexMage.GUI.Components {
 
                         // TODO - podivat se na generickou implementaci pathfinderu
                         // TODO - pathfindovani ze zdi najde cesty
-                        _gameInstance.Pathfinder.PathfindFrom(_gameInstance.TurnManager.CurrentMob.Coord);
+                        _gameInstance.Pathfinder.PathfindFromCurrentMob(_gameInstance.TurnManager);
                     }
 
                 if (inputManager.IsKeyJustPressed(Keys.Space)) {
@@ -181,6 +190,17 @@ namespace HexMage.GUI.Components {
             }
 
             UpdatePopovers(time, mouseHex);
+        }
+
+        private void UnselectAbilityIfNeeded() {
+            var mob = _gameInstance.TurnManager.CurrentMob;
+            if (mob != null && SelectedAbilityIndex.HasValue) {
+                var selectedAbility = mob.Abilities[SelectedAbilityIndex.Value];
+
+                if (selectedAbility.Cost > mob.Ap) {
+                    SelectedAbilityIndex = null;
+                }
+            }
         }
 
         private void HandleUserTurnInput(InputManager inputManager) {
@@ -220,10 +240,12 @@ namespace HexMage.GUI.Components {
             var ability = _gameInstance.TurnManager.CurrentMob.Abilities[abilityIndex];
 
             var usableAbility = usableAbilities.FirstOrDefault(ua => ua.Ability == ability);
-            if (usableAbility != null)
+            if (usableAbility != null) {
                 _eventHub.BroadcastAbilityUsed(_gameInstance.TurnManager.CurrentMob, target, usableAbility)
                          .LogContinuation();
-            else ShowMessage("You can't use the selected ability on that target.");
+            } else {
+                ShowMessage("You can't use the selected ability on that target.");
+            }
         }
 
         public void ToggleAbilitySelected(int index) {

@@ -63,5 +63,9 @@ namespace HexMage.Simulator
         public int Sum() {
             return X + Y + Z;
         }
+
+        public override string ToString() {
+            return $"[{X},{Y},{Z}]";
+        }
     }
 }

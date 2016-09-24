@@ -125,8 +125,17 @@ namespace HexMage.GUI.Renderers {
                     var cubepath = _gameInstance.Map.CubeLinedraw(currentMob.Coord, _camera.MouseHex);
 
                     int distance = 1;
+                    bool walled = false;
                     foreach (var cubeCoord in cubepath) {
-                        if (distance <= currentMob.Abilities[abilityIndex.Value].Range) {
+                        if (!_gameInstance.Pathfinder.IsValidCoord(cubeCoord)) {
+                            Utils.Log(LogSeverity.Warning, nameof(GameBoardRenderer), $"Computed invalid cube visibility path of {cubeCoord}.");
+                            continue;
+                        }
+                        if (_gameInstance.Map[cubeCoord] == HexType.Wall) {
+                            walled = true;
+                        }
+
+                        if (distance <= currentMob.Abilities[abilityIndex.Value].Range && !walled) {
                             DrawAt(hexUsable, cubeCoord);
                         } else {
                             DrawAt(hexTooFar, cubeCoord);
