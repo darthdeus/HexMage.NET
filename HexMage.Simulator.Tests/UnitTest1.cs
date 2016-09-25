@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using HexMage.Simulator.Model;
 using HexMage.Simulator.PCG;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -17,20 +18,7 @@ namespace HexMage.Simulator.Tests
             Assert.AreEqual(6, m[new AxialCoord(3, 4)]);
         }
     }
-
-    [TestClass]
-    public class GameInstanceTest {
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void TestDuplicateColorFails() {
-            var game = new GameInstance(10);
-
-            var ctrl = new AiRandomController(game);
-            game.MobManager.AddTeam(TeamColor.Red, ctrl);
-            game.MobManager.AddTeam(TeamColor.Red, ctrl);
-        }
-    }
-
+    
     [TestClass]
     public class PathfinderTest
     {
@@ -43,8 +31,8 @@ namespace HexMage.Simulator.Tests
 
             var pc1 = new AiRandomController(game);
 
-            var t1 = mobManager.AddTeam(TeamColor.Red, pc1);
-            var t2 = mobManager.AddTeam(TeamColor.Blue, pc1);
+            var t1 = TeamColor.Red;
+            var t2 = TeamColor.Blue;
 
             var m1 = Generator.RandomMob(t1, size, _ => true);
             var m2 = Generator.RandomMob(t2, size, c => !m1.Coord.Equals(c));
@@ -73,8 +61,8 @@ namespace HexMage.Simulator.Tests
             var game = new GameInstance(size);
 
             var ctrl = new AiRandomController(game);
-            var t1 = game.MobManager.AddTeam(TeamColor.Red, ctrl);
-            var t2 = game.MobManager.AddTeam(TeamColor.Blue, ctrl);
+            var t1 = TeamColor.Red;
+            var t2 = TeamColor.Blue;
 
             var m1 = Generator.RandomMob(t1, size);
             var m2 = Generator.RandomMob(t2, size, c => !m1.Coord.Equals(c));

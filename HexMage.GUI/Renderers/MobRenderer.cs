@@ -33,7 +33,7 @@ namespace HexMage.GUI.Renderers {
                 batch.Draw(assetManager[AssetManager.HexHoverSprite], pos, Color.White);
             }
 
-            var color = _mob.Team.Color == TeamColor.Red ? Color.OrangeRed : Color.Blue;
+            var color = _mob.Team == TeamColor.Red ? Color.OrangeRed : Color.Blue;
             _animationController.CurrentAnimation.RenderFrame(mobEntity, pos, color, batch, assetManager);
 
             var hbPos = pos.ToPoint() + _healthbarOffset;

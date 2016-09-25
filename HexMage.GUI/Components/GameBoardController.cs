@@ -127,6 +127,8 @@ namespace HexMage.GUI.Components {
 
             _eventHub.MainLoop()
                      .ContinueWith(t => {
+                                       Utils.Log(LogSeverity.Info, nameof(GameBoardController),
+                                                 "Finished waiting for main loop to exit");
                                        t.LogTask();
                                        ShowMessage("Game complete, restarting in 5 seconds.");
 #warning TODO - actually restart the game
@@ -162,7 +164,7 @@ namespace HexMage.GUI.Components {
             HandleKeyboardAbilitySelect();
 
             UnselectAbilityIfNeeded();
-            
+
             var inputManager = InputManager.Instance;
             var mouseHex = Camera2D.Instance.MouseHex;
 
@@ -268,7 +270,7 @@ namespace HexMage.GUI.Components {
                         if (mob.Hp == 0) {
                             ShowMessage("This mob is already dead.");
                         } else {
-                            if (mob.Team.Color == currentMob.Team.Color) {
+                            if (mob.Team == currentMob.Team) {
                                 ShowMessage("You can't target your team.");
                             } else if (SelectedAbilityIndex.HasValue) {
                                 if (abilitySelected) {
@@ -326,13 +328,13 @@ namespace HexMage.GUI.Components {
                         case HexType.Empty:
                             _emptyHexPopover.Active = true;
                             labelText.AppendLine("Empty hex");
-                            labelText.AppendLine();
+                            labelText.AppendLine($"Coord: {mouseHex}");
                             break;
 
                         case HexType.Wall:
                             _emptyHexPopover.Active = true;
                             labelText.AppendLine("Indestructible wall");
-                            labelText.AppendLine();
+                            labelText.AppendLine($"Coord: {mouseHex}");
                             break;
                     }
 
@@ -363,6 +365,9 @@ namespace HexMage.GUI.Components {
                     foreach (var buff in areaBuffs)
                         mobTextBuilder.AppendLine(
                             $"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns {buff.MoveSpeedModifier}spd");
+
+                    mobTextBuilder.AppendLine();
+                    mobTextBuilder.AppendLine($"Coord {mob.Coord}");
 
                     _mobHealthLabel.Text = mobTextBuilder.ToString();
                 }

@@ -38,6 +38,8 @@ namespace HexMage.Simulator {
             if (logLevel == LogSeverity.Error) {
                 Console.WriteLine(new StackTrace());
             }
+
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
 
@@ -98,8 +100,7 @@ namespace HexMage.Simulator {
 
         public static void LogTask(this Task task) {
             if (task.IsFaulted) {
-                Log(LogSeverity.Error, nameof(task), $"Task {task} failed.");
-                Debug.Assert(task.Exception != null, "Task failed without an exception.");
+                Log(LogSeverity.Error, nameof(task), $"Task {task} failed, exception: {task.Exception}.");
 
 #warning TODO - jak spravne vyhodit exception do GUI threadu?
                 SynchronizationContext.Current.Post(_ => { throw task.Exception; }, null);
@@ -111,8 +112,7 @@ namespace HexMage.Simulator {
 
         public static void LogTask<T>(this Task<T> task) {
             if (task.IsFaulted) {
-                Log(LogSeverity.Error, nameof(task), $"Task<T> {task} failed.");
-                Debug.Assert(task.Exception != null, "Task failed without an exception.");
+                Log(LogSeverity.Error, nameof(task), $"Task<T> {task} failed, exception {task.Exception}.");
 
 #warning TODO - jak spravne vyhodit exception do GUI threadu?
                 SynchronizationContext.Current.Post(_ => { throw task.Exception; }, null);

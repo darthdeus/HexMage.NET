@@ -8,6 +8,7 @@ namespace HexMage.Simulator {
     public class Pathfinder {
         private readonly Map _map;
         private readonly MobManager _mobManager;
+        private List<AxialCoord> _diffs;
         public HexMap<Path> Paths { get; set; }
 
         public Pathfinder(Map map, MobManager mobManager) {
@@ -15,6 +16,15 @@ namespace HexMage.Simulator {
             _mobManager = mobManager;
             Paths = new HexMap<Path>(map.Size);
             Paths.Initialize(() => new Path());
+
+            _diffs = new List<AxialCoord> {
+                new AxialCoord(-1, 0),
+                new AxialCoord(1, 0),
+                new AxialCoord(0, -1),
+                new AxialCoord(0, 1),
+                new AxialCoord(1, -1),
+                new AxialCoord(-1, 1),
+            };
         }
 
         private int Size => _map.Size;
@@ -48,14 +58,50 @@ namespace HexMage.Simulator {
         }
 
         public AxialCoord FurthestPointToTarget(Mob mob, Mob target) {
+            Utils.Log(LogSeverity.Debug, nameof(Pathfinder), $"Finding path from {mob.Coord} to {target.Coord}");
             var path = PathTo(target.Coord);
-            Debug.Assert(path.Count > 0, "Calculating a path while standing next to an enemy.");
 
-            path.RemoveAt(path.Count - 1);
+            if (path.Count == 0) {
+                AxialCoord? min = null;
+
+                foreach (var diff in _diffs) {
+                    var neighbour = target.Coord + diff;
+                    if (IsValidCoord(neighbour) &&
+                        _map[neighbour] != HexType.Wall &&
+                        _mobManager.AtCoord(neighbour) == null) {
+                        if (!min.HasValue) {
+                            min = neighbour;
+                        }
+
+                        if (Distance(neighbour) < Distance(min.Value)) {
+                            min = neighbour;
+                        }
+                    }
+                }
+
+                if (min.HasValue) {
+                    var shorterPath = PathTo(min.Value);
+
+                    Utils.Log(LogSeverity.Debug, nameof(Pathfinder),
+                              $"Trying shorter path from {mob.Coord} to {min.Value} instead of {target.Coord}");
+
+                    return FurthestPointOnPath(mob, shorterPath);
+                } else {
+                    Utils.Log(LogSeverity.Debug, nameof(Pathfinder), "Path not found");
+                    return mob.Coord;
+                }
+            }
+
             return FurthestPointOnPath(mob, path);
         }
 
         public AxialCoord FurthestPointOnPath(Mob mob, IList<AxialCoord> path) {
+            if (path.Count == 0) {
+                string errmsg = $"Trying to move on an empty path from {mob.Coord}, which is invalid.";
+                Utils.Log(LogSeverity.Error, nameof(Pathfinder), errmsg);
+                throw new InvalidOperationException(errmsg);
+            }
+
             int currentAp = mob.Ap;
             for (int i = path.Count - 1; i >= 0; i--) {
                 if (currentAp == 0) {
@@ -65,7 +111,7 @@ namespace HexMage.Simulator {
                 currentAp--;
             }
 
-            throw new InvalidOperationException("Trying to move on an empty path, which is invalid.");
+            return path[0];
         }
 
         public void MoveAsFarAsPossible(Mob mob, IList<AxialCoord> path) {
@@ -89,15 +135,6 @@ namespace HexMage.Simulator {
 
         public void PathfindFrom(AxialCoord start) {
             var queue = new Queue<AxialCoord>();
-
-            var diffs = new List<AxialCoord> {
-                new AxialCoord(-1, 0),
-                new AxialCoord(1, 0),
-                new AxialCoord(0, -1),
-                new AxialCoord(0, 1),
-                new AxialCoord(1, -1),
-                new AxialCoord(-1, 1),
-            };
 
             foreach (var coord in _map.AllCoords) {
                 var path = Paths[coord];
@@ -136,7 +173,7 @@ namespace HexMage.Simulator {
                 p.Reachable = true;
                 p.State = VertexState.Closed;
 
-                foreach (var diff in diffs) {
+                foreach (var diff in _diffs) {
                     AxialCoord neighbour = current + diff;
 
                     if (IsValidCoord(neighbour)) {
@@ -150,7 +187,7 @@ namespace HexMage.Simulator {
 
                         bool notClosed = n.State != VertexState.Closed;
                         bool noWall = _map[neighbour] != HexType.Wall;
-                        bool noMob = _mobManager.AtCoord(neighbour) == null;
+                        bool noMob = _mobManager.AtCoord(neighbour) == null || neighbour == start;
 
                         //if (notClosed && noWall && noMob) {
                         if (notClosed && noWall && noMob) {

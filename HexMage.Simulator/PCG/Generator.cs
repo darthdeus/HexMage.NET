@@ -45,12 +45,16 @@ namespace HexMage.Simulator.PCG {
     public static class Generator {
         private static readonly Random _random = new Random();
 
-        public static GameInstance RandomGame(int size, MapSeed seed, int teamSize, Func<GameInstance, IMobController> controllerFunc) {
+        public static GameInstance RandomGame(int size, MapSeed seed, int teamSize,
+                                              Func<GameInstance, IMobController> controllerFunc) {
             var map = new MapGenerator().Generate(size, seed);
             var game = new GameInstance(map);
 
-            var t1 = game.MobManager.AddTeam(TeamColor.Red, controllerFunc(game));
-            var t2 = game.MobManager.AddTeam(TeamColor.Blue, controllerFunc(game));
+            const TeamColor t1 = TeamColor.Red;
+            const TeamColor t2 = TeamColor.Blue;
+
+            game.MobManager.Teams[t1] = controllerFunc(game);
+            game.MobManager.Teams[t2] = controllerFunc(game);
 
             for (int i = 0; i < teamSize; i++) {
                 game.MobManager.AddMob(RandomMob(t1, size, c => game.MobManager.AtCoord(c) == null));
@@ -60,14 +64,14 @@ namespace HexMage.Simulator.PCG {
             return game;
         }
 
-        public static Mob RandomMob(Team team, int size) {
+        public static Mob RandomMob(TeamColor team, int size) {
             return RandomMob(team, size, _ => true);
         }
 
-        public static Mob RandomMob(Team team, int size, Predicate<AxialCoord> isCoordAvailable) {
+        public static Mob RandomMob(TeamColor team, int size, Predicate<AxialCoord> isCoordAvailable) {
             var abilities = new List<Ability>();
 
-            var elements = new AbilityElement[] {
+            var elements = new[] {
                 AbilityElement.Earth, AbilityElement.Fire, AbilityElement.Air, AbilityElement.Water
             };
 
@@ -93,12 +97,15 @@ namespace HexMage.Simulator.PCG {
             while (true) {
                 var x = _random.Next(-size, size);
                 var y = _random.Next(-size, size);
-                var z = -x - y;
-                var cube = new CubeCoord(x, y, z);
-                var zero = new CubeCoord(0, 0, 0);
+                //var z = -x - y;
+                //var cube = new CubeCoord(x, y, z);
+                //var zero = new CubeCoord(0, 0, 0);
 
-                if (isCoordAvailable(cube) && cube.Distance(zero) < size) {
-                    mob.Coord = cube.ToAxial();
+                var zero = new AxialCoord(0, 0);
+                var coord = new AxialCoord(x, y);
+
+                if (isCoordAvailable(coord) && coord.Distance(zero) < size) {
+                    mob.Coord = coord;
                     break;
                 }
             }
@@ -106,7 +113,7 @@ namespace HexMage.Simulator.PCG {
             return mob;
         }
 
-        public static List<Buff> RandomBuffs(AbilityElement element){
+        public static List<Buff> RandomBuffs(AbilityElement element) {
             var result = new List<Buff>();
 
             int count = _random.Next(2);

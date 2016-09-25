@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -17,19 +18,18 @@ namespace HexMage.Simulator {
             var turnManager = _gameInstance.TurnManager;
 
             turnManager.StartNextTurn(_gameInstance.Pathfinder);
-            
+
             Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Starting Main Loop");
             while (!_gameInstance.IsFinished()) {
                 Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Main Loop Iteration");
-                var action = turnManager.CurrentMob.Team.Controller.PlayTurn(this);
+                var action = turnManager.CurrentController.PlayTurn(this);
                 await action;
 
                 turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder);
+
+                await Task.Delay(TimeSpan.FromMilliseconds(200));
             }
 
-            var allmobs = _gameInstance.MobManager.Mobs.ToList();
-            var t1mobs = _gameInstance.MobManager.Teams.ToList()[0].Mobs.ToList();
-            var t2mobs = _gameInstance.MobManager.Teams.ToList()[1].Mobs.ToList();
             Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Main Loop DONE");
 
             return true;
@@ -59,14 +59,13 @@ namespace HexMage.Simulator {
 #warning TODO - nepredavat UsableAbility ale Ability
             await Task.WhenAll(_subscribers.Select(x => x.EventAbilityUsed(mob, target, ability)));
 
-            var defenseDesireResult = await ability.Use(_gameInstance.Map);
+            var defenseDesireResult = await ability.Use(_gameInstance.Map, _gameInstance.MobManager);
 
             await BroadcastDefenseDesire(target, defenseDesireResult);
         }
 
         public async Task BroadcastAbilityUsedWithDefense(Mob mob, Mob target, UsableAbility ability,
                                                           DefenseDesire defenseDesire) {
-
 #warning TODO - nepredavat UsableAbility ale Ability
             await Task.WhenAll(_subscribers.Select(x => x.EventAbilityUsed(mob, target, ability)));
 

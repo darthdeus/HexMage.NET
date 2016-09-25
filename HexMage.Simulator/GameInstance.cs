@@ -13,17 +13,20 @@ namespace HexMage.Simulator {
         public TurnManager TurnManager { get; set; }
         public int Size { get; set; }
 
-        public GameInstance(int size) : this(new Map(size)) {}
-
-        public GameInstance(Map map) {
-            Size = map.Size;
-            MobManager = new MobManager();
+        public GameInstance(Map map, MobManager mobManager) {
             Map = map;
+            MobManager = mobManager;
+
+            Size = map.Size;
             Pathfinder = new Pathfinder(Map, MobManager);
             TurnManager = new TurnManager(MobManager, Map);
         }
 
-        public GameInstance(int size, Map map, MobManager mobManager, Pathfinder pathfinder, TurnManager turnManager) {
+        public GameInstance(int size) : this(new Map(size)) {}
+
+        public GameInstance(Map map) : this(map, new MobManager()) {}
+
+        private GameInstance(int size, Map map, MobManager mobManager, Pathfinder pathfinder, TurnManager turnManager) {
             Size = size;
             MobManager = mobManager;
             Map = map;
@@ -31,13 +34,10 @@ namespace HexMage.Simulator {
             TurnManager = turnManager;
         }
 
-
         public bool IsFinished() {
-            // TODO - why is this still here?
-#if DEBUG
-            Debug.Assert(MobManager.Teams.All(team => team.Mobs.Any()));
-#endif
-            return MobManager.Teams.Any(team => team.Mobs.All(mob => mob.Hp == 0));
+            return MobManager.Teams
+                             .Any(pair => MobManager.MobsInTeam(pair.Key)
+                                                    .All(mob => mob.Hp == 0));
         }
 
         [Obsolete]
@@ -94,6 +94,7 @@ namespace HexMage.Simulator {
         }
 
         public GameInstance DeepCopy() {
+#warning TODO - tohle prepsat poradne
             var mapCopy = Map.DeepCopy();
             var mobManagerCopy = MobManager.DeepCopy();
             return new GameInstance(Size, mapCopy, mobManagerCopy, new Pathfinder(mapCopy, mobManagerCopy),

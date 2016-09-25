@@ -80,6 +80,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scenes\SceneManager.cs" />
+    <Compile Include="Scenes\TeamSelectionScene.cs" />
     <Compile Include="TextureGenerator.cs" />
     <Compile Include="Renderers\ColorRenderer.cs" />
     <Compile Include="UI\ElementMouseState.cs" />
@@ -117,6 +118,10 @@
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\HexMage.AI\HexMage.AI.csproj">
+      <Project>{8E3EA36C-C5AD-49DB-981B-1A1F40C8F7A0}</Project>
+      <Name>HexMage.AI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\HexMage.Simulator\HexMage.Simulator.csproj">
       <Project>{597fff01-9f07-4f0d-9dba-ced5ca9b76e9}</Project>
       <Name>HexMage.Simulator</Name>

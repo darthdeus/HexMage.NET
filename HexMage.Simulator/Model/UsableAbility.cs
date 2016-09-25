@@ -17,14 +17,16 @@ namespace HexMage.Simulator.Model {
             Index = index;
         }
 
-        public async Task<DefenseDesire> Use(Map map) {
+        public async Task<DefenseDesire> Use(Map map, MobManager mobManager) {
             Debug.Assert(Ability.CurrentCooldown == 0, "Trying to use an ability with non-zero cooldown.");
 
             DefenseDesire result;
 
             Ability.CurrentCooldown = Ability.Cooldown;
             if (_target.Ap >= _target.DefenseCost) {
-                var res = await _target.Team.Controller.RequestDesireToDefend(_target, Ability);
+#warning TODO - fuj
+                var controller = mobManager.Teams[_target.Team];
+                var res = await controller.RequestDesireToDefend(_target, Ability);
 
                 if (res == DefenseDesire.Block) {
                     _target.Ap -= _target.DefenseCost;

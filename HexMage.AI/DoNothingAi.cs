@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using HexMage.Simulator;
 using HexMage.Simulator.Model;
 
@@ -21,5 +17,7 @@ namespace HexMage.AI
         public Task<bool> RandomAction(GameEventHub eventHub) {
             return Task.FromResult(true);
         }
+
+        public string Name => nameof(DoNothingController);
     }
 }

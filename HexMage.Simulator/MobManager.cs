@@ -10,8 +10,8 @@ namespace HexMage.Simulator {
         private readonly List<Mob> _mobs = new List<Mob>();
         public IEnumerable<Mob> Mobs => _mobs;
         public IEnumerable<Mob> AliveMobs => Mobs.Where(m => m.Hp > 0);
-        // TODO - this shound't be public as a List<T>
-        public List<Team> Teams { get; set; } = new List<Team>();
+
+        public readonly Dictionary<TeamColor, IMobController> Teams = new Dictionary<TeamColor, IMobController>();
 
         public bool MoveMob(Mob mob, AxialCoord to) {
             if (mob.Coord == to) {
@@ -31,17 +31,12 @@ namespace HexMage.Simulator {
             }
         }
 
-        public Mob AtCoord(AxialCoord c) {
-            return Mobs.FirstOrDefault(mob => Equals(mob.Coord, c));
+        public IEnumerable<Mob> MobsInTeam(TeamColor color) {
+            return Mobs.Where(mob => mob.Team == color);
         }
 
-        public Team AddTeam(TeamColor color, IMobController controller) {
-            if (Teams.Any(t => t.Color == color)) {
-                throw new ArgumentException("Team color is already in use", nameof(color));
-            }
-            var team = new Team(color, controller, this);
-            Teams.Add(team);
-            return team;
+        public Mob AtCoord(AxialCoord c) {
+            return Mobs.FirstOrDefault(mob => Equals(mob.Coord, c));
         }
 
         public void AddMob(Mob mob) {
@@ -100,16 +95,16 @@ namespace HexMage.Simulator {
         public MobManager DeepCopy() {
             var mobManagerCopy = new MobManager();
 
-            foreach (var team in Teams) {
-                var teamCopy = team.DeepCopy(mobManagerCopy);
-                mobManagerCopy.Teams.Add(teamCopy);
-
-                foreach (var origMob in team.Mobs) {
-                    mobManagerCopy._mobs.Add(origMob.DeepCopy(teamCopy));
-                }
+            foreach (var mob in Mobs) {
+                mobManagerCopy.AddMob(mob.DeepCopy());
             }
 
             return mobManagerCopy;
+        }
+
+        public void Clear() {
+            _mobs.Clear();
+            Teams.Clear();           
         }
     }
 }

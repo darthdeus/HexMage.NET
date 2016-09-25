@@ -17,14 +17,14 @@ namespace HexMage.Simulator.Model {
         public int Iniciative { get; set; }
 
         public List<Ability> Abilities { get; set; }
-        public Team Team { get; set; }
+        public TeamColor Team { get; set; }
         public AxialCoord Coord { get; set; }
         public static int AbilityCount => 6;
         public object Metadata { get; set; }
         // TODO - should this maybe just be internal?
         public List<Buff> Buffs { get; set; } = new List<Buff>();
 
-        public Mob(Team team, int maxHp, int maxAp, int defenseCost, int iniciative, List<Ability> abilities) {
+        public Mob(TeamColor team, int maxHp, int maxAp, int defenseCost, int iniciative, List<Ability> abilities) {
             Team = team;
             MaxHp = maxHp;
             MaxAp = maxAp;
@@ -48,13 +48,13 @@ namespace HexMage.Simulator.Model {
             return (int) Math.Round(distance*SpeedModifier);
         }
 
-        public Mob DeepCopy(Team teamCopy) {
+        public Mob DeepCopy() {
             var abilitiesCopy = new List<Ability>();
             foreach (var ability in Abilities) {
                 abilitiesCopy.Add(ability.DeepCopy());
             }
 
-            var copy = new Mob(teamCopy, MaxHp, MaxAp, DefenseCost, Iniciative, abilitiesCopy);
+            var copy = new Mob(Team, MaxHp, MaxAp, DefenseCost, Iniciative, abilitiesCopy);
             copy.Coord = Coord;
 #warning TODO - check if metadata needs to be copied over (probably yes)
             copy.Metadata = Metadata;

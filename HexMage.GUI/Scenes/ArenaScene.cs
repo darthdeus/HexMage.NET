@@ -20,8 +20,8 @@ namespace HexMage.GUI.Scenes {
         private readonly GameEventHub _gameEventHub;
         private readonly ReplayRecorder _replayRecorder;
 
-        public ArenaScene(GameManager gameManager, Map map) : base(gameManager) {
-            _gameInstance = new GameInstance(map);
+        public ArenaScene(GameManager gameManager, GameInstance gameInstance) : base(gameManager) {
+            _gameInstance = gameInstance;
 
             _replayRecorder = new ReplayRecorder();
 
@@ -32,29 +32,13 @@ namespace HexMage.GUI.Scenes {
                 Position = new Vector2(500, 250),
                 Active = false
             };
-
-            //var t1 = _gameInstance.MobManager.AddTeam(TeamColor.Red, new AiRandomController(_gameInstance));
-            var t1 = _gameInstance.MobManager.AddTeam(TeamColor.Red, new PlayerController(this, _gameInstance));
-            var t2 = _gameInstance.MobManager.AddTeam(TeamColor.Blue, new PlayerController(this, _gameInstance));
-            //var t2 = _gameInstance.MobManager.AddTeam(TeamColor.Blue, new AiRandomController(_gameInstance));
-
+            
             _gameEventHub = new GameEventHub(_gameInstance);
-
-            for (int team = 0; team < 2; team++) {
-                for (int mobI = 0; mobI < 2; mobI++) {
-                    var mob = Generator.RandomMob(team%2 == 0 ? t1 : t2, _gameInstance.Size,
-                                                  c =>
-                                                      _gameInstance.Pathfinder.IsValidCoord(c) &&
-                                                      _gameInstance.MobManager.AtCoord(c) == null &&
-                                                      _gameInstance.Map[c] == HexType.Empty);
-
-                    _gameInstance.MobManager.AddMob(mob);
-                }
-            }
-            _gameInstance.TurnManager.StartNextTurn(_gameInstance.Pathfinder);
         }
 
         public override void Initialize() {
+            _gameInstance.TurnManager.StartNextTurn(_gameInstance.Pathfinder);
+
             Camera2D.Instance.Translate = new Vector3(600, 500, 0);
 
             _logBox = LogBox.Instance;

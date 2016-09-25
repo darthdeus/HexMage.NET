@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using HexMage.Simulator;
+using HexMage.Simulator.Model;
 using HexMage.Simulator.PCG;
 
 namespace HexMage.Benchmarks {
@@ -12,8 +13,8 @@ namespace HexMage.Benchmarks {
 
             var pc1 = new AiRandomController(g);
 
-            var t1 = g.MobManager.AddTeam(TeamColor.Red, pc1);
-            var t2 = g.MobManager.AddTeam(TeamColor.Blue, pc1);
+            var t1 = TeamColor.Red;
+            var t2 = TeamColor.Blue;
 
             var m1 = Generator.RandomMob(t1, size, _ => true);
             var m2 = Generator.RandomMob(t2, size, c => !c.Equals(m1.Coord));
@@ -55,7 +56,7 @@ namespace HexMage.Benchmarks {
 
                         if (abilities.Count > 0) {
 #warning Change this to await the defense query
-                            abilities.First().Use(map);
+                            abilities.First().Use(map, mobManager);
                         } else {
                             var path = pathfinder.PathTo(target.Coord);
 

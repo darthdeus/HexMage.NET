@@ -13,7 +13,7 @@ namespace HexMage.Simulator {
         public MobManager MobManager { get; set; }
         public List<Mob> TurnOrder { get; set; } = new List<Mob>();
         public Mob CurrentMob => _current < TurnOrder.Count ? TurnOrder[_current] : null;
-        public IMobController CurrentController => CurrentMob.Team.Controller;
+        public IMobController CurrentController => MobManager.Teams[CurrentMob.Team];
 
         private int _current = 0;
 

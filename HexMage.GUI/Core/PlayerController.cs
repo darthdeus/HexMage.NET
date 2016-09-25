@@ -37,5 +37,7 @@ namespace HexMage.GUI.Core {
 #warning TODO - perhaps there's a better way to handle this?
             return new AiRandomController(_gameInstance).PlayTurn(eventHub);
         }
+
+        public string Name => nameof(PlayerController);
     }
 }
