@@ -35,9 +35,7 @@ namespace HexMage.GUI.Renderers {
             }
 
             var color = _mob.Team == TeamColor.Red ? Color.OrangeRed : Color.Blue;
-            if (_mob.Hp == 0) {
-                batch.Draw(assetManager[AssetManager.DarkMageDeath], pos, color);
-            } else {
+            if (_mob.Hp > 0) {
                 _animationController.CurrentAnimation.RenderFrame(mobEntity, pos, color, batch, assetManager);
 
                 var hbPos = pos.ToPoint() + _healthbarOffset;
@@ -47,6 +45,8 @@ namespace HexMage.GUI.Renderers {
                 var apPos = hbPos + new Point(_healthbarWidth, 0);
                 DrawHealthbar((double) _mob.Ap/_mob.MaxAp,
                               batch, assetManager, apPos, Color.DarkBlue, Color.LightBlue);
+            } else {
+                batch.Draw(assetManager[AssetManager.DarkMageDeath], pos, color);
             }
         }
 

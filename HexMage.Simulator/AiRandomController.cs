@@ -23,7 +23,6 @@ namespace HexMage.Simulator {
             var mob = _gameInstance.TurnManager.CurrentMob;
             Debug.Assert(mob != null, "Requesting action while there's no current mob.");
             var targets = _gameInstance.PossibleTargets(mob);
-            var pathfinder = _gameInstance.Pathfinder;
 
             if (targets.Count > 0) {
                 var target = targets.OrderBy(t => t.Coord.Distance(mob.Coord)).First();
@@ -33,35 +32,39 @@ namespace HexMage.Simulator {
                     var ua = usableAbilities.First();
                     await eventHub.BroadcastAbilityUsed(mob, target, ua);
                 } else {
-                    Utils.Log(LogSeverity.Debug, nameof(AiRandomController), $"No usable abilities, moving towards target at {target.Coord}");
-                    var moveTarget = pathfinder.FurthestPointToTarget(mob, target);
+                    Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
+                              $"No usable abilities, moving towards target at {target.Coord}");
 
-                    if (moveTarget != mob.Coord && pathfinder.Distance(moveTarget) > 0) {
-                        await eventHub.BroadcastMobMoved(mob, moveTarget);
-                    } else {
-                        Utils.Log(LogSeverity.Debug, nameof(AiRandomController), $"Move failed since target is too close, source {mob.Coord}, target {target.Coord}");
-                    }
+                    await MoveTowardsEnemy(mob, target, eventHub);
                 }
             } else {
                 var enemies = _gameInstance.Enemies(mob);
                 if (enemies.Count > 0) {
                     var target = enemies.First();
 
-                    Utils.Log(LogSeverity.Debug, nameof(AiRandomController), $"There are no targets, moving towards a random enemy at {target.Coord}");
-                    var moveTarget = pathfinder.FurthestPointToTarget(mob, target);
+                    Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
+                              $"There are no targets, moving towards a random enemy at {target.Coord}");
 
-                    if (moveTarget != mob.Coord && pathfinder.Distance(moveTarget) > 0) {
-                        await eventHub.BroadcastMobMoved(mob, moveTarget);
-                    } else {
-                        Utils.Log(LogSeverity.Debug, nameof(AiRandomController), $"Move failed since target is too close, source {mob.Coord}, target {target.Coord}");
-                    }
+                    await MoveTowardsEnemy(mob, target, eventHub);
                 } else {
                     Utils.Log(LogSeverity.Info, nameof(AiRandomController), "No possible action");
                 }
             }
 
-#warning TODO - is there any cleanup necessary?
             return true;
+        }
+
+        private async Task MoveTowardsEnemy(Mob mob, Mob target, GameEventHub eventHub) {
+            var pathfinder = _gameInstance.Pathfinder;
+
+            var moveTarget = pathfinder.FurthestPointToTarget(mob, target);
+
+            if (moveTarget != null && pathfinder.Distance(moveTarget.Value) <= mob.Ap) {
+                await eventHub.BroadcastMobMoved(mob, moveTarget.Value);
+            } else {
+                Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
+                          $"Move failed since target is too close, source {mob.Coord}, target {target.Coord}");
+            }
         }
 
         public string Name => nameof(AiRandomController);

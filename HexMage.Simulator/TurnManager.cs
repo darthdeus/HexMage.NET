@@ -13,7 +13,7 @@ namespace HexMage.Simulator {
         public MobManager MobManager { get; set; }
         public List<Mob> TurnOrder { get; set; } = new List<Mob>();
         public Mob CurrentMob => _current < TurnOrder.Count ? TurnOrder[_current] : null;
-        public IMobController CurrentController => MobManager.Teams[CurrentMob.Team];
+        public IMobController CurrentController => CurrentMob != null ? MobManager.Teams[CurrentMob.Team] : null;
 
         private int _current = 0;
 
@@ -36,7 +36,9 @@ namespace HexMage.Simulator {
             _current = 0;
 
             TurnOrder.Sort((a, b) => a.Iniciative.CompareTo(b.Iniciative));
-            pathfinder.PathfindFrom(CurrentMob.Coord);
+            if (CurrentMob != null) {
+                pathfinder.PathfindFrom(CurrentMob.Coord);
+            }
         }
 
         public TurnEndResult NextMobOrNewTurn(Pathfinder pathfinder) {
@@ -47,7 +49,9 @@ namespace HexMage.Simulator {
             } else {
                 Utils.Log(LogSeverity.Info, nameof(TurnManager), "Moving to next mob (same turn)");
                 _current++;
-                Debug.Assert(_current < TurnOrder.Count);
+
+                if (CurrentMob.Hp <= 0) return NextMobOrNewTurn(pathfinder);
+
                 pathfinder.PathfindFrom(CurrentMob.Coord);
                 return TurnEndResult.NextMob;
             }

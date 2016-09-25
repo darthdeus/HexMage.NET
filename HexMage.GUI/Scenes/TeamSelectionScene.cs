@@ -36,7 +36,7 @@ namespace HexMage.GUI.Scenes {
             };
         }
 
-        private const int MinTeamSize = 3;
+        private const int MinTeamSize = 2;
         private const int MaxTeamSize = 7;
 
         public override void Initialize() {

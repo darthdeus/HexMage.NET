@@ -9,6 +9,7 @@ namespace HexMage.Simulator {
     public class GameEventHub {
         private readonly GameInstance _gameInstance;
         private readonly List<IGameEventSubscriber> _subscribers = new List<IGameEventSubscriber>();
+        public bool IsPaused { get; set; } = false;
 
         public GameEventHub(GameInstance gameInstance) {
             _gameInstance = gameInstance;
@@ -17,8 +18,6 @@ namespace HexMage.Simulator {
         public async Task<bool> MainLoop() {
             var turnManager = _gameInstance.TurnManager;
 
-            turnManager.StartNextTurn(_gameInstance.Pathfinder);
-
             Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Starting Main Loop");
             while (!_gameInstance.IsFinished()) {
                 Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Main Loop Iteration");
@@ -26,6 +25,10 @@ namespace HexMage.Simulator {
                 await action;
 
                 turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder);
+
+                while (IsPaused) {
+                    await Task.Delay(TimeSpan.FromMilliseconds(200));
+                }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(200));
             }
@@ -42,7 +45,7 @@ namespace HexMage.Simulator {
         public async Task BroadcastMobMoved(Mob mob, AxialCoord pos) {
             await Task.WhenAll(_subscribers.Select(x => x.EventMobMoved(mob, pos)));
 
-            int distance = mob.Coord.ModifiedDistance(mob, pos);
+            int distance = mob.Coord.Distance(pos);
 
             Debug.Assert(distance <= mob.Ap, "Trying to move a mob that doesn't have enough AP.");
             Debug.Assert(_gameInstance.Map[pos] == HexType.Empty, "Trying to move a mob into a wall.");

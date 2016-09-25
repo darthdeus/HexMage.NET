@@ -210,7 +210,7 @@ namespace HexMage.GUI.Scenes {
             abilityUpdater.OnClick += index => {
                 Console.WriteLine($"ABILITY EVENT, time {DateTime.Now.Millisecond}");
 
-                _gameBoardController.ToggleAbilitySelected(index);
+                _gameBoardController.SelectAbility(index);
             };
 
             return abilityDetailWrapper;
@@ -218,7 +218,6 @@ namespace HexMage.GUI.Scenes {
 
         private void FinalizeDefenseModal(DefenseDesire desire) {
             Debug.Assert(_defenseDesireSource != null, "Defense desire modal wasn't properly initialized");
-            Console.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] - Result set");
             _defenseDesireSource.SetResult(desire);
             _defenseDesireSource = null;
             _defenseModal.Active = false;

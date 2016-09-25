@@ -35,9 +35,10 @@ namespace HexMage.Simulator {
         }
 
         public bool IsFinished() {
-            return MobManager.Teams
-                             .Any(pair => MobManager.MobsInTeam(pair.Key)
-                                                    .All(mob => mob.Hp == 0));
+            return MobManager.AliveMobs
+                             .Select(m => m.Team)
+                             .Distinct()
+                             .Count() <= 1;
         }
 
         [Obsolete]
@@ -74,8 +75,8 @@ namespace HexMage.Simulator {
 
         public IList<Mob> PossibleTargets(Mob mob) {
             var usableAbilities = mob.Abilities
-                .Where(ability => IsAbilityUsable(mob, ability))
-                .ToList();
+                                     .Where(ability => IsAbilityUsable(mob, ability))
+                                     .ToList();
 
             if (usableAbilities.Count == 0) {
                 return new List<Mob>();
@@ -92,7 +93,9 @@ namespace HexMage.Simulator {
         }
 
         public IList<Mob> Enemies(Mob mob) {
-            return MobManager.Mobs.Where(enemy => !enemy.Team.Equals(mob.Team)).ToList();
+            return MobManager.AliveMobs
+                             .Where(enemy => !enemy.Team.Equals(mob.Team))
+                             .ToList();
         }
 
         public GameInstance DeepCopy() {

@@ -135,10 +135,7 @@ namespace HexMage.GUI.Components {
                                                  "Finished waiting for main loop to exit");
                                        t.LogTask();
 
-                                       await ShowMessage("Game complete, restarting in 5 seconds.", 5);
-                                       _arenaScene.Terminate();
-
-#warning TODO - actually restart the game
+                                       await ShowMessage("Game complete");
                                    });
         }
 
@@ -177,6 +174,15 @@ namespace HexMage.GUI.Components {
 
             if (inputManager.IsKeyJustPressed(Keys.P)) {
                 _replayRecorder.DumpReplay(Console.Out);
+            }
+
+            if (inputManager.IsKeyJustPressed(Keys.Pause)) {
+                if (_eventHub.IsPaused) {
+                    ShowMessage("Game resumed.");
+                } else {
+                    ShowMessage("Game paused.");
+                }
+                _eventHub.IsPaused = !_eventHub.IsPaused;
             }
 
             var controller = _gameInstance.TurnManager.CurrentController as PlayerController;
@@ -229,12 +235,19 @@ namespace HexMage.GUI.Components {
             else if (inputManager.IsKeyJustReleased(Keys.D6)) SelectAbility(5);
         }
 
-        private void SelectAbility(int index) {
+        public void SelectAbility(int index) {
             var currentMob = _gameInstance.TurnManager.CurrentMob;
             var ability = currentMob.Abilities[index];
 
-            if (_gameInstance.IsAbilityUsable(currentMob, ability) ||
-                SelectedAbilityIndex.HasValue) ToggleAbilitySelected(index);
+            if (SelectedAbilityIndex.HasValue) {
+                if (SelectedAbilityIndex.Value == index) {
+                    SelectedAbilityIndex = null;
+                } else if (_gameInstance.IsAbilityUsable(currentMob, ability)) {
+                    SelectedAbilityIndex = index;
+                }
+            } else if (_gameInstance.IsAbilityUsable(currentMob, ability)) {
+                    SelectedAbilityIndex = index;
+            }
         }
 
         private void AttackMob(Mob target) {
@@ -255,11 +268,6 @@ namespace HexMage.GUI.Components {
             } else {
                 ShowMessage("You can't use the selected ability on that target.");
             }
-        }
-
-        public void ToggleAbilitySelected(int index) {
-            if (SelectedAbilityIndex == index) SelectedAbilityIndex = null;
-            else SelectedAbilityIndex = index;
         }
 
         private void HandleLeftClick() {
@@ -293,7 +301,7 @@ namespace HexMage.GUI.Components {
                         ShowMessage("You can't cast spells on the ground.");
                     } else {
                         if (_gameInstance.Map[mouseHex] == HexType.Empty) {
-                            var distance = currentMob.Coord.ModifiedDistance(currentMob, mouseHex);
+                            var distance = currentMob.Coord.Distance(mouseHex);
 
                             if (distance > currentMob.Ap) {
                                 ShowMessage("You don't have enough AP.");

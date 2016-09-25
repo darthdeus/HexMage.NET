@@ -33,6 +33,7 @@ namespace HexMage.Simulator {
                     + Math.Abs(Y - to.Y))/2;
         }
 
+        [Obsolete]
         public int ModifiedDistance(Mob mob, AxialCoord to) {
             return (int)Math.Round(Distance(to)*mob.SpeedModifier);
         }
