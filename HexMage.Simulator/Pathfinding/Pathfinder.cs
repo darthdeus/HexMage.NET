@@ -85,14 +85,18 @@ namespace HexMage.Simulator {
                     Utils.Log(LogSeverity.Debug, nameof(Pathfinder),
                               $"Trying shorter path from {mob.Coord} to {min.Value} instead of {target.Coord}");
 
+                    if (shorterPath.Count == 0) {
+                        return mob.Coord;
+                    }
+
                     return FurthestPointOnPath(mob, shorterPath);
                 } else {
                     Utils.Log(LogSeverity.Debug, nameof(Pathfinder), "Path not found");
                     return mob.Coord;
                 }
+            } else {
+                return FurthestPointOnPath(mob, path);
             }
-
-            return FurthestPointOnPath(mob, path);
         }
 
         public AxialCoord FurthestPointOnPath(Mob mob, IList<AxialCoord> path) {

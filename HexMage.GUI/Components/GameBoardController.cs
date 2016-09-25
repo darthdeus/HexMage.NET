@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
+using HexMage.GUI.Scenes;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
 using HexMage.Simulator.Model;
@@ -16,6 +17,7 @@ namespace HexMage.GUI.Components {
     public class GameBoardController : Component, IGameEventSubscriber {
         private readonly GameEventHub _eventHub;
         private readonly ReplayRecorder _replayRecorder;
+        private readonly ArenaScene _arenaScene;
         private readonly GameInstance _gameInstance;
 
         private readonly Vector2 _mouseHoverPopoverOffset = new Vector2(
@@ -34,10 +36,12 @@ namespace HexMage.GUI.Components {
 
         public int? SelectedAbilityIndex;
 
-        public GameBoardController(GameInstance gameInstance, GameEventHub eventHub, ReplayRecorder replayRecorder) {
+        public GameBoardController(GameInstance gameInstance, GameEventHub eventHub, ReplayRecorder replayRecorder,
+                                   ArenaScene arenaScene) {
             _gameInstance = gameInstance;
             _eventHub = eventHub;
             _replayRecorder = replayRecorder;
+            _arenaScene = arenaScene;
         }
 
         public async Task<bool> EventAbilityUsed(Mob mob, Mob target, UsableAbility usableAbility) {
@@ -126,11 +130,14 @@ namespace HexMage.GUI.Components {
             CreateMobEntities(assetManager);
 
             _eventHub.MainLoop()
-                     .ContinueWith(t => {
+                     .ContinueWith(async t => {
                                        Utils.Log(LogSeverity.Info, nameof(GameBoardController),
                                                  "Finished waiting for main loop to exit");
                                        t.LogTask();
-                                       ShowMessage("Game complete, restarting in 5 seconds.");
+
+                                       await ShowMessage("Game complete, restarting in 5 seconds.", 5);
+                                       _arenaScene.Terminate();
+
 #warning TODO - actually restart the game
                                    });
         }

@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Security.AccessControl;
 using System.Text;
-using System.Threading.Tasks;
 using HexMage.AI;
 using HexMage.GUI.Core;
+using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.PCG;
 using Microsoft.Xna.Framework;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Scenes {
     public class TeamSelectionScene : GameScene {
@@ -22,6 +20,9 @@ namespace HexMage.GUI.Scenes {
         private readonly ArenaScene _arenaScene;
         private List<IMobController> _controllerList;
         private readonly MobManager _mobManager = new MobManager();
+        private VerticalLayout _teamPreviewLayout;
+        private HorizontalLayout _t1Preview;
+        private HorizontalLayout _t2Preview;
 
         public TeamSelectionScene(GameManager gameManager, Map map) : base(gameManager) {
             _map = map;
@@ -49,28 +50,43 @@ namespace HexMage.GUI.Scenes {
                 Position = new Vector2(400, 50)
             };
 
-           
-            var t1slider = left.AddChild(new Slider(MinTeamSize, MaxTeamSize, new Point(100, 10)));
-            var t2slider = right.AddChild(new Slider(MinTeamSize, MaxTeamSize, new Point(100, 10)));
+            var t1SliderLayout = left.AddChild(new VerticalLayout());
+            var t2SliderLayout = right.AddChild(new VerticalLayout());
 
-            t1slider.OnChange += value => RegenerateTeams(t1slider.Value, t2slider.Value);
-            t2slider.OnChange += value => RegenerateTeams(t1slider.Value, t2slider.Value);
+            var t1SizeLabel = t1SliderLayout.AddChild(new Label("Team 1 size:", _assetManager.Font));
+            var t2SizeLabel = t2SliderLayout.AddChild(new Label("Team 2 size:", _assetManager.Font));
 
-            foreach (var controller in _controllerList)
-            {
+            var t1Slider = t1SliderLayout.AddChild(new Slider(MinTeamSize, MaxTeamSize, new Point(100, 10)));
+            var t2Slider = t2SliderLayout.AddChild(new Slider(MinTeamSize, MaxTeamSize, new Point(100, 10)));
+
+            t1Slider.OnChange += value => RegenerateTeams(t1Slider.Value, t2Slider.Value);
+            t2Slider.OnChange += value => RegenerateTeams(t1Slider.Value, t2Slider.Value);
+
+            t1SizeLabel.AddComponent(() => t1SizeLabel.Text = $"Team 1 size: {t1Slider.Value}");
+            t2SizeLabel.AddComponent(() => t2SizeLabel.Text = $"Team 2 size: {t2Slider.Value}");
+
+            left.AddChild(new Separator(5));
+            right.AddChild(new Separator(5));
+
+            left.AddChild(new Label(() => _leftController?.ToString() ?? "", _assetManager.Font));
+            right.AddChild(new Label(() => _rightController?.ToString() ?? "", _assetManager.Font));
+
+            left.AddChild(new Separator(5));
+            right.AddChild(new Separator(5));
+
+            foreach (var controller in _controllerList) {
                 var btnLeft = left.AddChild(new TextButton(controller.Name, _assetManager.Font));
                 btnLeft.OnClick += _ => {
                     _leftController = controller;
-                    RegenerateTeams(t1slider.Value, t2slider.Value);
+                    RegenerateTeams(t1Slider.Value, t2Slider.Value);
                 };
 
                 var btnRight = right.AddChild(new TextButton(controller.Name, _assetManager.Font));
                 btnRight.OnClick += _ => {
                     _rightController = controller;
-                    RegenerateTeams(t1slider.Value, t2slider.Value);
+                    RegenerateTeams(t1Slider.Value, t2Slider.Value);
                 };
             }
-
 
             var btnStart = new TextButton("Start game", _assetManager.Font) {
                 SortOrder = Camera2D.SortUI,
@@ -79,10 +95,32 @@ namespace HexMage.GUI.Scenes {
 
             btnStart.OnClick += _ => { LoadNewScene(_arenaScene); };
 
+            var btnRegenerate = new TextButton("Regenerate teams", _assetManager.Font) {
+                SortOrder = Camera2D.SortUI,
+                Position = new Vector2(250, 40)
+            };
+
+            btnRegenerate.OnClick += _ => RegenerateTeams(t1Slider.Value, t2Slider.Value);
+
             AddAndInitializeRootEntity(btnStart, _assetManager);
+            AddAndInitializeRootEntity(btnRegenerate, _assetManager);
 
             AddAndInitializeRootEntity(left, _assetManager);
             AddAndInitializeRootEntity(right, _assetManager);
+
+            _teamPreviewLayout = new VerticalLayout() {
+                SortOrder = Camera2D.SortUI,
+                Position = new Vector2(100, 200),
+                Spacing = 40
+            };
+
+            _t1Preview = new HorizontalLayout {Spacing = 10};
+            _t2Preview = new HorizontalLayout {Spacing = 10};
+
+            _teamPreviewLayout.AddChild(_t1Preview);
+            _teamPreviewLayout.AddChild(_t2Preview);
+
+            AddAndInitializeRootEntity(_teamPreviewLayout, _assetManager);
         }
 
         private void RegenerateTeams(int t1size, int t2size) {
@@ -102,11 +140,16 @@ namespace HexMage.GUI.Scenes {
             _mobManager.Teams[t1] = _leftController;
             _mobManager.Teams[t2] = _rightController;
 
+            _t1Preview.ClearChildren();
+            _t2Preview.ClearChildren();
+
             for (int i = 0; i < t1size; i++) {
                 var mob = Generator.RandomMob(t1, _map.Size, c =>
                                                       _mobManager.AtCoord(c) == null && _map[c] == HexType.Empty);
 
                 _mobManager.AddMob(mob);
+
+                _t1Preview.AddChild(BuildMobPreview(() => mob));
             }
 
             for (int i = 0; i < t2size; i++) {
@@ -114,7 +157,40 @@ namespace HexMage.GUI.Scenes {
                                                       _mobManager.AtCoord(c) == null && _map[c] == HexType.Empty);
 
                 _mobManager.AddMob(mob);
+
+                _t2Preview.AddChild(BuildMobPreview(() => mob));
             }
+        }
+
+        public Entity BuildMobPreview(Func<Mob> mobFunc) {
+            Func<string> textFunc = () => {
+                var builder = new StringBuilder();
+
+                var mob = mobFunc();
+
+                builder.AppendLine(mob.ToString());
+
+                foreach (var ability in mob.Abilities) {
+                    builder.AppendLine("-----");
+                    builder.AppendLine(
+                        $"{ability.Element}, DMG {ability.Dmg}, Range {ability.Range}");
+                    builder.AppendLine("Buffs:");
+                    foreach (var buff in ability.Buffs) {
+                        builder.AppendLine(
+                            $"{buff.Element}, Hp {buff.HpChange}, Ap {buff.ApChange}");
+                    }
+                }
+
+                return builder.ToString();
+            };
+
+            var wrapper = new Entity {
+                Renderer = new ColorRenderer(Color.White)
+            };
+
+            wrapper.AddChild(new Label(textFunc, _assetManager.Font));
+
+            return wrapper;
         }
 
         public override void Cleanup() {}

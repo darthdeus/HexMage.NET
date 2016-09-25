@@ -8,15 +8,13 @@ using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
 using HexMage.Simulator.Model;
-using HexMage.Simulator.PCG;
 using Microsoft.Xna.Framework;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Scenes {
-    internal class ArenaScene : GameScene {
+    public class ArenaScene : GameScene {
         private readonly GameInstance _gameInstance;
         private readonly Entity _defenseModal;
-        public bool HoveringOverUi { get; private set; } = false;
         private readonly GameEventHub _gameEventHub;
         private readonly ReplayRecorder _replayRecorder;
 
@@ -68,7 +66,7 @@ namespace HexMage.GUI.Scenes {
             AddAndInitializeRootEntity(_defenseModal, _assetManager);
 
             var gameBoardEntity = CreateRootEntity(Camera2D.SortBackground);
-            var gameBoardController = new GameBoardController(_gameInstance, _gameEventHub, _replayRecorder);
+            var gameBoardController = new GameBoardController(_gameInstance, _gameEventHub, _replayRecorder, this);
             _gameBoardController = gameBoardController;
             gameBoardEntity.AddComponent(gameBoardController);
             gameBoardEntity.Renderer = new GameBoardRenderer(_gameInstance, gameBoardController, _camera);

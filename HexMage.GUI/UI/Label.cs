@@ -2,8 +2,9 @@
 using HexMage.GUI.Components;
 using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
-using Microsoft.Xna.Framework;
+using HexMage.Simulator;
 using Microsoft.Xna.Framework.Graphics;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.UI {
     public class Label : Entity, IRenderer {
@@ -25,8 +26,7 @@ namespace HexMage.GUI.UI {
         public Label(Func<string> textFunc, SpriteFont font) {
             Font = font;
             Renderer = this;
-#warning TODO - replace with lambda component
-            AddComponent(new TextSetter(this, textFunc));
+            AddComponent(() => Text = textFunc());
         }
 
         protected override void Layout() {
@@ -35,25 +35,10 @@ namespace HexMage.GUI.UI {
 
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
             if (DebugMode) {
-#warning TODO - replace with loggin
-                Console.WriteLine($"RENDER: {this} at {RenderPosition} with size {LayoutSize}");
+                Utils.Log(LogSeverity.Debug, nameof(Label) + "RENDER", $"{this} at {RenderPosition} with size {LayoutSize}");
             }
             batch.DrawString(Font, Text, RenderPosition, TextColor);
         }
 
-
-        private class TextSetter : Component {
-            private readonly Label _label;
-            private readonly Func<string> _textFunc;
-
-            public TextSetter(Label label, Func<string> textFunc) {
-                _label = label;
-                _textFunc = textFunc;
-            }
-
-            public override void Update(GameTime time) {
-                _label.Text = _textFunc();
-            }
-        }
     }
 }

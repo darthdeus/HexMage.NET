@@ -14,6 +14,7 @@ namespace HexMage.GUI {
 
         public const string DarkMageIdle = "mobs/dark-mage-idle";
         public const string DarkMageClicked = "mobs/dark-mage-clicked";
+        public const string DarkMageDeath = "mobs/dark-mage-death";
 
         public const string FireballSprite = "mobs/fireball";
         public const string FireballExplosionSprite = "mobs/fireball-explosion";

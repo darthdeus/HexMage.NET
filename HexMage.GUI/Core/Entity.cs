@@ -170,6 +170,10 @@ namespace HexMage.GUI.Core {
         public void EnqueueClickEvent(Action action) {
             Scene.EnqueueClickEvent(new ClickEvent(this, action));
         }
+
+        public void ClearChildren() {
+            Children.Clear();
+        }
     }
 
     public class SpriteRenderer : IRenderer {

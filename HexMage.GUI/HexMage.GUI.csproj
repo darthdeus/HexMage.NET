@@ -55,6 +55,7 @@
     <Compile Include="Renderers\IRenderer.cs" />
     <Compile Include="LambdaComponent.cs" />
     <Compile Include="Renderers\AnimationRenderer.cs" />
+    <Compile Include="Renderers\MapPreviewRenderer.cs" />
     <Compile Include="Renderers\MobRenderer.cs" />
     <Compile Include="Core\Entity.cs" />
     <Compile Include="Renderers\GameBoardRenderer.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="UI\Label.cs" />
     <Compile Include="UI\LogBox.cs" />
     <Compile Include="UI\Panel.cs" />
+    <Compile Include="UI\Separator.cs" />
     <Compile Include="UI\ShowOnHover.cs" />
     <Compile Include="UI\Slider.cs" />
     <Compile Include="UI\SpriteElement.cs" />

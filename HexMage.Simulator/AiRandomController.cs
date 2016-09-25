@@ -36,7 +36,7 @@ namespace HexMage.Simulator {
                     Utils.Log(LogSeverity.Debug, nameof(AiRandomController), $"No usable abilities, moving towards target at {target.Coord}");
                     var moveTarget = pathfinder.FurthestPointToTarget(mob, target);
 
-                    if (pathfinder.Distance(moveTarget) > 0) {
+                    if (moveTarget != mob.Coord && pathfinder.Distance(moveTarget) > 0) {
                         await eventHub.BroadcastMobMoved(mob, moveTarget);
                     } else {
                         Utils.Log(LogSeverity.Debug, nameof(AiRandomController), $"Move failed since target is too close, source {mob.Coord}, target {target.Coord}");
@@ -50,7 +50,7 @@ namespace HexMage.Simulator {
                     Utils.Log(LogSeverity.Debug, nameof(AiRandomController), $"There are no targets, moving towards a random enemy at {target.Coord}");
                     var moveTarget = pathfinder.FurthestPointToTarget(mob, target);
 
-                    if (pathfinder.Distance(moveTarget) > 0) {
+                    if (moveTarget != mob.Coord && pathfinder.Distance(moveTarget) > 0) {
                         await eventHub.BroadcastMobMoved(mob, moveTarget);
                     } else {
                         Utils.Log(LogSeverity.Debug, nameof(AiRandomController), $"Move failed since target is too close, source {mob.Coord}, target {target.Coord}");

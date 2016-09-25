@@ -27,6 +27,7 @@ namespace HexMage.GUI.Renderers {
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
             var mobEntity = (MobEntity) _mob.Metadata;
 
+#warning TODO - why isn't this entity.RenderPosition?
             var pos = entity.Position;
 
             if (_gameInstance.TurnManager.CurrentMob == _mob) {
@@ -34,15 +35,19 @@ namespace HexMage.GUI.Renderers {
             }
 
             var color = _mob.Team == TeamColor.Red ? Color.OrangeRed : Color.Blue;
-            _animationController.CurrentAnimation.RenderFrame(mobEntity, pos, color, batch, assetManager);
+            if (_mob.Hp == 0) {
+                batch.Draw(assetManager[AssetManager.DarkMageDeath], pos, color);
+            } else {
+                _animationController.CurrentAnimation.RenderFrame(mobEntity, pos, color, batch, assetManager);
 
-            var hbPos = pos.ToPoint() + _healthbarOffset;
-            DrawHealthbar((double) _mob.Hp/_mob.MaxHp,
-                          batch, assetManager, hbPos, Color.DarkGreen, Color.LightGreen);
+                var hbPos = pos.ToPoint() + _healthbarOffset;
+                DrawHealthbar((double) _mob.Hp/_mob.MaxHp,
+                              batch, assetManager, hbPos, Color.DarkGreen, Color.LightGreen);
 
-            var apPos = hbPos + new Point(_healthbarWidth, 0);
-            DrawHealthbar((double) _mob.Ap/_mob.MaxAp,
-                          batch, assetManager, apPos, Color.DarkBlue, Color.LightBlue);
+                var apPos = hbPos + new Point(_healthbarWidth, 0);
+                DrawHealthbar((double) _mob.Ap/_mob.MaxAp,
+                              batch, assetManager, apPos, Color.DarkBlue, Color.LightBlue);
+            }
         }
 
         private void DrawHealthbar(double percentage, SpriteBatch batch, AssetManager assetManager, Point pos,
