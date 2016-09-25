@@ -73,7 +73,9 @@ namespace HexMage.Simulator {
         }
 
         public IList<Mob> PossibleTargets(Mob mob) {
-            var usableAbilities = mob.Abilities.Where(ability => IsAbilityUsable(mob, ability)).ToList();
+            var usableAbilities = mob.Abilities
+                .Where(ability => IsAbilityUsable(mob, ability))
+                .ToList();
 
             if (usableAbilities.Count == 0) {
                 return new List<Mob>();
@@ -105,7 +107,7 @@ namespace HexMage.Simulator {
             Map.Reset();
             MobManager.Reset();
             TurnManager.Reset();
-            Pathfinder.Reset();            
+            Pathfinder.Reset();
         }
     }
 }
