@@ -8,7 +8,7 @@ namespace HexMage.Simulator {
         NextTurn
     }
 
-    public class TurnManager {
+    public class TurnManager : IResettable {
         private readonly Map _map;
         public MobManager MobManager { get; set; }
         public List<Mob> TurnOrder { get; set; } = new List<Mob>();
@@ -51,6 +51,10 @@ namespace HexMage.Simulator {
                 pathfinder.PathfindFrom(CurrentMob.Coord);
                 return TurnEndResult.NextMob;
             }
+        }
+
+        public void Reset() {
+            TurnOrder.Clear();
         }
     }
 }

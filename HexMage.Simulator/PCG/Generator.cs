@@ -106,6 +106,7 @@ namespace HexMage.Simulator.PCG {
 
                 if (isCoordAvailable(coord) && coord.Distance(zero) < size) {
                     mob.Coord = coord;
+                    mob.OrigCoord = coord;
                     break;
                 }
             }

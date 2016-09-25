@@ -5,7 +5,7 @@ using System.Linq;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
-    public class Pathfinder {
+    public class Pathfinder : IResettable {
         private readonly Map _map;
         private readonly MobManager _mobManager;
         private List<AxialCoord> _diffs;
@@ -210,9 +210,11 @@ namespace HexMage.Simulator {
         }
 
         public bool IsValidCoord(AxialCoord c) {
-            //return _map.AllCoords.Contains(c);
             return c.ToCube().Sum() == 0 && _map.CubeDistance(new CubeCoord(0, 0, 0), c) <= _map.Size;
-            //return c.Abs().Max() < Size && c.Min() >= 0;
+        }
+
+        public void Reset() {
+            // Right now we're not caching anything, so there's nothing to reset
         }
     }
 }

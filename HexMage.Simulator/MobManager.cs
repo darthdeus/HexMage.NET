@@ -5,7 +5,7 @@ using System.Linq;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
-    public class MobManager : IDeepCopyable<MobManager> {
+    public class MobManager : IDeepCopyable<MobManager>, IResettable {
         // TODO - combine this into the property
         private readonly List<Mob> _mobs = new List<Mob>();
         public IEnumerable<Mob> Mobs => _mobs;
@@ -105,6 +105,11 @@ namespace HexMage.Simulator {
         public void Clear() {
             _mobs.Clear();
             Teams.Clear();           
+        }
+        public void Reset() {
+            foreach (var mob in _mobs) {
+                mob.Reset();
+            }
         }
     }
 }

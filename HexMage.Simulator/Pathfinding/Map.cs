@@ -5,7 +5,7 @@ using System.Linq;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
-    public class Map : IDeepCopyable<Map> {
+    public class Map : IDeepCopyable<Map>, IResettable {
         private readonly HexMap<HexType> _hexes;
         private readonly HexMap<List<Buff>> _buffs;
         public int Size { get; set; }
@@ -101,6 +101,12 @@ namespace HexMage.Simulator {
             return new Map(Size, hexesCopy, buffsCopy) {
                 Guid = Guid
             };
+        }
+
+        public void Reset() {
+            foreach (var coord in AllCoords) {
+                _buffs[coord].Clear();
+            }
         }
     }
 }

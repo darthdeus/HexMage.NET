@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
-    public class GameInstance : IDeepCopyable<GameInstance> {
+    public class GameInstance : IDeepCopyable<GameInstance>, IResettable {
         public Map Map { get; set; }
         public MobManager MobManager { get; set; }
         public Pathfinder Pathfinder { get; set; }
@@ -99,6 +99,13 @@ namespace HexMage.Simulator {
             var mobManagerCopy = MobManager.DeepCopy();
             return new GameInstance(Size, mapCopy, mobManagerCopy, new Pathfinder(mapCopy, mobManagerCopy),
                                     new TurnManager(mobManagerCopy, mapCopy));
+        }
+
+        public void Reset() {
+            Map.Reset();
+            MobManager.Reset();
+            TurnManager.Reset();
+            Pathfinder.Reset();            
         }
     }
 }

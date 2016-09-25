@@ -48,6 +48,7 @@
     <Compile Include="Model\AreaBuff.cs" />
     <Compile Include="Model\Buff.cs" />
     <Compile Include="Model\IMobController.cs" />
+    <Compile Include="Model\IResettable.cs" />
     <Compile Include="Model\ReplayRecorder.cs" />
     <Compile Include="Model\TeamColor.cs" />
     <Compile Include="Pathfinding\Map.cs" />

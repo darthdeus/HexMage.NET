@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HexMage.Simulator;
+using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator.Model {
-    public class Mob {
+    public class Mob : IResettable {
         public static readonly int NumberOfAbilities = 6;
 
         private static int _lastId = 0;
@@ -19,7 +21,9 @@ namespace HexMage.Simulator.Model {
         public List<Ability> Abilities { get; set; }
         public TeamColor Team { get; set; }
         public AxialCoord Coord { get; set; }
+        public AxialCoord OrigCoord { get; set; }
         public static int AbilityCount => 6;
+#warning TODO - store this separately
         public object Metadata { get; set; }
         // TODO - should this maybe just be internal?
         public List<Buff> Buffs { get; set; } = new List<Buff>();
@@ -34,11 +38,20 @@ namespace HexMage.Simulator.Model {
             Hp = maxHp;
             Ap = maxAp;
             Coord = new AxialCoord(0, 0);
+            OrigCoord = Coord;
             Id = _lastId++;
         }
 
         public override string ToString() {
             return $"{Hp}/{MaxHp} {Ap}/{MaxAp}";
+        }
+
+        public void Reset() {
+            Buffs.Clear();
+            Coord = OrigCoord;
+            Hp = MaxHp;
+            Ap = MaxAp;
+            Metadata = null;
         }
 
         public float SpeedModifier => Buffs.Select(b => b.MoveSpeedModifier)
