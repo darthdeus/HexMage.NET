@@ -72,7 +72,6 @@ namespace HexMage.Simulator.Model {
 
             _target.Buffs.Add(Ability.ElementalEffect);
             foreach (var abilityBuff in Ability.Buffs) {
-                // TODO - handle lifetimes
                 _target.Buffs.Add(abilityBuff.DeepCopy());
             }
 
@@ -84,7 +83,6 @@ namespace HexMage.Simulator.Model {
                 }
             }
 
-            // TODO - handle negative AP
             _mob.Ap -= Ability.Cost;
         }
 

@@ -55,7 +55,6 @@ namespace HexMage.Simulator {
 
             var path = Paths[current];
 
-            // TODO - this is ugly, the hexagonal-map abstraction leaks
             if (path == null) return result;
 
             var iterations = 1000;
@@ -138,7 +137,6 @@ namespace HexMage.Simulator {
                 path.State = VertexState.Unvisited;
             }
 
-            // TODO - nema byt Y - X?
             var startPath = Paths[start];
 
             startPath.Distance = 0;
@@ -157,7 +155,6 @@ namespace HexMage.Simulator {
                 if ((iterations > Size*Size*10) || (queue.Count > 1000))
                     Utils.Log(LogSeverity.Error, nameof(Pathfinder), "Pathfinder stuck when calculating a path.");
 
-                // TODO - opet, nema byt Y a X?
                 var p = Paths[current];
 
                 if (p.State == VertexState.Closed) continue;

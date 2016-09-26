@@ -6,7 +6,6 @@ using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public class MobManager : IDeepCopyable<MobManager>, IResettable {
-        // TODO - combine this into the property
         private readonly List<Mob> _mobs = new List<Mob>();
         public IEnumerable<Mob> Mobs => _mobs;
         public IEnumerable<Mob> AliveMobs => Mobs.Where(m => m.Hp > 0);
@@ -63,7 +62,6 @@ namespace HexMage.Simulator {
                 }
             }
 
-            // TODO - store these in a list instead so that the whole map doesn't have to be iterated each turn
             foreach (var coord in map.AllCoords) {
                 var buffs = map.BuffsAt(coord);
                 foreach (var buff in buffs) {

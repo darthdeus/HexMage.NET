@@ -9,7 +9,6 @@ namespace HexMage.GUI.Components {
         public virtual void Initialize(AssetManager assetManager) {}
         public virtual void Update(GameTime time) {}
 
-        // TODO - find a better name for this
         protected void AssertNotInitialized() {
             if (IsInitialized) {
                 Console.WriteLine($"Component {this} for {Entity} already initialized.");

@@ -123,7 +123,7 @@ namespace HexMage.GUI.Renderers {
 
                         distance++;
                     }
-                } else {
+                } else if (path != null) {
                     foreach (var coord in path) {
                         if (currentMob.Coord.Distance(coord) <= currentMob.Ap) {
                             DrawAt(hexUsable, coord);

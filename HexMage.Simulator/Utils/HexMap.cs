@@ -54,7 +54,6 @@ namespace HexMage.Simulator {
         public void RecalculateCoords() {
             AllCoords.Clear();
 
-            // TODO - go from -Size
             for (var i = -_size; i < _size; i++) {
                 for (var j = -_size; j < _size; j++) {
                     for (var k = -_size; k < _size; k++) {

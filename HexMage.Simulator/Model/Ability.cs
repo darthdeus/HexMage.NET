@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
-    // TODO - rename
     public enum AbilityElement {
         Earth,
         Fire,

@@ -99,7 +99,6 @@ namespace HexMage.Simulator {
         }
 
         public GameInstance DeepCopy() {
-#warning TODO - tohle prepsat poradne
             var mapCopy = Map.DeepCopy();
             var mobManagerCopy = MobManager.DeepCopy();
             return new GameInstance(Size, mapCopy, mobManagerCopy, new Pathfinder(mapCopy, mobManagerCopy),

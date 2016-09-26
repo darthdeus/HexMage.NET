@@ -118,7 +118,6 @@ namespace HexMage.GUI.Components {
         }
 
         public Task<bool> EventDefenseDesireAcquired(Mob mob, DefenseDesire defenseDesireResult) {
-            ShowMessage($"{nameof(GameBoardController)} got defense {defenseDesireResult}");
             return Task.FromResult(true);
         }
 

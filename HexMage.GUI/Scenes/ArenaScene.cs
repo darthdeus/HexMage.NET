@@ -83,7 +83,6 @@ namespace HexMage.GUI.Scenes {
             NoParticles
         }
 
-        // TODO - sort out where else cleanup needs to be called
         public override void Cleanup() {}
 
         private void BuildUi() {

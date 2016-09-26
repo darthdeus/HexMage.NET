@@ -41,7 +41,6 @@ namespace HexMage.GUI.Components {
             float percent = (float) (_elapsedTime.TotalMilliseconds/_duration.TotalMilliseconds);
 
             if (percent > 0.99f) {
-                // TODO - destroy the entity and all of its components :)
                 Active = false;
                 _tcs.SetResult(true);
                 TargetHit?.Invoke();

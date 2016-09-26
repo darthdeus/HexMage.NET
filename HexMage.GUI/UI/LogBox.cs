@@ -15,7 +15,6 @@ using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.UI {
     public class LogEntry : Entity, IRenderer {
-        // TODO - remove this
         private readonly AssetManager _assetManager;
         public LogSeverity LogLevel { get; private set; }
         public string Owner { get; private set; }
@@ -41,7 +40,7 @@ namespace HexMage.GUI.UI {
             }
 
             // TODO - calculate the width properly
-            LayoutSize = new Vector2(800, height);
+            LayoutSize = new Vector2(1000, height);
         }
 
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {

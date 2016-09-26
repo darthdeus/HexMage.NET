@@ -23,9 +23,7 @@ namespace HexMage.Simulator.Model {
         public AxialCoord Coord { get; set; }
         public AxialCoord OrigCoord { get; set; }
         public static int AbilityCount => 6;
-#warning TODO - store this separately
         public object Metadata { get; set; }
-        // TODO - should this maybe just be internal?
         public List<Buff> Buffs { get; set; } = new List<Buff>();
 
         public Mob(TeamColor team, int maxHp, int maxAp, int defenseCost, int iniciative, List<Ability> abilities) {
