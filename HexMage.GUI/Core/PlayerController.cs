@@ -21,7 +21,6 @@ namespace HexMage.GUI.Core {
         private TaskCompletionSource<bool> _tcs;
 
         public Task<bool> PlayTurn(GameEventHub eventHub) {
-#warning TOOD - je tohle spravne?
             Debug.Assert(_tcs == null);            
             _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             return _tcs.Task;
@@ -34,7 +33,6 @@ namespace HexMage.GUI.Core {
         }
 
         public Task<bool> RandomAction(GameEventHub eventHub) {
-#warning TODO - perhaps there's a better way to handle this?
             return new AiRandomController(_gameInstance).PlayTurn(eventHub);
         }
 

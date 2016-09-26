@@ -129,7 +129,7 @@ namespace HexMage.GUI.Components {
             BuildPopovers();
             CreateMobEntities(assetManager);
 
-            _eventHub.MainLoop()
+            _eventHub.MainLoop(TimeSpan.FromMilliseconds(200))
                      .ContinueWith(async t => {
                                        Utils.Log(LogSeverity.Info, nameof(GameBoardController),
                                                  "Finished waiting for main loop to exit");

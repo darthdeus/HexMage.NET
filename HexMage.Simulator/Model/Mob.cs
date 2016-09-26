@@ -69,8 +69,7 @@ namespace HexMage.Simulator.Model {
 
             var copy = new Mob(Team, MaxHp, MaxAp, DefenseCost, Iniciative, abilitiesCopy);
             copy.Coord = Coord;
-#warning TODO - check if metadata needs to be copied over (probably yes)
-            copy.Metadata = Metadata;
+            copy.Metadata = null;
 
             foreach (var buff in Buffs) {
                 copy.Buffs.Add(buff.DeepCopy());

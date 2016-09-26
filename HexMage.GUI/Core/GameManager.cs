@@ -9,7 +9,6 @@ namespace HexMage.GUI {
         public AssetManager AssetManager { get; set; }
         public SpriteBatch SpriteBatch { get; set; }
         private readonly SceneSynchronizationContext _synchronizationContext;
-#warning TODO - this is horrible and should be fixed in the future
         public static SynchronizationContext CurrentSynchronizationContext;
 
         public GameManager(Camera2D camera, InputManager inputManager, AssetManager assetManager,

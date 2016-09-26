@@ -53,7 +53,15 @@ namespace HexMage.Simulator {
             }
 
             public override string ToString() {
-                return $"{nameof(_type)}: {_type}, {nameof(Current)}: {Current}, {nameof(Target)}: {Target}, {nameof(UsableAbility)}: {UsableAbility}, {nameof(Coord)}: {Coord}, {nameof(DefenseDesire)}: {DefenseDesire}";
+                switch (_type) {
+                    case ActionType.MoveAction:
+                        return $"MOVE: {Current.Coord} to {Coord}";
+                    case ActionType.AbilityAction:
+                        return
+                            $"ABILITY: {Current.Coord}, target: {Target.Coord} {Target.Hp}/{Target.MaxHp}, defense response: {DefenseDesire}, Ability: {UsableAbility.Ability}";
+                    default:
+                        throw new InvalidOperationException($"Invalid replay action type '{_type}'");
+                }
             }
         }
 
@@ -62,7 +70,8 @@ namespace HexMage.Simulator {
         private ReplayAction _unfinishedAbiltiyAction;
 
         public Task<bool> EventAbilityUsed(Mob mob, Mob target, UsableAbility ability) {
-            Debug.Assert(_unfinishedAbiltiyAction == null, "Received another ability event when waiting for defense desire result.");
+            Debug.Assert(_unfinishedAbiltiyAction == null,
+                         "Received another ability event when waiting for defense desire result.");
             _unfinishedAbiltiyAction = ReplayAction.CreateAbilityUsed(mob, target, ability);
             return Task.FromResult(true);
         }
@@ -85,6 +94,11 @@ namespace HexMage.Simulator {
             foreach (var action in Actions) {
                 writer.WriteLine(action);
             }
+        }
+
+        public void Clear() {
+            _unfinishedAbiltiyAction = null;
+            Actions.Clear();
         }
     }
 }

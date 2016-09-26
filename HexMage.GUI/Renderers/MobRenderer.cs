@@ -27,8 +27,7 @@ namespace HexMage.GUI.Renderers {
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
             var mobEntity = (MobEntity) _mob.Metadata;
 
-#warning TODO - why isn't this entity.RenderPosition?
-            var pos = entity.Position;
+            var pos = entity.RenderPosition;
 
             if (_gameInstance.TurnManager.CurrentMob == _mob) {
                 batch.Draw(assetManager[AssetManager.HexHoverSprite], pos, Color.White);

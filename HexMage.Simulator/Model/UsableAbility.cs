@@ -24,7 +24,6 @@ namespace HexMage.Simulator.Model {
 
             Ability.CurrentCooldown = Ability.Cooldown;
             if (_target.Ap >= _target.DefenseCost) {
-#warning TODO - fuj
                 var controller = mobManager.Teams[_target.Team];
                 var res = await controller.RequestDesireToDefend(_target, Ability);
 

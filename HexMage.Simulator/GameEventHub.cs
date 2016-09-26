@@ -15,22 +15,27 @@ namespace HexMage.Simulator {
             _gameInstance = gameInstance;
         }
 
-        public async Task<bool> MainLoop() {
+        private TimeSpan _pauseDelay = TimeSpan.FromMilliseconds(200);
+
+        public async Task<bool> MainLoop(TimeSpan turnDelay) {
             var turnManager = _gameInstance.TurnManager;
 
             Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Starting Main Loop");
+
             while (!_gameInstance.IsFinished()) {
                 Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Main Loop Iteration");
-                var action = turnManager.CurrentController.PlayTurn(this);
-                await action;
+
+                await turnManager.CurrentController.PlayTurn(this);
 
                 turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder);
 
                 while (IsPaused) {
-                    await Task.Delay(TimeSpan.FromMilliseconds(200));
+                    await Task.Delay(_pauseDelay);
                 }
 
-                await Task.Delay(TimeSpan.FromMilliseconds(200));
+                if (turnDelay != TimeSpan.Zero) {
+                    await Task.Delay(turnDelay);
+                }
             }
 
             Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Main Loop DONE");
@@ -57,9 +62,6 @@ namespace HexMage.Simulator {
         }
 
         public async Task BroadcastAbilityUsed(Mob mob, Mob target, UsableAbility ability) {
-            Utils.Log(LogSeverity.Info, nameof(GameEventHub), $"waiting for {_subscribers.Count} subscribers");
-
-#warning TODO - nepredavat UsableAbility ale Ability
             await Task.WhenAll(_subscribers.Select(x => x.EventAbilityUsed(mob, target, ability)));
 
             var defenseDesireResult = await ability.Use(_gameInstance.Map, _gameInstance.MobManager);
@@ -69,7 +71,6 @@ namespace HexMage.Simulator {
 
         public async Task BroadcastAbilityUsedWithDefense(Mob mob, Mob target, UsableAbility ability,
                                                           DefenseDesire defenseDesire) {
-#warning TODO - nepredavat UsableAbility ale Ability
             await Task.WhenAll(_subscribers.Select(x => x.EventAbilityUsed(mob, target, ability)));
 
             ability.UseWithDefenseResult(_gameInstance.Map, defenseDesire);

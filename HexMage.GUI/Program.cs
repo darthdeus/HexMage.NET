@@ -12,7 +12,7 @@ namespace HexMage.GUI {
                     var eventHub = new GameEventHub(game);
                     Utils.RegisterLogger(new StdoutLogger());
 
-                    eventHub.MainLoop().Wait();
+                    eventHub.MainLoop(TimeSpan.Zero).Wait();
                 }
             }
         }

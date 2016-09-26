@@ -102,11 +102,11 @@ namespace HexMage.Simulator {
             if (task.IsFaulted) {
                 Log(LogSeverity.Error, nameof(task), $"Task {task} failed, exception: {task.Exception}.");
 
-#warning TODO - jak spravne vyhodit exception do GUI threadu?
                 SynchronizationContext.Current.Post(_ => { throw task.Exception; }, null);
                 throw task.Exception;
             } else {
-                Log(LogSeverity.Info, nameof(task), $"Task {task} complete: {task.IsCompleted}, faulted: {task.IsFaulted}");
+                Log(LogSeverity.Info, nameof(task),
+                    $"Task {task} complete: {task.IsCompleted}, faulted: {task.IsFaulted}");
             }
         }
 
@@ -114,11 +114,9 @@ namespace HexMage.Simulator {
             if (task.IsFaulted) {
                 Log(LogSeverity.Error, nameof(task), $"Task<T> {task} failed, exception {task.Exception}.");
 
-#warning TODO - jak spravne vyhodit exception do GUI threadu?
                 SynchronizationContext.Current.Post(_ => { throw task.Exception; }, null);
                 throw task.Exception;
-            }
-            else {
+            } else {
                 Log(LogSeverity.Info, nameof(task),
                     $"Task<T> {task} complete: {task.IsCompleted}, result: {task.Result}, faulted: {task.IsFaulted}");
             }
