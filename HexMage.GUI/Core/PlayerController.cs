@@ -20,16 +20,22 @@ namespace HexMage.GUI.Core {
 
         private TaskCompletionSource<bool> _tcs;
 
+        public bool TurnActive { get; private set; }
+
         public Task<bool> PlayTurn(GameEventHub eventHub) {
+            TurnActive = true;
             Debug.Assert(_tcs == null);            
             _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             return _tcs.Task;
         }
 
         public void PlayerEndedTurn() {
+            if (!TurnActive) return;
+
             Debug.Assert(_tcs != null, "PlayerController.TaskCompletionSource wasn't properly initialized.");
             _tcs.SetResult(true);
             _tcs = null;
+            TurnActive = false;
         }
 
         public Task<bool> RandomAction(GameEventHub eventHub) {

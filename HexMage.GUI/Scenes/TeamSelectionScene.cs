@@ -34,7 +34,7 @@ namespace HexMage.GUI.Scenes {
                 new AiRandomController(_gameInstance),
             };
 
-            LoadAiControllers(@"C:\dev\HexMage.NET\HexMage.AI\bin\Debug\HexMage.AI.dll", _gameInstance, _controllerList);
+            LoadAiControllers(@"..\..\..\..\..\HexMage.AI\bin\Debug\HexMage.AI.dll", _gameInstance, _controllerList);
         }
 
         private const int MinTeamSize = 2;

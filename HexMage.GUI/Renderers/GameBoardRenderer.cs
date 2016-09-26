@@ -87,13 +87,15 @@ namespace HexMage.GUI.Renderers {
             var hexUsable = _assetManager[AssetManager.HexWithinDistance];
             var hexTooFar = _assetManager[AssetManager.HexPathSprite];
 
-            if (_gameInstance.Pathfinder.IsValidCoord(_camera.MouseHex)) {
+            var mouseHex = _camera.MouseHex;
+
+            if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
                 IList<AxialCoord> path;
-                var mouseMob = _gameInstance.MobManager.AtCoord(_camera.MouseHex);
+                var mouseMob = _gameInstance.MobManager.AtCoord(mouseHex);
                 if (mouseMob != null) {
                     path = _gameInstance.Pathfinder.PathToMob(mouseMob);
                 } else {
-                    path = _gameInstance.Pathfinder.PathTo(_camera.MouseHex);
+                    path = _gameInstance.Pathfinder.PathTo(mouseHex);
                 }
 
 
@@ -101,7 +103,7 @@ namespace HexMage.GUI.Renderers {
                 var abilityIndex = _gameBoardController.SelectedAbilityIndex;
 
                 if (abilityIndex.HasValue) {
-                    var cubepath = _gameInstance.Map.CubeLinedraw(currentMob.Coord, _camera.MouseHex);
+                    var cubepath = _gameInstance.Map.CubeLinedraw(currentMob.Coord, mouseHex);
 
                     int distance = 1;
                     bool walled = false;

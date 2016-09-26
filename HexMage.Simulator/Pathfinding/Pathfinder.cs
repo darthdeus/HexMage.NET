@@ -45,7 +45,11 @@ namespace HexMage.Simulator {
         public IList<AxialCoord> PathTo(AxialCoord target) {
             var result = new List<AxialCoord>();
 
+            // Return an empty path if the coord is invalid
+            if (!IsValidCoord(target)) return result;
+
             if (_mobManager.AtCoord(target) != null) {
+                //return result;
                 throw new InvalidOperationException(
                     $"Searching for a path into a mob is not allowed, use {nameof(PathToMob)} instead");
             }
