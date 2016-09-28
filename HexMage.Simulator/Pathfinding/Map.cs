@@ -46,6 +46,12 @@ namespace HexMage.Simulator {
             return _buffs[coord];
         }
 
+        public int AxialDistance(AxialCoord a, AxialCoord b) {
+            return (Math.Abs(a.X - b.X)
+                    + Math.Abs(a.X + a.Y - b.X - b.Y)
+                    + Math.Abs(a.Y - b.Y))/2;
+        }
+
         public int CubeDistance(CubeCoord a, CubeCoord b) {
             return (Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y) + Math.Abs(a.Z - b.Z))/2;
         }

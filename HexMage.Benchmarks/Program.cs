@@ -7,8 +7,8 @@ using HexMage.Simulator.Model;
 using HexMage.Simulator.PCG;
 
 namespace HexMage.Benchmarks {
-    internal class Program {
-        private static void Main(string[] args) {
+    public class Tester {
+        public void Run() {
             var size = 30;
             var gameInstance = new GameInstance(size);
 
@@ -29,6 +29,8 @@ namespace HexMage.Benchmarks {
             Mob m1 = null;
             Mob m2 = null;
 
+            Generator.Random = new Random(1234);
+
             for (int i = 0; i < 5; i++) {
                 m1 = Generator.RandomMob(t1, size, c => gameInstance.MobManager.AtCoord(c) == null);
                 m2 = Generator.RandomMob(t2, size, c => gameInstance.MobManager.AtCoord(c) == null);
@@ -43,14 +45,15 @@ namespace HexMage.Benchmarks {
             m1.Coord = new AxialCoord(0, 0);
             m2.Coord = new AxialCoord(0, 1);
 
-            var map = gameInstance.Map;
-
             var stopwatch = new Stopwatch();
             var iterations = 0;
             while (iterations < 10000000) {
                 iterations++;
 
+                stopwatch.Start();
                 turnManager.StartNextTurn(pathfinder);
+                var ticks = stopwatch.ElapsedTicks;
+                //Console.WriteLine($"Nextt turn {ticks}");
                 stopwatch.Start();
                 hub.MainLoop(TimeSpan.Zero).Wait();
 
@@ -59,13 +62,19 @@ namespace HexMage.Benchmarks {
                 stopwatch.Reset();
                 gameInstance.Reset();
 
-                Console.WriteLine();
-                replayRecorder.DumpReplay(Console.Out);
+                //Console.WriteLine();
+                //replayRecorder.DumpReplay(Console.Out);
                 replayRecorder.Clear();
-                Console.WriteLine();
+                //Console.WriteLine();
             }
 
             Console.WriteLine("Took {0}ms", stopwatch.ElapsedMilliseconds);
+        }
+    }
+
+    internal class Program {
+        private static void Main(string[] args) {
+            new Tester().Run();
         }
     }
 }

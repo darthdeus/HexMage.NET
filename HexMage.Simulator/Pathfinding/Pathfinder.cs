@@ -12,8 +12,7 @@ namespace HexMage.Simulator {
         public Pathfinder(Map map, MobManager mobManager) {
             _map = map;
             _mobManager = mobManager;
-            Paths = new HexMap<Path>(map.Size);
-            Paths.Initialize(() => new Path());
+            _allPaths = new HexMap<HexMap<int>>(_map.Size);
 
             _diffs = new List<AxialCoord> {
                 new AxialCoord(-1, 0),
@@ -25,7 +24,6 @@ namespace HexMage.Simulator {
             };
         }
 
-        public HexMap<Path> Paths { get; set; }
 
         private int Size => _map.Size;
 
@@ -33,56 +31,16 @@ namespace HexMage.Simulator {
             // Right now we're not caching anything, so there's nothing to reset
         }
 
-        public IList<AxialCoord> PathToMob(Mob mob) {
-            var target = NearestEmpty(mob.Coord);
-            if (target.HasValue) {
-                return PathTo(target.Value);
-            } else {
-                return null;
-            }
-        }
-
-        public IList<AxialCoord> PathTo(AxialCoord target) {
-            var result = new List<AxialCoord>();
-
-            if (_mobManager.AtCoord(target) != null) {
-                throw new InvalidOperationException(
-                    $"Searching for a path into a mob is not allowed, use {nameof(PathToMob)} instead");
-            }
-
-            var current = target;
-            result.Add(current);
-
-            var path = Paths[current];
-
-            // TODO - this is ugly, the hexagonal-map abstraction leaks
-            if (path == null) return result;
-
-            var iterations = 1000;
-            while ((path.Distance > 0) && (--iterations > 0)) {
-                if (path.Source != null) {
-                    result.Add(path.Source.Value);
-                    path = Paths[path.Source.Value];
-                } else {
-                    result.Clear();
-                    break;
-                }
-            }
-
-
-            Debug.Assert(iterations > 0);
-            return result;
-        }
-
         public AxialCoord? FurthestPointToTarget(Mob mob, Mob target) {
-            Utils.Log(LogSeverity.Debug, nameof(Pathfinder), $"Finding path from {mob.Coord} to {target.Coord}");
-            var path = PathToMob(target);
+            throw new NotImplementedException();
+            //Utils.Log(LogSeverity.Debug, nameof(Pathfinder), $"Finding path from {mob.Coord} to {target.Coord}");
+            //var path = PathToMob(target);
 
-            if (path != null) {
-                return FurthestPointOnPath(mob, path);
-            } else {
-                return null;
-            }
+            //if (path != null) {
+            //    return FurthestPointOnPath(mob, path);
+            //} else {
+            //    return null;
+            //}
         }
 
 
@@ -90,108 +48,68 @@ namespace HexMage.Simulator {
             return IsValidCoord(coord) && (_map[coord] == HexType.Empty) && (_mobManager.AtCoord(coord) == null);
         }
 
-        public AxialCoord FurthestPointOnPath(Mob mob, IList<AxialCoord> path) {
-            if (path.Count == 0) {
-                string errmsg = $"Trying to move on an empty path from {mob.Coord}, which is invalid.";
-                Utils.Log(LogSeverity.Error, nameof(Pathfinder), errmsg);
-                throw new InvalidOperationException(errmsg);
-            }
-
-            var currentAp = mob.Ap;
-            for (var i = path.Count - 1; i >= 0; i--) {
-                if (currentAp == 0) return path[i];
-
-                currentAp--;
-            }
-
-            return path[0];
-        }
-
-#warning TODO - move this some place else, it doesn't belong into the pathfinder
-        [Obsolete]
-        public void MoveAsFarAsPossible(Mob mob, IList<AxialCoord> path) {
-            var i = path.Count - 1;
-
-            while ((mob.Ap > 0) && (i > 0)) {
-                _mobManager.MoveMob(mob, path[i]);
-                i--;
-            }
-        }
-
         public int Distance(AxialCoord c) {
-            return Paths[c].Distance;
+            return _current[c];
         }
 
         public void PathfindFromCurrentMob(TurnManager turnManager) {
             if (turnManager.CurrentMob != null) PathfindFrom(turnManager.CurrentMob.Coord);
         }
 
-        public void PathfindFrom(AxialCoord start) {
+        readonly HexMap<HexMap<int>> _allPaths;
+        private HexMap<int> _current;
+
+        public void PathfindDistanceAll() {
+            foreach (var source in _allPaths.AllCoords) {
+                _allPaths[source] = new HexMap<int>(_map.Size);
+                PathfindDistanceOnlyFrom(_allPaths[source], source);
+            }
+        }
+
+        public void PathfindDistanceOnlyFrom(HexMap<int> distanceMap, AxialCoord start) {
             var queue = new Queue<AxialCoord>();
+            var states = new HexMap<VertexState>(_map.Size);
 
-            foreach (var coord in _map.AllCoords) {
-                var path = Paths[coord];
-
-                path.Source = null;
-                path.Distance = int.MaxValue;
-                path.Reachable = false;
-                path.State = VertexState.Unvisited;
+            foreach (var coord in distanceMap.AllCoords) {
+                distanceMap[coord] = int.MaxValue;
+                states[coord] = VertexState.Unvisited;
             }
 
-            // TODO - nema byt Y - X?
-            var startPath = Paths[start];
-
-            startPath.Distance = 0;
-            startPath.State = VertexState.Open;
-            startPath.Reachable = true;
-
+            states[start] = VertexState.Open;
+            distanceMap[start] = 0;
             queue.Enqueue(start);
-
-            var iterations = 0;
+            int iterations = 0;
 
             while (queue.Count > 0) {
-                var current = queue.Dequeue();
-
                 iterations++;
-
-                if ((iterations > Size*Size*10) || (queue.Count > 1000))
+                if ((iterations > Size*Size*10) || (queue.Count > 1000)) {
                     Utils.Log(LogSeverity.Error, nameof(Pathfinder), "Pathfinder stuck when calculating a path.");
+                }
 
-                // TODO - opet, nema byt Y a X?
-                var p = Paths[current];
-
-                if (p.State == VertexState.Closed) continue;
-
-                p.Reachable = true;
-                p.State = VertexState.Closed;
+                var current = queue.Dequeue();
+                if (states[start] == VertexState.Closed) continue;
+                states[start] = VertexState.Closed;
 
                 foreach (var diff in _diffs) {
                     var neighbour = current + diff;
 
                     if (IsValidCoord(neighbour)) {
-                        // We can immediately skip the starting position to avoid further complicated checks
+                        // We can immediately skip the starting position
                         if (neighbour == start) continue;
 
-                        var n = Paths[neighbour];
-
-                        // TODO - this is not right
-                        if (n == null) continue;
-
-                        if ((n.State != VertexState.Closed) && IsWalkable(neighbour)) {
-                            if ((n.State == VertexState.Unvisited) || (n.Distance > p.Distance + 1)) {
-                                n.Distance = p.Distance + 1;
-                                n.Source = current;
-                                n.Reachable = true;
-                            }
-
-                            n.State = VertexState.Open;
-                            queue.Enqueue(neighbour);
+                        if (states[neighbour] != VertexState.Closed) {
+                            distanceMap[neighbour] = distanceMap[current] + 1;
                         }
+
+                        states[neighbour] = VertexState.Open;
+                        queue.Enqueue(neighbour);
                     }
                 }
             }
+        }
 
-            UpdateMobPaths();
+        public void PathfindFrom(AxialCoord start) {
+            _current = _allPaths[start];
         }
 
         private AxialCoord? NearestEmpty(AxialCoord coord) {
@@ -211,25 +129,14 @@ namespace HexMage.Simulator {
         }
 
         public bool IsValidCoord(AxialCoord c) {
-            return (c.ToCube().Sum() == 0) && (_map.CubeDistance(new CubeCoord(0, 0, 0), c) <= _map.Size);
+            //int distance = (Math.Abs(c.X)
+            //                + Math.Abs(c.X + c.Y)
+            //                + Math.Abs(c.Y)) / 2;
+            //return distance <= _map.Size;
+
+            //return _map.AxialDistance(c, new AxialCoord(0, 0)) <= _map.Size;
+            return _map.CubeDistance(new CubeCoord(0, 0, 0), c) <= _map.Size;
         }
 
-
-        private void UpdateMobPaths() {
-            foreach (var mob in _mobManager.Mobs) {
-                var path = Paths[mob.Coord];
-
-                foreach (var diff in _diffs) {
-                    var neighbour = mob.Coord + diff;
-
-                    if (IsValidCoord(neighbour) && Distance(neighbour) < path.Distance) {
-                        path.Distance = 1 + Distance(neighbour);
-                        path.Source = neighbour;
-                        path.State = VertexState.Closed;
-                        path.Reachable = true;
-                    }
-                }
-            }
-        }
     }
 }

@@ -6,9 +6,7 @@ using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public class MobManager : IDeepCopyable<MobManager>, IResettable {
-        // TODO - combine this into the property
-        private readonly List<Mob> _mobs = new List<Mob>();
-        public IEnumerable<Mob> Mobs => _mobs;
+        public readonly List<Mob> Mobs = new List<Mob>();
         public IEnumerable<Mob> AliveMobs => Mobs.Where(m => m.Hp > 0);
 
         public readonly Dictionary<TeamColor, IMobController> Teams = new Dictionary<TeamColor, IMobController>();
@@ -36,11 +34,17 @@ namespace HexMage.Simulator {
         }
 
         public Mob AtCoord(AxialCoord c) {
-            return Mobs.FirstOrDefault(mob => Equals(mob.Coord, c));
+            foreach (var mob in Mobs) {
+                if (mob.Coord.Equals(c)) {
+                    return mob;
+                }
+            }
+
+            return null;
         }
 
         public void AddMob(Mob mob) {
-            _mobs.Add(mob);
+            Mobs.Add(mob);
         }
 
         public enum LifetimeChange {
@@ -103,11 +107,12 @@ namespace HexMage.Simulator {
         }
 
         public void Clear() {
-            _mobs.Clear();
-            Teams.Clear();           
+            Mobs.Clear();
+            Teams.Clear();
         }
+
         public void Reset() {
-            foreach (var mob in _mobs) {
+            foreach (var mob in Mobs) {
                 mob.Reset();
             }
         }

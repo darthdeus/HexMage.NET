@@ -24,24 +24,29 @@ namespace HexMage.Simulator {
             set { this[new AxialCoord(x, y)] = value; }
         }
 
+        private List<AxialCoord> _allCoords;
+
         public List<AxialCoord> AllCoords {
             get {
-                var result = new List<AxialCoord>();
+                if (_allCoords == null) {
+                    var result = new List<AxialCoord>();
 
-                var from = -_size;
-                var to = _size;
+                    var from = -_size;
+                    var to = _size;
 
-                for (var i = from; i <= to; i++) {
-                    for (var j = from; j <= to; j++) {
-                        for (var k = from; k <= to; k++) {
-                            if (i + j + k == 0) {
-                                result.Add(new AxialCoord(j, i));
+                    for (var i = from; i <= to; i++) {
+                        for (var j = from; j <= to; j++) {
+                            for (var k = from; k <= to; k++) {
+                                if (i + j + k == 0) {
+                                    result.Add(new AxialCoord(j, i));
+                                }
                             }
                         }
                     }
+                    _allCoords = result;
                 }
 
-                return result;
+                return _allCoords;
             }
         }
 

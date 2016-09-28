@@ -90,11 +90,11 @@ namespace HexMage.GUI.Renderers {
             if (_gameInstance.Pathfinder.IsValidCoord(_camera.MouseHex)) {
                 IList<AxialCoord> path;
                 var mouseMob = _gameInstance.MobManager.AtCoord(_camera.MouseHex);
-                if (mouseMob != null) {
-                    path = _gameInstance.Pathfinder.PathToMob(mouseMob);
-                } else {
-                    path = _gameInstance.Pathfinder.PathTo(_camera.MouseHex);
-                }
+                //if (mouseMob != null) {
+                //    path = _gameInstance.Pathfinder.PathToMob(mouseMob);
+                //} else {
+                //    path = _gameInstance.Pathfinder.PathTo(_camera.MouseHex);
+                //}
 
 
                 var currentMob = _gameInstance.TurnManager.CurrentMob;
@@ -124,13 +124,14 @@ namespace HexMage.GUI.Renderers {
                         distance++;
                     }
                 } else {
-                    foreach (var coord in path) {
-                        if (currentMob.Coord.Distance(coord) <= currentMob.Ap) {
-                            DrawAt(hexUsable, coord);
-                        } else {
-                            DrawAt(hexTooFar, coord);
-                        }
-                    }
+                    Utils.Log(LogSeverity.Warning, nameof(GameBoardRenderer), "Pathfinder only calculates distance at the moment.");
+                    //foreach (var coord in path) {
+                    //    if (currentMob.Coord.Distance(coord) <= currentMob.Ap) {
+                    //        DrawAt(hexUsable, coord);
+                    //    } else {
+                    //        DrawAt(hexTooFar, coord);
+                    //    }
+                    //}
                 }
             }
             _spriteBatch.End();

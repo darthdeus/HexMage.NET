@@ -122,7 +122,6 @@ namespace HexMage.Simulator {
             }
         }
 
-
         public static void LogContinuation(this Task task) {
             task.ContinueWith(t => { task.LogTask(); }, TaskContinuationOptions.LongRunning);
         }

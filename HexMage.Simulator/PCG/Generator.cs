@@ -43,7 +43,7 @@ namespace HexMage.Simulator.PCG {
     }
 
     public static class Generator {
-        private static readonly Random _random = new Random();
+        public static Random Random = new Random();
 
         public static GameInstance RandomGame(int size, MapSeed seed, int teamSize,
                                               Func<GameInstance, IMobController> controllerFunc) {
@@ -76,27 +76,27 @@ namespace HexMage.Simulator.PCG {
             };
 
             for (int i = 0; i < Mob.AbilityCount; i++) {
-                var element = elements[_random.Next(0, 4)];
+                var element = elements[Random.Next(0, 4)];
                 var buffs = RandomBuffs(element);
 
                 var areaBuffs = RandomAreaBuffs(element);
 
-                abilities.Add(new Ability(_random.Next(1, 10),
-                                          _random.Next(3, 7),
-                                          _random.Next(3, 10),
-                                          _random.Next(0, 3),
+                abilities.Add(new Ability(Random.Next(1, 10),
+                                          Random.Next(3, 7),
+                                          Random.Next(3, 10),
+                                          Random.Next(0, 3),
                                           element,
                                           buffs,
                                           areaBuffs));
             }
 
-            int iniciative = _random.Next(10);
+            int iniciative = Random.Next(10);
 
             var mob = new Mob(team, 10, 10, 3, iniciative, abilities);
 
             while (true) {
-                var x = _random.Next(-size, size);
-                var y = _random.Next(-size, size);
+                var x = Random.Next(-size, size);
+                var y = Random.Next(-size, size);
                 //var z = -x - y;
                 //var cube = new CubeCoord(x, y, z);
                 //var zero = new CubeCoord(0, 0, 0);
@@ -117,7 +117,7 @@ namespace HexMage.Simulator.PCG {
         public static List<Buff> RandomBuffs(AbilityElement element) {
             var result = new List<Buff>();
 
-            int count = _random.Next(2);
+            int count = Random.Next(2);
             for (int i = 0; i < count; i++) {
                 result.Add(RandomBuff(element));
             }
@@ -126,13 +126,13 @@ namespace HexMage.Simulator.PCG {
         }
 
         public static Buff RandomBuff(AbilityElement element) {
-            var hpChange = _random.Next(-2, 1);
-            var apChange = _random.Next(-1, 1);
-            var lifetime = _random.Next(1, 3);
+            var hpChange = Random.Next(-2, 1);
+            var apChange = Random.Next(-1, 1);
+            var lifetime = Random.Next(1, 3);
 
             while (hpChange == 0 && apChange == 0) {
-                hpChange = _random.Next(-2, 1);
-                apChange = _random.Next(-1, 1);
+                hpChange = Random.Next(-2, 1);
+                apChange = Random.Next(-1, 1);
             }
             return new Buff(element, hpChange, apChange, lifetime);
         }
@@ -140,9 +140,9 @@ namespace HexMage.Simulator.PCG {
         public static List<AreaBuff> RandomAreaBuffs(AbilityElement element) {
             var result = new List<AreaBuff>();
 
-            int count = _random.Next(2);
+            int count = Random.Next(2);
             for (int i = 0; i < count; i++) {
-                result.Add(new AreaBuff(_random.Next(4), RandomBuff(element)));
+                result.Add(new AreaBuff(Random.Next(4), RandomBuff(element)));
             }
 
             return result;
