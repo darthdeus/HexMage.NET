@@ -52,6 +52,8 @@
     <Compile Include="Components\MobStateUpdater.cs" />
     <Compile Include="Components\PositionAtMob.cs" />
     <Compile Include="Components\ProjectileEntity.cs" />
+    <Compile Include="NetworkLoggerClient.cs" />
+    <Compile Include="NetworkLoggerServer.cs" />
     <Compile Include="Renderers\IRenderer.cs" />
     <Compile Include="LambdaComponent.cs" />
     <Compile Include="Renderers\AnimationRenderer.cs" />
