@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Text;
 using HexMage.GUI.Core;
@@ -41,13 +42,15 @@ namespace HexMage.GUI.Scenes {
         private const int MaxTeamSize = 7;
 
         public void LoadAiControllers(string file, GameInstance gameInstance, List<IMobController> controllers) {
-            Assembly dll = Assembly.LoadFrom(file);
-            Type[] types = dll.GetExportedTypes();
+            if (File.Exists(file)) {
+                Assembly dll = Assembly.LoadFrom(file);
+                Type[] types = dll.GetExportedTypes();
 
-            foreach (var type in types) {
-                if (type != null && type.GetInterface(nameof(HexMage.Simulator.IMobController)) != null) {
-                    IMobController controller = (IMobController) Activator.CreateInstance(type, gameInstance);
-                    controllers.Add(controller);
+                foreach (var type in types) {
+                    if (type != null && type.GetInterface(nameof(HexMage.Simulator.IMobController)) != null) {
+                        IMobController controller = (IMobController) Activator.CreateInstance(type, gameInstance);
+                        controllers.Add(controller);
+                    }
                 }
             }
         }
@@ -139,7 +142,7 @@ namespace HexMage.GUI.Scenes {
         private void RegenerateTeams(int t1size, int t2size) {
             if (_leftController == null || _rightController == null) {
                 Utils.Log(LogSeverity.Warning, nameof(TeamSelectionScene),
-                    "Generating teams while no controllers are selected.");
+                          "Generating teams while no controllers are selected.");
                 return;
             }
 
@@ -158,7 +161,7 @@ namespace HexMage.GUI.Scenes {
 
             for (int i = 0; i < t1size; i++) {
                 var mob = Generator.RandomMob(t1, _map.Size, c =>
-                        _mobManager.AtCoord(c) == null && _map[c] == HexType.Empty);
+                                                      _mobManager.AtCoord(c) == null && _map[c] == HexType.Empty);
 
                 _mobManager.AddMob(mob);
 
@@ -167,7 +170,7 @@ namespace HexMage.GUI.Scenes {
 
             for (int i = 0; i < t2size; i++) {
                 var mob = Generator.RandomMob(t2, _map.Size, c =>
-                        _mobManager.AtCoord(c) == null && _map[c] == HexType.Empty);
+                                                      _mobManager.AtCoord(c) == null && _map[c] == HexType.Empty);
 
                 _mobManager.AddMob(mob);
 
@@ -206,7 +209,6 @@ namespace HexMage.GUI.Scenes {
             return wrapper;
         }
 
-        public override void Cleanup() {
-        }
+        public override void Cleanup() {}
     }
 }
