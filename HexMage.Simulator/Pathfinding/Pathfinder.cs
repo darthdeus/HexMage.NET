@@ -32,15 +32,19 @@ namespace HexMage.Simulator {
         }
 
         public AxialCoord? FurthestPointToTarget(Mob mob, Mob target) {
-            throw new NotImplementedException();
-            //Utils.Log(LogSeverity.Debug, nameof(Pathfinder), $"Finding path from {mob.Coord} to {target.Coord}");
-            //var path = PathToMob(target);
+            Utils.Log(LogSeverity.Debug, nameof(Pathfinder), $"Finding path from {mob.Coord} to {target.Coord}");
 
-            //if (path != null) {
-            //    return FurthestPointOnPath(mob, path);
-            //} else {
-            //    return null;
-            //}
+            int iterations = 0;
+            while (true) {
+                if (iterations++ > 1000)
+                    throw new InvalidOperationException("Pathfinding got stuck searching for a shorter path");
+                var closer = NearestEmpty(target.Coord);
+                if (closer == null) return null;
+
+                if (Distance(closer.Value) <= mob.Ap) {
+                    return closer;
+                }
+            }
         }
 
 
@@ -49,6 +53,7 @@ namespace HexMage.Simulator {
         }
 
         public int Distance(AxialCoord c) {
+            Debug.Assert(_current != null);
             return _current[c];
         }
 
@@ -60,10 +65,29 @@ namespace HexMage.Simulator {
         private HexMap<int> _current;
 
         public void PathfindDistanceAll() {
+            Console.WriteLine($"Initializing pathfinder, {_allPaths.AllCoords.Count} locations");
+
+            int done = 0;
+            int loops = 0;
+            long total = 0;
+            var sw = Stopwatch.StartNew();
+
             foreach (var source in _allPaths.AllCoords) {
                 _allPaths[source] = new HexMap<int>(_map.Size);
                 PathfindDistanceOnlyFrom(_allPaths[source], source);
+                done++;
+                if (done == 100) {
+                    loops++;
+                    done = 0;
+                    long elapsed = sw.ElapsedMilliseconds;
+                    total += elapsed;
+                    //Console.WriteLine($"Done 100 in {sw.ElapsedTicks * 10}us");
+                    Console.WriteLine($"Done 100 in {elapsed}ms");
+                    sw.Restart();
+                }
             }
+
+            Console.WriteLine($"Pathfinder initialized, took {total}, avg: {total/loops}");
         }
 
         public void PathfindDistanceOnlyFrom(HexMap<int> distanceMap, AxialCoord start) {
@@ -77,7 +101,9 @@ namespace HexMage.Simulator {
 
             states[start] = VertexState.Open;
             distanceMap[start] = 0;
+
             queue.Enqueue(start);
+
             int iterations = 0;
 
             while (queue.Count > 0) {
@@ -87,8 +113,8 @@ namespace HexMage.Simulator {
                 }
 
                 var current = queue.Dequeue();
-                if (states[start] == VertexState.Closed) continue;
-                states[start] = VertexState.Closed;
+                if (states[current] == VertexState.Closed) continue;
+                states[current] = VertexState.Closed;
 
                 foreach (var diff in _diffs) {
                     var neighbour = current + diff;
@@ -98,17 +124,23 @@ namespace HexMage.Simulator {
                         if (neighbour == start) continue;
 
                         if (states[neighbour] != VertexState.Closed) {
-                            distanceMap[neighbour] = distanceMap[current] + 1;
-                        }
+                            if (states[neighbour] == VertexState.Unvisited ||
+                                distanceMap[neighbour] > distanceMap[current] + 1) {
+                                distanceMap[neighbour] = distanceMap[current] + 1;
+                            }
 
-                        states[neighbour] = VertexState.Open;
-                        queue.Enqueue(neighbour);
+                            states[neighbour] = VertexState.Open;
+                            queue.Enqueue(neighbour);
+                        }
                     }
                 }
             }
+
+            //Console.WriteLine("Pathfinder done");
         }
 
         public void PathfindFrom(AxialCoord start) {
+            Debug.Assert(_allPaths[start] != null, "Trying to pathfind from an uninitialized location");
             _current = _allPaths[start];
         }
 
@@ -129,14 +161,18 @@ namespace HexMage.Simulator {
         }
 
         public bool IsValidCoord(AxialCoord c) {
+            int a = (c.X + c.Y);
+            int distance = ((c.X < 0 ? -c.X : c.X)
+                            + (a < 0 ? -a : a)
+                            + (c.Y < 0 ? -c.Y : c.Y)) / 2;
+
             //int distance = (Math.Abs(c.X)
             //                + Math.Abs(c.X + c.Y)
             //                + Math.Abs(c.Y)) / 2;
-            //return distance <= _map.Size;
+            return distance <= _map.Size;
 
             //return _map.AxialDistance(c, new AxialCoord(0, 0)) <= _map.Size;
-            return _map.CubeDistance(new CubeCoord(0, 0, 0), c) <= _map.Size;
+            //return _map.CubeDistance(new CubeCoord(0, 0, 0), c) <= _map.Size;
         }
-
     }
 }

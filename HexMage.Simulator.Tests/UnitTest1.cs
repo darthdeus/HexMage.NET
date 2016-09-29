@@ -47,9 +47,7 @@ namespace HexMage.Simulator.Tests
 
             Assert.AreNotEqual(0, pathfinder.Distance(m2.Coord));
 
-            var path = pathfinder.PathTo(m2.Coord);
-
-            Assert.IsTrue(path.Count >= 1);
+            Assert.IsTrue(pathfinder.Distance(m2.Coord) >= 1);
         }
     }
 

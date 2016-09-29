@@ -35,6 +35,7 @@ namespace HexMage.GUI.Scenes {
         }
 
         public override void Initialize() {
+            _gameInstance.Pathfinder.PathfindDistanceAll();
             _gameInstance.TurnManager.StartNextTurn(_gameInstance.Pathfinder);
 
             Camera2D.Instance.Translate = new Vector3(600, 500, 0);

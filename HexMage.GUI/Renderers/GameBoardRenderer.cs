@@ -54,6 +54,9 @@ namespace HexMage.GUI.Renderers {
                     DrawAt(hexWall, coord);
                 }
 
+                var pos = _camera.HexToPixel(coord);
+                _spriteBatch.DrawString(_assetManager.Font, _gameInstance.Pathfinder.Distance(coord).ToString(), pos, Color.Black);
+
                 var hexBuffs = map.BuffsAt(coord);
 
                 if (hexBuffs.Count > 0) {
@@ -124,7 +127,7 @@ namespace HexMage.GUI.Renderers {
                         distance++;
                     }
                 } else {
-                    Utils.Log(LogSeverity.Warning, nameof(GameBoardRenderer), "Pathfinder only calculates distance at the moment.");
+                    //Utils.Log(LogSeverity.Warning, nameof(GameBoardRenderer), "Pathfinder only calculates distance at the moment.");
                     //foreach (var coord in path) {
                     //    if (currentMob.Coord.Distance(coord) <= currentMob.Ap) {
                     //        DrawAt(hexUsable, coord);

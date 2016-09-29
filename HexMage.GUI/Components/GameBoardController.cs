@@ -107,12 +107,7 @@ namespace HexMage.GUI.Components {
             Debug.Assert(mob.Metadata != null, "Trying to move a mob without an associated entity.");
             var entity = (MobEntity) mob.Metadata;
 
-            var path = _gameInstance.Pathfinder.PathTo(pos).Reverse().Skip(1);
-            AxialCoord source = mob.Coord;
-            foreach (var destination in path) {
-                await entity.MoveTo(source, destination);
-                source = destination;
-            }
+            await entity.MoveTo(mob.Coord, pos);
 
             return true;
         }
@@ -246,7 +241,7 @@ namespace HexMage.GUI.Components {
                     SelectedAbilityIndex = index;
                 }
             } else if (_gameInstance.IsAbilityUsable(currentMob, ability)) {
-                    SelectedAbilityIndex = index;
+                SelectedAbilityIndex = index;
             }
         }
 

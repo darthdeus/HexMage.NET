@@ -9,7 +9,7 @@ using HexMage.Simulator.PCG;
 namespace HexMage.Benchmarks {
     public class Tester {
         public void Run() {
-            var size = 30;
+            var size = 50;
             var gameInstance = new GameInstance(size);
 
             var hub = new GameEventHub(gameInstance);
@@ -44,6 +44,13 @@ namespace HexMage.Benchmarks {
 
             m1.Coord = new AxialCoord(0, 0);
             m2.Coord = new AxialCoord(0, 1);
+
+            for (int i = 0; i < 5; i++) {
+                pathfinder.PathfindDistanceAll();
+                Console.WriteLine();
+            }
+
+            return;
 
             var stopwatch = new Stopwatch();
             var iterations = 0;
