@@ -17,13 +17,16 @@ namespace HexMage.Simulator {
 
         private TimeSpan _pauseDelay = TimeSpan.FromMilliseconds(200);
 
-        public async Task<bool> MainLoop(TimeSpan turnDelay) {
+        public async Task<int> MainLoop(TimeSpan turnDelay) {
             var turnManager = _gameInstance.TurnManager;
             turnManager.StartNextTurn(_gameInstance.Pathfinder);
 
             Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Starting Main Loop");
 
+            int totalTurns = 0;
+
             while (!_gameInstance.IsFinished()) {
+                totalTurns++;
                 Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Main Loop Iteration");
 
                 await turnManager.CurrentController.PlayTurn(this);
@@ -41,7 +44,7 @@ namespace HexMage.Simulator {
 
             Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Main Loop DONE");
 
-            return true;
+            return totalTurns;
         }
 
         public void AddSubscriber(IGameEventSubscriber subscriber) {

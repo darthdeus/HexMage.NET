@@ -57,15 +57,23 @@ namespace HexMage.Simulator.Model {
         }
 
         private void TargetHit(Map map) {
-            var elements = _target.Buffs.Select(b => b.Element).Distinct();
-
             AbilityElement opposite = OppositeElement(Ability.Element);
 
-            foreach (var buff in _target.Buffs.Where(b => b.Element == opposite)) {
-                buff.Lifetime = 0;
+            foreach (var buff in _target.Buffs) {
+                if (buff.Element == opposite) {
+                    buff.Lifetime = 0;
+                }
             }
 
-            bool bonusDmg = elements.Contains(BonusElement(Ability.Element));
+            bool bonusDmg = false;
+
+            var bonusElement = BonusElement(Ability.Element);
+            foreach (var buff in _target.Buffs) {
+                if (buff.Element == bonusElement) {
+                    bonusDmg = true;
+                }
+            }
+
             int modifier = bonusDmg ? 2 : 1;
 
             _target.Hp = Math.Max(0, _target.Hp - Ability.Dmg*modifier);
@@ -77,10 +85,18 @@ namespace HexMage.Simulator.Model {
             }
 
             foreach (var areaBuff in Ability.AreaBuffs) {
-                var affectedArea = map.AllCoords.Where(x => map.CubeDistance(x, _target.Coord) <= areaBuff.Radius);
-                Utils.Log(LogSeverity.Debug, nameof(UsableAbility), $"Applying buffs at {map.Guid}");
-                foreach (var coord in affectedArea) {
-                    map.BuffsAt(coord).Add(areaBuff.Effect.DeepCopy());
+                //foreach (var coord in map.AllCoords) {
+                //    if (map.AxialDistance(coord, _target.Coord) <= areaBuff.Radius) {
+                //        map.BuffsAt(coord).Add(areaBuff.Effect.DeepCopy());
+                //    }
+                //}
+
+                foreach (var zeroCoord in CoordRadiusCache.Instance.Coords[areaBuff.Radius]) {
+                    var coord = zeroCoord + _target.Coord;
+                    if (map.AxialDistance(coord, _target.Coord) <= areaBuff.Radius && map.IsValidCoord(coord)) {
+                        var buffsAt = map.BuffsAt(coord);
+                        buffsAt.Add(areaBuff.Effect.DeepCopy());
+                    }
                 }
             }
 

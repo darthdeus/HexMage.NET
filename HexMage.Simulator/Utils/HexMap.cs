@@ -22,7 +22,7 @@ namespace HexMage.Simulator {
         public T this[int x, int y] {
             get { return this[new AxialCoord(x, y)]; }
             set { this[new AxialCoord(x, y)] = value; }
-        }
+        }        
 
         private static Dictionary<int, List<AxialCoord>> _allCoordDictionary = new Dictionary<int, List<AxialCoord>>();
         private List<AxialCoord> _allCoords;

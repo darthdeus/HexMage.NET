@@ -24,6 +24,7 @@ namespace HexMage.GUI.Renderers {
             var map = _mapFunc();
 
             var pathfinder = new Pathfinder(map, new MobManager());
+            pathfinder.PathfindDistanceAll();
             var distanceMap = new HexMap<int>(map.Size);
             pathfinder.PathfindDistanceOnlyFrom(distanceMap, new AxialCoord(0, 0));
             pathfinder.PathfindFrom(new AxialCoord(0, 0));

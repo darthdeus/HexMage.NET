@@ -19,6 +19,8 @@ namespace HexMage.GUI {
 
         [STAThread]
         static void Main() {
+            CoordRadiusCache.Instance.PrecomputeUpto(50);
+
             using (var game = new HexMageGame())
                 game.Run();
         }

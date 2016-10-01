@@ -29,6 +29,7 @@ namespace HexMage.Simulator.Model {
         public Buff DeepCopy() {
             var disabledElementsCopy = new List<AbilityElement>();
 
+            // TODO - odstranit disabled elementy
             foreach (var element in DisabledElements) {
                 disabledElementsCopy.Add(element);
             }

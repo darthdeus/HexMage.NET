@@ -35,10 +35,23 @@ namespace HexMage.Simulator {
         }
 
         public bool IsFinished() {
-            return MobManager.AliveMobs
-                             .Select(m => m.Team)
-                             .Distinct()
-                             .Count() <= 1;
+            bool redAlive = false;
+            bool blueAlive = false;
+
+            foreach (var mob in MobManager.Mobs) {
+                if (mob.Hp > 0) {
+                    switch (mob.Team) {
+                        case TeamColor.Red:
+                            redAlive = true;
+                            break;
+                        case TeamColor.Blue:
+                            blueAlive = true;
+                            break;
+                    }
+                }
+            }
+
+            return !redAlive || !blueAlive;
         }
 
         [Obsolete]
@@ -48,48 +61,56 @@ namespace HexMage.Simulator {
 
         public bool IsAbilityUsable(Mob mob, Ability ability) {
             // TODO - handle visibiliy
-            var isElementDisabled = mob.Buffs
-                                       .SelectMany(b => b.DisabledElements)
-                                       .Distinct()
-                                       .Contains(ability.Element);
+            foreach (var buff in mob.Buffs) {
+                if (buff.DisabledElements.Contains(ability.Element)) {
+                    return false;
+                }
+            }
 
-            return !isElementDisabled && mob.Ap >= ability.Cost && ability.CurrentCooldown == 0;
+            return mob.Ap >= ability.Cost && ability.CurrentCooldown == 0;
         }
 
         public IList<UsableAbility> UsableAbilities(Mob mob, Mob target) {
             var line = Map.CubeLinedraw(mob.Coord, target.Coord);
             int distance = line.Count - 1;
 
-            var obstructed = line.Any(c => Map[c] == HexType.Wall);
+            var result = new List<UsableAbility>();
 
-            if (obstructed) {
-                Utils.Log(LogSeverity.Debug, nameof(GameInstance), "Path obstructed, no usable abilities.");
-                return new List<UsableAbility>();
+            foreach (var coord in line) {
+                if (Map[coord] == HexType.Wall) {
+                    Utils.Log(LogSeverity.Debug, nameof(GameInstance), "Path obstructed, no usable abilities.");
+                    return result;
+                }
             }
 
-            return mob.Abilities
-                      .Select((ability, i) => new UsableAbility(mob, target, ability, i))
-                      .Where(ua => ua.Ability.Range >= distance && IsAbilityUsable(mob, ua.Ability))
-                      .ToList();
+            for (int i = 0; i < mob.Abilities.Count; i++) {
+                var ability = mob.Abilities[i];
+                if (ability.Range >= distance && IsAbilityUsable(mob, ability)) {
+                    result.Add(new UsableAbility(mob, target, ability, i));
+                }
+            }
+
+            return result;
         }
 
         public IList<Mob> PossibleTargets(Mob mob) {
-            var usableAbilities = mob.Abilities
-                                     .Where(ability => IsAbilityUsable(mob, ability))
-                                     .ToList();
+            var result = new List<Mob>();
 
-            if (usableAbilities.Count == 0) {
-                return new List<Mob>();
+            int maxRange = 0;
+            // TODO - nezohlednuje disablovane ability
+            foreach (var ability in mob.Abilities) {
+                if (maxRange < ability.Range && ability.Cost <= mob.Ap) {
+                    maxRange = ability.Range;
+                }
             }
 
-            int maxRange = usableAbilities.Max(ability => ability.Range);
+            foreach (var target in MobManager.Mobs) {
+                if (target.Hp > 0 && Pathfinder.Distance(target.Coord) <= maxRange && target.Team != mob.Team) {
+                    result.Add(target);
+                }
+            }
 
-            return MobManager
-                .AliveMobs
-                .Where(m => m != mob
-                            && Pathfinder.Distance(m.Coord) <= maxRange
-                            && m.Team != mob.Team)
-                .ToList();
+            return result;
         }
 
         public IList<Mob> Enemies(Mob mob) {

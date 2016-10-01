@@ -9,7 +9,12 @@ using HexMage.Simulator.PCG;
 namespace HexMage.Benchmarks {
     public class Tester {
         public void Run() {
-            var size = 50;
+            var size = 7;
+
+            var s = Stopwatch.StartNew();
+            CoordRadiusCache.Instance.PrecomputeUpto(50);
+            Console.WriteLine($"Cache precomputed in {s.Elapsed.TotalMilliseconds}ms");
+
             var gameInstance = new GameInstance(size);
 
             var hub = new GameEventHub(gameInstance);
@@ -42,40 +47,41 @@ namespace HexMage.Benchmarks {
             mobManager.Teams[t1] = new AiRandomController(gameInstance);
             mobManager.Teams[t2] = new AiRandomController(gameInstance);
 
-            m1.Coord = new AxialCoord(0, 0);
-            m2.Coord = new AxialCoord(0, 1);
-
             for (int i = 0; i < 5; i++) {
                 pathfinder.PathfindDistanceAll();
                 Console.WriteLine();
             }
 
-            return;
-
+            var totalStopwatch = Stopwatch.StartNew();
             var stopwatch = new Stopwatch();
             var iterations = 0;
-            while (iterations < 10000000) {
+            int roundsPerThousand = 0;
+
+            while (iterations < 1000000) {
                 iterations++;
 
-                stopwatch.Start();
                 turnManager.StartNextTurn(pathfinder);
-                var ticks = stopwatch.ElapsedTicks;
-                //Console.WriteLine($"Nextt turn {ticks}");
+
                 stopwatch.Start();
-                hub.MainLoop(TimeSpan.Zero).Wait();
+                var rounds = hub.MainLoop(TimeSpan.Zero);
+                rounds.Wait();
+                stopwatch.Stop();
 
-                Console.WriteLine($"Starting a new game, took {stopwatch.ElapsedMilliseconds}ms");
+                roundsPerThousand += rounds.Result;
 
-                stopwatch.Reset();
+                if (iterations%1000 == 0) {
+                    Console.WriteLine($"Starting a new game {iterations}, {roundsPerThousand/1000} average rounds, {stopwatch.Elapsed.TotalMilliseconds}ms");
+                    roundsPerThousand = 0;
+                    stopwatch.Reset();
+                }
+
                 gameInstance.Reset();
 
-                //Console.WriteLine();
                 //replayRecorder.DumpReplay(Console.Out);
                 replayRecorder.Clear();
-                //Console.WriteLine();
             }
 
-            Console.WriteLine("Took {0}ms", stopwatch.ElapsedMilliseconds);
+            Console.WriteLine("Took {0}ms", totalStopwatch.ElapsedMilliseconds);
         }
     }
 
