@@ -227,7 +227,7 @@ namespace HexMage.GUI.Scenes {
         private GameBoardController _gameBoardController;
         private LogBox _logBox;
 
-        public Task<DefenseDesire> RequestDesireToDefend(Mob mob, AbilityInfo abilityInfo) {
+        public Task<DefenseDesire> RequestDesireToDefend(Mob mob, Ability ability) {
             _defenseModal.Active = true;
             _defenseDesireSource = new TaskCompletionSource<DefenseDesire>();
 

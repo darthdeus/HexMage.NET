@@ -15,7 +15,7 @@ namespace HexMage.GUI.Components {
         private readonly Label _elementLabel;
         private readonly Label _cooldownLabel;
         private readonly Label _buffsLabel;
-        private AbilityInfo _abilityInfo;
+        private Ability _ability;
 
         public event Action<int> OnClick;
 
@@ -36,7 +36,7 @@ namespace HexMage.GUI.Components {
                 Debug.Assert(mob.Abilities.Count == Mob.AbilityCount);
                 Debug.Assert(_abilityIndex < mob.Abilities.Count);
 
-                _abilityInfo = mob.Abilities[_abilityIndex];
+                _ability = mob.Abilities[_abilityIndex];
 
                 var inputManager = InputManager.Instance;
                 var aabb = new Rectangle(Entity.RenderPosition.ToPoint(),
@@ -49,23 +49,23 @@ namespace HexMage.GUI.Components {
                     }
                 }
 
-                _dmgLabel.Text = $"DMG {_abilityInfo.Dmg}, Cost {_abilityInfo.Cost}";
-                _rangeLabel.Text = $"Range {_abilityInfo.Range}";
-                _elementLabel.Text = _abilityInfo.Element.ToString();
+                _dmgLabel.Text = $"DMG {_ability.Dmg}, Cost {_ability.Cost}";
+                _rangeLabel.Text = $"Range {_ability.Range}";
+                _elementLabel.Text = _ability.Element.ToString();
 
-                if (_abilityInfo.CurrentCooldown == 0) {
-                    _cooldownLabel.Text = $"Cooldown: {_abilityInfo.Cooldown} turns";
+                if (_ability.CurrentCooldown == 0) {
+                    _cooldownLabel.Text = $"Cooldown: {_ability.Cooldown} turns";
                 } else {
-                    _cooldownLabel.Text = $"Again in {_abilityInfo.CurrentCooldown} turns";
+                    _cooldownLabel.Text = $"Again in {_ability.CurrentCooldown} turns";
                 }
 
                 var buffTextBuilder = new StringBuilder();
 
-                foreach (var buff in _abilityInfo.Buffs) {
+                foreach (var buff in _ability.Buffs) {
                     buffTextBuilder.AppendLine($"Buff {buff.HpChange}/{buff.ApChange}\nover {buff.Lifetime} turns");
                 }
 
-                foreach (var areaBuff in _abilityInfo.AreaBuffs) {
+                foreach (var areaBuff in _ability.AreaBuffs) {
                     buffTextBuilder.AppendLine(
                         $"Area buff {areaBuff.Effect.HpChange}/{areaBuff.Effect.ApChange}\nover {areaBuff.Effect.Lifetime}, radius {areaBuff.Radius}");
                 }

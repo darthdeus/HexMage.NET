@@ -54,7 +54,7 @@ namespace HexMage.Simulator {
             return !redAlive || !blueAlive;
         }
 
-        public bool IsAbilityUsable(Mob mob, AbilityInstance ability) {
+        public bool IsAbilityUsable(Mob mob, Ability ability) {
             // TODO - handle visibiliy
             foreach (var buff in mob.Buffs) {
                 if (buff.DisabledElements.Contains(ability.Element)) {

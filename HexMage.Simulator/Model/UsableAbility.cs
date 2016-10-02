@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 namespace HexMage.Simulator.Model {
     public class UsableAbility {
         public readonly int Index;
-        public readonly AbilityInstance Ability;
+        public readonly Ability Ability;
         private readonly Mob _mob;
         private readonly Mob _target;
 
-        public UsableAbility(Mob mob, Mob target, AbilityInstance ability, int index) {
+        public UsableAbility(Mob mob, Mob target, Ability ability, int index) {
             _mob = mob;
             _target = target;
             Ability = ability;
@@ -25,7 +25,7 @@ namespace HexMage.Simulator.Model {
             Ability.CurrentCooldown = Ability.Cooldown;
             if (_target.Ap >= _target.DefenseCost) {
                 var controller = mobManager.Teams[_target.Team];
-                var res = controller.FastRequestDesireToDefend(_target, Ability.AbilityInfo);
+                var res = controller.FastRequestDesireToDefend(_target, Ability);
 
                 if (res == DefenseDesire.Block) {
                     _target.Ap -= _target.DefenseCost;
@@ -51,7 +51,7 @@ namespace HexMage.Simulator.Model {
             Ability.CurrentCooldown = Ability.Cooldown;
             if (_target.Ap >= _target.DefenseCost) {
                 var controller = mobManager.Teams[_target.Team];
-                var res = await controller.RequestDesireToDefend(_target, Ability.AbilityInfo);
+                var res = await controller.RequestDesireToDefend(_target, Ability);
 
                 if (res == DefenseDesire.Block) {
                     _target.Ap -= _target.DefenseCost;

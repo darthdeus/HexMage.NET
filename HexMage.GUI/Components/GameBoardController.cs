@@ -45,11 +45,11 @@ namespace HexMage.GUI.Components {
         }
 
         public async Task<bool> EventAbilityUsed(Mob mob, Mob target, UsableAbility usableAbility) {
-            var ability = usableAbility.AbilityInfo;
+            var ability = usableAbility.Ability;
 
             Utils.Log(LogSeverity.Info, nameof(GameBoardController), "EventAbilityUsed");
 
-            BuildUsedAbilityPopover(mob, usableAbility.AbilityInfo)
+            BuildUsedAbilityPopover(mob, usableAbility.Ability)
                 .LogContinuation();
 
             var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
@@ -256,7 +256,7 @@ namespace HexMage.GUI.Components {
             var abilityIndex = SelectedAbilityIndex.Value;
             var ability = _gameInstance.TurnManager.CurrentMob.Abilities[abilityIndex];
 
-            var usableAbility = usableAbilities.FirstOrDefault(ua => ua.AbilityInfo == ability);
+            var usableAbility = usableAbilities.FirstOrDefault(ua => ua.Ability == ability);
             if (usableAbility != null) {
                 _eventHub.BroadcastAbilityUsed(_gameInstance.TurnManager.CurrentMob, target, usableAbility)
                          .LogContinuation();
@@ -429,7 +429,7 @@ namespace HexMage.GUI.Components {
 
         private readonly TimeSpan _abilityPopoverDisplayTime = TimeSpan.FromSeconds(3);
 
-        private async Task BuildUsedAbilityPopover(Mob mob, AbilityInfo abilityInfo) {
+        private async Task BuildUsedAbilityPopover(Mob mob, Ability ability) {
             var result = new VerticalLayout {
                 Renderer = new ColorRenderer(Color.LightGray),
                 Padding = _popoverPadding,
@@ -442,7 +442,7 @@ namespace HexMage.GUI.Components {
             result.AddComponent(
                 () => { result.Position = camera.HexToPixelWorld(mob.Coord) + _usedAbilityOffset; });
 
-            string labelText = $"{abilityInfo.Dmg}DMG cost {abilityInfo.Cost}";
+            string labelText = $"{ability.Dmg}DMG cost {ability.Cost}";
             result.AddChild(new Label(labelText, _assetManager.Font));
 
             Entity.Scene.AddAndInitializeRootEntity(result, _assetManager);

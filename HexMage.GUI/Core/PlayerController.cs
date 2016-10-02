@@ -14,8 +14,8 @@ namespace HexMage.GUI.Core {
             _gameInstance = gameInstance;
         }
 
-        public Task<DefenseDesire> RequestDesireToDefend(Mob mob, AbilityInfo abilityInfo) {
-            return _arenaScene.RequestDesireToDefend(mob, abilityInfo);
+        public Task<DefenseDesire> RequestDesireToDefend(Mob mob, Ability ability) {
+            return _arenaScene.RequestDesireToDefend(mob, ability);
         }
 
         private TaskCompletionSource<bool> _tcs;
