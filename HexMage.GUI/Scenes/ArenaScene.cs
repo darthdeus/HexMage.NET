@@ -34,6 +34,7 @@ namespace HexMage.GUI.Scenes {
         }
 
         public override void Initialize() {
+            _gameInstance.Map.PrecomputeCubeLinedraw();
             _gameInstance.Pathfinder.PathfindDistanceAll();
             _gameInstance.TurnManager.StartNextTurn(_gameInstance.Pathfinder);
 

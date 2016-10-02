@@ -7,26 +7,22 @@ using HexMage.Simulator.Model;
 namespace HexMage.Simulator {
     public class Map : IDeepCopyable<Map>, IResettable {
         private readonly HexMap<HexType> _hexes;
-        private readonly HexMap<List<Buff>> _buffs;
         public int Size { get; set; }
         public Guid Guid = Guid.NewGuid();
 
+        public List<AreaBuff> AreaBuffs = new List<AreaBuff>();
+
         public List<AxialCoord> AllCoords => _hexes.AllCoords;
 
-        public Map(int size, HexMap<HexType> hexes, HexMap<List<Buff>> buffs) {
+        public Map(int size, HexMap<HexType> hexes, List<AreaBuff> buffs) {
             Size = size;
             _hexes = hexes;
-            _buffs = buffs;
+            AreaBuffs = buffs;
         }
 
         public Map(int size) {
             Size = size;
             _hexes = new HexMap<HexType>(size);
-            _buffs = new HexMap<List<Buff>>(size);
-
-            foreach (var coord in _buffs.AllCoords) {
-                _buffs[coord] = new List<Buff>();
-            }
         }
 
         public HexType this[AxialCoord c] {
@@ -43,7 +39,9 @@ namespace HexMage.Simulator {
         }
 
         public List<Buff> BuffsAt(AxialCoord coord) {
-            return _buffs[coord];
+            return AreaBuffs.Where(b => AxialDistance(b.Coord, coord) <= b.Radius)
+                            .Select(b => b.Effect)
+                            .ToList();
         }
 
         public int AxialDistance(AxialCoord a, AxialCoord b) {
@@ -103,16 +101,14 @@ namespace HexMage.Simulator {
 
         public Map DeepCopy() {
             var hexesCopy = new HexMap<HexType>(Size);
-            var buffsCopy = new HexMap<List<Buff>>(Size);
+            var buffsCopy = new List<AreaBuff>();
 
             foreach (var coord in AllCoords) {
                 hexesCopy[coord] = _hexes[coord];
-                Debug.Assert(buffsCopy[coord] == null, "Duplicate coords in AllCoords.");
-                buffsCopy[coord] = new List<Buff>();
+            }
 
-                foreach (var buff in _buffs[coord]) {
-                    buffsCopy[coord].Add(buff.DeepCopy());
-                }
+            foreach (var buff in AreaBuffs) {
+                buffsCopy.Add(buff.DeepCopy());
             }
 
             return new Map(Size, hexesCopy, buffsCopy) {
@@ -121,9 +117,7 @@ namespace HexMage.Simulator {
         }
 
         public void Reset() {
-            foreach (var coord in AllCoords) {
-                _buffs[coord].Clear();
-            }
+            AreaBuffs.Clear();
         }
 
         public bool IsValidCoord(AxialCoord c) {

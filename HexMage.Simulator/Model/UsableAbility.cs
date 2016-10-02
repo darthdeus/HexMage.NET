@@ -106,26 +106,15 @@ namespace HexMage.Simulator.Model {
             _target.Hp = Math.Max(0, _target.Hp - Ability.Dmg*modifier);
 
             _target.Buffs.Add(Ability.ElementalEffect);
-            foreach (var abilityBuff in Ability.Buffs)
-            {
+            foreach (var abilityBuff in Ability.Buffs) {
                 // TODO - handle lifetimes
                 _target.Buffs.Add(abilityBuff.DeepCopy());
             }
 
             foreach (var areaBuff in Ability.AreaBuffs) {
-                //foreach (var coord in map.AllCoords) {
-                //    if (map.AxialDistance(coord, _target.Coord) <= areaBuff.Radius) {
-                //        map.BuffsAt(coord).Add(areaBuff.Effect.DeepCopy());
-                //    }
-                //}
-
-                foreach (var zeroCoord in CoordRadiusCache.Instance.Coords[areaBuff.Radius]) {
-                    var coord = zeroCoord + _target.Coord;
-                    if (map.AxialDistance(coord, _target.Coord) <= areaBuff.Radius && map.IsValidCoord(coord)) {
-                        var buffsAt = map.BuffsAt(coord);
-                        buffsAt.Add(areaBuff.Effect.DeepCopy());
-                    }
-                }
+                var copy = areaBuff.DeepCopy();
+                copy.Coord = _target.Coord;
+                map.AreaBuffs.Add(copy);
             }
 
             // TODO - handle negative AP

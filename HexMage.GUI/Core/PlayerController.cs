@@ -14,6 +14,18 @@ namespace HexMage.GUI.Core {
             _gameInstance = gameInstance;
         }
 
+        public DefenseDesire FastRequestDesireToDefend(Mob mob, Ability ability) {
+            throw new System.NotImplementedException();
+        }
+
+        public void FastPlayTurn(GameEventHub eventHub) {
+            throw new System.NotImplementedException();
+        }
+
+        public void FastRandomAction(GameEventHub eventHub) {
+            throw new System.NotImplementedException();
+        }
+
         public Task<DefenseDesire> RequestDesireToDefend(Mob mob, Ability ability) {
             return _arenaScene.RequestDesireToDefend(mob, ability);
         }

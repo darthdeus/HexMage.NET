@@ -142,7 +142,7 @@ namespace HexMage.Simulator.PCG {
 
             int count = Random.Next(2);
             for (int i = 0; i < count; i++) {
-                result.Add(new AreaBuff(Random.Next(4), RandomBuff(element)));
+                result.Add(new AreaBuff(AxialCoord.Zero, Random.Next(4), RandomBuff(element)));
             }
 
             return result;

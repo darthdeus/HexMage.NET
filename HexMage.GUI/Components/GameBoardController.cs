@@ -366,15 +366,14 @@ namespace HexMage.GUI.Components {
                     mobTextBuilder.AppendLine("Buffs:");
                     foreach (var buff in mob.Buffs)
                         mobTextBuilder.AppendLine(
-                            $"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns {buff.MoveSpeedModifier}spd");
+                            $"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");
 
                     mobTextBuilder.AppendLine();
                     mobTextBuilder.AppendLine("Area buffs:");
 
-                    var areaBuffs = _gameInstance.Map.BuffsAt(mob.Coord);
-                    foreach (var buff in areaBuffs)
-                        mobTextBuilder.AppendLine(
-                            $"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns {buff.MoveSpeedModifier}spd");
+                    foreach (var buff in _gameInstance.Map.BuffsAt(mob.Coord)) {
+                        mobTextBuilder.AppendLine($"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");
+                    }
 
                     mobTextBuilder.AppendLine();
                     mobTextBuilder.AppendLine($"Coord {mob.Coord}");

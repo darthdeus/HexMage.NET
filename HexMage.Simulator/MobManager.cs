@@ -54,25 +54,24 @@ namespace HexMage.Simulator {
                 }
 
                 mob.Buffs.RemoveAll(x => x.Lifetime == 0);
+            }
 
-                var buffs = map.BuffsAt(mob.Coord);
+            var newBuffs = new List<AreaBuff>();
 
-                foreach (var buff in buffs) {
-                    ApplyBuff(mob, buff, LifetimeChange.KeepLifetime);
+            foreach (var areaBuff in map.AreaBuffs) {
+                foreach (var mob in Mobs) {
+                    if (map.AxialDistance(mob.Coord, areaBuff.Coord) <= areaBuff.Radius) {
+                        ApplyBuff(mob, areaBuff.Effect, LifetimeChange.KeepLifetime);
+                    }
+                }
+
+                areaBuff.Effect.Lifetime--;
+                if (areaBuff.Effect.Lifetime > 0) {
+                    newBuffs.Add(areaBuff);
                 }
             }
 
-            // TODO - store these in a list instead so that the whole map doesn't have to be iterated each turn
-            foreach (var coord in map.AllCoords) {
-                var buffs = map.BuffsAt(coord);
-                foreach (var buff in buffs) {
-                    buff.Lifetime--;
-                    Debug.Assert(buff.Lifetime >= 0,
-                                 "Buff lifetime should never be negative, as they're removed when they reach zero.");
-                }
-
-                buffs.RemoveAll(x => x.Lifetime == 0);
-            }
+            map.AreaBuffs = newBuffs;
         }
 
         public void ApplyBuff(Mob mob, Buff buff, LifetimeChange lifetimeChange) {

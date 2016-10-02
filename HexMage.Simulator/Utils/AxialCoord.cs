@@ -5,6 +5,7 @@ namespace HexMage.Simulator {
     public struct AxialCoord : IEquatable<AxialCoord> {
         public int X { get; set; }
         public int Y { get; set; }
+        public static AxialCoord Zero { get; } = new AxialCoord(0, 0);
 
         public AxialCoord(int x, int y) {
             X = x;
