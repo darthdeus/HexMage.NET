@@ -41,15 +41,13 @@ namespace HexMage.Simulator {
             get {
                 switch (Element) {
                     case AbilityElement.Earth:
-                        return new Buff(AbilityElement.Earth, 0, 0, 1, 0.5f);
+                        return new Buff(AbilityElement.Earth, 0, 0, 1);
                     case AbilityElement.Fire:
                         return new Buff(AbilityElement.Fire, -1, 0, 2);
                     case AbilityElement.Air:
-                        return new Buff(AbilityElement.Air, 0, 0, 1, 2f);
+                        return new Buff(AbilityElement.Air, 0, 0, 1);
                     case AbilityElement.Water:
-                        return new Buff(AbilityElement.Water, 0, 0, 1, new List<AbilityElement>() {
-                                            AbilityElement.Air
-                                        });
+                        return new Buff(AbilityElement.Water, 0, 0, 1);
                     default:
                         throw new InvalidOperationException("Invalid element type");
                 }

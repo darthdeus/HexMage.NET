@@ -55,13 +55,6 @@ namespace HexMage.Simulator {
         }
 
         public bool IsAbilityUsable(Mob mob, Ability ability) {
-            // TODO - handle visibiliy
-            foreach (var buff in mob.Buffs) {
-                if (buff.DisabledElements.Contains(ability.Element)) {
-                    return false;
-                }
-            }
-
             return mob.Ap >= ability.Cost && ability.CurrentCooldown == 0;
         }
 
@@ -92,7 +85,7 @@ namespace HexMage.Simulator {
             var result = new List<Mob>();
 
             var ability = mob.UsableMaxRange();
-            
+
             foreach (var target in MobManager.Mobs) {
                 if (target.Hp > 0 && Pathfinder.Distance(target.Coord) <= ability.Range && target.Team != mob.Team) {
                     result.Add(target);

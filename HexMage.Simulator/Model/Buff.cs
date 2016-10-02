@@ -7,31 +7,16 @@ namespace HexMage.Simulator.Model {
         public int HpChange { get; set; }
         public int ApChange { get; set; }
         public int Lifetime { get; set; }
-        public List<AbilityElement> DisabledElements { get; set; }
 
-        public Buff(AbilityElement element, int hpChange, int apChange, int lifetime) :
-            this(element, hpChange, apChange, lifetime, new List<AbilityElement>()) {}
-
-        public Buff(AbilityElement element, int hpChange, int apChange, int lifetime, float moveSpeedModifier) :
-            this(element, hpChange, apChange, lifetime, new List<AbilityElement>()) {}
-
-        public Buff(AbilityElement element, int hpChange, int apChange, int lifetime,
-                    List<AbilityElement> disabledElements) {
+        public Buff(AbilityElement element, int hpChange, int apChange, int lifetime) {
             Element = element;
             HpChange = hpChange;
             ApChange = apChange;
             Lifetime = lifetime;
-            DisabledElements = disabledElements;
         }
 
         public Buff DeepCopy() {
-            var disabledElementsCopy = new List<AbilityElement>();
-
-            // TODO - odstranit disabled elementy
-            foreach (var element in DisabledElements) {
-                disabledElementsCopy.Add(element);
-            }
-            return new Buff(Element, HpChange, ApChange, Lifetime, disabledElementsCopy);
+            return new Buff(Element, HpChange, ApChange, Lifetime);
         }
 
         public override string ToString() {

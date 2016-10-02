@@ -62,7 +62,8 @@ namespace HexMage.Benchmarks {
             var iterations = 0;
             int roundsPerThousand = 0;
 
-            int totalIterations = 100000;
+            int totalIterations = 200000;
+            double ratio = 1000000/totalIterations;
 
             while (iterations < totalIterations) {
                 iterations++;
@@ -88,7 +89,7 @@ namespace HexMage.Benchmarks {
                     double estimateSecondsPerMil =
                         Math.Round(totalStopwatch.Elapsed.TotalSeconds/iterations*totalIterations, 2);
                     Console.WriteLine(
-                        $"Starting a new game {iterations}, {roundsPerThousand/1000} average rounds, {perThousandMs}ms\trunning average per 1M: {estimateSecondsPerMil*10}s");
+                        $"Starting a new game {iterations}, {roundsPerThousand/1000} average rounds, {perThousandMs}ms\trunning average per 1M: {estimateSecondsPerMil*ratio}s");
                     roundsPerThousand = 0;
                     stopwatch.Reset();
                 }

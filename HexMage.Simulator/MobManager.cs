@@ -42,15 +42,12 @@ namespace HexMage.Simulator {
             Mobs.Add(mob);
         }
 
-        public enum LifetimeChange {
-            UpdateLifetime,
-            KeepLifetime
-        }
-
         public void ApplyDots(Map map) {
             foreach (var mob in Mobs) {
                 foreach (var buff in mob.Buffs) {
-                    ApplyBuff(mob, buff, LifetimeChange.UpdateLifetime);
+                    mob.Ap += buff.ApChange;
+                    mob.Hp += buff.HpChange;
+                    buff.Lifetime--;
                 }
 
                 mob.Buffs.RemoveAll(x => x.Lifetime == 0);
@@ -61,25 +58,21 @@ namespace HexMage.Simulator {
             foreach (var areaBuff in map.AreaBuffs) {
                 foreach (var mob in Mobs) {
                     if (map.AxialDistance(mob.Coord, areaBuff.Coord) <= areaBuff.Radius) {
-                        ApplyBuff(mob, areaBuff.Effect, LifetimeChange.KeepLifetime);
+                        mob.Ap += areaBuff.Effect.ApChange;
+                        mob.Hp += areaBuff.Effect.HpChange;
                     }
                 }
 
                 areaBuff.Effect.Lifetime--;
-                if (areaBuff.Effect.Lifetime > 0) {
-                    newBuffs.Add(areaBuff);
+            }
+
+            foreach (var buff in map.AreaBuffs) {
+                if (buff.Effect.Lifetime > 0) {
+                    newBuffs.Add(buff);
                 }
             }
 
             map.AreaBuffs = newBuffs;
-        }
-
-        public void ApplyBuff(Mob mob, Buff buff, LifetimeChange lifetimeChange) {
-            mob.Ap += buff.ApChange;
-            mob.Hp += buff.HpChange;
-            if (lifetimeChange == LifetimeChange.UpdateLifetime) {
-                buff.Lifetime--;
-            }
         }
 
         public void FastMoveMob(Map map, Pathfinder pathfinder, Mob mob, AxialCoord pos) {
