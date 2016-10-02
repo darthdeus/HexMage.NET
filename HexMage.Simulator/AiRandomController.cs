@@ -11,7 +11,7 @@ namespace HexMage.Simulator {
             _gameInstance = gameInstance;
         }
 
-        public DefenseDesire FastRequestDesireToDefend(Mob mob, Ability ability) {
+        public DefenseDesire FastRequestDesireToDefend(Mob mob, AbilityInfo abilityInfo) {
             return DefenseDesire.Pass;
         }
 
@@ -52,7 +52,7 @@ namespace HexMage.Simulator {
             }
         }
 
-        public Task<DefenseDesire> RequestDesireToDefend(Mob mob, Ability ability) {
+        public Task<DefenseDesire> RequestDesireToDefend(Mob mob, AbilityInfo abilityInfo) {
             return Task.FromResult(DefenseDesire.Pass);
         }
 

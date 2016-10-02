@@ -6,7 +6,7 @@ namespace HexMage.AI
 {
     public class DoNothingController : IMobController
     {
-        public DefenseDesire FastRequestDesireToDefend(Mob mob, Ability ability) {
+        public DefenseDesire FastRequestDesireToDefend(Mob mob, AbilityInfo abilityInfo) {
             throw new System.NotImplementedException();
         }
 
@@ -18,7 +18,7 @@ namespace HexMage.AI
             throw new System.NotImplementedException();
         }
 
-        public Task<DefenseDesire> RequestDesireToDefend(Mob mob, Ability ability) {
+        public Task<DefenseDesire> RequestDesireToDefend(Mob mob, AbilityInfo abilityInfo) {
             return Task.FromResult(DefenseDesire.Pass);
         }
 

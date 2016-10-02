@@ -34,8 +34,8 @@ namespace HexMage.Simulator.Tests
             var t1 = TeamColor.Red;
             var t2 = TeamColor.Blue;
 
-            var m1 = Generator.RandomMob(t1, size, _ => true);
-            var m2 = Generator.RandomMob(t2, size, c => !m1.Coord.Equals(c));
+            var m1 = Generator.RandomMob(t1, game);
+            var m2 = Generator.RandomMob(t2, game);
 
             Assert.AreNotEqual(m1.Coord, m2.Coord);
 
@@ -62,8 +62,8 @@ namespace HexMage.Simulator.Tests
             var t1 = TeamColor.Red;
             var t2 = TeamColor.Blue;
 
-            var m1 = Generator.RandomMob(t1, size);
-            var m2 = Generator.RandomMob(t2, size, c => !m1.Coord.Equals(c));
+            var m1 = Generator.RandomMob(t1, game);
+            var m2 = Generator.RandomMob(t2, game);
 
             game.MobManager.AddMob(m1);
             game.MobManager.AddMob(m2);

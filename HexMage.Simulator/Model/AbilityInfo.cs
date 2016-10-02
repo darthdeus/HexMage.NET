@@ -1,9 +1,7 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using HexMage.Simulator.Model;
 
-namespace HexMage.Simulator {
+namespace HexMage.Simulator.Model {
     // TODO - rename
     public enum AbilityElement {
         Earth,
@@ -12,21 +10,44 @@ namespace HexMage.Simulator {
         Water
     }
 
-    public class Ability : IDeepCopyable<Ability> {
+    public class AbilityInstance : IDeepCopyable<AbilityInstance> {
+        public int CurrentCooldown { get; set; }
+        private readonly AbilityInfo _abilityInfo;
+        public AbilityInfo AbilityInfo => _abilityInfo;
+
+        public int Dmg => _abilityInfo.Dmg;
+        public int Cost => _abilityInfo.Cost;
+        public int Range => _abilityInfo.Range;
+        public int Cooldown => _abilityInfo.Cooldown;
+        public AbilityElement Element => _abilityInfo.Element;
+        public List<Buff> Buffs => _abilityInfo.Buffs;
+        public List<AreaBuff> AreaBuffs => _abilityInfo.AreaBuffs;
+        public Buff ElementalEffect => _abilityInfo.ElementalEffect;
+
+        public AbilityInstance(AbilityInfo abilityInfo) {
+            _abilityInfo = abilityInfo;
+            CurrentCooldown = abilityInfo.Cooldown;
+        }
+
+        public AbilityInstance DeepCopy() {
+            return (AbilityInstance) MemberwiseClone();
+        }
+    }
+
+    public class AbilityInfo {
         public int Dmg { get; set; }
         public int Cost { get; set; }
         public int Range { get; set; }
         public int Cooldown { get; set; }
-        public int CurrentCooldown { get; set; }
         public AbilityElement Element { get; set; }
         public List<Buff> Buffs { get; set; }
         public List<AreaBuff> AreaBuffs { get; set; }
 
-        public Ability(int dmg, int cost, int range, int cooldown, AbilityElement element)
+        public AbilityInfo(int dmg, int cost, int range, int cooldown, AbilityElement element)
             : this(dmg, cost, range, cooldown, element, new List<Buff>(), new List<AreaBuff>()) {}
 
-        public Ability(int dmg, int cost, int range, int cooldown, AbilityElement element, List<Buff> buffs,
-                       List<AreaBuff> areaBuffs) {
+        public AbilityInfo(int dmg, int cost, int range, int cooldown, AbilityElement element, List<Buff> buffs,
+                           List<AreaBuff> areaBuffs) {
             Dmg = dmg;
             Cost = cost;
             Range = range;
@@ -34,7 +55,10 @@ namespace HexMage.Simulator {
             Element = element;
             Buffs = buffs;
             AreaBuffs = areaBuffs;
-            CurrentCooldown = 0;
+        }
+
+        public AbilityInstance CreateInstance() {
+            return new AbilityInstance(this);
         }
 
         public Buff ElementalEffect {
@@ -54,20 +78,6 @@ namespace HexMage.Simulator {
                         throw new InvalidOperationException("Invalid element type");
                 }
             }
-        }
-
-        public Ability DeepCopy() {
-            var buffsCopy = new List<Buff>();
-            foreach (var buff in Buffs) {
-                buffsCopy.Add(buff.DeepCopy());
-            }
-            var areaBuffsCopy = new List<AreaBuff>();
-            foreach (var areaBuff in AreaBuffs) {
-                areaBuffsCopy.Add(areaBuff.DeepCopy());
-            }
-
-            var copy = new Ability(Dmg, Cost, Range, Cooldown, Element, buffsCopy, areaBuffsCopy);
-            return copy;
         }
     }
 }

@@ -38,8 +38,11 @@ namespace HexMage.Benchmarks {
             Generator.Random = new Random(1234);
 
             for (int i = 0; i < 5; i++) {
-                m1 = Generator.RandomMob(t1, size, c => gameInstance.MobManager.AtCoord(c) == null);
-                m2 = Generator.RandomMob(t2, size, c => gameInstance.MobManager.AtCoord(c) == null);
+                m1 = Generator.RandomMob(t1, gameInstance);
+                m2 = Generator.RandomMob(t2, gameInstance);
+
+                m1.Coord = Generator.RandomPosition(gameInstance);
+                m2.Coord = Generator.RandomPosition(gameInstance);
 
                 mobManager.AddMob(m1);
                 mobManager.AddMob(m2);

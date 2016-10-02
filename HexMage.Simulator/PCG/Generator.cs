@@ -57,64 +57,72 @@ namespace HexMage.Simulator.PCG {
             game.MobManager.Teams[t2] = controllerFunc(game);
 
             for (int i = 0; i < teamSize; i++) {
-                game.MobManager.AddMob(RandomMob(t1, size, c => game.MobManager.AtCoord(c) == null));
-                game.MobManager.AddMob(RandomMob(t2, size, c => game.MobManager.AtCoord(c) == null));
+                game.MobManager.AddMob(RandomMob(t1, game));
+                game.MobManager.AddMob(RandomMob(t2, game));
             }
 
             return game;
         }
 
-        public static Mob RandomMob(TeamColor team, int size) {
-            return RandomMob(team, size, _ => true);
+        public static AxialCoord RandomPosition(GameInstance gameInstance) {
+            var map = gameInstance.Map;
+            var mobManager = gameInstance.MobManager;
+
+            int size = map.Size;
+            int iterations = 0;
+
+            while (iterations++ < 10000) {
+                var x = Random.Next(-size, size);
+                var y = Random.Next(-size, size);
+                
+                var zero = new AxialCoord(0, 0);
+                var coord = new AxialCoord(x, y);
+
+                if (map.IsValidCoord(coord) && map[coord] != HexType.Wall && mobManager.AtCoord(coord) == null && coord.Distance(zero) < size) {
+                    return coord;
+                }
+            }
+
+            throw new InvalidOperationException("PCG got stuck trying to place a mob, there's no free space available.");
         }
 
-        public static Mob RandomMob(TeamColor team, int size, Predicate<AxialCoord> isCoordAvailable) {
-            var abilities = new List<Ability>();
-
-            var elements = new[] {
-                AbilityElement.Earth, AbilityElement.Fire, AbilityElement.Air, AbilityElement.Water
-            };
+        public static Mob RandomMob(TeamColor team, GameInstance gameInstance) {
+            var abilities = new List<AbilityInfo>();
 
             for (int i = 0; i < Mob.AbilityCount; i++) {
-                var element = elements[Random.Next(0, 4)];
-                var buffs = RandomBuffs(element);
-
-                var areaBuffs = RandomAreaBuffs(element);
-
-                abilities.Add(new Ability(Random.Next(1, 10),
-                                          Random.Next(3, 7),
-                                          Random.Next(3, 10),
-                                          Random.Next(0, 3),
-                                          element,
-                                          buffs,
-                                          areaBuffs));
+                var ability = RandomAbility();
+                
+                abilities.Add(ability);
             }
 
             int iniciative = Random.Next(10);
 
-            var mob = new Mob(team, 10, 10, 3, iniciative, abilities);
-
-            while (true) {
-                var x = Random.Next(-size, size);
-                var y = Random.Next(-size, size);
-                //var z = -x - y;
-                //var cube = new CubeCoord(x, y, z);
-                //var zero = new CubeCoord(0, 0, 0);
-
-                var zero = new AxialCoord(0, 0);
-                var coord = new AxialCoord(x, y);
-
-                if (isCoordAvailable(coord) && coord.Distance(zero) < size) {
-                    mob.Coord = coord;
-                    mob.OrigCoord = coord;
-                    break;
-                }
-            }
+            var mob = new Mob(team, 10, 10, 3, iniciative, abilities.Select(a => new AbilityInstance(a)).ToList());
+            mob.Coord = RandomPosition(gameInstance);
+            mob.OrigCoord = mob.Coord;
 
             return mob;
         }
 
-        public static List<Buff> RandomBuffs(AbilityElement element) {
+        private static AbilityInfo RandomAbility() {
+            var elements = new[] {
+                AbilityElement.Earth, AbilityElement.Fire, AbilityElement.Air, AbilityElement.Water
+            };
+            var element = elements[Random.Next(0, 4)];
+            var buffs = RandomBuffs(element);
+
+            var areaBuffs = RandomAreaBuffs(element);
+
+            return new AbilityInfo(Random.Next(1, 10),
+                               Random.Next(3, 7),
+                               Random.Next(3, 10),
+                               Random.Next(0, 3),
+                               element,
+                               buffs,
+                               areaBuffs);
+        }
+
+        private static List<Buff> RandomBuffs(AbilityElement element) {
             var result = new List<Buff>();
 
             int count = Random.Next(2);
@@ -125,7 +133,7 @@ namespace HexMage.Simulator.PCG {
             return result;
         }
 
-        public static Buff RandomBuff(AbilityElement element) {
+        private static Buff RandomBuff(AbilityElement element) {
             var hpChange = Random.Next(-2, 1);
             var apChange = Random.Next(-1, 1);
             var lifetime = Random.Next(1, 3);
@@ -137,7 +145,7 @@ namespace HexMage.Simulator.PCG {
             return new Buff(element, hpChange, apChange, lifetime);
         }
 
-        public static List<AreaBuff> RandomAreaBuffs(AbilityElement element) {
+        private static List<AreaBuff> RandomAreaBuffs(AbilityElement element) {
             var result = new List<AreaBuff>();
 
             int count = Random.Next(2);
