@@ -88,7 +88,7 @@ namespace HexMage.Benchmarks {
                     double estimateSecondsPerMil =
                         Math.Round(totalStopwatch.Elapsed.TotalSeconds/iterations*totalIterations, 2);
                     Console.WriteLine(
-                        $"Starting a new game {iterations}, {roundsPerThousand/1000} average rounds, {perThousandMs}ms\trunning average per 1M: {estimateSecondsPerMil}s");
+                        $"Starting a new game {iterations}, {roundsPerThousand/1000} average rounds, {perThousandMs}ms\trunning average per 1M: {estimateSecondsPerMil*10}s");
                     roundsPerThousand = 0;
                     stopwatch.Reset();
                 }

@@ -15,15 +15,18 @@ namespace HexMage.Simulator {
         public Mob CurrentMob => _current < TurnOrder.Count ? TurnOrder[_current] : null;
         public IMobController CurrentController => CurrentMob != null ? MobManager.Teams[CurrentMob.Team] : null;
 
+        public int TurnNumber { get; private set; }
         private int _current = 0;
 
         public TurnManager(MobManager mobManager, Map map) {
             _map = map;
             MobManager = mobManager;
+            TurnNumber = 0;
         }
 
         public void StartNextTurn(Pathfinder pathfinder) {
             TurnOrder.Clear();
+            TurnNumber++;
 
             foreach (var mob in MobManager.Mobs) {
                 if (mob.Hp > 0) {
@@ -61,6 +64,7 @@ namespace HexMage.Simulator {
 
         public void Reset() {
             TurnOrder.Clear();
+            TurnNumber = 0;
         }
     }
 }

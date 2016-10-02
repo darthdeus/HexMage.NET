@@ -20,95 +20,38 @@ namespace HexMage.Simulator {
             FastRandomAction(eventHub);
         }
 
-        //public void FastRandomAction(GameEventHub eventHub) {
-        //    var mob = _gameInstance.TurnManager.CurrentMob;
-        //    var pathfinder = _gameInstance.Pathfinder;
-
-        //    var ability = mob.UsableMaxRange();
-
-        //    Mob spellTarget = null;
-        //    Mob moveTarget = null;
-        //    foreach (var possibleTarget in _gameInstance.MobManager.Mobs) {
-        //        if (possibleTarget.Hp <= 0) continue;
-
-        //        // TODO - mela by to byt viditelna vzdalenost
-        //        if (possibleTarget.Team != mob.Team) {
-        //            if (pathfinder.Distance(possibleTarget.Coord) <= ability.Range) {
-        //                spellTarget = possibleTarget;
-        //                break;
-        //            }
-
-        //            moveTarget = possibleTarget;
-        //        }
-        //    }
-
-        //    if (spellTarget != null) {
-        //        // TODO - tohle tu neni vubec potreba
-        //        var usableAbility = new UsableAbility(mob, spellTarget, ability, 0);
-        //        usableAbility.FastUse(_gameInstance.Map, _gameInstance.MobManager);
-        //    } else if (moveTarget != null) {
-        //        Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
-        //                  $"There are no targets, moving towards a random enemy at {moveTarget.Coord}");
-        //        FastMoveTowardsEnemy(mob, moveTarget);
-        //    } else {
-        //        throw new InvalidOperationException("No targets, game should be over.");
-        //    }
-        //}
-
-        public void FastRandomAction(GameEventHub eventHub)
-        {
+        public void FastRandomAction(GameEventHub eventHub) {
             var mob = _gameInstance.TurnManager.CurrentMob;
-            Debug.Assert(mob != null, "Requesting action while there's no current mob.");
-            var targets = _gameInstance.PossibleTargets(mob);
+            var pathfinder = _gameInstance.Pathfinder;
 
-            if (targets.Count > 0)
-            {
-                Mob target = targets[0];
-                var pathfinder = _gameInstance.Pathfinder;
+            var ability = mob.UsableMaxRange();
 
-                foreach (var possibleTarget in targets)
-                {
-                    if (pathfinder.Distance(possibleTarget.Coord) < pathfinder.Distance(target.Coord))
-                    {
-                        target = possibleTarget;
+            Mob spellTarget = null;
+            Mob moveTarget = null;
+            foreach (var possibleTarget in _gameInstance.MobManager.Mobs) {
+                if (possibleTarget.Hp <= 0) continue;
+
+                // TODO - mela by to byt viditelna vzdalenost
+                if (possibleTarget.Team != mob.Team) {
+                    if (pathfinder.Distance(possibleTarget.Coord) <= ability.Range) {
+                        spellTarget = possibleTarget;
+                        break;
                     }
-                }
 
-                var usableAbilities = _gameInstance.UsableAbilities(mob, target);
-                if (usableAbilities.Count > 0)
-                {
-                    var ua = usableAbilities.First();
-                    ua.FastUse(_gameInstance.Map, _gameInstance.MobManager);
-                }
-                else
-                {
-                    Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
-                              $"No usable abilities, moving towards target at {target.Coord}");
-
-                    FastMoveTowardsEnemy(mob, target);
+                    moveTarget = possibleTarget;
                 }
             }
-            else
-            {
-                Mob target = null;
-                foreach (var possibleTarget in _gameInstance.MobManager.Mobs)
-                {
-                    if (possibleTarget.Team != mob.Team && possibleTarget.Hp > 0)
-                    {
-                        target = possibleTarget;
-                    }
-                }
 
-                if (target != null)
-                {
-                    Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
-                              $"There are no targets, moving towards a random enemy at {target.Coord}");
-                    FastMoveTowardsEnemy(mob, target);
-                }
-                else
-                {
-                    Utils.Log(LogSeverity.Info, nameof(AiRandomController), "No possible action");
-                }
+            if (spellTarget != null) {
+                // TODO - tohle tu neni vubec potreba
+                var usableAbility = new UsableAbility(mob, spellTarget, ability, 0);
+                usableAbility.FastUse(_gameInstance.Map, _gameInstance.MobManager);
+            } else if (moveTarget != null) {
+                Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
+                          $"There are no targets, moving towards a random enemy at {moveTarget.Coord}");
+                FastMoveTowardsEnemy(mob, moveTarget);
+            } else {
+                throw new InvalidOperationException("No targets, game should be over.");
             }
         }
 
