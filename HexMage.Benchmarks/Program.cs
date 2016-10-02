@@ -62,7 +62,7 @@ namespace HexMage.Benchmarks {
             var iterations = 0;
             int roundsPerThousand = 0;
 
-            int totalIterations = 1000000;
+            int totalIterations = 100000;
 
             while (iterations < totalIterations) {
                 iterations++;

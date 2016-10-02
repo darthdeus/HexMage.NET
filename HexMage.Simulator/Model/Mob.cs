@@ -34,7 +34,7 @@ namespace HexMage.Simulator.Model {
             MaxAp = maxAp;
             DefenseCost = defenseCost;
             Iniciative = iniciative;
-            Abilities = abilities;
+            Abilities = abilities.OrderByDescending(a => a.Range).ToList();
             Hp = maxHp;
             Ap = maxAp;
             Coord = new AxialCoord(0, 0);
@@ -70,5 +70,15 @@ namespace HexMage.Simulator.Model {
 
             return copy;
         }
+
+        public Ability UsableMaxRange() {
+            foreach (var ability in Abilities) {
+                if (ability.Cost <= Ap && ability.CurrentCooldown == 0) {
+                    return ability;
+                }
+            }
+
+            return null;
+        }   
     }
 }

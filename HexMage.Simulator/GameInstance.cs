@@ -91,16 +91,10 @@ namespace HexMage.Simulator {
         public IList<Mob> PossibleTargets(Mob mob) {
             var result = new List<Mob>();
 
-            int maxRange = 0;
-            // TODO - nezohlednuje disablovane ability
-            foreach (var ability in mob.Abilities) {
-                if (maxRange < ability.Range && ability.Cost <= mob.Ap) {
-                    maxRange = ability.Range;
-                }
-            }
-
+            var ability = mob.UsableMaxRange();
+            
             foreach (var target in MobManager.Mobs) {
-                if (target.Hp > 0 && Pathfinder.Distance(target.Coord) <= maxRange && target.Team != mob.Team) {
+                if (target.Hp > 0 && Pathfinder.Distance(target.Coord) <= ability.Range && target.Team != mob.Team) {
                     result.Add(target);
                 }
             }

@@ -19,6 +19,7 @@ namespace HexMage.Simulator.Model {
 
         public DefenseDesire FastUse(Map map, MobManager mobManager) {
             Debug.Assert(Ability.CurrentCooldown == 0, "Trying to use an ability with non-zero cooldown.");
+            Debug.Assert(_target.Hp > 0, "Target is dead.");
 
             DefenseDesire result;
 
@@ -104,11 +105,12 @@ namespace HexMage.Simulator.Model {
 
             _target.Hp = Math.Max(0, _target.Hp - Ability.Dmg*modifier);
 
-            //_target.Buffs.Add(Ability.ElementalEffect);
-            //foreach (var abilityBuff in Ability.Buffs) {
-            //    // TODO - handle lifetimes
-            //    _target.Buffs.Add(abilityBuff.DeepCopy());
-            //}
+            _target.Buffs.Add(Ability.ElementalEffect);
+            foreach (var abilityBuff in Ability.Buffs)
+            {
+                // TODO - handle lifetimes
+                _target.Buffs.Add(abilityBuff.DeepCopy());
+            }
 
             foreach (var areaBuff in Ability.AreaBuffs) {
                 //foreach (var coord in map.AllCoords) {
