@@ -17,6 +17,24 @@ namespace HexMage.Simulator {
 
         private TimeSpan _pauseDelay = TimeSpan.FromMilliseconds(200);
 
+        public int FastMainLoop(TimeSpan turnDelay) {
+            var turnManager = _gameInstance.TurnManager;
+            turnManager.StartNextTurn(_gameInstance.Pathfinder);
+
+            Utils.Log(LogSeverity.Info, nameof(GameEventHub), "FAST Starting Main Loop");
+
+            int totalTurns = 0;
+
+            while (!_gameInstance.IsFinished()) {
+                totalTurns++;
+
+                turnManager.CurrentController.FastPlayTurn(this);
+                turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder);
+            }
+
+            return totalTurns;
+        }
+
         public async Task<int> MainLoop(TimeSpan turnDelay) {
             var turnManager = _gameInstance.TurnManager;
             turnManager.StartNextTurn(_gameInstance.Pathfinder);
@@ -53,16 +71,7 @@ namespace HexMage.Simulator {
 
         public async Task BroadcastMobMoved(Mob mob, AxialCoord pos) {
             await Task.WhenAll(_subscribers.Select(x => x.EventMobMoved(mob, pos)));
-
-            int distance = mob.Coord.Distance(pos);
-
-            Debug.Assert(distance <= mob.Ap, "Trying to move a mob that doesn't have enough AP.");
-            Debug.Assert(_gameInstance.Map[pos] == HexType.Empty, "Trying to move a mob into a wall.");
-            Debug.Assert(_gameInstance.MobManager.AtCoord(pos) == null, "Trying to move into a mob.");
-
-            mob.Ap -= distance;
-            mob.Coord = pos;
-            _gameInstance.Pathfinder.PathfindFrom(pos);
+            _gameInstance.MobManager.FastMoveMob(_gameInstance.Map, _gameInstance.Pathfinder, mob, pos);
         }
 
         public async Task BroadcastAbilityUsed(Mob mob, Mob target, UsableAbility ability) {

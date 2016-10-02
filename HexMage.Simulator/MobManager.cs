@@ -7,11 +7,10 @@ using HexMage.Simulator.Model;
 namespace HexMage.Simulator {
     public class MobManager : IDeepCopyable<MobManager>, IResettable {
         public readonly List<Mob> Mobs = new List<Mob>();
-        public IEnumerable<Mob> AliveMobs => Mobs.Where(m => m.Hp > 0);
 
         public readonly Dictionary<TeamColor, IMobController> Teams = new Dictionary<TeamColor, IMobController>();
 
-        public bool MoveMob(Mob mob, AxialCoord to) {
+        public bool MoveOneHex(Mob mob, AxialCoord to) {
             if (mob.Coord == to) {
                 Utils.Log(LogSeverity.Debug, nameof(MobManager), "MoveMob failed trying to move zero distance.");
                 return false;
@@ -27,10 +26,6 @@ namespace HexMage.Simulator {
             } else {
                 return false;
             }
-        }
-
-        public IEnumerable<Mob> MobsInTeam(TeamColor color) {
-            return Mobs.Where(mob => mob.Team == color);
         }
 
         public Mob AtCoord(AxialCoord c) {
@@ -86,6 +81,18 @@ namespace HexMage.Simulator {
             if (lifetimeChange == LifetimeChange.UpdateLifetime) {
                 buff.Lifetime--;
             }
+        }
+
+        public void FastMoveMob(Map map, Pathfinder pathfinder, Mob mob, AxialCoord pos) {
+            int distance = mob.Coord.Distance(pos);
+
+            Debug.Assert(distance <= mob.Ap, "Trying to move a mob that doesn't have enough AP.");
+            Debug.Assert(map[pos] == HexType.Empty, "Trying to move a mob into a wall.");
+            Debug.Assert(AtCoord(pos) == null, "Trying to move into a mob.");
+
+            mob.Ap -= distance;
+            mob.Coord = pos;
+            pathfinder.PathfindFrom(pos);
         }
 
         public void LowerCooldowns() {

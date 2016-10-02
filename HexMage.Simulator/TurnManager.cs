@@ -25,9 +25,11 @@ namespace HexMage.Simulator {
         public void StartNextTurn(Pathfinder pathfinder) {
             TurnOrder.Clear();
 
-            foreach (var mob in MobManager.AliveMobs) {
-                mob.Ap = mob.MaxAp;
-                TurnOrder.Add(mob);
+            foreach (var mob in MobManager.Mobs) {
+                if (mob.Hp > 0) {
+                    mob.Ap = mob.MaxAp;
+                    TurnOrder.Add(mob);
+                }
             }
 
             MobManager.ApplyDots(_map);

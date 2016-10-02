@@ -5,33 +5,6 @@ using System.Linq;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
-    public class CoordRadiusCache {
-        public static CoordRadiusCache Instance = new CoordRadiusCache();
-
-        public readonly Dictionary<int, List<AxialCoord>> Coords = new Dictionary<int, List<AxialCoord>>();
-
-        public void PrecomputeUpto(int maxSize) {            
-            for (int size = 0; size < maxSize; size++) {
-                var validCoords = new List<AxialCoord>();
-
-                var from = -size;
-                var to = size;
-
-                for (var i = from; i <= to; i++) {
-                    for (var j = from; j <= to; j++) {
-                        for (var k = from; k <= to; k++) {
-                            if (i + j + k == 0) {
-                                validCoords.Add(new AxialCoord(j, i));
-                            }
-                        }
-                    }
-                }
-
-                Coords[size] = validCoords;
-            }
-        }
-    }
-
     public class Map : IDeepCopyable<Map>, IResettable {
         private readonly HexMap<HexType> _hexes;
         private readonly HexMap<List<Buff>> _buffs;
@@ -97,7 +70,23 @@ namespace HexMage.Simulator {
                                  LerpRound(a.Z, b.Z, t, -0.000002f));
         }
 
-        public List<CubeCoord> CubeLinedraw(CubeCoord a, CubeCoord b) {
+        private readonly Dictionary<CoordPair, List<AxialCoord>> _cubeLines =
+            new Dictionary<CoordPair, List<AxialCoord>>();
+
+        public void PrecomputeCubeLinedraw() {
+            foreach (var a in AllCoords) {
+                foreach (var b in AllCoords) {
+                    var result = ComputeCubeLinedraw(a, b);
+                    _cubeLines[new CoordPair(a, b)] = result.Select(x => x.ToAxial()).ToList();
+                }
+            }
+        }
+
+        public List<AxialCoord> AxialLinedraw(AxialCoord a, AxialCoord b) {
+            return _cubeLines[new CoordPair(a, b)];
+        }
+
+        private List<CubeCoord> ComputeCubeLinedraw(CubeCoord a, CubeCoord b) {
             var result = new List<CubeCoord>();
 
             if (a == b) {
@@ -107,14 +96,9 @@ namespace HexMage.Simulator {
             var N = CubeDistance(a, b);
             for (int i = 0; i < N + 1; i++) {
                 result.Add(CubeLerp(a, b, ((float) i)/N));
-                //Utils.Log(LogSeverity.Debug, nameof(Map), $"Lerping {a} and {b} with {i}/{N}");
             }
 
             return result;
-        }
-
-        public bool IsVisible(CubeCoord a, CubeCoord b) {
-            return CubeLinedraw(a, b).All(c => this[c] == HexType.Empty);
         }
 
         public Map DeepCopy() {

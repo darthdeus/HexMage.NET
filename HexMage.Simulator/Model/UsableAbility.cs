@@ -17,6 +17,32 @@ namespace HexMage.Simulator.Model {
             Index = index;
         }
 
+        public DefenseDesire FastUse(Map map, MobManager mobManager) {
+            Debug.Assert(Ability.CurrentCooldown == 0, "Trying to use an ability with non-zero cooldown.");
+
+            DefenseDesire result;
+
+            Ability.CurrentCooldown = Ability.Cooldown;
+            if (_target.Ap >= _target.DefenseCost) {
+                var controller = mobManager.Teams[_target.Team];
+                var res = controller.FastRequestDesireToDefend(_target, Ability);
+
+                if (res == DefenseDesire.Block) {
+                    _target.Ap -= _target.DefenseCost;
+                    result = DefenseDesire.Block;
+                } else {
+                    TargetHit(map);
+
+                    result = DefenseDesire.Pass;
+                }
+            } else {
+                TargetHit(map);
+                result = DefenseDesire.Pass;
+            }
+
+            return result;
+        }
+
         public async Task<DefenseDesire> Use(Map map, MobManager mobManager) {
             Debug.Assert(Ability.CurrentCooldown == 0, "Trying to use an ability with non-zero cooldown.");
 
@@ -78,11 +104,11 @@ namespace HexMage.Simulator.Model {
 
             _target.Hp = Math.Max(0, _target.Hp - Ability.Dmg*modifier);
 
-            _target.Buffs.Add(Ability.ElementalEffect);
-            foreach (var abilityBuff in Ability.Buffs) {
-                // TODO - handle lifetimes
-                _target.Buffs.Add(abilityBuff.DeepCopy());
-            }
+            //_target.Buffs.Add(Ability.ElementalEffect);
+            //foreach (var abilityBuff in Ability.Buffs) {
+            //    // TODO - handle lifetimes
+            //    _target.Buffs.Add(abilityBuff.DeepCopy());
+            //}
 
             foreach (var areaBuff in Ability.AreaBuffs) {
                 //foreach (var coord in map.AllCoords) {

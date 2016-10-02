@@ -104,7 +104,7 @@ namespace HexMage.GUI.Renderers {
                 var abilityIndex = _gameBoardController.SelectedAbilityIndex;
 
                 if (abilityIndex.HasValue) {
-                    var cubepath = _gameInstance.Map.CubeLinedraw(currentMob.Coord, _camera.MouseHex);
+                    var cubepath = _gameInstance.Map.AxialLinedraw(currentMob.Coord, _camera.MouseHex);
 
                     int distance = 1;
                     bool walled = false;

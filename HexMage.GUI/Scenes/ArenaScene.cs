@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 using HexMage.GUI.Components;
 using HexMage.GUI.Core;

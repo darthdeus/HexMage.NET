@@ -54,11 +54,6 @@ namespace HexMage.Simulator {
             return !redAlive || !blueAlive;
         }
 
-        [Obsolete]
-        public IList<Ability> UsableAbilities(Mob mob) {
-            return mob.Abilities.Where(ability => IsAbilityUsable(mob, ability)).ToList();
-        }
-
         public bool IsAbilityUsable(Mob mob, Ability ability) {
             // TODO - handle visibiliy
             foreach (var buff in mob.Buffs) {
@@ -71,7 +66,7 @@ namespace HexMage.Simulator {
         }
 
         public IList<UsableAbility> UsableAbilities(Mob mob, Mob target) {
-            var line = Map.CubeLinedraw(mob.Coord, target.Coord);
+            var line = Map.AxialLinedraw(mob.Coord, target.Coord);
             int distance = line.Count - 1;
 
             var result = new List<UsableAbility>();
@@ -114,9 +109,15 @@ namespace HexMage.Simulator {
         }
 
         public IList<Mob> Enemies(Mob mob) {
-            return MobManager.AliveMobs
-                             .Where(enemy => !enemy.Team.Equals(mob.Team))
-                             .ToList();
+            var result = new List<Mob>();
+
+            foreach (var target in MobManager.Mobs) {
+                if (target.Hp > 0 && target.Team != mob.Team) {
+                    result.Add(target);
+                }
+            }
+
+            return result;
         }
 
         public GameInstance DeepCopy() {

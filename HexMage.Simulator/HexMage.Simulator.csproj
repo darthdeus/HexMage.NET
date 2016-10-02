@@ -51,6 +51,8 @@
     <Compile Include="Model\IResettable.cs" />
     <Compile Include="Model\ReplayRecorder.cs" />
     <Compile Include="Model\TeamColor.cs" />
+    <Compile Include="Pathfinding\CoordPair.cs" />
+    <Compile Include="Pathfinding\CoordRadiusCache.cs" />
     <Compile Include="Pathfinding\Map.cs" />
     <Compile Include="Model\UsableAbility.cs" />
     <Compile Include="Utils.cs" />

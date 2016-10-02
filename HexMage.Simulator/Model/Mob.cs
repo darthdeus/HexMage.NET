@@ -54,13 +54,6 @@ namespace HexMage.Simulator.Model {
             Metadata = null;
         }
 
-        public float SpeedModifier => Buffs.Select(b => b.MoveSpeedModifier)
-                                           .Aggregate(1.0f, (a, m) => a*(1/m));
-
-        public int ModifiedDistance(int distance) {
-            return (int) Math.Round(distance*SpeedModifier);
-        }
-
         public Mob DeepCopy() {
             var abilitiesCopy = new List<Ability>();
             foreach (var ability in Abilities) {

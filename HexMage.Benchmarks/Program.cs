@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define FAST
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -52,25 +53,42 @@ namespace HexMage.Benchmarks {
                 Console.WriteLine();
             }
 
+            Console.WriteLine("Precomputing cubes");
+            gameInstance.Map.PrecomputeCubeLinedraw();
+            Console.WriteLine("Cubes precomputed");
+
             var totalStopwatch = Stopwatch.StartNew();
             var stopwatch = new Stopwatch();
             var iterations = 0;
             int roundsPerThousand = 0;
 
-            while (iterations < 1000000) {
+            int totalIterations = 1000000;
+
+            while (iterations < totalIterations) {
                 iterations++;
 
                 turnManager.StartNextTurn(pathfinder);
 
                 stopwatch.Start();
-                var rounds = hub.MainLoop(TimeSpan.Zero);
-                rounds.Wait();
+#if FAST
+                var rounds = hub.FastMainLoop(TimeSpan.Zero);
                 stopwatch.Stop();
 
+                roundsPerThousand += rounds;
+#else
+                var rounds = hub.MainLoop(TimeSpan.Zero);
+                stopwatch.Stop();
+
+                rounds.Wait();
                 roundsPerThousand += rounds.Result;
+#endif
 
                 if (iterations%1000 == 0) {
-                    Console.WriteLine($"Starting a new game {iterations}, {roundsPerThousand/1000} average rounds, {stopwatch.Elapsed.TotalMilliseconds}ms");
+                    double perThousandMs = Math.Round(stopwatch.Elapsed.TotalMilliseconds, 2);
+                    double estimateSecondsPerMil =
+                        Math.Round(totalStopwatch.Elapsed.TotalSeconds/iterations*totalIterations, 2);
+                    Console.WriteLine(
+                        $"Starting a new game {iterations}, {roundsPerThousand/1000} average rounds, {perThousandMs}ms\trunning average per 1M: {estimateSecondsPerMil}s");
                     roundsPerThousand = 0;
                     stopwatch.Reset();
                 }

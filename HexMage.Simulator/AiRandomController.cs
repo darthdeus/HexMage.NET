@@ -11,6 +11,47 @@ namespace HexMage.Simulator {
             _gameInstance = gameInstance;
         }
 
+        public DefenseDesire FastRequestDesireToDefend(Mob mob, Ability ability) {
+            return DefenseDesire.Pass;
+        }
+
+        public void FastPlayTurn(GameEventHub eventHub) {
+            FastRandomAction(eventHub);
+        }
+
+        public void FastRandomAction(GameEventHub eventHub) {
+            var mob = _gameInstance.TurnManager.CurrentMob;
+            Debug.Assert(mob != null, "Requesting action while there's no current mob.");
+            var targets = _gameInstance.PossibleTargets(mob);
+
+            if (targets.Count > 0) {
+                var target = targets.OrderBy(t => t.Coord.Distance(mob.Coord)).First();
+
+                var usableAbilities = _gameInstance.UsableAbilities(mob, target);
+                if (usableAbilities.Count > 0) {
+                    var ua = usableAbilities.First();
+                    ua.FastUse(_gameInstance.Map, _gameInstance.MobManager);
+                } else {
+                    Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
+                              $"No usable abilities, moving towards target at {target.Coord}");
+
+                    FastMoveTowardsEnemy(mob, target);
+                }
+            } else {
+                var enemies = _gameInstance.Enemies(mob);
+                if (enemies.Count > 0) {
+                    var target = enemies.First();
+
+                    Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
+                              $"There are no targets, moving towards a random enemy at {target.Coord}");
+
+                    FastMoveTowardsEnemy(mob, target);
+                } else {
+                    Utils.Log(LogSeverity.Info, nameof(AiRandomController), "No possible action");
+                }
+            }
+        }
+
         public Task<DefenseDesire> RequestDesireToDefend(Mob mob, Ability ability) {
             return Task.FromResult(DefenseDesire.Pass);
         }
@@ -52,6 +93,19 @@ namespace HexMage.Simulator {
             }
 
             return true;
+        }
+
+        private void FastMoveTowardsEnemy(Mob mob, Mob target) {
+            var pathfinder = _gameInstance.Pathfinder;
+
+            var moveTarget = pathfinder.FurthestPointToTarget(mob, target);
+
+            if (moveTarget != null && pathfinder.Distance(moveTarget.Value) <= mob.Ap) {
+                _gameInstance.MobManager.FastMoveMob(_gameInstance.Map, _gameInstance.Pathfinder, mob, moveTarget.Value);
+            } else {
+                Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
+                          $"Move failed since target is too close, source {mob.Coord}, target {target.Coord}");
+            }
         }
 
         private async Task MoveTowardsEnemy(Mob mob, Mob target, GameEventHub eventHub) {

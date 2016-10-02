@@ -47,7 +47,7 @@ namespace HexMage.Simulator {
                     case AbilityElement.Air:
                         return new Buff(AbilityElement.Air, 0, 0, 1, 2f);
                     case AbilityElement.Water:
-                        return new Buff(AbilityElement.Water, 0, 0, 1, 1, new List<AbilityElement>() {
+                        return new Buff(AbilityElement.Water, 0, 0, 1, new List<AbilityElement>() {
                                             AbilityElement.Air
                                         });
                     default:
