@@ -61,6 +61,7 @@ namespace HexMage.Benchmarks {
             var stopwatch = new Stopwatch();
             var iterations = 0;
             int roundsPerThousand = 0;
+            int dumpIterations = 1000;
 
             int totalIterations = 200000;
             double ratio = 1000000/totalIterations;
@@ -84,12 +85,15 @@ namespace HexMage.Benchmarks {
                 roundsPerThousand += rounds.Result;
 #endif
 
-                if (iterations%1000 == 0) {
+                if (iterations% dumpIterations == 0) {
                     double perThousandMs = Math.Round(stopwatch.Elapsed.TotalMilliseconds, 2);
+
                     double estimateSecondsPerMil =
                         Math.Round(totalStopwatch.Elapsed.TotalSeconds/iterations*totalIterations, 2);
+                    double perGame = Math.Round(perThousandMs/dumpIterations*1000, 2);
+
                     Console.WriteLine(
-                        $"Starting a new game {iterations}, {roundsPerThousand/1000} average rounds, {perThousandMs}ms\trunning average per 1M: {estimateSecondsPerMil*ratio}s");
+                        $"Starting a new game {iterations:00000}, {roundsPerThousand/1000} average rounds, {perThousandMs:00.00}ms\trunning average per 1M: {estimateSecondsPerMil*ratio:00.00}s, per game: {perGame:00.00}us");
                     roundsPerThousand = 0;
                     stopwatch.Reset();
                 }
