@@ -32,8 +32,6 @@ namespace HexMage.Simulator {
         }
 
         public AxialCoord? FurthestPointToTarget(Mob mob, Mob target) {
-            Utils.Log(LogSeverity.Debug, nameof(Pathfinder), $"Finding path from {mob.Coord} to {target.Coord}");
-
             int iterations = 0;
             while (true) {
                 if (iterations++ > 1000)

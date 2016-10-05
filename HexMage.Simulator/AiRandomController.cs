@@ -51,11 +51,10 @@ namespace HexMage.Simulator {
             }
 
             if (spellTarget != null) {
-#warning TODO - fuj, AbilityId by nemelo jit vytvaret asi takhle primo?
-                _gameInstance.FastUse(new AbilityId(ability.Id), mob, spellTarget);
+                _gameInstance.FastUse(ability.AbilityId, mob, spellTarget);
             } else if (moveTarget != null) {
-                Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
-                    $"There are no targets, moving towards a random enemy at {moveTarget.Coord}");
+                //Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
+                //    $"There are no targets, moving towards a random enemy at {moveTarget.Coord}");
                 FastMoveTowardsEnemy(mob, moveTarget);
             } else {
                 throw new InvalidOperationException("No targets, game should be over.");
