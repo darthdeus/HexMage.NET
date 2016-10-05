@@ -46,7 +46,7 @@ namespace HexMage.Simulator.PCG {
         public static Random Random = new Random();
 
         public static GameInstance RandomGame(int size, MapSeed seed, int teamSize,
-                                              Func<GameInstance, IMobController> controllerFunc) {
+            Func<GameInstance, IMobController> controllerFunc) {
             var map = new MapGenerator().Generate(size, seed);
             var game = new GameInstance(map);
 
@@ -68,12 +68,13 @@ namespace HexMage.Simulator.PCG {
             return RandomMob(mobManager, team, size, _ => true);
         }
 
-        public static Mob RandomMob(MobManager mobManager, TeamColor team, int size, Predicate<AxialCoord> isCoordAvailable) {
-            var abilities = new List<AbilityInstance>();
-
+        public static Mob RandomMob(MobManager mobManager, TeamColor team, int size,
+            Predicate<AxialCoord> isCoordAvailable) {
             var elements = new[] {
                 AbilityElement.Earth, AbilityElement.Fire, AbilityElement.Air, AbilityElement.Water
             };
+
+            var abilities = new List<AbilityId>();
 
             for (int i = 0; i < Mob.AbilityCount; i++) {
                 var element = elements[Random.Next(0, 4)];
@@ -81,7 +82,9 @@ namespace HexMage.Simulator.PCG {
 
                 var areaBuffs = RandomAreaBuffs(element);
 
-                var ability = new Ability(Random.Next(1, 10),
+                int id = mobManager.Abilities.Count;
+                var ability = new Ability(id,
+                    Random.Next(1, 10),
                     Random.Next(3, 7),
                     Random.Next(3, 10),
                     Random.Next(0, 3),
@@ -90,8 +93,9 @@ namespace HexMage.Simulator.PCG {
                     areaBuffs);
 
                 mobManager.Abilities.Add(ability);
+                mobManager.Cooldowns.Add(0);
 
-                abilities.Add(new AbilityInstance(mobManager.Abilities, mobManager.Abilities.Count - 1));
+                abilities.Add(ability.AbilityId);
             }
 
             int iniciative = Random.Next(10);

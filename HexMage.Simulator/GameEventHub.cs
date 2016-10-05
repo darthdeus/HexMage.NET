@@ -35,35 +35,6 @@ namespace HexMage.Simulator {
             return totalTurns;
         }
 
-        public async Task<int> MainLoop(TimeSpan turnDelay) {
-            var turnManager = _gameInstance.TurnManager;
-            turnManager.StartNextTurn(_gameInstance.Pathfinder);
-
-            Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Starting Main Loop");
-
-            int totalTurns = 0;
-
-            while (!_gameInstance.IsFinished()) {
-                totalTurns++;
-                Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Main Loop Iteration");
-
-                await turnManager.CurrentController.PlayTurn(this);
-
-                turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder);
-
-                while (IsPaused) {
-                    await Task.Delay(_pauseDelay);
-                }
-
-                if (turnDelay != TimeSpan.Zero) {
-                    await Task.Delay(turnDelay);
-                }
-            }
-
-            Utils.Log(LogSeverity.Info, nameof(GameEventHub), "Main Loop DONE");
-
-            return totalTurns;
-        }
 
         public void AddSubscriber(IGameEventSubscriber subscriber) {
             _subscribers.Add(subscriber);
@@ -77,23 +48,26 @@ namespace HexMage.Simulator {
             _gameInstance.MobManager.FastMoveMob(_gameInstance.Map, _gameInstance.Pathfinder, mob, pos);
         }
 
-        public void BroadcastAbilityUsed(Mob mob, Mob target, ref AbilityInstance ability) {
+        public void BroadcastAbilityUsed(Mob mob, Mob target, AbilityId abilityId) {
+            var ability = _gameInstance.MobManager.AbilityForId(abilityId);
             foreach (var subscriber in _subscribers) {
-                subscriber.EventAbilityUsed(mob, target, ability.GetAbility);
+                subscriber.EventAbilityUsed(mob, target, ability);
             }
 
-            var defenseDesireResult = _gameInstance.FastUse(ref ability, mob, target);
+            var defenseDesireResult = _gameInstance.FastUse(abilityId, mob, target);
 
             BroadcastDefenseDesire(target, defenseDesireResult);
         }
 
-        public void BroadcastAbilityUsedWithDefense(Mob mob, Mob target, ref AbilityInstance ability,
+        public void BroadcastAbilityUsedWithDefense(Mob mob, Mob target, AbilityId abilityId,
             DefenseDesire defenseDesire) {
+            var ability = _gameInstance.MobManager.AbilityForId(abilityId);
+
             foreach (var subscriber in _subscribers) {
-                subscriber.EventAbilityUsed(mob, target, ability.GetAbility);
+                subscriber.EventAbilityUsed(mob, target, ability);
             }
 
-            _gameInstance.FastUseWithDefenseDesire(mob, target, ref ability, defenseDesire);
+            _gameInstance.FastUseWithDefenseDesire(mob, target, abilityId, defenseDesire);
 
             BroadcastDefenseDesire(target, defenseDesire);
         }

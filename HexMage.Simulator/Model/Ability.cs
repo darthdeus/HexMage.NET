@@ -31,6 +31,8 @@ namespace HexMage.Simulator {
         public List<Buff> Buffs { get; set; }
         public List<AreaBuff> AreaBuffs { get; set; }
 
+        public AbilityId AbilityId => new AbilityId(Id);
+
         public Ability(int id, int dmg, int cost, int range, int cooldown, AbilityElement element)
             : this(id, dmg, cost, range, cooldown, element, new List<Buff>(), new List<AreaBuff>()) {
         }

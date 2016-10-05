@@ -6,8 +6,9 @@ using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public class MobManager : IDeepCopyable<MobManager>, IResettable {
-        public readonly List<Ability> Abilities = new List<Ability>();
-        public readonly List<Mob> Mobs = new List<Mob>();
+        public List<Ability> Abilities = new List<Ability>();
+        public List<Mob> Mobs = new List<Mob>();
+        public List<int> Cooldowns = new List<int>();
 
         public readonly Dictionary<TeamColor, IMobController> Teams = new Dictionary<TeamColor, IMobController>();
 
@@ -33,12 +34,13 @@ namespace HexMage.Simulator {
             return Abilities[id.Id];
         }
 
+
         public int CooldownFor(AbilityId id) {
-            throw new NotImplementedException();
+            return Cooldowns[id.Id];
         }
 
         public void SetCooldownFor(AbilityId id, int cooldown) {
-            throw new NotImplementedException();
+            Cooldowns[id.Id] = cooldown;
         }
 
         public Mob AtCoord(AxialCoord c) {
@@ -113,15 +115,21 @@ namespace HexMage.Simulator {
         }
 
         public void LowerCooldowns() {
-            foreach (var mob in Mobs) {
-                foreach (var ability in mob.Abilities) {
-                    if (ability.CurrentCooldown > 0) ability.CurrentCooldown--;
+            for (int i = 0; i < Cooldowns.Count; i++) {
+                if (Cooldowns[i] > 0) {
+                    Cooldowns[i]--;
                 }
             }
         }
 
         public MobManager DeepCopy() {
             var mobManagerCopy = new MobManager();
+            for (int i = 0; i < Cooldowns.Count; i++)
+            {
+                mobManagerCopy.Cooldowns.Add(0);
+            }
+
+            mobManagerCopy.Abilities = Abilities;
 
             foreach (var mob in Mobs) {
                 mobManagerCopy.AddMob(mob.DeepCopy());

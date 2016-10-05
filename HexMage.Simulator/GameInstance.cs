@@ -125,37 +125,37 @@ namespace HexMage.Simulator {
 
             int modifier = bonusDmg ? 2 : 1;
 
-            target.Hp = Math.Max(0, target.Hp - desc.Dmg*modifier);
+            target.Hp = Math.Max(0, target.Hp - ability.Dmg*modifier);
 
-            target.Buffs.Add(desc.ElementalEffect);
-            foreach (var abilityBuff in desc.Buffs) {
+            target.Buffs.Add(ability.ElementalEffect);
+            foreach (var abilityBuff in ability.Buffs) {
                 // TODO - handle lifetimes
                 target.Buffs.Add(abilityBuff);
             }
 
-            foreach (var areaBuff in desc.AreaBuffs) {
+            foreach (var areaBuff in ability.AreaBuffs) {
                 var copy = areaBuff;
                 copy.Coord = target.Coord;
                 Map.AreaBuffs.Add(copy);
             }
 
             // TODO - handle negative AP
-            mob.Ap -= desc.Cost;
+            mob.Ap -= ability.Cost;
         }
 
-        public IList<Mob> PossibleTargets(Mob mob) {
-            var result = new List<Mob>();
+        //public IList<Mob> PossibleTargets(Mob mob) {
+        //    var result = new List<Mob>();
 
-            var ability = mob.UsableMaxRange();
+        //    var ability = mob.UsableMaxRange();
 
-            foreach (var target in MobManager.Mobs) {
-                if (target.Hp > 0 && Pathfinder.Distance(target.Coord) <= ability.Range && target.Team != mob.Team) {
-                    result.Add(target);
-                }
-            }
+        //    foreach (var target in MobManager.Mobs) {
+        //        if (target.Hp > 0 && Pathfinder.Distance(target.Coord) <= ability.Range && target.Team != mob.Team) {
+        //            result.Add(target);
+        //        }
+        //    }
 
-            return result;
-        }
+        //    return result;
+        //}
 
         public IList<Mob> Enemies(Mob mob) {
             var result = new List<Mob>();
@@ -215,7 +215,7 @@ namespace HexMage.Simulator {
             }
         }
 
-        public void FastUseWithDefenseDesire(Mob mob, Mob target, ref AbilityInstance ability,
+        public void FastUseWithDefenseDesire(Mob mob, Mob target, AbilityId ability,
             DefenseDesire defenseDesire) {
             throw new NotImplementedException();
         }

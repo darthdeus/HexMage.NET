@@ -12,9 +12,10 @@ namespace HexMage.Simulator {
             _gameInstance = gameInstance;
         }
 
-        public DefenseDesire FastRequestDesireToDefend(Mob mob, Ability ability) {
+        public DefenseDesire FastRequestDesireToDefend(Mob mob, AbilityId ability) {
             return DefenseDesire.Pass;
         }
+
 
         public void FastPlayTurn(GameEventHub eventHub) {
             FastRandomAction(eventHub);
@@ -24,7 +25,14 @@ namespace HexMage.Simulator {
             var mob = _gameInstance.TurnManager.CurrentMob;
             var pathfinder = _gameInstance.Pathfinder;
 
-            var ability = mob.UsableMaxRange();
+            Ability ability = null;
+            foreach (var possibleAbilityId in mob.Abilities) {
+                var possibleAbility = _gameInstance.MobManager.AbilityForId(possibleAbilityId);
+
+                if (possibleAbility.Cost <= mob.Ap && _gameInstance.MobManager.CooldownFor(possibleAbilityId) == 0) {
+                    ability = possibleAbility;
+                }
+            }
 
             Mob spellTarget = null;
             Mob moveTarget = null;
@@ -43,11 +51,11 @@ namespace HexMage.Simulator {
             }
 
             if (spellTarget != null) {
-#warning TODO - tohle je extremne spatne
-                _gameInstance.FastUse(ref ability, mob, spellTarget);
+#warning TODO - fuj, AbilityId by nemelo jit vytvaret asi takhle primo?
+                _gameInstance.FastUse(new AbilityId(ability.Id), mob, spellTarget);
             } else if (moveTarget != null) {
                 Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
-                          $"There are no targets, moving towards a random enemy at {moveTarget.Coord}");
+                    $"There are no targets, moving towards a random enemy at {moveTarget.Coord}");
                 FastMoveTowardsEnemy(mob, moveTarget);
             } else {
                 throw new InvalidOperationException("No targets, game should be over.");
@@ -63,7 +71,7 @@ namespace HexMage.Simulator {
                 _gameInstance.MobManager.FastMoveMob(_gameInstance.Map, _gameInstance.Pathfinder, mob, moveTarget.Value);
             } else {
                 Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
-                          $"Move failed since target is too close, source {mob.Coord}, target {target.Coord}");
+                    $"Move failed since target is too close, source {mob.Coord}, target {target.Coord}");
             }
         }
 
@@ -76,7 +84,7 @@ namespace HexMage.Simulator {
                 await eventHub.BroadcastMobMoved(mob, moveTarget.Value);
             } else {
                 Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
-                          $"Move failed since target is too close, source {mob.Coord}, target {target.Coord}");
+                    $"Move failed since target is too close, source {mob.Coord}, target {target.Coord}");
             }
         }
 

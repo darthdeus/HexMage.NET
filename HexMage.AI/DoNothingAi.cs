@@ -6,28 +6,14 @@ namespace HexMage.AI
 {
     public class DoNothingController : IMobController
     {
-        public DefenseDesire FastRequestDesireToDefend(Mob mob, Ability ability) {
-            throw new System.NotImplementedException();
+        public DefenseDesire FastRequestDesireToDefend(Mob mob, AbilityId abilityId) {
+            return DefenseDesire.Pass;
         }
 
         public void FastPlayTurn(GameEventHub eventHub) {
-            throw new System.NotImplementedException();
         }
 
         public void FastRandomAction(GameEventHub eventHub) {
-            throw new System.NotImplementedException();
-        }
-
-        public Task<DefenseDesire> RequestDesireToDefend(Mob mob, Ability ability) {
-            return Task.FromResult(DefenseDesire.Pass);
-        }
-
-        public Task<bool> PlayTurn(GameEventHub eventHub) {
-            return Task.FromResult(true);
-        }
-
-        public Task<bool> RandomAction(GameEventHub eventHub) {
-            return Task.FromResult(true);
         }
 
         public string Name => nameof(DoNothingController);

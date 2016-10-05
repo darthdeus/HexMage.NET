@@ -70,15 +70,5 @@ namespace HexMage.Simulator.Model {
 
             return copy;
         }
-
-        public Ability UsableMaxRange() {
-            foreach (var ability in Abilities) {
-                if (ability.Cost <= Ap && ability.CurrentCooldown == 0) {
-                    return ability;
-                }
-            }
-
-            return null;
-        }   
     }
 }

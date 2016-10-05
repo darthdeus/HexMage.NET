@@ -53,6 +53,8 @@ namespace HexMage.Benchmarks {
                 Console.WriteLine();
             }
 
+            goto SKIP_COPY_BENCH;
+
             {
                 Console.WriteLine("---- STATE COPY BENCHMARK ----");
 
@@ -71,9 +73,9 @@ namespace HexMage.Benchmarks {
                     copyStopwatch.Stop();
 
                     if (iterations%dumpIterations == 0) {
-                        double secondsPerThousand = (double)copyStopwatch.ElapsedTicks/Stopwatch.Frequency;
+                        double secondsPerThousand = (double) copyStopwatch.ElapsedTicks/Stopwatch.Frequency;
                         double msPerCopy = secondsPerThousand;
-                        Console.WriteLine($"Copy {msPerCopy:0.00}ms, 1M in: {secondsPerThousand * 1000}s");
+                        Console.WriteLine($"Copy {msPerCopy:0.00}ms, 1M in: {secondsPerThousand*1000}s");
                         copyStopwatch.Reset();
                     }
                 }
@@ -83,6 +85,8 @@ namespace HexMage.Benchmarks {
 
             Console.WriteLine("Press any key to continue.");
             Console.ReadKey();
+
+            SKIP_COPY_BENCH:
 
             Console.WriteLine("Precomputing cubes");
             gameInstance.Map.PrecomputeCubeLinedraw();
