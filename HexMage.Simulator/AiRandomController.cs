@@ -74,19 +74,6 @@ namespace HexMage.Simulator {
             }
         }
 
-        private async Task MoveTowardsEnemy(Mob mob, Mob target, GameEventHub eventHub) {
-            var pathfinder = _gameInstance.Pathfinder;
-
-            var moveTarget = pathfinder.FurthestPointToTarget(mob, target);
-
-            if (moveTarget != null && pathfinder.Distance(moveTarget.Value) <= mob.Ap) {
-                await eventHub.BroadcastMobMoved(mob, moveTarget.Value);
-            } else {
-                Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
-                    $"Move failed since target is too close, source {mob.Coord}, target {target.Coord}");
-            }
-        }
-
         public string Name => nameof(AiRandomController);
     }
 }

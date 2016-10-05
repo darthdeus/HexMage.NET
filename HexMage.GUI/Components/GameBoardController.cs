@@ -16,7 +16,6 @@ using Color = Microsoft.Xna.Framework.Color;
 namespace HexMage.GUI.Components {
     public class GameBoardController : Component, IGameEventSubscriber {
         private readonly GameEventHub _eventHub;
-        private readonly ReplayRecorder _replayRecorder;
         private readonly ArenaScene _arenaScene;
         private readonly GameInstance _gameInstance;
 
@@ -36,23 +35,19 @@ namespace HexMage.GUI.Components {
 
         public int? SelectedAbilityIndex;
 
-        public GameBoardController(GameInstance gameInstance, GameEventHub eventHub, ReplayRecorder replayRecorder,
-                                   ArenaScene arenaScene) {
+        public GameBoardController(GameInstance gameInstance, GameEventHub eventHub, ArenaScene arenaScene) {
             _gameInstance = gameInstance;
             _eventHub = eventHub;
-            _replayRecorder = replayRecorder;
             _arenaScene = arenaScene;
         }
 
-        public async Task<bool> EventAbilityUsed(Mob mob, Mob target, UsableAbility usableAbility) {
-            var ability = usableAbility.Ability;
-
+#warning TODO - async void with no error handling
+        public async void EventAbilityUsed(Mob mob, Mob target, Ability ability) {
             Utils.Log(LogSeverity.Info, nameof(GameBoardController), "EventAbilityUsed");
 
-            BuildUsedAbilityPopover(mob, usableAbility.Ability)
-                .LogContinuation();
+            BuildUsedAbilityPopover(mob, ability).LogContinuation();
 
-            var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.GetAbility.Element);
+            var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
 
             var projectileAnimation = new Animation(projectileSprite,
                                                     TimeSpan.FromMilliseconds(50),
@@ -83,7 +78,7 @@ namespace HexMage.GUI.Components {
 
             explosion.AddComponent(new PositionAtMob(target));
 
-            var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(ability.GetAbility.Element);
+            var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(ability.Element);
 
             var explosionAnimation = new Animation(
                 explosionSprite,
@@ -99,22 +94,17 @@ namespace HexMage.GUI.Components {
             Entity.Scene.AddAndInitializeNextFrame(explosion);
 
             Entity.Scene.DestroyEntity(projectile);
-
-            return true;
         }
 
-        public async Task<bool> EventMobMoved(Mob mob, AxialCoord pos) {
+        public void EventMobMoved(Mob mob, AxialCoord pos) {
             Debug.Assert(mob.Metadata != null, "Trying to move a mob without an associated entity.");
             var entity = (MobEntity) mob.Metadata;
 
-            await entity.MoveTo(mob.Coord, pos);
-
-            return true;
+            entity.MoveTo(mob.Coord, pos);
         }
 
-        public Task<bool> EventDefenseDesireAcquired(Mob mob, DefenseDesire defenseDesireResult) {
+        public void EventDefenseDesireAcquired(Mob mob, DefenseDesire defenseDesireResult) {
             ShowMessage($"{nameof(GameBoardController)} got defense {defenseDesireResult}");
-            return Task.FromResult(true);
         }
 
         public override void Initialize(AssetManager assetManager) {
@@ -124,14 +114,7 @@ namespace HexMage.GUI.Components {
             BuildPopovers();
             CreateMobEntities(assetManager);
 
-            _eventHub.MainLoop(TimeSpan.FromMilliseconds(200))
-                     .ContinueWith(async t => {
-                                       Utils.Log(LogSeverity.Info, nameof(GameBoardController),
-                                                 "Finished waiting for main loop to exit");
-                                       t.LogTask();
-
-                                       await ShowMessage("Game complete");
-                                   });
+            _eventHub.FastMainLoop(TimeSpan.FromMilliseconds(200));
         }
 
         private void CreateMobEntities(AssetManager assetManager) {
@@ -166,10 +149,6 @@ namespace HexMage.GUI.Components {
 
             var inputManager = InputManager.Instance;
             var mouseHex = Camera2D.Instance.MouseHex;
-
-            if (inputManager.IsKeyJustPressed(Keys.P)) {
-                _replayRecorder.DumpReplay(Console.Out);
-            }
 
             if (inputManager.IsKeyJustPressed(Keys.Pause)) {
                 if (_eventHub.IsPaused) {
@@ -207,16 +186,21 @@ namespace HexMage.GUI.Components {
             if (mob != null && SelectedAbilityIndex.HasValue) {
                 var selectedAbility = mob.Abilities[SelectedAbilityIndex.Value];
 
-                if (selectedAbility.GetAbility.Cost > mob.Ap) {
+                if (_gameInstance.MobManager.AbilityForId(selectedAbility).Cost > mob.Ap) {
                     SelectedAbilityIndex = null;
                 }
             }
         }
 
         private void HandleUserTurnInput(InputManager inputManager) {
-            if (inputManager.JustLeftClickReleased()) EnqueueClickEvent(HandleLeftClick);
-            else if (inputManager.IsKeyJustReleased(Keys.R))
-                _gameInstance.TurnManager.CurrentController.RandomAction(_eventHub);
+            if (inputManager.JustLeftClickReleased()) {
+                EnqueueClickEvent(HandleLeftClick);
+            }
+            else if (inputManager.IsKeyJustReleased(Keys.R)) {
+#warning TODO - implement this
+                //_gameInstance.TurnManager.CurrentController.RandomAction(_eventHub);
+
+            }
         }
 
         private void HandleKeyboardAbilitySelect() {
@@ -246,23 +230,23 @@ namespace HexMage.GUI.Components {
         }
 
         private void AttackMob(Mob target) {
-            var usableAbilities = _gameInstance.UsableAbilities(
-                _gameInstance.TurnManager.CurrentMob,
-                target);
+#warning re-enable user interaction
+            //var usableAbilities = _gameInstance.UsableAbilities(
+            //    _gameInstance.TurnManager.CurrentMob,
+            //    target);
 
-            Debug.Assert(SelectedAbilityIndex != null,
-                         "_gameInstance.TurnManager.SelectedAbilityIndex != null");
+            //Debug.Assert(SelectedAbilityIndex != null,
+            //             "_gameInstance.TurnManager.SelectedAbilityIndex != null");
 
-            var abilityIndex = SelectedAbilityIndex.Value;
-            var ability = _gameInstance.TurnManager.CurrentMob.Abilities[abilityIndex];
+            //var abilityIndex = SelectedAbilityIndex.Value;
+            //var ability = _gameInstance.TurnManager.CurrentMob.Abilities[abilityIndex];
 
-            var usableAbility = usableAbilities.FirstOrDefault(ua => ua.Ability == ability);
-            if (usableAbility != null) {
-                _eventHub.BroadcastAbilityUsed(_gameInstance.TurnManager.CurrentMob, target, usableAbility)
-                         .LogContinuation();
-            } else {
-                ShowMessage("You can't use the selected ability on that target.");
-            }
+            //var usableAbility = usableAbilities.FirstOrDefault(ua => ua.Ability == ability);
+            //if (usableAbility != null) {
+            //    _eventHub.BroadcastAbilityUsed(_gameInstance.TurnManager.CurrentMob, target, usableAbility);
+            //} else {
+            //    ShowMessage("You can't use the selected ability on that target.");
+            //}
         }
 
         private void HandleLeftClick() {
@@ -301,10 +285,7 @@ namespace HexMage.GUI.Components {
                             if (distance > currentMob.Ap) {
                                 ShowMessage("You don't have enough AP.");
                             } else {
-                                _eventHub.BroadcastMobMoved(currentMob, mouseHex)
-                                         .ContinueWith((t, o) => t.LogContinuation(),
-                                                       TaskContinuationOptions.LongRunning,
-                                                       TaskScheduler.Default);
+                                _eventHub.BroadcastMobMoved(currentMob, mouseHex);
                             }
                         } else {
                             ShowMessage("You can't walk into a wall.");

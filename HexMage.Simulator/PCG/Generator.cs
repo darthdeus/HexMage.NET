@@ -61,6 +61,9 @@ namespace HexMage.Simulator.PCG {
                 game.MobManager.AddMob(RandomMob(game.MobManager, t2, size, c => game.MobManager.AtCoord(c) == null));
             }
 
+            game.RedAlive = teamSize;
+            game.BlueAlive = teamSize;
+
             return game;
         }
 

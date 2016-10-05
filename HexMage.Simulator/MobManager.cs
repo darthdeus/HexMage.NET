@@ -34,7 +34,6 @@ namespace HexMage.Simulator {
             return Abilities[id.Id];
         }
 
-
         public int CooldownFor(AbilityId id) {
             return Cooldowns[id.Id];
         }
@@ -57,14 +56,15 @@ namespace HexMage.Simulator {
             Mobs.Add(mob);
         }
 
-        public void ApplyDots(Map map) {
+        public void ApplyDots(Map map, GameInstance gameInstance) {
             foreach (var mob in Mobs) {
                 var buffs = mob.Buffs;
                 for (int i = 0; i < buffs.Count; i++) {
                     var buff = buffs[i];
 
                     mob.Ap += buff.ApChange;
-                    mob.Hp += buff.HpChange;
+                    mob.Hp += buff.HpChange;     
+                    gameInstance.MobHpChanged(mob);               
                     buff.Lifetime--;
                     buffs[i] = buff;
                 }
@@ -80,6 +80,7 @@ namespace HexMage.Simulator {
                     if (map.AxialDistance(mob.Coord, areaBuff.Coord) <= areaBuff.Radius) {
                         mob.Ap += areaBuff.Effect.ApChange;
                         mob.Hp += areaBuff.Effect.HpChange;
+                        gameInstance.MobHpChanged(mob);
                     }
                 }
 

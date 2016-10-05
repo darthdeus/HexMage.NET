@@ -25,7 +25,7 @@ namespace HexMage.Simulator {
 
             int totalTurns = 0;
 
-            while (!_gameInstance.IsFinished()) {
+            while (!_gameInstance.IsFinished) {
                 totalTurns++;
 
                 turnManager.CurrentController.FastPlayTurn(this);
@@ -40,7 +40,7 @@ namespace HexMage.Simulator {
             _subscribers.Add(subscriber);
         }
 
-        public async Task BroadcastMobMoved(Mob mob, AxialCoord pos) {
+        public void BroadcastMobMoved(Mob mob, AxialCoord pos) {
             foreach (var subscriber in _subscribers) {
                 subscriber.EventMobMoved(mob, pos);
             }

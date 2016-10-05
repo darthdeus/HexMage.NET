@@ -12,47 +12,29 @@ namespace HexMage.Simulator {
         public TurnManager TurnManager { get; set; }
         public int Size { get; set; }
 
+        public int RedAlive = 0;
+        public int BlueAlive = 0;
+
+        public bool IsFinished => RedAlive == 0 || BlueAlive == 0;
+
         public GameInstance(Map map, MobManager mobManager) {
             Map = map;
             MobManager = mobManager;
 
             Size = map.Size;
             Pathfinder = new Pathfinder(Map, MobManager);
-            TurnManager = new TurnManager(MobManager, Map);
+            TurnManager = new TurnManager(this);
         }
 
-        public GameInstance(int size) : this(new Map(size)) {
-        }
+        public GameInstance(int size) : this(new Map(size)) { }
+        public GameInstance(Map map) : this(map, new MobManager()) {}
 
-        public GameInstance(Map map) : this(map, new MobManager()) {
-        }
-
-        private GameInstance(int size, Map map, MobManager mobManager, Pathfinder pathfinder, TurnManager turnManager) {
+        private GameInstance(int size, Map map, MobManager mobManager, Pathfinder pathfinder) {
             Size = size;
             MobManager = mobManager;
             Map = map;
             Pathfinder = pathfinder;
-            TurnManager = turnManager;
-        }
-
-        public bool IsFinished() {
-            bool redAlive = false;
-            bool blueAlive = false;
-
-            foreach (var mob in MobManager.Mobs) {
-                if (mob.Hp > 0) {
-                    switch (mob.Team) {
-                        case TeamColor.Red:
-                            redAlive = true;
-                            break;
-                        case TeamColor.Blue:
-                            blueAlive = true;
-                            break;
-                    }
-                }
-            }
-
-            return !redAlive || !blueAlive;
+            TurnManager = new TurnManager(this);
         }
 
         public bool IsAbilityUsable(Mob mob, AbilityId abilityId) {
@@ -126,6 +108,7 @@ namespace HexMage.Simulator {
             int modifier = bonusDmg ? 2 : 1;
 
             target.Hp = Math.Max(0, target.Hp - ability.Dmg*modifier);
+            MobHpChanged(target);
 
             target.Buffs.Add(ability.ElementalEffect);
             foreach (var abilityBuff in ability.Buffs) {
@@ -141,6 +124,19 @@ namespace HexMage.Simulator {
 
             // TODO - handle negative AP
             mob.Ap -= ability.Cost;
+        }
+
+        public void MobHpChanged(Mob mob) {
+            if (mob.Hp == 0) {
+                switch (mob.Team) {
+                    case TeamColor.Red:
+                        RedAlive--;
+                        break;
+                    case TeamColor.Blue:
+                        BlueAlive--;
+                        break;
+                }
+            }
         }
 
         //public IList<Mob> PossibleTargets(Mob mob) {
@@ -173,8 +169,9 @@ namespace HexMage.Simulator {
 #warning TODO - tohle prepsat poradne
             var mapCopy = Map.DeepCopy();
             var mobManagerCopy = MobManager.DeepCopy();
-            return new GameInstance(Size, mapCopy, mobManagerCopy, new Pathfinder(mapCopy, mobManagerCopy),
-                new TurnManager(mobManagerCopy, mapCopy));
+            var game = new GameInstance(Size, mapCopy, mobManagerCopy, new Pathfinder(mapCopy, mobManagerCopy));
+
+            return game;
         }
 
         public void Reset() {
@@ -182,6 +179,9 @@ namespace HexMage.Simulator {
             MobManager.Reset();
             TurnManager.Reset();
             Pathfinder.Reset();
+
+            RedAlive = MobManager.Mobs.Count(m => m.Team == TeamColor.Red);
+            BlueAlive = MobManager.Mobs.Count(m => m.Team == TeamColor.Blue);
         }
 
 
@@ -216,7 +216,7 @@ namespace HexMage.Simulator {
         }
 
         public void FastUseWithDefenseDesire(Mob mob, Mob target, AbilityId ability,
-            DefenseDesire defenseDesire) {
+                                             DefenseDesire defenseDesire) {
             throw new NotImplementedException();
         }
     }

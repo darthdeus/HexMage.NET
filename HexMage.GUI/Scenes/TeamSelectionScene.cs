@@ -170,12 +170,13 @@ namespace HexMage.GUI.Scenes {
 
                 builder.AppendLine(mob.ToString());
 
-                foreach (var ability in mob.Abilities) {
+                foreach (var abilityId in mob.Abilities) {
+                    var ability = _gameInstance.MobManager.AbilityForId(abilityId);
                     builder.AppendLine("-----");
                     builder.AppendLine(
-                        $"{ability.GetAbility.Element}, DMG {ability.GetAbility.Dmg}, Range {ability.GetAbility.Range}");
+                        $"{ability.Element}, DMG {ability.Dmg}, Range {ability.Range}");
                     builder.AppendLine("Buffs:");
-                    foreach (var buff in ability.GetAbility.Buffs) {
+                    foreach (var buff in ability.Buffs) {
                         builder.AppendLine(
                             $"{buff.Element}, Hp {buff.HpChange}, Ap {buff.ApChange}");
                     }

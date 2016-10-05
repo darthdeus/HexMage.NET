@@ -30,14 +30,15 @@ namespace HexMage.GUI.Renderers {
 
             var mob = _mobFunc();
             if (mob != null) {
-                var ability = mob.Abilities[_abilityIndex];
+                var abilityId = mob.Abilities[_abilityIndex];
 
                 var isActive = _gameBoardController.SelectedAbilityIndex == _abilityIndex;
 
-                if (_gameInstance.IsAbilityUsable(mob, ability)) {
+                if (_gameInstance.IsAbilityUsable(mob, abilityId)) {
                     isActive = true;
                 }
 
+                var ability = _gameInstance.MobManager.AbilityForId(abilityId);
                 batch.Draw(assetManager[ElementBg(ability, isActive)], entity.RenderPosition);
 
                 if (entity.AABB.Contains(InputManager.Instance.MousePosition)) {

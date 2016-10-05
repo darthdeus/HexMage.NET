@@ -118,7 +118,9 @@ namespace HexMage.GUI.Renderers {
                             walled = true;
                         }
 
-                        if (distance <= currentMob.Abilities[abilityIndex.Value].GetAbility.Range && !walled) {
+                        var abilityId = currentMob.Abilities[abilityIndex.Value];
+                        var ability = _gameInstance.MobManager.AbilityForId(abilityId);
+                        if (distance <= ability.Range && !walled) {
                             DrawAt(hexUsable, cubeCoord);
                         } else {
                             DrawAt(hexTooFar, cubeCoord);

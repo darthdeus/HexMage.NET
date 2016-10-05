@@ -36,6 +36,7 @@ namespace HexMage.Benchmarks {
             Mob m2 = null;
 
             Generator.Random = new Random(1234);
+            //Generator.Random = new Random();
 
             for (int i = 0; i < 5; i++) {
                 m1 = Generator.RandomMob(mobManager, t1, size, c => gameInstance.MobManager.AtCoord(c) == null);
@@ -147,7 +148,9 @@ namespace HexMage.Benchmarks {
 
     internal class Program {
         private static void Main(string[] args) {
-            new Tester().Run();
+            for (int i = 0; i < 10; i++) {
+                new Tester().Run();
+            }
         }
     }
 }

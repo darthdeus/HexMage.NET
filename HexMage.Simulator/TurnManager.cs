@@ -9,6 +9,7 @@ namespace HexMage.Simulator {
     }
 
     public class TurnManager : IResettable {
+        private readonly GameInstance _gameInstance;
         private readonly Map _map;
         public MobManager MobManager { get; set; }
         public List<Mob> TurnOrder { get; set; } = new List<Mob>();
@@ -18,10 +19,10 @@ namespace HexMage.Simulator {
         public int TurnNumber { get; private set; }
         private int _current = 0;
 
-        public TurnManager(MobManager mobManager, Map map) {
-            _map = map;
-            MobManager = mobManager;
-            TurnNumber = 0;
+        public TurnManager(GameInstance gameInstance) {
+            _gameInstance = gameInstance;
+            MobManager = gameInstance.MobManager;
+            _map = gameInstance.Map;
         }
 
         public void StartNextTurn(Pathfinder pathfinder) {
@@ -35,7 +36,7 @@ namespace HexMage.Simulator {
                 }
             }
 
-            MobManager.ApplyDots(_map);
+            MobManager.ApplyDots(_map, _gameInstance);
             MobManager.LowerCooldowns();
 
             _current = 0;

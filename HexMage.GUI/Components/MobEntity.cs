@@ -46,7 +46,8 @@ namespace HexMage.GUI.Components {
         }
 
         private TaskCompletionSource<bool> _tcs;
-                                 
+
+#warning TODO - zjistit, jestli se tohle pouziva            
         public Task<bool> MoveTo(AxialCoord source, AxialCoord destination)
         {
             Debug.Assert(!_animateMovement, "Movement already in progress, can't move until it finishes.");
@@ -60,6 +61,7 @@ namespace HexMage.GUI.Components {
 
             return _tcs.Task;
         }
+
         public Task<bool> MoveTo(AxialCoord coord) {
             Debug.Assert(!_animateMovement, "Movement already in progress, can't move until it finishes.");
             Debug.Assert(_tcs == null, "_tcs != null when trying to re-initialize it.");

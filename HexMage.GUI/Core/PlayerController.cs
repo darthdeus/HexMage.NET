@@ -14,18 +14,6 @@ namespace HexMage.GUI.Core {
             _gameInstance = gameInstance;
         }
 
-        public DefenseDesire FastRequestDesireToDefend(Mob mob, Ability ability) {
-            throw new System.NotImplementedException();
-        }
-
-        public void FastPlayTurn(GameEventHub eventHub) {
-            throw new System.NotImplementedException();
-        }
-
-        public void FastRandomAction(GameEventHub eventHub) {
-            throw new System.NotImplementedException();
-        }
-
         public Task<DefenseDesire> RequestDesireToDefend(Mob mob, Ability ability) {
             return _arenaScene.RequestDesireToDefend(mob, ability);
         }
@@ -44,8 +32,20 @@ namespace HexMage.GUI.Core {
             _tcs = null;
         }
 
-        public Task<bool> RandomAction(GameEventHub eventHub) {
-            return new AiRandomController(_gameInstance).PlayTurn(eventHub);
+        public void RandomAction(GameEventHub eventHub) {
+            new AiRandomController(_gameInstance).FastPlayTurn(eventHub);
+        }
+
+        public DefenseDesire FastRequestDesireToDefend(Mob mob, AbilityId abilityId) {
+            throw new System.NotImplementedException();
+        }
+
+        public void FastPlayTurn(GameEventHub eventHub) {
+            throw new System.NotImplementedException();
+        }
+
+        public void FastRandomAction(GameEventHub eventHub) {
+            throw new System.NotImplementedException();
         }
 
         public string Name => nameof(PlayerController);
