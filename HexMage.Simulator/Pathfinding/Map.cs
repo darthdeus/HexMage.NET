@@ -108,7 +108,7 @@ namespace HexMage.Simulator {
             }
 
             foreach (var buff in AreaBuffs) {
-                buffsCopy.Add(buff.DeepCopy());
+                buffsCopy.Add(buff);
             }
 
             return new Map(Size, hexesCopy, buffsCopy) {

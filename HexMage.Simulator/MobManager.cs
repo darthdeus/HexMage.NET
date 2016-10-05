@@ -6,6 +6,7 @@ using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public class MobManager : IDeepCopyable<MobManager>, IResettable {
+        public readonly List<Ability> Abilities = new List<Ability>();
         public readonly List<Mob> Mobs = new List<Mob>();
 
         public readonly Dictionary<TeamColor, IMobController> Teams = new Dictionary<TeamColor, IMobController>();
@@ -28,6 +29,18 @@ namespace HexMage.Simulator {
             }
         }
 
+        public Ability AbilityForId(AbilityId id) {
+            return Abilities[id.Id];
+        }
+
+        public int CooldownFor(AbilityId id) {
+            throw new NotImplementedException();
+        }
+
+        public void SetCooldownFor(AbilityId id, int cooldown) {
+            throw new NotImplementedException();
+        }
+
         public Mob AtCoord(AxialCoord c) {
             foreach (var mob in Mobs) {
                 if (mob.Coord.Equals(c)) {
@@ -44,10 +57,14 @@ namespace HexMage.Simulator {
 
         public void ApplyDots(Map map) {
             foreach (var mob in Mobs) {
-                foreach (var buff in mob.Buffs) {
+                var buffs = mob.Buffs;
+                for (int i = 0; i < buffs.Count; i++) {
+                    var buff = buffs[i];
+
                     mob.Ap += buff.ApChange;
                     mob.Hp += buff.HpChange;
                     buff.Lifetime--;
+                    buffs[i] = buff;
                 }
 
                 mob.Buffs.RemoveAll(x => x.Lifetime == 0);
@@ -55,7 +72,8 @@ namespace HexMage.Simulator {
 
             var newBuffs = new List<AreaBuff>();
 
-            foreach (var areaBuff in map.AreaBuffs) {
+            for (int i = 0; i < map.AreaBuffs.Count; i++) {
+                var areaBuff = map.AreaBuffs[i];
                 foreach (var mob in Mobs) {
                     if (map.AxialDistance(mob.Coord, areaBuff.Coord) <= areaBuff.Radius) {
                         mob.Ap += areaBuff.Effect.ApChange;
@@ -63,7 +81,14 @@ namespace HexMage.Simulator {
                     }
                 }
 
-                areaBuff.Effect.Lifetime--;
+                areaBuff.DecreaseLifetime();
+                map.AreaBuffs[i] = areaBuff;
+            }
+
+            for (int i = 0; i < map.AreaBuffs.Count; i++) {
+                var buff = map.AreaBuffs[i];
+                buff.DecreaseLifetime();
+                map.AreaBuffs[i] = buff;
             }
 
             foreach (var buff in map.AreaBuffs) {

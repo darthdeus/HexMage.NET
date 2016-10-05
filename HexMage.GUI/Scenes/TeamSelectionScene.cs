@@ -144,7 +144,7 @@ namespace HexMage.GUI.Scenes {
             _t2Preview.ClearChildren();
 
             for (int i = 0; i < t1size; i++) {
-                var mob = Generator.RandomMob(t1, _map.Size, c =>
+                var mob = Generator.RandomMob(_mobManager, t1, _map.Size, c =>
                                                       _mobManager.AtCoord(c) == null && _map[c] == HexType.Empty);
 
                 _mobManager.AddMob(mob);
@@ -153,7 +153,7 @@ namespace HexMage.GUI.Scenes {
             }
 
             for (int i = 0; i < t2size; i++) {
-                var mob = Generator.RandomMob(t2, _map.Size, c =>
+                var mob = Generator.RandomMob(_mobManager, t2, _map.Size, c =>
                                                       _mobManager.AtCoord(c) == null && _map[c] == HexType.Empty);
 
                 _mobManager.AddMob(mob);
@@ -173,9 +173,9 @@ namespace HexMage.GUI.Scenes {
                 foreach (var ability in mob.Abilities) {
                     builder.AppendLine("-----");
                     builder.AppendLine(
-                        $"{ability.Element}, DMG {ability.Dmg}, Range {ability.Range}");
+                        $"{ability.GetAbility.Element}, DMG {ability.GetAbility.Dmg}, Range {ability.GetAbility.Range}");
                     builder.AppendLine("Buffs:");
-                    foreach (var buff in ability.Buffs) {
+                    foreach (var buff in ability.GetAbility.Buffs) {
                         builder.AppendLine(
                             $"{buff.Element}, Hp {buff.HpChange}, Ap {buff.ApChange}");
                     }

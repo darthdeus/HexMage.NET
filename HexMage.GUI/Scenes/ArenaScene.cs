@@ -187,7 +187,7 @@ namespace HexMage.GUI.Scenes {
                     var mob = mobFunc();
                     if (_gameBoardController.SelectedAbilityIndex.HasValue && mob != null) {
                         int index = _gameBoardController.SelectedAbilityIndex.Value;
-                        return ElementColor(mob.Abilities[index].Element);
+                        return ElementColor(mob.Abilities[index].GetAbility.Element);
                     } else {
                         return Color.White;
                     }

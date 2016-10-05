@@ -118,7 +118,7 @@ namespace HexMage.GUI.Renderers {
                             walled = true;
                         }
 
-                        if (distance <= currentMob.Abilities[abilityIndex.Value].Range && !walled) {
+                        if (distance <= currentMob.Abilities[abilityIndex.Value].GetAbility.Range && !walled) {
                             DrawAt(hexUsable, cubeCoord);
                         } else {
                             DrawAt(hexTooFar, cubeCoord);

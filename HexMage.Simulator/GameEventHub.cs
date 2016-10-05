@@ -70,29 +70,38 @@ namespace HexMage.Simulator {
         }
 
         public async Task BroadcastMobMoved(Mob mob, AxialCoord pos) {
-            await Task.WhenAll(_subscribers.Select(x => x.EventMobMoved(mob, pos)));
+            foreach (var subscriber in _subscribers) {
+                subscriber.EventMobMoved(mob, pos);
+            }
+
             _gameInstance.MobManager.FastMoveMob(_gameInstance.Map, _gameInstance.Pathfinder, mob, pos);
         }
 
-        public async Task BroadcastAbilityUsed(Mob mob, Mob target, UsableAbility ability) {
-            await Task.WhenAll(_subscribers.Select(x => x.EventAbilityUsed(mob, target, ability)));
+        public void BroadcastAbilityUsed(Mob mob, Mob target, ref AbilityInstance ability) {
+            foreach (var subscriber in _subscribers) {
+                subscriber.EventAbilityUsed(mob, target, ability.GetAbility);
+            }
 
-            var defenseDesireResult = await ability.Use(_gameInstance.Map, _gameInstance.MobManager);
+            var defenseDesireResult = _gameInstance.FastUse(ref ability, mob, target);
 
-            await BroadcastDefenseDesire(target, defenseDesireResult);
+            BroadcastDefenseDesire(target, defenseDesireResult);
         }
 
-        public async Task BroadcastAbilityUsedWithDefense(Mob mob, Mob target, UsableAbility ability,
-                                                          DefenseDesire defenseDesire) {
-            await Task.WhenAll(_subscribers.Select(x => x.EventAbilityUsed(mob, target, ability)));
+        public void BroadcastAbilityUsedWithDefense(Mob mob, Mob target, ref AbilityInstance ability,
+            DefenseDesire defenseDesire) {
+            foreach (var subscriber in _subscribers) {
+                subscriber.EventAbilityUsed(mob, target, ability.GetAbility);
+            }
 
-            ability.UseWithDefenseResult(_gameInstance.Map, defenseDesire);
+            _gameInstance.FastUseWithDefenseDesire(mob, target, ref ability, defenseDesire);
 
-            await BroadcastDefenseDesire(target, defenseDesire);
+            BroadcastDefenseDesire(target, defenseDesire);
         }
 
-        public async Task BroadcastDefenseDesire(Mob mob, DefenseDesire defenseDesireResult) {
-            await Task.WhenAll(_subscribers.Select(x => x.EventDefenseDesireAcquired(mob, defenseDesireResult)));
+        public void BroadcastDefenseDesire(Mob mob, DefenseDesire defenseDesireResult) {
+            foreach (var subscriber in _subscribers) {
+                subscriber.EventDefenseDesireAcquired(mob, defenseDesireResult);
+            }
         }
     }
 }

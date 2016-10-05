@@ -18,7 +18,7 @@ namespace HexMage.Simulator.Model {
         public int DefenseCost { get; set; }
         public int Iniciative { get; set; }
 
-        public List<Ability> Abilities { get; set; }
+        public List<AbilityId> Abilities { get; set; }
         public TeamColor Team { get; set; }
         public AxialCoord Coord { get; set; }
         public AxialCoord OrigCoord { get; set; }
@@ -28,13 +28,13 @@ namespace HexMage.Simulator.Model {
         // TODO - should this maybe just be internal?
         public List<Buff> Buffs { get; set; } = new List<Buff>();
 
-        public Mob(TeamColor team, int maxHp, int maxAp, int defenseCost, int iniciative, List<Ability> abilities) {
+        public Mob(TeamColor team, int maxHp, int maxAp, int defenseCost, int iniciative, List<AbilityId> abilities) {
             Team = team;
             MaxHp = maxHp;
             MaxAp = maxAp;
             DefenseCost = defenseCost;
             Iniciative = iniciative;
-            Abilities = abilities.OrderByDescending(a => a.Range).ToList();
+            Abilities = abilities;
             Hp = maxHp;
             Ap = maxAp;
             Coord = new AxialCoord(0, 0);
@@ -55,9 +55,9 @@ namespace HexMage.Simulator.Model {
         }
 
         public Mob DeepCopy() {
-            var abilitiesCopy = new List<Ability>();
+            var abilitiesCopy = new List<AbilityId>();
             foreach (var ability in Abilities) {
-                abilitiesCopy.Add(ability.DeepCopy());
+                abilitiesCopy.Add(ability);
             }
 
             var copy = new Mob(Team, MaxHp, MaxAp, DefenseCost, Iniciative, abilitiesCopy);
@@ -65,7 +65,7 @@ namespace HexMage.Simulator.Model {
             copy.Metadata = null;
 
             foreach (var buff in Buffs) {
-                copy.Buffs.Add(buff.DeepCopy());
+                copy.Buffs.Add(buff);
             }
 
             return copy;

@@ -57,19 +57,19 @@ namespace HexMage.Simulator.PCG {
             game.MobManager.Teams[t2] = controllerFunc(game);
 
             for (int i = 0; i < teamSize; i++) {
-                game.MobManager.AddMob(RandomMob(t1, size, c => game.MobManager.AtCoord(c) == null));
-                game.MobManager.AddMob(RandomMob(t2, size, c => game.MobManager.AtCoord(c) == null));
+                game.MobManager.AddMob(RandomMob(game.MobManager, t1, size, c => game.MobManager.AtCoord(c) == null));
+                game.MobManager.AddMob(RandomMob(game.MobManager, t2, size, c => game.MobManager.AtCoord(c) == null));
             }
 
             return game;
         }
 
-        public static Mob RandomMob(TeamColor team, int size) {
-            return RandomMob(team, size, _ => true);
+        public static Mob RandomMob(MobManager mobManager, TeamColor team, int size) {
+            return RandomMob(mobManager, team, size, _ => true);
         }
 
-        public static Mob RandomMob(TeamColor team, int size, Predicate<AxialCoord> isCoordAvailable) {
-            var abilities = new List<Ability>();
+        public static Mob RandomMob(MobManager mobManager, TeamColor team, int size, Predicate<AxialCoord> isCoordAvailable) {
+            var abilities = new List<AbilityInstance>();
 
             var elements = new[] {
                 AbilityElement.Earth, AbilityElement.Fire, AbilityElement.Air, AbilityElement.Water
@@ -81,13 +81,17 @@ namespace HexMage.Simulator.PCG {
 
                 var areaBuffs = RandomAreaBuffs(element);
 
-                abilities.Add(new Ability(Random.Next(1, 10),
-                                          Random.Next(3, 7),
-                                          Random.Next(3, 10),
-                                          Random.Next(0, 3),
-                                          element,
-                                          buffs,
-                                          areaBuffs));
+                var ability = new Ability(Random.Next(1, 10),
+                    Random.Next(3, 7),
+                    Random.Next(3, 10),
+                    Random.Next(0, 3),
+                    element,
+                    buffs,
+                    areaBuffs);
+
+                mobManager.Abilities.Add(ability);
+
+                abilities.Add(new AbilityInstance(mobManager.Abilities, mobManager.Abilities.Count - 1));
             }
 
             int iniciative = Random.Next(10);

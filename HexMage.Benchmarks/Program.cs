@@ -19,8 +19,8 @@ namespace HexMage.Benchmarks {
             var gameInstance = new GameInstance(size);
 
             var hub = new GameEventHub(gameInstance);
-            var replayRecorder = new ReplayRecorder();
-            hub.AddSubscriber(replayRecorder);
+            //var replayRecorder = new ReplayRecorder();
+            //hub.AddSubscriber(replayRecorder);
 
             //Utils.RegisterLogger(new StdoutLogger());
             Utils.MainThreadId = Thread.CurrentThread.ManagedThreadId;
@@ -38,8 +38,8 @@ namespace HexMage.Benchmarks {
             Generator.Random = new Random(1234);
 
             for (int i = 0; i < 5; i++) {
-                m1 = Generator.RandomMob(t1, size, c => gameInstance.MobManager.AtCoord(c) == null);
-                m2 = Generator.RandomMob(t2, size, c => gameInstance.MobManager.AtCoord(c) == null);
+                m1 = Generator.RandomMob(mobManager, t1, size, c => gameInstance.MobManager.AtCoord(c) == null);
+                m2 = Generator.RandomMob(mobManager, t2, size, c => gameInstance.MobManager.AtCoord(c) == null);
 
                 mobManager.AddMob(m1);
                 mobManager.AddMob(m2);
@@ -53,30 +53,62 @@ namespace HexMage.Benchmarks {
                 Console.WriteLine();
             }
 
+            {
+                Console.WriteLine("---- STATE COPY BENCHMARK ----");
+
+                int totalIterations = 1000000;
+                int iterations = 0;
+                const int dumpIterations = 1000;
+
+                var copyStopwatch = Stopwatch.StartNew();
+                var totalCopyStopwatch = Stopwatch.StartNew();
+
+                while (iterations < totalIterations) {
+                    iterations++;
+
+                    copyStopwatch.Start();
+                    gameInstance.DeepCopy();
+                    copyStopwatch.Stop();
+
+                    if (iterations%dumpIterations == 0) {
+                        double secondsPerThousand = (double)copyStopwatch.ElapsedTicks/Stopwatch.Frequency;
+                        double msPerCopy = secondsPerThousand;
+                        Console.WriteLine($"Copy {msPerCopy:0.00}ms, 1M in: {secondsPerThousand * 1000}s");
+                        copyStopwatch.Reset();
+                    }
+                }
+
+                Console.WriteLine($"Total copy time for {totalIterations}: {totalCopyStopwatch.ElapsedMilliseconds}ms");
+            }
+
+            Console.WriteLine("Press any key to continue.");
+            Console.ReadKey();
+
             Console.WriteLine("Precomputing cubes");
             gameInstance.Map.PrecomputeCubeLinedraw();
             Console.WriteLine("Cubes precomputed");
 
-            var totalStopwatch = Stopwatch.StartNew();
-            var stopwatch = new Stopwatch();
-            var iterations = 0;
-            int roundsPerThousand = 0;
-            int dumpIterations = 1000;
+            {
+                var totalStopwatch = Stopwatch.StartNew();
+                var stopwatch = new Stopwatch();
+                var iterations = 0;
+                int roundsPerThousand = 0;
+                int dumpIterations = 1000;
 
-            int totalIterations = 200000;
-            double ratio = 1000000/totalIterations;
+                int totalIterations = 200000;
+                double ratio = 1000000/totalIterations;
 
-            while (iterations < totalIterations) {
-                iterations++;
+                while (iterations < totalIterations) {
+                    iterations++;
 
-                turnManager.StartNextTurn(pathfinder);
+                    turnManager.StartNextTurn(pathfinder);
 
-                stopwatch.Start();
+                    stopwatch.Start();
 #if FAST
-                var rounds = hub.FastMainLoop(TimeSpan.Zero);
-                stopwatch.Stop();
+                    var rounds = hub.FastMainLoop(TimeSpan.Zero);
+                    stopwatch.Stop();
 
-                roundsPerThousand += rounds;
+                    roundsPerThousand += rounds;
 #else
                 var rounds = hub.MainLoop(TimeSpan.Zero);
                 stopwatch.Stop();
@@ -85,26 +117,27 @@ namespace HexMage.Benchmarks {
                 roundsPerThousand += rounds.Result;
 #endif
 
-                if (iterations% dumpIterations == 0) {
-                    double perThousandMs = Math.Round(stopwatch.Elapsed.TotalMilliseconds, 2);
+                    if (iterations%dumpIterations == 0) {
+                        double perThousandMs = Math.Round(stopwatch.Elapsed.TotalMilliseconds, 2);
 
-                    double estimateSecondsPerMil =
-                        Math.Round(totalStopwatch.Elapsed.TotalSeconds/iterations*totalIterations, 2);
-                    double perGame = Math.Round(perThousandMs/dumpIterations*1000, 2);
+                        double estimateSecondsPerMil =
+                            Math.Round(totalStopwatch.Elapsed.TotalSeconds/iterations*totalIterations, 2);
+                        double perGame = Math.Round(perThousandMs/dumpIterations*1000, 2);
 
-                    Console.WriteLine(
-                        $"Starting a new game {iterations:00000}, {roundsPerThousand/1000} average rounds, {perThousandMs:00.00}ms\trunning average per 1M: {estimateSecondsPerMil*ratio:00.00}s, per game: {perGame:00.00}us");
-                    roundsPerThousand = 0;
-                    stopwatch.Reset();
+                        Console.WriteLine(
+                            $"Starting a new game {iterations:00000}, {roundsPerThousand/1000} average rounds, {perThousandMs:00.00}ms\trunning average per 1M: {estimateSecondsPerMil*ratio:00.00}s, per game: {perGame:00.00}us");
+                        roundsPerThousand = 0;
+                        stopwatch.Reset();
+                    }
+
+                    gameInstance.Reset();
+
+                    //replayRecorder.DumpReplay(Console.Out);
+                    //replayRecorder.Clear();
                 }
 
-                gameInstance.Reset();
-
-                //replayRecorder.DumpReplay(Console.Out);
-                replayRecorder.Clear();
+                Console.WriteLine("Took {0}ms", totalStopwatch.ElapsedMilliseconds);
             }
-
-            Console.WriteLine("Took {0}ms", totalStopwatch.ElapsedMilliseconds);
         }
     }
 

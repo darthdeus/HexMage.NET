@@ -54,7 +54,6 @@
     <Compile Include="Pathfinding\CoordPair.cs" />
     <Compile Include="Pathfinding\CoordRadiusCache.cs" />
     <Compile Include="Pathfinding\Map.cs" />
-    <Compile Include="Model\UsableAbility.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Utils\Color.cs" />
     <Compile Include="Model\Ability.cs" />

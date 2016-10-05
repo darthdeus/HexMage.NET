@@ -52,7 +52,7 @@ namespace HexMage.GUI.Components {
             BuildUsedAbilityPopover(mob, usableAbility.Ability)
                 .LogContinuation();
 
-            var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
+            var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.GetAbility.Element);
 
             var projectileAnimation = new Animation(projectileSprite,
                                                     TimeSpan.FromMilliseconds(50),
@@ -83,7 +83,7 @@ namespace HexMage.GUI.Components {
 
             explosion.AddComponent(new PositionAtMob(target));
 
-            var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(ability.Element);
+            var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(ability.GetAbility.Element);
 
             var explosionAnimation = new Animation(
                 explosionSprite,
@@ -207,7 +207,7 @@ namespace HexMage.GUI.Components {
             if (mob != null && SelectedAbilityIndex.HasValue) {
                 var selectedAbility = mob.Abilities[SelectedAbilityIndex.Value];
 
-                if (selectedAbility.Cost > mob.Ap) {
+                if (selectedAbility.GetAbility.Cost > mob.Ap) {
                     SelectedAbilityIndex = null;
                 }
             }

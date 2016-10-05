@@ -1,7 +1,5 @@
-﻿using HexMage.Simulator.Model;
-
-namespace HexMage.Simulator {
-    public class AreaBuff : IDeepCopyable<AreaBuff> {
+﻿namespace HexMage.Simulator.Model {
+    public struct AreaBuff {
         public AxialCoord Coord { get; set; }
         public int Radius { get; set; }
         public Buff Effect { get; set; }
@@ -12,8 +10,10 @@ namespace HexMage.Simulator {
             Effect = effect;
         }
 
-        public AreaBuff DeepCopy() {
-            return new AreaBuff(Coord, Radius, Effect.DeepCopy());
+        public void DecreaseLifetime() {
+            var copy = Effect;
+            copy.Lifetime--;
+            Effect = copy;
         }
 
         public override string ToString() {
