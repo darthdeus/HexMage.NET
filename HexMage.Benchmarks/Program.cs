@@ -136,9 +136,6 @@ namespace HexMage.Benchmarks {
                     }
 
                     gameInstance.Reset();
-
-                    //replayRecorder.DumpReplay(Console.Out);
-                    //replayRecorder.Clear();
                 }
 
                 Console.WriteLine("Took {0}ms", totalStopwatch.ElapsedMilliseconds);

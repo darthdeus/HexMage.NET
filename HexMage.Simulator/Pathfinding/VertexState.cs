@@ -1,4 +1,4 @@
-﻿namespace HexMage.Simulator
+﻿namespace HexMage.Simulator.Pathfinding
 {
     public enum VertexState
     {

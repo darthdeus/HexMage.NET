@@ -119,20 +119,5 @@ namespace HexMage.Simulator {
         public void Reset() {
             AreaBuffs.Clear();
         }
-
-        public bool IsValidCoord(AxialCoord c) {
-            int a = (c.X + c.Y);
-            int distance = ((c.X < 0 ? -c.X : c.X)
-                            + (a < 0 ? -a : a)
-                            + (c.Y < 0 ? -c.Y : c.Y))/2;
-
-            //int distance = (Math.Abs(c.X)
-            //                + Math.Abs(c.X + c.Y)
-            //                + Math.Abs(c.Y)) / 2;
-            return distance <= Size;
-
-            //return _map.AxialDistance(c, new AxialCoord(0, 0)) <= _map.Size;
-            //return _map.CubeDistance(new CubeCoord(0, 0, 0), c) <= _map.Size;
-        }
     }
 }
