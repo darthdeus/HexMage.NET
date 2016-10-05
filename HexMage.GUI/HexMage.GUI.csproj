@@ -53,7 +53,7 @@
     <Compile Include="Components\PositionAtMob.cs" />
     <Compile Include="Components\ProjectileEntity.cs" />
     <Compile Include="Renderers\IRenderer.cs" />
-    <Compile Include="LambdaComponent.cs" />
+    <Compile Include="Components\LambdaComponent.cs" />
     <Compile Include="Renderers\AnimationRenderer.cs" />
     <Compile Include="Renderers\MapPreviewRenderer.cs" />
     <Compile Include="Renderers\MobRenderer.cs" />

@@ -17,6 +17,22 @@ namespace HexMage.Simulator {
 
         public bool IsFinished => RedAlive == 0 || BlueAlive == 0;
 
+        public void SlowUpdateIsFinished() {
+            RedAlive = 0;
+            foreach (var mob in MobManager.Mobs) {
+                if (mob.Hp > 0 && mob.Team == TeamColor.Red) { RedAlive++; }
+                if (mob.Hp > 0 && mob.Team == TeamColor.Blue) { BlueAlive++; }
+            }
+        }
+
+        [Obsolete]
+        public bool SlowIsFinished() {
+            return MobManager.Mobs.Where(m => m.Hp > 0)
+                             .Select(m => m.Team)
+                             .Distinct()
+                             .Count() <= 1;
+        }
+
         public GameInstance(Map map, MobManager mobManager) {
             Map = map;
             MobManager = mobManager;
@@ -26,7 +42,7 @@ namespace HexMage.Simulator {
             TurnManager = new TurnManager(this);
         }
 
-        public GameInstance(int size) : this(new Map(size)) { }
+        public GameInstance(int size) : this(new Map(size)) {}
         public GameInstance(Map map) : this(map, new MobManager()) {}
 
         private GameInstance(int size, Map map, MobManager mobManager, Pathfinder pathfinder) {

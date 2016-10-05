@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using HexMage.Simulator.Model;
 
@@ -21,16 +22,26 @@ namespace HexMage.Simulator {
             var turnManager = _gameInstance.TurnManager;
             turnManager.StartNextTurn(_gameInstance.Pathfinder);
 
+            _gameInstance.SlowUpdateIsFinished();
+
             Utils.Log(LogSeverity.Info, nameof(GameEventHub), "FAST Starting Main Loop");
 
             int totalTurns = 0;
 
+            //while (!_gameInstance.SlowIsFinished()) {
             while (!_gameInstance.IsFinished) {
+                Utils.Log(LogSeverity.Info, nameof(GameEventHub), "FAST Main loop iterations");
                 totalTurns++;
 
                 turnManager.CurrentController.FastPlayTurn(this);
                 turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder);
+
+                if (turnDelay != TimeSpan.Zero) {
+                    Thread.Sleep(turnDelay);
+                }
             }
+
+            Utils.Log(LogSeverity.Info, nameof(GameEventHub), "FAST Main loop DONE");
 
             return totalTurns;
         }

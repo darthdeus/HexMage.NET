@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
@@ -114,7 +115,7 @@ namespace HexMage.GUI.Components {
             BuildPopovers();
             CreateMobEntities(assetManager);
 
-            _eventHub.FastMainLoop(TimeSpan.FromMilliseconds(200));
+            new Thread(() => { _eventHub.FastMainLoop(TimeSpan.FromMilliseconds(200)); }).Start();
         }
 
         private void CreateMobEntities(AssetManager assetManager) {
@@ -195,11 +196,9 @@ namespace HexMage.GUI.Components {
         private void HandleUserTurnInput(InputManager inputManager) {
             if (inputManager.JustLeftClickReleased()) {
                 EnqueueClickEvent(HandleLeftClick);
-            }
-            else if (inputManager.IsKeyJustReleased(Keys.R)) {
+            } else if (inputManager.IsKeyJustReleased(Keys.R)) {
 #warning TODO - implement this
                 //_gameInstance.TurnManager.CurrentController.RandomAction(_eventHub);
-
             }
         }
 
@@ -353,7 +352,8 @@ namespace HexMage.GUI.Components {
                     mobTextBuilder.AppendLine("Area buffs:");
 
                     foreach (var buff in _gameInstance.Map.BuffsAt(mob.Coord)) {
-                        mobTextBuilder.AppendLine($"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");
+                        mobTextBuilder.AppendLine(
+                            $"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");
                     }
 
                     mobTextBuilder.AppendLine();
