@@ -160,6 +160,9 @@ namespace HexMage.GUI.Scenes {
 
                 _t2Preview.AddChild(BuildMobPreview(() => mob));
             }
+
+            _gameInstance.RedAlive = t1size;
+            _gameInstance.BlueAlive = t2size;
         }
 
         public Entity BuildMobPreview(Func<Mob> mobFunc) {

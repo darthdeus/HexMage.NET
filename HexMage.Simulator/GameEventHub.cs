@@ -21,9 +21,7 @@ namespace HexMage.Simulator {
         public int FastMainLoop(TimeSpan turnDelay) {
             var turnManager = _gameInstance.TurnManager;
             turnManager.StartNextTurn(_gameInstance.Pathfinder);
-
-            _gameInstance.SlowUpdateIsFinished();
-
+            
             Utils.Log(LogSeverity.Info, nameof(GameEventHub), "FAST Starting Main Loop");
 
             int totalTurns = 0;

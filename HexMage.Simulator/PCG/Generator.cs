@@ -45,8 +45,7 @@ namespace HexMage.Simulator.PCG {
     public static class Generator {
         public static Random Random = new Random();
 
-        public static GameInstance RandomGame(int size, MapSeed seed, int teamSize,
-            Func<GameInstance, IMobController> controllerFunc) {
+        public static GameInstance RandomGame(int size, MapSeed seed, int teamSize, Func<GameInstance, IMobController> controllerFunc) {
             var map = new MapGenerator().Generate(size, seed);
             var game = new GameInstance(map);
 
