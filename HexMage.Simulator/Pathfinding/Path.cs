@@ -1,6 +1,4 @@
-﻿using HexMage.Simulator.Pathfinding;
-
-namespace HexMage.Simulator
+﻿namespace HexMage.Simulator
 {
     public class Path
     {

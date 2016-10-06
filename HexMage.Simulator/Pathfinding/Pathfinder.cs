@@ -2,9 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using HexMage.Simulator.Model;
-using HexMage.Simulator.Pathfinding;
 
 namespace HexMage.Simulator {
+    public enum VertexState {
+        Unvisited,
+        Open,
+        Closed
+    }
+
     public class Pathfinder : IResettable {
         private readonly List<AxialCoord> _diffs;
         private readonly Map _map;

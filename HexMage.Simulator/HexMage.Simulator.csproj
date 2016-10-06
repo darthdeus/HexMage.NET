@@ -71,7 +71,6 @@
     <Compile Include="Pathfinding\Path.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TurnManager.cs" />
-    <Compile Include="Model\VertexState.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
