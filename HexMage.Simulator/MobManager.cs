@@ -9,7 +9,7 @@ namespace HexMage.Simulator {
         public List<Ability> Abilities = new List<Ability>();
         public List<MobId> Mobs = new List<MobId>();
         public List<MobInfo> MobInfos = new List<MobInfo>();
-        public List<MobInstance> MobInstances = new List<MobInstance>();
+        public MobInstance[] MobInstances = new MobInstance[0];
         public List<int> Cooldowns = new List<int>();
 
         public readonly Dictionary<TeamColor, IMobController> Teams = new Dictionary<TeamColor, IMobController>();
@@ -60,24 +60,21 @@ namespace HexMage.Simulator {
             Mobs.Add(id);
 
             MobInfos.Add(mobInfo);
-            MobInstances.Add(new MobInstance(id));
+            Array.Resize(ref MobInstances, MobInstances.Length + 1);
+            MobInstances[MobInstances.Length - 1] = new MobInstance(id);
 
             return id;
         }
 
 
         public void ChangeMobHp(GameInstance gameInstance, MobId mobId, int hpChange) {
-            var copy = MobInstances[mobId];
-            copy.Hp += hpChange;
-            MobInstances[mobId] = copy;
+            MobInstances[mobId].Hp += hpChange;
 
-            gameInstance.MobHpChanged(copy.Hp, MobInfos[mobId].Team);
+            gameInstance.MobHpChanged(MobInstances[mobId].Hp, MobInfos[mobId].Team);
         }
 
         public void ChangeMobAp(MobId mobId, int apChange) {
-            var copy = MobInstances[mobId];
-            copy.Ap += apChange;
-            MobInstances[mobId] = copy;
+            MobInstances[mobId].Ap += apChange;
         }
 
         public void ApplyDots(Map map, GameInstance gameInstance) {
@@ -136,7 +133,7 @@ namespace HexMage.Simulator {
             Debug.Assert(distance <= mobInstance.Ap, "Trying to move a mob that doesn't have enough AP.");
             Debug.Assert(map[pos] == HexType.Empty, "Trying to move a mob into a wall.");
             Debug.Assert(AtCoord(pos) == null, "Trying to move into a mob.");
-
+            
             mobInstance.Ap -= distance;
             mobInstance.Coord = pos;
             MobInstances[mobId] = mobInstance;
@@ -162,8 +159,10 @@ namespace HexMage.Simulator {
             mobManagerCopy.MobInfos = MobInfos;
             mobManagerCopy.Mobs = Mobs;
 
-            foreach (var mobInstance in MobInstances) {
-                mobManagerCopy.MobInstances.Add(mobInstance.DeepCopy());
+            mobManagerCopy.MobInstances = new MobInstance[MobInstances.Length];
+
+            for (int i = 0; i < MobInstances.Length; i++) {
+                mobManagerCopy.MobInstances[i] = MobInstances[i].DeepCopy();
             }
 
             return mobManagerCopy;
@@ -177,12 +176,9 @@ namespace HexMage.Simulator {
         public void Reset() {
             foreach (var mobId in Mobs) {
                 var mobInfo = MobInfoForId(mobId);
-                var copy = MobInstances[mobId];
-                copy.Hp = mobInfo.MaxHp;
-                copy.Ap = mobInfo.MaxAp;
-                copy.Coord = copy.OrigCoord;
-
-                MobInstances[mobId] = copy;
+                MobInstances[mobId].Hp = mobInfo.MaxHp;
+                MobInstances[mobId].Ap = mobInfo.MaxAp;
+                MobInstances[mobId].Coord = MobInstances[mobId].OrigCoord;
             }
         }
 
@@ -195,16 +191,12 @@ namespace HexMage.Simulator {
         }
 
         public void ResetAp(MobId mobId) {
-            var copy = MobInstanceForId(mobId);
-            copy.Ap = MobInfoForId(mobId).MaxAp;
-            MobInstances[mobId.Id] = copy;
+            MobInstances[mobId].Ap = MobInfoForId(mobId).MaxAp;
         }
 
         public void SetMobPosition(MobId mobId, AxialCoord coord) {
-            var instance = MobInstanceForId(mobId);
-            instance.Coord = coord;
-            instance.OrigCoord = coord;
-            MobInstances[mobId.Id] = instance;
+            MobInstances[mobId].Coord = coord;
+            MobInstances[mobId].OrigCoord = coord;
         }
     }
 }
