@@ -16,7 +16,7 @@ namespace HexMage.Simulator {
         public int RedAlive = 0;
         public int BlueAlive = 0;
 
-        public bool IsFinished => RedAlive == 0 || BlueAlive == 0;
+        public bool IsFinished => RedAlive <= 0 || BlueAlive <= 0;
 
         public void SlowUpdateIsFinished() {
             RedAlive = 0;
@@ -114,11 +114,10 @@ namespace HexMage.Simulator {
         private void TargetHit(AbilityId abilityId, MobId mobId, MobId targetId) {
             var ability = MobManager.AbilityForId(abilityId);
 
+            MobManager.ChangeMobHp(this, targetId, -ability.Dmg);
+
             var targetInstance = MobManager.MobInstanceForId(targetId);
             var targetInfo = MobManager.MobInfoForId(targetId);
-
-            MobManager.ChangeMobHp(targetId, -ability.Dmg);
-            MobHpChanged(targetInstance, targetInfo.Team);
 
             targetInstance.Buffs.Add(ability.ElementalEffect);
             foreach (var abilityBuff in ability.Buffs) {
@@ -136,8 +135,8 @@ namespace HexMage.Simulator {
             MobManager.ChangeMobAp(mobId, -ability.Cost);
         }
 
-        public void MobHpChanged(MobInstance mob, TeamColor team) {
-            if (mob.Hp == 0) {                
+        public void MobHpChanged(int hp, TeamColor team) {
+            if (hp <= 0) {                
                 switch (team) {
                     case TeamColor.Red:
                         RedAlive--;

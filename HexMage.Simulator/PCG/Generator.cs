@@ -67,15 +67,18 @@ namespace HexMage.Simulator.PCG {
         //}
 
         public static void RandomPlaceMob(MobManager mobManager, MobId mob, Map map) {
-
             int size = map.Size;
 
             Predicate<AxialCoord> isCoordAvailable = c => {
                 bool isWall = map[c] == HexType.Wall;
-                var atCoord = mobManager.AtCoord(mobManager.MobInstances[mob].Coord);
+                var atCoord = mobManager.AtCoord(c);
 
                 return !isWall && (!atCoord.HasValue || (atCoord.HasValue && atCoord.Value == mob));
             };
+
+            var copy = mobManager.MobInstances[mob];
+            copy.Coord = new AxialCoord(int.MaxValue, int.MaxValue);
+            mobManager.MobInstances[mob] = copy;
 
             while (true)
             {

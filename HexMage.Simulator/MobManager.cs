@@ -66,10 +66,12 @@ namespace HexMage.Simulator {
         }
 
 
-        public void ChangeMobHp(MobId mobId, int hpChange) {
+        public void ChangeMobHp(GameInstance gameInstance, MobId mobId, int hpChange) {
             var copy = MobInstances[mobId];
             copy.Hp += hpChange;
             MobInstances[mobId] = copy;
+
+            gameInstance.MobHpChanged(copy.Hp, MobInfos[mobId].Team);
         }
 
         public void ChangeMobAp(MobId mobId, int apChange) {
@@ -86,9 +88,8 @@ namespace HexMage.Simulator {
                 for (int i = 0; i < buffs.Count; i++) {
                     var buff = buffs[i];
 
-                    ChangeMobHp(mobId, buff.HpChange);
+                    ChangeMobHp(gameInstance, mobId, buff.HpChange);
                     ChangeMobAp(mobId, buff.ApChange);
-                    gameInstance.MobHpChanged(MobInstanceForId(mobId), MobInfoForId(mobId).Team);
                     buff.Lifetime--;
                     buffs[i] = buff;
                 }
@@ -102,9 +103,8 @@ namespace HexMage.Simulator {
                 var areaBuff = map.AreaBuffs[i];
                 foreach (var mobId in Mobs) {
                     if (map.AxialDistance(MobInstanceForId(mobId).Coord, areaBuff.Coord) <= areaBuff.Radius) {
-                        ChangeMobHp(mobId, areaBuff.Effect.HpChange);
+                        ChangeMobHp(gameInstance, mobId, areaBuff.Effect.HpChange);
                         ChangeMobAp(mobId, areaBuff.Effect.ApChange);
-                        gameInstance.MobHpChanged(MobInstanceForId(mobId), MobInfoForId(mobId).Team);
                     }
                 }
 
@@ -198,19 +198,6 @@ namespace HexMage.Simulator {
             var copy = MobInstanceForId(mobId);
             copy.Ap = MobInfoForId(mobId).MaxAp;
             MobInstances[mobId.Id] = copy;
-        }
-
-        public void SetMobHp(MobId mobId, int hp) {
-            var instance = MobInstanceForId(mobId);
-            instance.Hp = hp;
-            MobInstances[mobId.Id] = instance;
-        }
-
-
-        public void SetMobAp(MobId mobId, int ap) {
-            var instance = MobInstanceForId(mobId);
-            instance.Ap = ap;
-            MobInstances[mobId.Id] = instance;
         }
 
         public void SetMobPosition(MobId mobId, AxialCoord coord) {

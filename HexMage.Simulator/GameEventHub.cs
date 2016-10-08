@@ -27,7 +27,6 @@ namespace HexMage.Simulator {
             int totalTurns = 0;
             _gameInstance.SlowUpdateIsFinished();
 
-            //while (!_gameInstance.SlowIsFinished()) {
             while (!_gameInstance.IsFinished) {
                 //Utils.Log(LogSeverity.Info, nameof(GameEventHub), $"FAST Main loop iteration, turn {totalTurns}");
                 totalTurns++;
@@ -40,7 +39,7 @@ namespace HexMage.Simulator {
                     Thread.Sleep(turnDelay);
                 }
 
-                _gameInstance.SlowUpdateIsFinished();
+                //_gameInstance.SlowUpdateIsFinished();
             }
 
             //Utils.Log(LogSeverity.Info, nameof(GameEventHub), "FAST Main loop DONE");
