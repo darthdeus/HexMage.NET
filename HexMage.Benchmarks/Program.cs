@@ -22,7 +22,7 @@ namespace HexMage.Benchmarks {
             //var replayRecorder = new ReplayRecorder();
             //hub.AddSubscriber(replayRecorder);
 
-            //Utils.RegisterLogger(new StdoutLogger());
+            Utils.RegisterLogger(new StdoutLogger());
             Utils.MainThreadId = Thread.CurrentThread.ManagedThreadId;
 
             var t1 = TeamColor.Red;
@@ -36,11 +36,14 @@ namespace HexMage.Benchmarks {
             //Generator.Random = new Random();
 
             for (int i = 0; i < 5; i++) {                
-                MobInfo m1 = Generator.RandomMob(mobManager, t1, size, c => gameInstance.MobManager.AtCoord(c) == null);
-                MobInfo m2 = Generator.RandomMob(mobManager, t2, size, c => gameInstance.MobManager.AtCoord(c) == null);
+                MobInfo mi1 = Generator.RandomMob(mobManager, t1);
+                MobInfo mi2 = Generator.RandomMob(mobManager, t2);
 
-                mobManager.AddMobWithInfo(m1);
-                mobManager.AddMobWithInfo(m2);
+                MobId m1 = mobManager.AddMobWithInfo(mi1);
+                MobId m2 = mobManager.AddMobWithInfo(mi2);
+
+                Generator.RandomPlaceMob(mobManager, m1, size, c => gameInstance.MobManager.AtCoord(c) == null);
+                Generator.RandomPlaceMob(mobManager, m2, size, c => gameInstance.MobManager.AtCoord(c) == null);
             }
 
             mobManager.Teams[t1] = new AiRandomController(gameInstance);
@@ -49,6 +52,12 @@ namespace HexMage.Benchmarks {
             for (int i = 0; i < 5; i++) {
                 pathfinder.PathfindDistanceAll();
                 Console.WriteLine();
+            }
+
+            foreach (var coord in gameInstance.Map.AllCoords) {
+                if (mobManager.MobInstances.Count(x => x.Coord == coord) > 1) {
+                    throw new InvalidOperationException("There are duplicate mobs on the same coord.");
+                }
             }
 
             goto SKIP_COPY_BENCH;
@@ -107,7 +116,7 @@ namespace HexMage.Benchmarks {
 
                     stopwatch.Start();
 #if FAST
-                    var rounds = hub.FastMainLoop(TimeSpan.Zero);
+                    var rounds = hub.FastMainLoop(TimeSpan.FromMilliseconds(100));
                     stopwatch.Stop();
 
                     roundsPerThousand += rounds;

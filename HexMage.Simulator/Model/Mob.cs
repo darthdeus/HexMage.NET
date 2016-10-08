@@ -9,6 +9,10 @@ namespace HexMage.Simulator.Model {
             Id = id;
         }
 
+        public static implicit operator int(MobId mobId) {
+            return mobId.Id;
+        }
+
         public bool Equals(MobId other) {
             return Id == other.Id;
         }
@@ -69,9 +73,34 @@ namespace HexMage.Simulator.Model {
         public AxialCoord OrigCoord { get; set; }
         public int Hp { get; set; }
         public int Ap { get; set; }
+        public List<Buff> Buffs { get; set; }
 
         public MobInstance(MobId id) : this() {
             Id = id;
+            Buffs = new List<Buff>();
+        }
+
+        public MobInstance DeepCopy() {
+            var copy = new MobInstance(Id) {
+                Coord = Coord,
+                OrigCoord = OrigCoord,
+                Hp = Hp,
+                Ap = Ap
+            };
+
+            var buffs = new List<Buff>();
+
+            foreach (var buff in Buffs) {
+                buffs.Add(buff);
+            }
+
+            copy.Buffs = buffs;
+
+            return copy;
+        }
+
+        public override string ToString() {
+            return $"{Hp}HP {Ap}AP";
         }
     }
 

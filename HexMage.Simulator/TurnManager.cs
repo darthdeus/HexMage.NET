@@ -13,8 +13,19 @@ namespace HexMage.Simulator {
         private readonly Map _map;
         public MobManager MobManager { get; set; }
         public List<MobId> TurnOrder { get; set; } = new List<MobId>();
-        public MobId? CurrentMob => _current < TurnOrder.Count ? TurnOrder[_current] : null;
-        public IMobController CurrentController => CurrentMob != null ? MobManager.Teams[MobManager.MobInfoForId(CurrentMob.Value).Team] : null;
+
+        public IMobController CurrentController
+            => CurrentMob != null ? MobManager.Teams[MobManager.MobInfoForId(CurrentMob.Value).Team] : null;
+
+        public MobId? CurrentMob {
+            get {
+                if (_current < TurnOrder.Count) {
+                    return TurnOrder[_current];
+                } else {
+                    return null;
+                }
+            }
+        }
 
         public int TurnNumber { get; private set; }
         private int _current = 0;

@@ -77,7 +77,6 @@ namespace HexMage.Simulator {
 
 
         public DefenseDesire FastUse(AbilityId abilityId, MobId mobId, MobId targetId) {
-            new List<int>();
             var target = MobManager.MobInstanceForId(targetId);
             var targetInfo = MobManager.MobInfoForId(targetId);
             Debug.Assert(MobManager.CooldownFor(abilityId) == 0, "Trying to use an ability with non-zero cooldown.");
@@ -120,15 +119,15 @@ namespace HexMage.Simulator {
             MobManager.ChangeMobHp(targetId, -ability.Dmg);
             MobHpChanged(targetInstance, targetInfo.Team);
 
-            target.Buffs.Add(ability.ElementalEffect);
+            targetInstance.Buffs.Add(ability.ElementalEffect);
             foreach (var abilityBuff in ability.Buffs) {
                 // TODO - handle lifetimes
-                target.Buffs.Add(abilityBuff);
+                targetInstance.Buffs.Add(abilityBuff);
             }
 
             foreach (var areaBuff in ability.AreaBuffs) {
                 var copy = areaBuff;
-                copy.Coord = target.Coord;
+                copy.Coord = targetInstance.Coord;
                 Map.AreaBuffs.Add(copy);
             }
 

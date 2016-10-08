@@ -62,7 +62,7 @@ namespace HexMage.Simulator {
         }
 
         public void PathfindFromCurrentMob(TurnManager turnManager) {
-            if (turnManager.CurrentMob != null) PathfindFrom(turnManager.CurrentMob.Coord);
+            if (turnManager.CurrentMob != null) PathfindFrom(_mobManager.MobInstanceForId(turnManager.CurrentMob.Value).Coord);
         }
 
         readonly HexMap<HexMap<int>> _allPaths;

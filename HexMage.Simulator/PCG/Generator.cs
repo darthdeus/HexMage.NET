@@ -86,12 +86,7 @@ namespace HexMage.Simulator.PCG {
             }
         }
 
-        public static MobInfo RandomMob(MobManager mobManager, TeamColor team, int size) {
-            return RandomMob(mobManager, team, size, _ => true);
-        }
-
-        public static MobInfo RandomMob(MobManager mobManager, TeamColor team, int size,
-            Predicate<AxialCoord> isCoordAvailable) {
+        public static MobInfo RandomMob(MobManager mobManager, TeamColor team) {
             var elements = new[] {
                 AbilityElement.Earth, AbilityElement.Fire, AbilityElement.Air, AbilityElement.Water
             };
