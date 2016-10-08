@@ -158,6 +158,7 @@ namespace HexMage.Simulator {
             return game;
         }
 
+#warning TODO - funguje tohle jeste?
         public void Reset() {
             Map.Reset();
             MobManager.Reset();

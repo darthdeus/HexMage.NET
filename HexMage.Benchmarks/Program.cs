@@ -32,8 +32,8 @@ namespace HexMage.Benchmarks {
             var mobManager = gameInstance.MobManager;
             var pathfinder = gameInstance.Pathfinder;
 
-            //Generator.Random = new Random(1234);
-            Generator.Random = new Random();
+            Generator.Random = new Random(1234);
+            //Generator.Random = new Random();
 
             for (int i = 0; i < 5; i++) {                
                 MobInfo mi1 = Generator.RandomMob(mobManager, t1);
@@ -61,6 +61,7 @@ namespace HexMage.Benchmarks {
             }
 
             mobManager.Reset();
+            turnManager.PresortTurnOrder();
 
             goto SKIP_COPY_BENCH;
 
