@@ -25,24 +25,25 @@ namespace HexMage.GUI.Renderers {
         }
 
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
-            var mobEntity = (MobEntity) _mob.Metadata;
-
             var pos = entity.RenderPosition;
 
-            if (_gameInstance.TurnManager.CurrentMob == _mob) {
+            if (_gameInstance.TurnManager.CurrentMob == _mobId) {
                 batch.Draw(assetManager[AssetManager.HexHoverSprite], pos, Color.White);
             }
 
-            var color = _mob.Team == TeamColor.Red ? Color.OrangeRed : Color.Blue;
-            if (_mob.Hp > 0) {
-                _animationController.CurrentAnimation.RenderFrame(mobEntity, pos, color, batch, assetManager);
+            var mobInfo = _gameInstance.MobManager.MobInfoForId(_mobId);
+            var mobInstance = _gameInstance.MobManager.MobInstanceForId(_mobId);
+
+            var color = mobInfo.Team == TeamColor.Red ? Color.OrangeRed : Color.Blue;
+            if (mobInstance.Hp > 0) {
+                _animationController.CurrentAnimation.RenderFrame(null, pos, color, batch, assetManager);
 
                 var hbPos = pos.ToPoint() + _healthbarOffset;
-                DrawHealthbar((double) _mob.Hp/_mob.MaxHp,
+                DrawHealthbar((double)mobInstance.Hp/mobInfo.MaxHp,
                               batch, assetManager, hbPos, Color.DarkGreen, Color.LightGreen);
 
                 var apPos = hbPos + new Point(_healthbarWidth, 0);
-                DrawHealthbar((double) _mob.Ap/_mob.MaxAp,
+                DrawHealthbar((double)mobInstance.Ap/mobInfo.MaxAp,
                               batch, assetManager, apPos, Color.DarkBlue, Color.LightBlue);
             } else {
                 batch.Draw(assetManager[AssetManager.DarkMageDeath], pos, color);

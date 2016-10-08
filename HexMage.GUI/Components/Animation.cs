@@ -40,7 +40,7 @@ namespace HexMage.GUI.Components {
                 position,
                 sourceRectangle,
                 color,
-                entity.Rotation,
+                entity?.Rotation ?? 0,
                 Origin,
                 Vector2.One,
                 SpriteEffects.None,

@@ -22,15 +22,17 @@ namespace HexMage.Simulator {
             var turnManager = _gameInstance.TurnManager;
             turnManager.StartNextTurn(_gameInstance.Pathfinder);
             
-            Utils.Log(LogSeverity.Info, nameof(GameEventHub), "FAST Starting Main Loop");
+            //Utils.Log(LogSeverity.Info, nameof(GameEventHub), "FAST Starting Main Loop");
 
             int totalTurns = 0;
+            _gameInstance.SlowUpdateIsFinished();
 
             //while (!_gameInstance.SlowIsFinished()) {
             while (!_gameInstance.IsFinished) {
-                Utils.Log(LogSeverity.Info, nameof(GameEventHub), $"FAST Main loop iteration, turn {totalTurns}");
+                //Utils.Log(LogSeverity.Info, nameof(GameEventHub), $"FAST Main loop iteration, turn {totalTurns}");
                 totalTurns++;
 
+                //Console.WriteLine($"Playing {_gameInstance.BlueAlive}B, {_gameInstance.RedAlive}R");
                 turnManager.CurrentController.FastPlayTurn(this);
                 turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder);
 
@@ -41,7 +43,7 @@ namespace HexMage.Simulator {
                 _gameInstance.SlowUpdateIsFinished();
             }
 
-            Utils.Log(LogSeverity.Info, nameof(GameEventHub), "FAST Main loop DONE");
+            //Utils.Log(LogSeverity.Info, nameof(GameEventHub), "FAST Main loop DONE");
 
             return totalTurns;
         }

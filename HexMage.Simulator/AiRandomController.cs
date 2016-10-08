@@ -60,13 +60,12 @@ namespace HexMage.Simulator {
             }
 
             if (spellTarget != MobId.Invalid) {
-                var hpBefore = _gameInstance.MobManager.MobInstanceForId(spellTarget).Hp;
                 _gameInstance.FastUse(ability.AbilityId, mobId.Value, spellTarget);
-                var hpAfter = _gameInstance.MobManager.MobInstanceForId(spellTarget).Hp;
-                Utils.Log(LogSeverity.Debug, nameof(AiRandomController), $"Using ability {ability.Dmg}, HP {hpBefore} -> {hpAfter}");
             }
             else if (moveTarget != MobId.Invalid) {
-                Utils.Log(LogSeverity.Debug, nameof(AiRandomController), $"There are no targets, moving towards a random enemy at {_gameInstance.MobManager.MobInstanceForId(moveTarget).Coord}");
+                var fromCoord = _gameInstance.MobManager.MobInstanceForId(mobId.Value).Coord;
+                var targetCoord = _gameInstance.MobManager.MobInstanceForId(moveTarget).Coord;
+                //Utils.Log(LogSeverity.Debug, nameof(AiRandomController), $"There are no targets, moving towards a random enemy from {fromCoord} to {targetCoord}");
                 FastMoveTowardsEnemy(mobId.Value, moveTarget);
             } else {
                 throw new InvalidOperationException("No targets, game should be over.");

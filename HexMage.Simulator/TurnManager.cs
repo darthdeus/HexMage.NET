@@ -66,11 +66,11 @@ namespace HexMage.Simulator {
 
         public TurnEndResult NextMobOrNewTurn(Pathfinder pathfinder) {
             if (_current >= TurnOrder.Count - 1) {
-                Utils.Log(LogSeverity.Info, nameof(TurnManager), "Starting next turn");
+                //Utils.Log(LogSeverity.Info, nameof(TurnManager), "Starting next turn");
                 StartNextTurn(pathfinder);
                 return TurnEndResult.NextTurn;
             } else {
-                Utils.Log(LogSeverity.Info, nameof(TurnManager), "Moving to next mob (same turn)");
+                //Utils.Log(LogSeverity.Info, nameof(TurnManager), "Moving to next mob (same turn)");
                 _current++;
 
                 Debug.Assert(CurrentMob.HasValue, "There's no current mob but still trying to move to one.");

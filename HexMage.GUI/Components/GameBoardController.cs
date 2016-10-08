@@ -100,14 +100,14 @@ namespace HexMage.GUI.Components {
             Entity.Scene.DestroyEntity(projectile);
         }
 
-        public void EventMobMoved(Mob mob, AxialCoord pos) {
-            Debug.Assert(mob.Metadata != null, "Trying to move a mob without an associated entity.");
-            var entity = (MobEntity) mob.Metadata;
-
-            entity.MoveTo(mob.Coord, pos);
+        public void EventMobMoved(MobId mob, AxialCoord pos) {
+            var mobEntity = _arenaScene.MobEntities[mob];
+            Debug.Assert(mobEntity != null, "Trying to move a mob without an associated entity.");
+            
+            mobEntity.MoveTo(_gameInstance.MobManager.MobInstanceForId(mob).Coord, pos);
         }
 
-        public void EventDefenseDesireAcquired(Mob mob, DefenseDesire defenseDesireResult) {
+        public void EventDefenseDesireAcquired(MobId mob, DefenseDesire defenseDesireResult) {
             ShowMessage($"{nameof(GameBoardController)} got defense {defenseDesireResult}");
         }
 
@@ -123,16 +123,14 @@ namespace HexMage.GUI.Components {
 
         private void CreateMobEntities(AssetManager assetManager) {
             foreach (var mob in _gameInstance.MobManager.Mobs) {
-                var mobAnimationController = new MobAnimationController();
+                var mobAnimationController = new MobAnimationController(_gameInstance);
 
                 var mobEntity = new MobEntity(mob, _gameInstance) {
                     Renderer = new MobRenderer(_gameInstance, mob, mobAnimationController),
                     SortOrder = Camera2D.SortMobs,
                     Transform = () => Camera2D.Instance.Transform
                 };
-                mob.Metadata = mobEntity;
                 mobEntity.AddComponent(mobAnimationController);
-                mobEntity.AddComponent(new MobStateUpdater(mob));
 
                 Entity.Scene.AddRootEntity(mobEntity);
                 mobEntity.InitializeEntity(assetManager);
@@ -264,22 +262,23 @@ namespace HexMage.GUI.Components {
             var currentMob = _gameInstance.TurnManager.CurrentMob;
 
             if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                var mobId = _gameInstance.MobManager.AtCoord(mouseHex);
-                if (mobId != null) {
-                    if (mobId == currentMob) {
+                var targetId = _gameInstance.MobManager.AtCoord(mouseHex);
+                if (targetId != null) {
+                    if (targetId == currentMob) {
                         ShowMessage("You can't target yourself.");
                     } else {
-                        var mobInstance = _gameInstance.MobManager.MobInstanceForId(mobId.Value);
-                        var mobInfo = _gameInstance.MobManager.MobInfoForId(mobId.Value);
+                        var mobInfo = _gameInstance.MobManager.MobInfoForId(currentMob.Value);
+                        var targetInstance = _gameInstance.MobManager.MobInstanceForId(targetId.Value);
+                        var targetInfo = _gameInstance.MobManager.MobInfoForId(targetId.Value);
 
-                        if (mobInstance.Hp == 0) {
+                        if (targetInstance.Hp == 0) {
                             ShowMessage("This mob is already dead.");
                         } else {
-                            if (mobInfo.Team == mobInfo.Team) {
+                            if (mobInfo.Team == targetInfo.Team) {
                                 ShowMessage("You can't target your team.");
                             } else if (SelectedAbilityIndex.HasValue) {
                                 if (abilitySelected) {
-                                    AttackMob(mobId);
+                                    AttackMob(targetId.Value);
                                 } else {
                                     ShowMessage("You can't move here.");
                                 }

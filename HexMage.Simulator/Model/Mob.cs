@@ -55,9 +55,6 @@ namespace HexMage.Simulator.Model {
         public TeamColor Team { get; set; }
 
         public static int AbilityCount => 6;
-        // TODO - should this maybe just be internal?
-        public List<Buff> Buffs { get; set; }
-
 
         public MobInfo(TeamColor team, int maxHp, int maxAp, int defenseCost, int iniciative, List<AbilityId> abilities) {
             Team = team;
@@ -67,7 +64,6 @@ namespace HexMage.Simulator.Model {
             Iniciative = iniciative;
             Abilities = abilities;
             Id = _lastId++;
-            Buffs = new List<Buff>();
         }
     }
 

@@ -20,6 +20,7 @@ namespace HexMage.Simulator {
 
         public void SlowUpdateIsFinished() {
             RedAlive = 0;
+            BlueAlive = 0;
             foreach (var mobId in MobManager.Mobs) {
                 var mobInfo = MobManager.MobInfoForId(mobId);
                 var mobInstance = MobManager.MobInstanceForId(mobId);

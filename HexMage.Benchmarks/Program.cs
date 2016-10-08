@@ -60,6 +60,8 @@ namespace HexMage.Benchmarks {
                 }
             }
 
+            mobManager.Reset();
+
             goto SKIP_COPY_BENCH;
 
             {

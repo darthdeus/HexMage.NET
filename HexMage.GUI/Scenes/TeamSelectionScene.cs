@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using HexMage.AI;
 using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
@@ -32,7 +31,6 @@ namespace HexMage.GUI.Scenes {
             _controllerList = new List<IMobController> {
                 new PlayerController(_arenaScene, _gameInstance),
                 new AiRandomController(_gameInstance),
-                new DoNothingController()
             };
         }
 

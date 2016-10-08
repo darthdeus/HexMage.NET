@@ -80,9 +80,9 @@ namespace HexMage.Simulator {
 
         public void ApplyDots(Map map, GameInstance gameInstance) {
             foreach (var mobId in Mobs) {
-                var mobInfo = MobInfoForId(mobId);
+                var mobInstance = MobInstanceForId(mobId);
 
-                var buffs = mobInfo.Buffs;
+                var buffs = mobInstance.Buffs;
                 for (int i = 0; i < buffs.Count; i++) {
                     var buff = buffs[i];
 
@@ -93,7 +93,7 @@ namespace HexMage.Simulator {
                     buffs[i] = buff;
                 }
 
-                MobInstanceForId(mobId).Buffs.RemoveAll(x => x.Lifetime == 0);
+                buffs.RemoveAll(x => x.Lifetime == 0);
             }
 
             var newBuffs = new List<AreaBuff>();
@@ -139,6 +139,8 @@ namespace HexMage.Simulator {
 
             mobInstance.Ap -= distance;
             mobInstance.Coord = pos;
+            MobInstances[mobId] = mobInstance;
+
             pathfinder.PathfindFrom(pos);
         }
 

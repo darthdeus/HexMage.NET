@@ -103,8 +103,11 @@ namespace HexMage.GUI.Renderers {
                 var currentMob = _gameInstance.TurnManager.CurrentMob;
                 var abilityIndex = _gameBoardController.SelectedAbilityIndex;
 
-                if (abilityIndex.HasValue) {
-                    var cubepath = _gameInstance.Map.AxialLinedraw(currentMob.Coord, _camera.MouseHex);
+                if (abilityIndex.HasValue && currentMob.HasValue) {
+                    var mobInfo = _gameInstance.MobManager.MobInfos[currentMob.Value];
+                    var mobInstance = _gameInstance.MobManager.MobInstances[currentMob.Value];
+
+                    var cubepath = _gameInstance.Map.AxialLinedraw(mobInstance.Coord, _camera.MouseHex);
 
                     int distance = 1;
                     bool walled = false;
@@ -118,7 +121,7 @@ namespace HexMage.GUI.Renderers {
                             walled = true;
                         }
 
-                        var abilityId = currentMob.Abilities[abilityIndex.Value];
+                        var abilityId = mobInfo.Abilities[abilityIndex.Value];
                         var ability = _gameInstance.MobManager.AbilityForId(abilityId);
                         if (distance <= ability.Range && !walled) {
                             DrawAt(hexUsable, cubeCoord);

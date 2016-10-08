@@ -16,7 +16,7 @@ namespace HexMage.GUI.Scenes {
         private readonly GameInstance _gameInstance;
         private readonly Entity _defenseModal;
         private readonly GameEventHub _gameEventHub;
-        private readonly Dictionary<MobId, MobEntity> _metadata = new Dictionary<MobId, MobEntity>();
+        public readonly Dictionary<MobId, MobEntity> MobEntities = new Dictionary<MobId, MobEntity>();
 
         public ArenaScene(GameManager gameManager, GameInstance gameInstance) : base(gameManager) {
             _gameInstance = gameInstance;
@@ -33,6 +33,7 @@ namespace HexMage.GUI.Scenes {
         }
 
         public override void Initialize() {
+            _gameInstance.MobManager.Reset();
             _gameInstance.Map.PrecomputeCubeLinedraw();
             _gameInstance.Pathfinder.PathfindDistanceAll();
             _gameInstance.TurnManager.StartNextTurn(_gameInstance.Pathfinder);

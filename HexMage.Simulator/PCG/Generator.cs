@@ -73,23 +73,25 @@ namespace HexMage.Simulator.PCG {
             Predicate<AxialCoord> isCoordAvailable = c => {
                 bool isWall = map[c] == HexType.Wall;
                 var atCoord = mobManager.AtCoord(mobManager.MobInstances[mob].Coord);
-                return !isWall && (atCoord == mob || !atCoord.HasValue);
+
+                return !isWall && (!atCoord.HasValue || (atCoord.HasValue && atCoord.Value == mob));
             };
 
             while (true)
             {
                 var x = Random.Next(-size, size);
                 var y = Random.Next(-size, size);
-                //var z = -x - y;
-                //var cube = new CubeCoord(x, y, z);
-                //var zero = new CubeCoord(0, 0, 0);
 
                 var zero = new AxialCoord(0, 0);
                 var coord = new AxialCoord(x, y);
 
                 if (isCoordAvailable(coord) && coord.Distance(zero) < size) {
-                    mobManager.SetMobPosition(mob, coord);
-                    break;
+                    if (mobManager.AtCoord(coord) == null) {
+                        mobManager.SetMobPosition(mob, coord);
+                        break;
+                    } else {
+                        throw new InvalidOperationException($"There already is a mob at {coord}");
+                    }
                 }
             }
         }
