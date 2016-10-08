@@ -3,8 +3,8 @@ using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public interface IGameEventSubscriber {
-        void EventAbilityUsed(Mob mob, Mob target, Ability ability);
-        void EventMobMoved(Mob mob, AxialCoord pos);
-        void EventDefenseDesireAcquired(Mob mob, DefenseDesire defenseDesireResult);
+        void EventAbilityUsed(MobId mobId, MobId targetId, Ability ability);
+        void EventMobMoved(MobId mobId, AxialCoord pos);
+        void EventDefenseDesireAcquired(MobId mobId, DefenseDesire defenseDesireResult);
     }
 }

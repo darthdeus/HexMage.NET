@@ -10,7 +10,7 @@ using HexMage.Simulator.PCG;
 namespace HexMage.Benchmarks {
     public class Tester {
         public void Run() {
-            var size = 7;
+            var size = 7;            
 
             var s = Stopwatch.StartNew();
             CoordRadiusCache.Instance.PrecomputeUpto(50);
@@ -32,18 +32,15 @@ namespace HexMage.Benchmarks {
             var mobManager = gameInstance.MobManager;
             var pathfinder = gameInstance.Pathfinder;
 
-            Mob m1 = null;
-            Mob m2 = null;
-
             Generator.Random = new Random(1234);
             //Generator.Random = new Random();
 
-            for (int i = 0; i < 5; i++) {
-                m1 = Generator.RandomMob(mobManager, t1, size, c => gameInstance.MobManager.AtCoord(c) == null);
-                m2 = Generator.RandomMob(mobManager, t2, size, c => gameInstance.MobManager.AtCoord(c) == null);
+            for (int i = 0; i < 5; i++) {                
+                MobInfo m1 = Generator.RandomMob(mobManager, t1, size, c => gameInstance.MobManager.AtCoord(c) == null);
+                MobInfo m2 = Generator.RandomMob(mobManager, t2, size, c => gameInstance.MobManager.AtCoord(c) == null);
 
-                mobManager.AddMob(m1);
-                mobManager.AddMob(m2);
+                mobManager.AddMobWithInfo(m1);
+                mobManager.AddMobWithInfo(m2);
             }
 
             mobManager.Teams[t1] = new AiRandomController(gameInstance);

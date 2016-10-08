@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
@@ -19,18 +20,13 @@ namespace HexMage.Simulator {
 
         public void SlowUpdateIsFinished() {
             RedAlive = 0;
-            foreach (var mob in MobManager.Mobs) {
-                if (mob.Hp > 0 && mob.Team == TeamColor.Red) { RedAlive++; }
-                if (mob.Hp > 0 && mob.Team == TeamColor.Blue) { BlueAlive++; }
-            }
-        }
+            foreach (var mobId in MobManager.Mobs) {
+                var mobInfo = MobManager.MobInfoForId(mobId);
+                var mobInstance = MobManager.MobInstanceForId(mobId);
 
-        [Obsolete]
-        public bool SlowIsFinished() {
-            return MobManager.Mobs.Where(m => m.Hp > 0)
-                             .Select(m => m.Team)
-                             .Distinct()
-                             .Count() <= 1;
+                if (mobInstance.Hp > 0 && mobInfo.Team == TeamColor.Red) { RedAlive++; }
+                if (mobInstance.Hp > 0 && mobInfo.Team == TeamColor.Blue) { BlueAlive++; }
+            }
         }
 
         public GameInstance(Map map, MobManager mobManager) {
@@ -53,12 +49,16 @@ namespace HexMage.Simulator {
             TurnManager = new TurnManager(this);
         }
 
-        public bool IsAbilityUsable(Mob mob, AbilityId abilityId) {
+        public bool IsAbilityUsable(MobId mobId, AbilityId abilityId) {
             var ability = MobManager.AbilityForId(abilityId);
+            var mob = MobManager.MobInstanceForId(mobId);
             return mob.Ap >= ability.Cost && MobManager.CooldownFor(abilityId) == 0;
         }
 
-        public bool IsAbilityUsable(Mob mob, Mob target, AbilityId abilityId) {
+        public bool IsAbilityUsable(MobId mobId, MobId targetId, AbilityId abilityId) {
+            var mob = MobManager.MobInstanceForId(mobId);
+            var target = MobManager.MobInstanceForId(targetId);
+
             var line = Map.AxialLinedraw(mob.Coord, target.Coord);
             int distance = line.Count - 1;
 
@@ -72,10 +72,14 @@ namespace HexMage.Simulator {
             var ability = MobManager.AbilityForId(abilityId);
 
             // TODO - neni tohle extra lookupovani AbilityForId zbytecny?
-            return ability.Range >= distance && IsAbilityUsable(mob, abilityId);
+            return ability.Range >= distance && IsAbilityUsable(mobId, abilityId);
         }
 
-        public DefenseDesire FastUse(AbilityId abilityId, Mob mob, Mob target) {
+
+        public DefenseDesire FastUse(AbilityId abilityId, MobId mobId, MobId targetId) {
+            new List<int>();
+            var target = MobManager.MobInstanceForId(targetId);
+            var targetInfo = MobManager.MobInfoForId(targetId);
             Debug.Assert(MobManager.CooldownFor(abilityId) == 0, "Trying to use an ability with non-zero cooldown.");
             Debug.Assert(target.Hp > 0, "Target is dead.");
 
@@ -84,20 +88,22 @@ namespace HexMage.Simulator {
             var ability = MobManager.AbilityForId(abilityId);
 
             MobManager.SetCooldownFor(abilityId, ability.Cooldown);
-            if (target.Ap >= target.DefenseCost) {
-                var controller = MobManager.Teams[target.Team];
-                var res = controller.FastRequestDesireToDefend(target, abilityId);
+            if (target.Ap >= targetInfo.DefenseCost) {
+                var controller = MobManager.Teams[targetInfo.Team];
+                var res = controller.FastRequestDesireToDefend(targetId, abilityId);
 
-                if (res == DefenseDesire.Block) {
-                    target.Ap -= target.DefenseCost;
-                    result = DefenseDesire.Block;
+                if (res == DefenseDesire.Block) {                    
+                    throw new NotImplementedException();
+#warning TODO - tohle je spatne, AP se neaktualizuje
+                    //target.Ap -= target.DefenseCost;
+                    return DefenseDesire.Block;
                 } else {
-                    TargetHit(abilityId, mob, target);
+                    TargetHit(abilityId, mobId, targetId);
 
                     result = DefenseDesire.Pass;
                 }
             } else {
-                TargetHit(abilityId, mob, target);
+                TargetHit(abilityId, mobId, targetId);
                 result = DefenseDesire.Pass;
             }
 
@@ -105,26 +111,14 @@ namespace HexMage.Simulator {
         }
 
 
-        private void TargetHit(AbilityId abilityId, Mob mob, Mob target) {
+        private void TargetHit(AbilityId abilityId, MobId mobId, MobId targetId) {
             var ability = MobManager.AbilityForId(abilityId);
-            var abilityElement = ability.Element;
-            AbilityElement opposite = OppositeElement(abilityElement);
 
-            target.Buffs.RemoveAll(b => b.Element == opposite);
+            var targetInstance = MobManager.MobInstanceForId(targetId);
+            var targetInfo = MobManager.MobInfoForId(targetId);
 
-            bool bonusDmg = false;
-
-            var bonusElement = BonusElement(abilityElement);
-            foreach (var buff in target.Buffs) {
-                if (buff.Element == bonusElement) {
-                    bonusDmg = true;
-                }
-            }
-
-            int modifier = bonusDmg ? 2 : 1;
-
-            target.Hp = Math.Max(0, target.Hp - ability.Dmg*modifier);
-            MobHpChanged(target);
+            MobManager.ChangeMobHp(targetId, -ability.Dmg);
+            MobHpChanged(targetInstance, targetInfo.Team);
 
             target.Buffs.Add(ability.ElementalEffect);
             foreach (var abilityBuff in ability.Buffs) {
@@ -139,12 +133,12 @@ namespace HexMage.Simulator {
             }
 
             // TODO - handle negative AP
-            mob.Ap -= ability.Cost;
+            MobManager.ChangeMobAp(mobId, -ability.Cost);
         }
 
-        public void MobHpChanged(Mob mob) {
-            if (mob.Hp == 0) {
-                switch (mob.Team) {
+        public void MobHpChanged(MobInstance mob, TeamColor team) {
+            if (mob.Hp == 0) {                
+                switch (team) {
                     case TeamColor.Red:
                         RedAlive--;
                         break;
@@ -155,31 +149,6 @@ namespace HexMage.Simulator {
             }
         }
 
-        //public IList<Mob> PossibleTargets(Mob mob) {
-        //    var result = new List<Mob>();
-
-        //    var ability = mob.UsableMaxRange();
-
-        //    foreach (var target in MobManager.Mobs) {
-        //        if (target.Hp > 0 && Pathfinder.Distance(target.Coord) <= ability.Range && target.Team != mob.Team) {
-        //            result.Add(target);
-        //        }
-        //    }
-
-        //    return result;
-        //}
-
-        public IList<Mob> Enemies(Mob mob) {
-            var result = new List<Mob>();
-
-            foreach (var target in MobManager.Mobs) {
-                if (target.Hp > 0 && target.Team != mob.Team) {
-                    result.Add(target);
-                }
-            }
-
-            return result;
-        }
 
         public GameInstance DeepCopy() {
 #warning TODO - tohle prepsat poradne
@@ -196,10 +165,9 @@ namespace HexMage.Simulator {
             TurnManager.Reset();
             Pathfinder.Reset();
 
-            RedAlive = MobManager.Mobs.Count(m => m.Team == TeamColor.Red);
-            BlueAlive = MobManager.Mobs.Count(m => m.Team == TeamColor.Blue);
+            RedAlive = MobManager.Mobs.Count(m => MobManager.MobInfoForId(m).Team == TeamColor.Red);
+            BlueAlive = MobManager.Mobs.Count(m => MobManager.MobInfoForId(m).Team == TeamColor.Blue);
         }
-
 
         private AbilityElement BonusElement(AbilityElement element) {
             switch (element) {
@@ -231,7 +199,7 @@ namespace HexMage.Simulator {
             }
         }
 
-        public void FastUseWithDefenseDesire(Mob mob, Mob target, AbilityId ability,
+        public void FastUseWithDefenseDesire(MobId mob, MobId target, AbilityId ability,
                                              DefenseDesire defenseDesire) {
             throw new NotImplementedException();
         }

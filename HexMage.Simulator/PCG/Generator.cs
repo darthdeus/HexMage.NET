@@ -45,32 +45,52 @@ namespace HexMage.Simulator.PCG {
     public static class Generator {
         public static Random Random = new Random();
 
-        public static GameInstance RandomGame(int size, MapSeed seed, int teamSize, Func<GameInstance, IMobController> controllerFunc) {
-            var map = new MapGenerator().Generate(size, seed);
-            var game = new GameInstance(map);
+        //public static GameInstance RandomGame(int size, MapSeed seed, int teamSize, Func<GameInstance, IMobController> controllerFunc) {
+        //    var map = new MapGenerator().Generate(size, seed);
+        //    var game = new GameInstance(map);
 
-            const TeamColor t1 = TeamColor.Red;
-            const TeamColor t2 = TeamColor.Blue;
+        //    const TeamColor t1 = TeamColor.Red;
+        //    const TeamColor t2 = TeamColor.Blue;
 
-            game.MobManager.Teams[t1] = controllerFunc(game);
-            game.MobManager.Teams[t2] = controllerFunc(game);
+        //    game.MobManager.Teams[t1] = controllerFunc(game);
+        //    game.MobManager.Teams[t2] = controllerFunc(game);
 
-            for (int i = 0; i < teamSize; i++) {
-                game.MobManager.AddMob(RandomMob(game.MobManager, t1, size, c => game.MobManager.AtCoord(c) == null));
-                game.MobManager.AddMob(RandomMob(game.MobManager, t2, size, c => game.MobManager.AtCoord(c) == null));
+        //    for (int i = 0; i < teamSize; i++) {
+        //        game.MobManager.AddMob(RandomMob(game.MobManager, t1, size, c => game.MobManager.AtCoord(c) == null));
+        //        game.MobManager.AddMob(RandomMob(game.MobManager, t2, size, c => game.MobManager.AtCoord(c) == null));
+        //    }
+
+        //    game.RedAlive = teamSize;
+        //    game.BlueAlive = teamSize;
+
+        //    return game;
+        //}
+
+        public static void RandomPlaceMob(MobManager mobManager, MobId mob, int size, Predicate<AxialCoord> isCoordAvailable) {
+
+            while (true)
+            {
+                var x = Random.Next(-size, size);
+                var y = Random.Next(-size, size);
+                //var z = -x - y;
+                //var cube = new CubeCoord(x, y, z);
+                //var zero = new CubeCoord(0, 0, 0);
+
+                var zero = new AxialCoord(0, 0);
+                var coord = new AxialCoord(x, y);
+
+                if (isCoordAvailable(coord) && coord.Distance(zero) < size) {
+                    mobManager.SetMobPosition(mob, coord);
+                    break;
+                }
             }
-
-            game.RedAlive = teamSize;
-            game.BlueAlive = teamSize;
-
-            return game;
         }
 
-        public static Mob RandomMob(MobManager mobManager, TeamColor team, int size) {
+        public static MobInfo RandomMob(MobManager mobManager, TeamColor team, int size) {
             return RandomMob(mobManager, team, size, _ => true);
         }
 
-        public static Mob RandomMob(MobManager mobManager, TeamColor team, int size,
+        public static MobInfo RandomMob(MobManager mobManager, TeamColor team, int size,
             Predicate<AxialCoord> isCoordAvailable) {
             var elements = new[] {
                 AbilityElement.Earth, AbilityElement.Fire, AbilityElement.Air, AbilityElement.Water
@@ -78,7 +98,7 @@ namespace HexMage.Simulator.PCG {
 
             var abilities = new List<AbilityId>();
 
-            for (int i = 0; i < Mob.AbilityCount; i++) {
+            for (int i = 0; i < MobInfo.AbilityCount; i++) {
                 var element = elements[Random.Next(0, 4)];
                 var buffs = RandomBuffs(element);
 
@@ -102,26 +122,8 @@ namespace HexMage.Simulator.PCG {
 
             int iniciative = Random.Next(10);
 
-            var mob = new Mob(team, 10, 10, 3, iniciative, abilities);
-
-            while (true) {
-                var x = Random.Next(-size, size);
-                var y = Random.Next(-size, size);
-                //var z = -x - y;
-                //var cube = new CubeCoord(x, y, z);
-                //var zero = new CubeCoord(0, 0, 0);
-
-                var zero = new AxialCoord(0, 0);
-                var coord = new AxialCoord(x, y);
-
-                if (isCoordAvailable(coord) && coord.Distance(zero) < size) {
-                    mob.Coord = coord;
-                    mob.OrigCoord = coord;
-                    break;
-                }
-            }
-
-            return mob;
+#warning TODO - generated mobs do not have their coords assigned
+            return new MobInfo(team, 10, 10, 3, iniciative, abilities);
         }
 
         public static List<Buff> RandomBuffs(AbilityElement element) {

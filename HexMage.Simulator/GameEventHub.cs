@@ -49,7 +49,7 @@ namespace HexMage.Simulator {
             _subscribers.Add(subscriber);
         }
 
-        public void BroadcastMobMoved(Mob mob, AxialCoord pos) {
+        public void BroadcastMobMoved(MobId mob, AxialCoord pos) {
             foreach (var subscriber in _subscribers) {
                 subscriber.EventMobMoved(mob, pos);
             }
@@ -57,18 +57,18 @@ namespace HexMage.Simulator {
             _gameInstance.MobManager.FastMoveMob(_gameInstance.Map, _gameInstance.Pathfinder, mob, pos);
         }
 
-        public void BroadcastAbilityUsed(Mob mob, Mob target, AbilityId abilityId) {
+        public void BroadcastAbilityUsed(MobId mobId, MobId targetId, AbilityId abilityId) {
             var ability = _gameInstance.MobManager.AbilityForId(abilityId);
             foreach (var subscriber in _subscribers) {
-                subscriber.EventAbilityUsed(mob, target, ability);
+                subscriber.EventAbilityUsed(mobId, targetId, ability);
             }
 
-            var defenseDesireResult = _gameInstance.FastUse(abilityId, mob, target);
+            var defenseDesireResult = _gameInstance.FastUse(abilityId, mobId, targetId);
 
-            BroadcastDefenseDesire(target, defenseDesireResult);
+            BroadcastDefenseDesire(targetId, defenseDesireResult);
         }
 
-        public void BroadcastAbilityUsedWithDefense(Mob mob, Mob target, AbilityId abilityId,
+        public void BroadcastAbilityUsedWithDefense(MobId mob, MobId target, AbilityId abilityId,
             DefenseDesire defenseDesire) {
             var ability = _gameInstance.MobManager.AbilityForId(abilityId);
 
@@ -81,7 +81,7 @@ namespace HexMage.Simulator {
             BroadcastDefenseDesire(target, defenseDesire);
         }
 
-        public void BroadcastDefenseDesire(Mob mob, DefenseDesire defenseDesireResult) {
+        public void BroadcastDefenseDesire(MobId mob, DefenseDesire defenseDesireResult) {
             foreach (var subscriber in _subscribers) {
                 subscriber.EventDefenseDesireAcquired(mob, defenseDesireResult);
             }

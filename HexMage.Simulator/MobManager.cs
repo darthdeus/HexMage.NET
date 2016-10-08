@@ -7,28 +7,30 @@ using HexMage.Simulator.Model;
 namespace HexMage.Simulator {
     public class MobManager : IDeepCopyable<MobManager>, IResettable {
         public List<Ability> Abilities = new List<Ability>();
-        public List<Mob> Mobs = new List<Mob>();
+        public List<MobId> Mobs = new List<MobId>();
+        public List<MobInfo> MobInfos = new List<MobInfo>();
+        public List<MobInstance> MobInstances = new List<MobInstance>();
         public List<int> Cooldowns = new List<int>();
 
         public readonly Dictionary<TeamColor, IMobController> Teams = new Dictionary<TeamColor, IMobController>();
 
-        public bool MoveOneHex(Mob mob, AxialCoord to) {
-            if (mob.Coord == to) {
-                Utils.Log(LogSeverity.Debug, nameof(MobManager), "MoveMob failed trying to move zero distance.");
-                return false;
-            }
-            Debug.Assert(mob.Coord != to, "Trying to move zero distance.");
-            Debug.Assert(mob.Coord.Distance(to) == 1, "Trying to walk more than 1 hex");
+        //public bool MoveOneHex(Mob mob, AxialCoord to) {
+        //    if (mob.Coord == to) {
+        //        Utils.Log(LogSeverity.Debug, nameof(MobManager), "MoveMob failed trying to move zero distance.");
+        //        return false;
+        //    }
+        //    Debug.Assert(mob.Coord != to, "Trying to move zero distance.");
+        //    Debug.Assert(mob.Coord.Distance(to) == 1, "Trying to walk more than 1 hex");
 
-            if (mob.Ap > 0) {
-                mob.Coord = to;
-                mob.Ap--;
+        //    if (mob.Ap > 0) {
+        //        mob.Coord = to;
+        //        mob.Ap--;
 
-                return true;
-            } else {
-                return false;
-            }
-        }
+        //        return true;
+        //    } else {
+        //        return false;
+        //    }
+        //}
 
         public Ability AbilityForId(AbilityId id) {
             return Abilities[id.Id];
@@ -42,29 +44,48 @@ namespace HexMage.Simulator {
             Cooldowns[id.Id] = cooldown;
         }
 
-        public Mob AtCoord(AxialCoord c) {
-            foreach (var mob in Mobs) {
-                if (mob.Coord.Equals(c)) {
-                    return mob;
+        public MobId? AtCoord(AxialCoord c) {
+            foreach (var mobId in Mobs) {
+                var mobInstance = MobInstanceForId(mobId);
+                if (mobInstance.Coord.Equals(c)) {
+                    return mobId;
                 }
             }
 
             return null;
         }
 
-        public void AddMob(Mob mob) {
-            Mobs.Add(mob);
+        public MobId AddMobWithInfo(MobInfo mobInfo) {
+            var id = new MobId(Mobs.Count);
+            Mobs.Add(id);
+
+            MobInfos.Add(mobInfo);
+            MobInstances.Add(new MobInstance(id));
+
+            return id;
+        }
+
+
+        public void ChangeMobHp(MobId mobId, int hpChange) {
+            
+        }
+
+        public void ChangeMobAp(MobId mobId, int hpChange)
+        {
+
         }
 
         public void ApplyDots(Map map, GameInstance gameInstance) {
-            foreach (var mob in Mobs) {
-                var buffs = mob.Buffs;
+            foreach (var mobId in Mobs) {
+                var mobInfo = MobInfoForId(mobId);
+                
+                var buffs = mobInfo.Buffs;
                 for (int i = 0; i < buffs.Count; i++) {
                     var buff = buffs[i];
 
-                    mob.Ap += buff.ApChange;
-                    mob.Hp += buff.HpChange;     
-                    gameInstance.MobHpChanged(mob);               
+                    ChangeMobHp(mobId, buff.HpChange);
+                    ChangeMobAp(mobId, buff.ApChange);
+                    gameInstance.MobHpChanged(MobInstanceForId(mobId), MobInfoForId(mobId).Team);               
                     buff.Lifetime--;
                     buffs[i] = buff;
                 }
@@ -76,11 +97,11 @@ namespace HexMage.Simulator {
 
             for (int i = 0; i < map.AreaBuffs.Count; i++) {
                 var areaBuff = map.AreaBuffs[i];
-                foreach (var mob in Mobs) {
-                    if (map.AxialDistance(mob.Coord, areaBuff.Coord) <= areaBuff.Radius) {
-                        mob.Ap += areaBuff.Effect.ApChange;
-                        mob.Hp += areaBuff.Effect.HpChange;
-                        gameInstance.MobHpChanged(mob);
+                foreach (var mobId in Mobs) {
+                    if (map.AxialDistance(MobInstanceForId(mobId).Coord, areaBuff.Coord) <= areaBuff.Radius) {
+                        ChangeMobHp(mobId, areaBuff.Effect.HpChange);
+                        ChangeMobAp(mobId, areaBuff.Effect.ApChange);
+                        gameInstance.MobHpChanged(MobInstanceForId(mobId), MobInfoForId(mobId).Team);
                     }
                 }
 
@@ -103,15 +124,18 @@ namespace HexMage.Simulator {
             map.AreaBuffs = newBuffs;
         }
 
-        public void FastMoveMob(Map map, Pathfinder pathfinder, Mob mob, AxialCoord pos) {
-            int distance = mob.Coord.Distance(pos);
+        public void FastMoveMob(Map map, Pathfinder pathfinder, MobId mobId, AxialCoord pos) {
+            var mobInfo = MobInfoForId(mobId);
+            var mobInstance = MobInstanceForId(mobId);
 
-            Debug.Assert(distance <= mob.Ap, "Trying to move a mob that doesn't have enough AP.");
+            int distance = mobInstance.Coord.Distance(pos);
+
+            Debug.Assert(distance <= mobInstance.Ap, "Trying to move a mob that doesn't have enough AP.");
             Debug.Assert(map[pos] == HexType.Empty, "Trying to move a mob into a wall.");
             Debug.Assert(AtCoord(pos) == null, "Trying to move into a mob.");
 
-            mob.Ap -= distance;
-            mob.Coord = pos;
+            mobInstance.Ap -= distance;
+            mobInstance.Coord = pos;
             pathfinder.PathfindFrom(pos);
         }
 
@@ -148,6 +172,25 @@ namespace HexMage.Simulator {
             foreach (var mob in Mobs) {
                 mob.Reset();
             }
+        }
+
+        public MobInfo MobInfoForId(MobId mobId) {
+            throw new NotImplementedException();
+        }
+
+        public MobInstance MobInstanceForId(MobId mobId) {
+            throw new NotImplementedException();
+        }
+
+        public void ResetAp(MobId mobId) {
+            throw new NotImplementedException();
+        }
+
+        public void SetMobPosition(MobId mobId, AxialCoord coord) {
+            var instance = MobInstanceForId(mobId);
+            instance.Coord = coord;
+            instance.OrigCoord = coord;
+            MobInstances[mobId.Id] = instance;
         }
     }
 }

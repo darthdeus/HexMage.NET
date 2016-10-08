@@ -3,7 +3,7 @@ using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public interface IMobController {
-        DefenseDesire FastRequestDesireToDefend(Mob mob, AbilityId abilityId);
+        DefenseDesire FastRequestDesireToDefend(MobId mobId, AbilityId abilityId);
         void FastPlayTurn(GameEventHub eventHub);
         void FastRandomAction(GameEventHub eventHub);
 

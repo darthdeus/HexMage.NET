@@ -41,7 +41,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AiRandomController.cs" />
-    <Compile Include="AI\IPlayer.cs" />
     <Compile Include="GameEventHub.cs" />
     <Compile Include="IDeepCopyable.cs" />
     <Compile Include="IGameEventSubscriber.cs" />
@@ -71,6 +70,9 @@
     <Compile Include="Pathfinding\Path.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TurnManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="AI\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

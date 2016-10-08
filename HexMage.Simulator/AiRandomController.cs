@@ -12,7 +12,7 @@ namespace HexMage.Simulator {
             _gameInstance = gameInstance;
         }
 
-        public DefenseDesire FastRequestDesireToDefend(Mob mob, AbilityId ability) {
+        public DefenseDesire FastRequestDesireToDefend(MobId mobId, AbilityId ability) {
             return DefenseDesire.Pass;
         }
 
@@ -22,26 +22,35 @@ namespace HexMage.Simulator {
         }
 
         public void FastRandomAction(GameEventHub eventHub) {
-            var mob = _gameInstance.TurnManager.CurrentMob;
+            var mobId = _gameInstance.TurnManager.CurrentMob;
+
+            if (mobId == null) throw new InvalidOperationException("Requesting mob action when there is no current mob.");
+
             var pathfinder = _gameInstance.Pathfinder;
 
+            var mobInfo = _gameInstance.MobManager.MobInfoForId(mobId.Value);
+            var mobInstance = _gameInstance.MobManager.MobInstanceForId(mobId.Value);
+
             Ability ability = null;
-            foreach (var possibleAbilityId in mob.Abilities) {
+            foreach (var possibleAbilityId in mobInfo.Abilities) {
                 var possibleAbility = _gameInstance.MobManager.AbilityForId(possibleAbilityId);
 
-                if (possibleAbility.Cost <= mob.Ap && _gameInstance.MobManager.CooldownFor(possibleAbilityId) == 0) {
+                if (possibleAbility.Cost <= mobInstance.Ap && _gameInstance.MobManager.CooldownFor(possibleAbilityId) == 0) {
                     ability = possibleAbility;
                 }
             }
 
-            Mob spellTarget = null;
-            Mob moveTarget = null;
+            MobId spellTarget = MobId.Invalid;
+            MobId moveTarget = MobId.Invalid;
+
             foreach (var possibleTarget in _gameInstance.MobManager.Mobs) {
-                if (possibleTarget.Hp <= 0) continue;
+                var possibleTargetInstance = _gameInstance.MobManager.MobInstanceForId(possibleTarget);
+                var possibleTargetInfo = _gameInstance.MobManager.MobInfoForId(possibleTarget);
+                if (possibleTargetInstance.Hp <= 0) continue;
 
                 // TODO - mela by to byt viditelna vzdalenost
-                if (possibleTarget.Team != mob.Team) {
-                    if (pathfinder.Distance(possibleTarget.Coord) <= ability.Range) {
+                if (possibleTargetInfo.Team != mobInfo.Team) {
+                    if (pathfinder.Distance(possibleTargetInstance.Coord) <= ability.Range) {
                         spellTarget = possibleTarget;
                         break;
                     }
@@ -50,27 +59,29 @@ namespace HexMage.Simulator {
                 }
             }
 
-            if (spellTarget != null) {
-                _gameInstance.FastUse(ability.AbilityId, mob, spellTarget);
-            } else if (moveTarget != null) {
+            if (spellTarget == MobId.Invalid) {
+                _gameInstance.FastUse(ability.AbilityId, mobId.Value, spellTarget);
+            } else if (moveTarget == MobId.Invalid) {
                 //Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
                 //    $"There are no targets, moving towards a random enemy at {moveTarget.Coord}");
-                FastMoveTowardsEnemy(mob, moveTarget);
+                FastMoveTowardsEnemy(mobId.Value, moveTarget);
             } else {
                 throw new InvalidOperationException("No targets, game should be over.");
             }
         }
 
-        private void FastMoveTowardsEnemy(Mob mob, Mob target) {
+        private void FastMoveTowardsEnemy(MobId mobId, MobId targetId) {
             var pathfinder = _gameInstance.Pathfinder;
+            var mobInstance = _gameInstance.MobManager.MobInstanceForId(mobId);
+            var targetInstance = _gameInstance.MobManager.MobInstanceForId(targetId);
 
-            var moveTarget = pathfinder.FurthestPointToTarget(mob, target);
+            var moveTarget = pathfinder.FurthestPointToTarget(mobInstance, targetInstance);
 
-            if (moveTarget != null && pathfinder.Distance(moveTarget.Value) <= mob.Ap) {
-                _gameInstance.MobManager.FastMoveMob(_gameInstance.Map, _gameInstance.Pathfinder, mob, moveTarget.Value);
+            if (moveTarget != null && pathfinder.Distance(moveTarget.Value) <= mobInstance.Ap) {
+                _gameInstance.MobManager.FastMoveMob(_gameInstance.Map, _gameInstance.Pathfinder, mobId, moveTarget.Value);
             } else {
                 Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
-                    $"Move failed since target is too close, source {mob.Coord}, target {target.Coord}");
+                    $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
             }
         }
 

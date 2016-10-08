@@ -37,7 +37,7 @@ namespace HexMage.Simulator {
             // Right now we're not caching anything, so there's nothing to reset
         }
 
-        public AxialCoord? FurthestPointToTarget(Mob mob, Mob target) {
+        public AxialCoord? FurthestPointToTarget(MobInstance mob, MobInstance target) {
             int iterations = 0;
             while (true) {
                 if (iterations++ > 1000)
