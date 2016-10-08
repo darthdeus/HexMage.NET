@@ -10,10 +10,10 @@ namespace HexMage.GUI.Renderers {
     public class SpellRenderer : IRenderer {
         private readonly GameInstance _gameInstance;
         private readonly GameBoardController _gameBoardController;
-        private readonly Func<Mob> _mobFunc;
+        private readonly Func<MobId?> _mobFunc;
         private readonly int _abilityIndex;
 
-        public SpellRenderer(GameInstance gameInstance, GameBoardController gameBoardController, Func<Mob> mobFunc , int abilityIndex) {
+        public SpellRenderer(GameInstance gameInstance, GameBoardController gameBoardController, Func<MobId?> mobFunc , int abilityIndex) {
             _gameInstance = gameInstance;
             _gameBoardController = gameBoardController;
             _mobFunc = mobFunc;
@@ -28,13 +28,14 @@ namespace HexMage.GUI.Renderers {
             //effect.Parameters["Time"].SetValue(time);
             batch.Begin(effect: effect);
 
-            var mob = _mobFunc();
-            if (mob != null) {
-                var abilityId = mob.Abilities[_abilityIndex];
+            var mobId = _mobFunc();
+            if (mobId != null) {
+                var mobInfo = _gameInstance.MobManager.MobInfoForId(mobId.Value);
+                var abilityId = mobInfo.Abilities[_abilityIndex];
 
                 var isActive = _gameBoardController.SelectedAbilityIndex == _abilityIndex;
 
-                if (_gameInstance.IsAbilityUsable(mob, abilityId)) {
+                if (_gameInstance.IsAbilityUsable(mobId.Value, abilityId)) {
                     isActive = true;
                 }
 

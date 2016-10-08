@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 namespace HexMage.GUI.Components {
     public class AbilityUpdater : Component {
         private readonly Func<GameInstance> _gameFunc;
-        private readonly Func<Mob> _mobFunc;
+        private readonly Func<MobId?> _mobFunc;
         private readonly int _abilityIndex;
         private readonly Label _dmgLabel;
         private readonly Label _rangeLabel;
@@ -20,7 +20,7 @@ namespace HexMage.GUI.Components {
 
         public event Action<int> OnClick;
 
-        public AbilityUpdater(Func<GameInstance> gameFunc, Func<Mob> mobFunc, int abilityIndex, Label dmgLabel, Label rangeLabel,
+        public AbilityUpdater(Func<GameInstance> gameFunc, Func<MobId?> mobFunc, int abilityIndex, Label dmgLabel, Label rangeLabel,
                               Label elementLabel, Label cooldownLabel, Label buffsLabel) {
             _gameFunc = gameFunc;
             _mobFunc = mobFunc;
@@ -33,13 +33,17 @@ namespace HexMage.GUI.Components {
         }
 
         public override void Update(GameTime time) {
-            var mob = _mobFunc();
-            if (mob != null) {
-                Debug.Assert(mob.Abilities.Count == Mob.AbilityCount);
-                Debug.Assert(_abilityIndex < mob.Abilities.Count);
-
+            var mobId = _mobFunc();
+            if (mobId != null) {
                 var mobManager = _gameFunc().MobManager;
-                var abilityId = mob.Abilities[_abilityIndex];
+
+                var mobInstance = mobManager.MobInstanceForId(mobId.Value);
+                var mobInfo = mobManager.MobInfoForId(mobId.Value);
+
+                Debug.Assert(mobInfo.Abilities.Count == MobInfo.AbilityCount);
+                Debug.Assert(_abilityIndex < mobInfo.Abilities.Count);
+
+                var abilityId = mobInfo.Abilities[_abilityIndex];
                 _ability = mobManager.AbilityForId(abilityId);
 
                 var inputManager = InputManager.Instance;

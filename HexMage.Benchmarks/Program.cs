@@ -116,7 +116,7 @@ namespace HexMage.Benchmarks {
 
                     stopwatch.Start();
 #if FAST
-                    var rounds = hub.FastMainLoop(TimeSpan.FromMilliseconds(100));
+                    var rounds = hub.FastMainLoop(TimeSpan.Zero);
                     stopwatch.Stop();
 
                     roundsPerThousand += rounds;

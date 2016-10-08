@@ -33,6 +33,10 @@ namespace HexMage.Simulator.Model {
         public static bool operator !=(MobId left, MobId right) {
             return !left.Equals(right);
         }
+
+        public override string ToString() {
+            return $"MobId#{Id}";
+        }
     }
 
     public struct MobInfo {

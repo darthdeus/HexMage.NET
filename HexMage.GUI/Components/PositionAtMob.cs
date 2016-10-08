@@ -4,16 +4,18 @@ using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.Components {
     public class PositionAtMob : Component {
-        private readonly Mob _mob;
+        private readonly MobManager _mobManager;
+        private readonly MobId _mobId;
 
-        public PositionAtMob(Mob mob) {
-            _mob = mob;
+        public PositionAtMob(MobManager mobManager, MobId mobId) {
+            _mobManager = mobManager;
+            _mobId = mobId;
         }
 
         public override void Update(GameTime time) {
             base.Update(time);
 
-            Entity.Position = Camera2D.Instance.HexToPixel(_mob.Coord);
+            Entity.Position = Camera2D.Instance.HexToPixel(_mobManager.MobInstanceForId(_mobId).Coord);
         }
     }
 }
