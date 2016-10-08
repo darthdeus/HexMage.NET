@@ -144,36 +144,37 @@ namespace HexMage.GUI.Scenes {
             _t2Preview.ClearChildren();
 
             for (int i = 0; i < t1size; i++) {
-                var mob = Generator.RandomMob(_mobManager, t1, _map.Size, c =>
-                                                      _mobManager.AtCoord(c) == null && _map[c] == HexType.Empty);
+                var mobInfo = Generator.RandomMob(_mobManager, t1);
+                var mobId = _mobManager.AddMobWithInfo(mobInfo);
+                Generator.RandomPlaceMob(_gameInstance.MobManager, mobId, _map);
 
-                _mobManager.AddMob(mob);
 
-                _t1Preview.AddChild(BuildMobPreview(() => mob));
+                _t1Preview.AddChild(BuildMobPreview(() => mobId));
             }
 
             for (int i = 0; i < t2size; i++) {
-                var mob = Generator.RandomMob(_mobManager, t2, _map.Size, c =>
-                                                      _mobManager.AtCoord(c) == null && _map[c] == HexType.Empty);
+                var mobInfo = Generator.RandomMob(_mobManager, t2);
+                var mobId = _mobManager.AddMobWithInfo(mobInfo);
+                Generator.RandomPlaceMob(_gameInstance.MobManager, mobId, _map);
 
-                _mobManager.AddMob(mob);
-
-                _t2Preview.AddChild(BuildMobPreview(() => mob));
+                _t2Preview.AddChild(BuildMobPreview(() => mobId));
             }
 
             _gameInstance.RedAlive = t1size;
             _gameInstance.BlueAlive = t2size;
         }
 
-        public Entity BuildMobPreview(Func<Mob> mobFunc) {
+        public Entity BuildMobPreview(Func<MobId> mobFunc) {
             Func<string> textFunc = () => {
                 var builder = new StringBuilder();
 
-                var mob = mobFunc();
+                var mobId = mobFunc();
 
-                builder.AppendLine(mob.ToString());
+                builder.AppendLine(mobId.ToString());
 
-                foreach (var abilityId in mob.Abilities) {
+                var mobInfo = _gameInstance.MobManager.MobInfos[mobId];
+
+                foreach (var abilityId in mobInfo.Abilities) {
                     var ability = _gameInstance.MobManager.AbilityForId(abilityId);
                     builder.AppendLine("-----");
                     builder.AppendLine(

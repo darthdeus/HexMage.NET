@@ -12,11 +12,11 @@ namespace HexMage.GUI.Components {
         private AxialCoord _destination;
         private AxialCoord _source;
         private bool _animateMovement;
-        public Mob Mob { get; set; }
+        public MobId MobId { get; set; }
 
-        public MobEntity(Mob mob, GameInstance gameInstance) {
+        public MobEntity(MobId mobId, GameInstance gameInstance) {
             _gameInstance = gameInstance;
-            Mob = mob;
+            MobId = mobId;
         }
 
         protected override void Update(GameTime time) {
@@ -41,7 +41,8 @@ namespace HexMage.GUI.Components {
 
                 Position = sourcePos + _moveProgress*(destinationPos - sourcePos);
             } else {
-                Position = camera.HexToPixel(Mob.Coord);
+                var coord = _gameInstance.MobManager.MobInstanceForId(MobId).Coord;
+                Position = camera.HexToPixel(coord);
             }
         }
 
@@ -69,7 +70,7 @@ namespace HexMage.GUI.Components {
             _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             _moveProgress = 0.0f;
             _destination = coord;
-            _source = Mob.Coord;
+            _source = _gameInstance.MobManager.MobInstanceForId(MobId).Coord;
             _animateMovement = true;
 
             return _tcs.Task;

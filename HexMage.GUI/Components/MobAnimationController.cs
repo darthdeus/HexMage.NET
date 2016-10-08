@@ -7,8 +7,8 @@ using Microsoft.Xna.Framework;
 namespace HexMage.GUI.Components {
     public class MobAnimationController : Component {
         private MobEntity _mobEntity;
-        private Mob _mob;
-        private MobRenderer _mobRenderer;
+        private MobId _mobId;
+        private GameInstance _gameInstance;
 
         private TimeSpan _time;
         private Animation _animationClicked;
@@ -16,12 +16,15 @@ namespace HexMage.GUI.Components {
 
         public Animation CurrentAnimation { get; set; }
 
+        public MobAnimationController(GameInstance gameInstance) {
+            _gameInstance = gameInstance;
+        }
+
         public override void Initialize(AssetManager assetManager) {
             base.Initialize(assetManager);
 
             _mobEntity = (MobEntity) Entity;
-            _mob = _mobEntity.Mob;
-            _mobRenderer = (MobRenderer) _mobEntity.Renderer;
+            _mobId = _mobEntity.MobId;
 
             const int idleFrameCount = 2;
             _animationIdle = new Animation(AssetManager.DarkMageIdle, TimeSpan.FromMilliseconds(500),
@@ -39,7 +42,7 @@ namespace HexMage.GUI.Components {
             base.Update(time);
 
             var mouseHex = Camera2D.Instance.MouseHex;
-            if (_mob.Coord.Equals(mouseHex)) {
+            if (_gameInstance.MobManager.MobInstances[_mobId].Coord.Equals(mouseHex)) {
                 SwitchAnimation(_animationClicked);
             }
 

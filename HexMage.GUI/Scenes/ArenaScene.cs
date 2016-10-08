@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using HexMage.GUI.Components;
@@ -15,6 +16,7 @@ namespace HexMage.GUI.Scenes {
         private readonly GameInstance _gameInstance;
         private readonly Entity _defenseModal;
         private readonly GameEventHub _gameEventHub;
+        private readonly Dictionary<MobId, MobEntity> _metadata = new Dictionary<MobId, MobEntity>();
 
         public ArenaScene(GameManager gameManager, GameInstance gameInstance) : base(gameManager) {
             _gameInstance = gameInstance;
@@ -110,8 +112,8 @@ namespace HexMage.GUI.Scenes {
 
 #warning TODO - this shouldn't be a func, but rater pass it directly
             Func<GameInstance> gameFunc = () => _gameInstance;
-            Func<Mob> currentMobFunc = () => _gameInstance.TurnManager.CurrentMob;
-            Func<Mob> hoverMobFunc = () => {
+            Func<MobId?> currentMobFunc = () => _gameInstance.TurnManager.CurrentMob;
+            Func<MobId?> hoverMobFunc = () => {
                 var mouseHex = Camera2D.Instance.MouseHex;
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
                     return _gameInstance.MobManager.AtCoord(mouseHex);
@@ -120,13 +122,13 @@ namespace HexMage.GUI.Scenes {
                 }
             };
 
-            for (int i = 0; i < Mob.NumberOfAbilities; i++) {
+            for (int i = 0; i < MobInfo.NumberOfAbilities; i++) {
                 currentLayout.AddChild(AbilityDetail(gameFunc, currentMobFunc, i, ParticleEffectSettings.HighlightParticles));
                 hoverLayout.AddChild(AbilityDetail(gameFunc, hoverMobFunc, i, ParticleEffectSettings.NoParticles));
             }
         }
 
-        private Entity AbilityDetail(Func<GameInstance> gameFunc, Func<Mob> mobFunc, int abilityIndex, ParticleEffectSettings particleEffectSettings) {
+        private Entity AbilityDetail(Func<GameInstance> gameFunc, Func<MobId?> mobFunc, int abilityIndex, ParticleEffectSettings particleEffectSettings) {
             var abilityDetailWrapper = new Entity {
                 SizeFunc = () => new Vector2(120, 80)
             };
@@ -185,7 +187,7 @@ namespace HexMage.GUI.Scenes {
                     var mob = mobFunc();
                     if (_gameBoardController.SelectedAbilityIndex.HasValue && mob != null) {
                         int index = _gameBoardController.SelectedAbilityIndex.Value;
-                        var ability = _gameInstance.MobManager.AbilityForId(mob.Abilities[index]);
+                        var ability = _gameInstance.MobManager.AbilityForId(_gameInstance.MobManager.MobInfos[mob.Value].Abilities[index]);
                         return ElementColor(ability.Element);
                     } else {
                         return Color.White;

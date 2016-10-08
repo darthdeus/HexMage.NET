@@ -42,8 +42,8 @@ namespace HexMage.Benchmarks {
                 MobId m1 = mobManager.AddMobWithInfo(mi1);
                 MobId m2 = mobManager.AddMobWithInfo(mi2);
 
-                Generator.RandomPlaceMob(mobManager, m1, size, c => gameInstance.MobManager.AtCoord(c) == null);
-                Generator.RandomPlaceMob(mobManager, m2, size, c => gameInstance.MobManager.AtCoord(c) == null);
+                Generator.RandomPlaceMob(mobManager, m1, gameInstance.Map);
+                Generator.RandomPlaceMob(mobManager, m2, gameInstance.Map);
             }
 
             mobManager.Teams[t1] = new AiRandomController(gameInstance);
