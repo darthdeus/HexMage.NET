@@ -25,8 +25,12 @@ namespace HexMage.Simulator {
                 var mobInfo = MobManager.MobInfoForId(mobId);
                 var mobInstance = MobManager.MobInstanceForId(mobId);
 
-                if (mobInstance.Hp > 0 && mobInfo.Team == TeamColor.Red) { RedAlive++; }
-                if (mobInstance.Hp > 0 && mobInfo.Team == TeamColor.Blue) { BlueAlive++; }
+                if (mobInstance.Hp > 0 && mobInfo.Team == TeamColor.Red) {
+                    RedAlive++;
+                }
+                if (mobInstance.Hp > 0 && mobInfo.Team == TeamColor.Blue) {
+                    BlueAlive++;
+                }
             }
         }
 
@@ -92,7 +96,7 @@ namespace HexMage.Simulator {
                 var controller = MobManager.Teams[targetInfo.Team];
                 var res = controller.FastRequestDesireToDefend(targetId, abilityId);
 
-                if (res == DefenseDesire.Block) {                    
+                if (res == DefenseDesire.Block) {
                     throw new NotImplementedException();
 #warning TODO - tohle je spatne, AP se neaktualizuje
                     //target.Ap -= target.DefenseCost;
@@ -136,7 +140,7 @@ namespace HexMage.Simulator {
         }
 
         public void MobHpChanged(int hp, TeamColor team) {
-            if (hp <= 0) {                
+            if (hp <= 0) {
                 switch (team) {
                     case TeamColor.Red:
                         RedAlive--;
@@ -165,8 +169,18 @@ namespace HexMage.Simulator {
             TurnManager.Reset();
             Pathfinder.Reset();
 
-            RedAlive = MobManager.Mobs.Count(m => MobManager.MobInfoForId(m).Team == TeamColor.Red);
-            BlueAlive = MobManager.Mobs.Count(m => MobManager.MobInfoForId(m).Team == TeamColor.Blue);
+            RedAlive = 0;
+            BlueAlive = 0;
+
+            foreach (var mob in MobManager.MobInfos) {
+                if (mob.Team == TeamColor.Red) {
+                    RedAlive++;
+                }
+
+                if (mob.Team == TeamColor.Blue) {
+                    BlueAlive++;
+                }
+            }
         }
 
         private AbilityElement BonusElement(AbilityElement element) {
