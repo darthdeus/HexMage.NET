@@ -36,6 +36,9 @@ namespace HexMage.GUI.Scenes {
             _gameInstance.MobManager.Reset();
             _gameInstance.Map.PrecomputeCubeLinedraw();
             _gameInstance.Pathfinder.PathfindDistanceAll();
+
+            // TODO - vyresit kdy presne volat presort (mozna nejaky unifikovany initialize?)
+            _gameInstance.TurnManager.PresortTurnOrder();
             _gameInstance.TurnManager.StartNextTurn(_gameInstance.Pathfinder);
 
             Camera2D.Instance.Translate = new Vector3(600, 500, 0);

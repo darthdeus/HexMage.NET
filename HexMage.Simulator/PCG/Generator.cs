@@ -77,11 +77,10 @@ namespace HexMage.Simulator.PCG {
             };
 
             var copy = mobManager.MobInstances[mob];
-            copy.Coord = new AxialCoord(int.MaxValue, int.MaxValue);
+            copy.Coord = AxialCoord.Zero;
             mobManager.MobInstances[mob] = copy;
 
-            while (true)
-            {
+            while (true) {
                 var x = Random.Next(-size, size);
                 var y = Random.Next(-size, size);
 
@@ -114,13 +113,13 @@ namespace HexMage.Simulator.PCG {
 
                 int id = mobManager.Abilities.Count;
                 var ability = new Ability(id,
-                    Random.Next(1, 10),
-                    Random.Next(3, 7),
-                    Random.Next(3, 10),
-                    Random.Next(0, 3),
-                    element,
-                    buffs,
-                    areaBuffs);
+                                          Random.Next(1, 10),
+                                          Random.Next(3, 7),
+                                          Random.Next(3, 10),
+                                          Random.Next(0, 3),
+                                          element,
+                                          buffs,
+                                          areaBuffs);
 
                 mobManager.Abilities.Add(ability);
                 mobManager.Cooldowns.Add(0);

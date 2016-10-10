@@ -12,6 +12,8 @@ namespace HexMage.Simulator {
         public MobInstance[] MobInstances = new MobInstance[0];
         public List<int> Cooldowns = new List<int>();
 
+        public HexMap<MobId?> MobPositions;
+
         public readonly Dictionary<TeamColor, IMobController> Teams = new Dictionary<TeamColor, IMobController>();
 
         //public bool MoveOneHex(Mob mob, AxialCoord to) {
@@ -45,14 +47,15 @@ namespace HexMage.Simulator {
         }
 
         public MobId? AtCoord(AxialCoord c) {
-            foreach (var mobId in Mobs) {
-                var mobInstance = MobInstanceForId(mobId);
-                if (mobInstance.Coord.Equals(c)) {
-                    return mobId;
-                }
-            }
+            return MobPositions[c];
+            //foreach (var mobId in Mobs) {
+            //    var mobInstance = MobInstanceForId(mobId);
+            //    if (mobInstance.Coord.Equals(c)) {
+            //        return mobId;
+            //    }
+            //}
 
-            return null;
+            //return null;
         }
 
         public MobId AddMobWithInfo(MobInfo mobInfo) {
@@ -65,7 +68,6 @@ namespace HexMage.Simulator {
 
             return id;
         }
-
 
         public void ChangeMobHp(GameInstance gameInstance, MobId mobId, int hpChange) {
             MobInstances[mobId].Hp += hpChange;
@@ -125,7 +127,6 @@ namespace HexMage.Simulator {
         }
 
         public void FastMoveMob(Map map, Pathfinder pathfinder, MobId mobId, AxialCoord pos) {
-            var mobInfo = MobInfoForId(mobId);
             var mobInstance = MobInstanceForId(mobId);
 
             int distance = mobInstance.Coord.Distance(pos);
@@ -133,10 +134,11 @@ namespace HexMage.Simulator {
             Debug.Assert(distance <= mobInstance.Ap, "Trying to move a mob that doesn't have enough AP.");
             Debug.Assert(map[pos] == HexType.Empty, "Trying to move a mob into a wall.");
             Debug.Assert(AtCoord(pos) == null, "Trying to move into a mob.");
-            
+
+            // TODO - odebrat dvojte kopirovani tady
             mobInstance.Ap -= distance;
-            mobInstance.Coord = pos;
             MobInstances[mobId] = mobInstance;
+            SetMobPosition(mobId, pos);
 
             pathfinder.PathfindFrom(pos);
         }
@@ -178,7 +180,7 @@ namespace HexMage.Simulator {
                 var mobInfo = MobInfoForId(mobId);
                 MobInstances[mobId].Hp = mobInfo.MaxHp;
                 MobInstances[mobId].Ap = mobInfo.MaxAp;
-                MobInstances[mobId].Coord = MobInstances[mobId].OrigCoord;
+                SetMobPosition(mobId, MobInstances[mobId].OrigCoord);
             }
         }
 
@@ -195,6 +197,10 @@ namespace HexMage.Simulator {
         }
 
         public void SetMobPosition(MobId mobId, AxialCoord coord) {
+            var instance = MobInstances[mobId];
+            MobPositions[instance.Coord] = null;
+            MobPositions[coord] = mobId;
+
             MobInstances[mobId].Coord = coord;
             MobInstances[mobId].OrigCoord = coord;
         }

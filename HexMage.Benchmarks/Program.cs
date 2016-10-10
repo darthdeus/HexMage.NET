@@ -32,6 +32,8 @@ namespace HexMage.Benchmarks {
             var mobManager = gameInstance.MobManager;
             var pathfinder = gameInstance.Pathfinder;
 
+            mobManager.MobPositions = new HexMap<MobId?>(size);
+
             Generator.Random = new Random(1234);
             //Generator.Random = new Random();
 
