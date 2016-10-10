@@ -10,7 +10,7 @@ using HexMage.Simulator.PCG;
 namespace HexMage.Benchmarks {
     public class Tester {
         public void Run() {
-            var size = 7;            
+            var size = 7;
 
             var s = Stopwatch.StartNew();
             CoordRadiusCache.Instance.PrecomputeUpto(50);
@@ -35,9 +35,9 @@ namespace HexMage.Benchmarks {
             mobManager.MobPositions = new HexMap<MobId?>(size);
 
             Generator.Random = new Random(1234);
-            //Generator.Random = new Random();
+            //Generator.Random = new Random();            
 
-            for (int i = 0; i < 5; i++) {                
+            for (int i = 0; i < 5; i++) {
                 MobInfo mi1 = Generator.RandomMob(mobManager, t1);
                 MobInfo mi2 = Generator.RandomMob(mobManager, t2);
 
@@ -109,9 +109,9 @@ namespace HexMage.Benchmarks {
                 var stopwatch = new Stopwatch();
                 var iterations = 0;
                 int roundsPerThousand = 0;
-                int dumpIterations = 1000;
+                int dumpIterations = 10000;
 
-                int totalIterations = 200000;
+                int totalIterations = 500000;
                 double ratio = 1000000/totalIterations;
 
                 while (iterations < totalIterations) {
@@ -141,7 +141,7 @@ namespace HexMage.Benchmarks {
                         double perGame = Math.Round(perThousandMs/dumpIterations*1000, 2);
 
                         Console.WriteLine(
-                            $"Starting a new game {iterations:00000}, {roundsPerThousand/1000} average rounds, {perThousandMs:00.00}ms\trunning average per 1M: {estimateSecondsPerMil*ratio:00.00}s, per game: {perGame:00.00}us");
+                            $"Starting a new game {iterations:00000}, {roundsPerThousand/dumpIterations} average rounds, {perThousandMs:00.00}ms\trunning average per 1M: {estimateSecondsPerMil*ratio:00.00}s, per game: {perGame:00.00}us");
                         roundsPerThousand = 0;
                         stopwatch.Reset();
                     }

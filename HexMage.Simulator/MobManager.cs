@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using HexMage.Simulator.Model;
 
@@ -96,7 +97,6 @@ namespace HexMage.Simulator {
                 buffs.RemoveAll(x => x.Lifetime == 0);
             }
 
-            var newBuffs = new List<AreaBuff>();
 
             for (int i = 0; i < map.AreaBuffs.Count; i++) {
                 var areaBuff = map.AreaBuffs[i];
@@ -116,6 +116,11 @@ namespace HexMage.Simulator {
                 buff.DecreaseLifetime();
                 map.AreaBuffs[i] = buff;
             }
+
+
+            //map.AreaBuffs.RemoveAll(b => b.Effect.Lifetime == 0);
+
+            var newBuffs = new List<AreaBuff>();
 
             foreach (var buff in map.AreaBuffs) {
                 if (buff.Effect.Lifetime > 0) {

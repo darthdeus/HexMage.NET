@@ -55,12 +55,16 @@ namespace HexMage.Simulator {
         public void StartNextTurn(Pathfinder pathfinder) {
             TurnNumber++;
 
-            foreach (var mobId in MobManager.Mobs) {
-                var mob = MobManager.MobInstanceForId(mobId);
-                if (mob.Hp > 0) {
-                    MobManager.ResetAp(mobId);
-                }
+            for (int i = 0; i < MobManager.MobInstances.Length; i++) {
+                MobManager.MobInstances[i].Ap = MobManager.MobInfos[i].MaxAp;
             }
+
+            //foreach (var mobId in MobManager.Mobs) {
+            //    var mob = MobManager.MobInstanceForId(mobId);
+            //    if (mob.Hp > 0) {
+            //        MobManager.ResetAp(mobId);
+            //    }
+            //}
 
             _turnOrder.RemoveAll(x => MobManager.MobInstances[x].Hp <= 0);
 
