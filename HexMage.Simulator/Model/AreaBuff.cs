@@ -1,8 +1,8 @@
 ﻿namespace HexMage.Simulator.Model {
     public struct AreaBuff {
-        public AxialCoord Coord { get; set; }
-        public int Radius { get; set; }
-        public Buff Effect { get; set; }
+        public AxialCoord Coord;
+        public int Radius;
+        public Buff Effect;
 
         public AreaBuff(AxialCoord coord, int radius, Buff effect) {
             Coord = coord;

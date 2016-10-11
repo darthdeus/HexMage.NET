@@ -68,11 +68,11 @@ namespace HexMage.Simulator.Model {
     }
 
     public struct MobInstance {
-        public MobId Id { get; set; }
-        public AxialCoord Coord { get; set; }
-        public AxialCoord OrigCoord { get; set; }
-        public int Hp { get; set; }
-        public int Ap { get; set; }
+        public MobId Id;
+        public AxialCoord Coord;
+        public AxialCoord OrigCoord;
+        public int Hp;
+        public int Ap;
         public List<Buff> Buffs { get; set; }
 
         public MobInstance(MobId id) : this() {
