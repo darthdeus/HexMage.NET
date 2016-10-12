@@ -100,6 +100,7 @@ namespace HexMage.Simulator {
 
             for (int i = 0; i < map.AreaBuffs.Count; i++) {
                 var areaBuff = map.AreaBuffs[i];
+
                 foreach (var mobId in Mobs) {
                     if (map.AxialDistance(MobInstanceForId(mobId).Coord, areaBuff.Coord) <= areaBuff.Radius) {
                         ChangeMobHp(gameInstance, mobId, areaBuff.Effect.HpChange);
@@ -118,17 +119,7 @@ namespace HexMage.Simulator {
             }
 
 
-            //map.AreaBuffs.RemoveAll(b => b.Effect.Lifetime == 0);
-
-            var newBuffs = new List<AreaBuff>();
-
-            foreach (var buff in map.AreaBuffs) {
-                if (buff.Effect.Lifetime > 0) {
-                    newBuffs.Add(buff);
-                }
-            }
-
-            map.AreaBuffs = newBuffs;
+            map.AreaBuffs.RemoveAll(b => b.Effect.Lifetime == 0);
         }
 
         public void FastMoveMob(Map map, Pathfinder pathfinder, MobId mobId, AxialCoord pos) {
