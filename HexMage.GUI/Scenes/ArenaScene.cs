@@ -79,6 +79,14 @@ namespace HexMage.GUI.Scenes {
             _gameEventHub.AddSubscriber(gameBoardController);
 
             BuildUi();
+
+            foreach (var mobId in _gameInstance.MobManager.Mobs) {
+                var mobEntity = new MobEntity(mobId, _gameInstance) {
+                    SortOrder = Camera2D.SortUI
+                };
+                AddAndInitializeRootEntity(mobEntity, _assetManager);
+                MobEntities.Add(mobId, mobEntity);
+            }
         }
 
         private enum ParticleEffectSettings {

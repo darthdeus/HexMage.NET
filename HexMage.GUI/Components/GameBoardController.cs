@@ -103,7 +103,7 @@ namespace HexMage.GUI.Components {
         public void EventMobMoved(MobId mob, AxialCoord pos) {
             var mobEntity = _arenaScene.MobEntities[mob];
             Debug.Assert(mobEntity != null, "Trying to move a mob without an associated entity.");
-            
+
             mobEntity.MoveTo(_gameInstance.MobManager.MobInstanceForId(mob).Coord, pos);
         }
 
@@ -236,23 +236,15 @@ namespace HexMage.GUI.Components {
         }
 
         private void AttackMob(MobId targetId) {
-#warning re-enable user interaction
-            //var usableAbilities = _gameInstance.UsableAbilities(
-            //    _gameInstance.TurnManager.CurrentMob,
-            //    target);
+            Debug.Assert(SelectedAbilityIndex != null,
+                         "_gameInstance.TurnManager.SelectedAbilityIndex != null");
 
-            //Debug.Assert(SelectedAbilityIndex != null,
-            //             "_gameInstance.TurnManager.SelectedAbilityIndex != null");
+            var abilityIndex = SelectedAbilityIndex.Value;
+            var mobId = _gameInstance.TurnManager.CurrentMob;
 
-            //var abilityIndex = SelectedAbilityIndex.Value;
-            //var ability = _gameInstance.TurnManager.CurrentMob.Abilities[abilityIndex];
-
-            //var usableAbility = usableAbilities.FirstOrDefault(ua => ua.Ability == ability);
-            //if (usableAbility != null) {
-            //    _eventHub.BroadcastAbilityUsed(_gameInstance.TurnManager.CurrentMob, target, usableAbility);
-            //} else {
-            //    ShowMessage("You can't use the selected ability on that target.");
-            //}
+            Debug.Assert(mobId != null);
+            var abilityId = _gameInstance.MobManager.MobInfos[mobId.Value].Abilities[abilityIndex].Id;
+            _gameInstance.FastUse(new AbilityId(abilityId), new MobId(mobId.Value), targetId);
         }
 
         private void HandleLeftClick() {
@@ -356,7 +348,8 @@ namespace HexMage.GUI.Components {
                     var mobInstance = _gameInstance.MobManager.MobInstanceForId(mobId.Value);
                     var mobInfo = _gameInstance.MobManager.MobInfoForId(mobId.Value);
 
-                    mobTextBuilder.AppendLine($"HP {mobInstance.Hp}/{mobInfo.MaxHp}\nAP {mobInstance.Ap}/{mobInfo.MaxAp}");
+                    mobTextBuilder.AppendLine(
+                        $"HP {mobInstance.Hp}/{mobInfo.MaxHp}\nAP {mobInstance.Ap}/{mobInfo.MaxAp}");
                     mobTextBuilder.AppendLine($"Iniciative: {mobInfo.Iniciative}");
                     mobTextBuilder.AppendLine();
 
@@ -437,7 +430,10 @@ namespace HexMage.GUI.Components {
             var camera = Camera2D.Instance;
 
             result.AddComponent(
-                () => { result.Position = camera.HexToPixelWorld(_gameInstance.MobManager.MobInstanceForId(mobId).Coord) + _usedAbilityOffset; });
+                () => {
+                    result.Position = camera.HexToPixelWorld(_gameInstance.MobManager.MobInstanceForId(mobId).Coord) +
+                                      _usedAbilityOffset;
+                });
 
             string labelText = $"{ability.Dmg}DMG cost {ability.Cost}";
             result.AddChild(new Label(labelText, _assetManager.Font));

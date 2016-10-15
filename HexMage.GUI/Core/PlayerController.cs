@@ -37,11 +37,13 @@ namespace HexMage.GUI.Core {
         }
 
         public DefenseDesire FastRequestDesireToDefend(MobId mob, AbilityId abilityId) {
-            throw new System.NotImplementedException();
+            return DefenseDesire.Pass;
         }
 
         public void FastPlayTurn(GameEventHub eventHub) {
-            throw new System.NotImplementedException();
+            Debug.Assert(_tcs == null);
+            _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            _tcs.Task.Wait();
         }
 
         public void FastRandomAction(GameEventHub eventHub) {
