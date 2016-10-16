@@ -100,11 +100,14 @@ namespace HexMage.GUI.Components {
             Entity.Scene.DestroyEntity(projectile);
         }
 
-        public void EventMobMoved(MobId mob, AxialCoord pos) {
+        public async void EventMobMoved(MobId mob, AxialCoord pos) {
             var mobEntity = _arenaScene.MobEntities[mob];
             Debug.Assert(mobEntity != null, "Trying to move a mob without an associated entity.");
 
-            mobEntity.MoveTo(_gameInstance.MobManager.MobInstanceForId(mob).Coord, pos);
+            var path = _gameInstance.Pathfinder.PathTo(pos).Reverse();
+            foreach (var coord in path) {
+                await mobEntity.MoveTo(_gameInstance.MobManager.MobInstanceForId(mob).Coord, coord);
+            }
         }
 
         public void EventDefenseDesireAcquired(MobId mob, DefenseDesire defenseDesireResult) {
@@ -116,25 +119,8 @@ namespace HexMage.GUI.Components {
             _assetManager = assetManager;
 
             BuildPopovers();
-            CreateMobEntities(assetManager);
 
-            new Thread(() => { _eventHub.FastMainLoop(TimeSpan.FromMilliseconds(200)); }).Start();
-        }
-
-        private void CreateMobEntities(AssetManager assetManager) {
-            foreach (var mob in _gameInstance.MobManager.Mobs) {
-                var mobAnimationController = new MobAnimationController(_gameInstance);
-
-                var mobEntity = new MobEntity(mob, _gameInstance) {
-                    Renderer = new MobRenderer(_gameInstance, mob, mobAnimationController),
-                    SortOrder = Camera2D.SortMobs,
-                    Transform = () => Camera2D.Instance.Transform
-                };
-                mobEntity.AddComponent(mobAnimationController);
-
-                Entity.Scene.AddRootEntity(mobEntity);
-                mobEntity.InitializeEntity(assetManager);
-            }
+            new Thread(() => { _eventHub.FastMainLoop(TimeSpan.FromMilliseconds(500)); }).Start();
         }
 
         public Task ShowMessage(string message, int displayForSeconds = 5) {

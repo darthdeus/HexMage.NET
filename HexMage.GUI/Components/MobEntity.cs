@@ -40,29 +40,19 @@ namespace HexMage.GUI.Components {
                     Console.WriteLine("Move finished");
                     _tcs.SetResult(true);
                     _tcs = null;
-                    _moveJustFinished = true;
                 }
 
                 Position = sourcePos + _moveProgress*(destinationPos - sourcePos);
-                Console.WriteLine($"Moving {_source} to {_destination}, at {Position} \t\t{GetHashCode()}");
             } else {
                 var posBefore = Position;
 
                 var coord = _gameInstance.MobManager.MobInstanceForId(MobId).Coord;
                 Position = camera.HexToPixel(coord);
-
-                if (_moveJustFinished) {
-                    _moveJustFinished = false;
-                    Console.WriteLine(
-                        $"Move just finished {_source} to {_destination}, at {Position} (before {posBefore})");
-                }
             }
         }
 
-        private bool _moveJustFinished = false;
         private TaskCompletionSource<bool> _tcs;
 
-#warning TODO - zjistit, jestli se tohle pouziva
         public Task<bool> MoveTo(AxialCoord source, AxialCoord destination) {
             Debug.Assert(!_animateMovement, "Movement already in progress, can't move until it finishes.");
             Debug.Assert(_tcs == null, "_tcs != null when trying to re-initialize it.");

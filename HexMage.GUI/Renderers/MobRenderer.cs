@@ -35,10 +35,6 @@ namespace HexMage.GUI.Renderers {
             var mobInfo = _gameInstance.MobManager.MobInfoForId(_mobId);
             var mobInstance = _gameInstance.MobManager.MobInstanceForId(_mobId);
 
-            if (mobInfo.Team == TeamColor.Red) {
-                Console.WriteLine($"{entity.GetType()} Drawing at {entity.RenderPosition}, pos {entity.Position}\t\t{entity.GetHashCode()}");
-            }
-
             var color = mobInfo.Team == TeamColor.Red ? Color.OrangeRed : Color.Blue;
             if (mobInstance.Hp > 0) {
                 _animationController.CurrentAnimation.RenderFrame(null, pos, color, batch, assetManager);
