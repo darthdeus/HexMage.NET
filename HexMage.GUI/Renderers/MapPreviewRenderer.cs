@@ -42,9 +42,6 @@ namespace HexMage.GUI.Renderers {
                 if (coord == new AxialCoord(0, 0)) {
                     batch.Draw(assetManager[AssetManager.HexHoverSprite], pixelCoord, scale: scale);
                 }
-
-
-                batch.DrawString(assetManager.Font, distanceMap[coord].ToString(), pixelCoord, Color.Black);
             }
         }
     }
