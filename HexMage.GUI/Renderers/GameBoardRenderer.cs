@@ -161,6 +161,7 @@ namespace HexMage.GUI.Renderers {
                         foreach (var abilityId in mobInfo.Abilities) {
                             var abilityInfo = mobManager.AbilityForId(abilityId);
 
+#warning TODO - resit cooldowny
                             if (coord.Distance(mobInstance.Coord) <= abilityInfo.Range &&
                                 abilityInfo.Cost <= mobInstance.Ap) {
                                 if (abilityInfo.Dmg > maxAbilityDmg) {
