@@ -118,8 +118,6 @@ namespace HexMage.Simulator {
 
 
         public void PathfindDistanceAll() {
-            Console.WriteLine($"Initializing pathfinder, {_allPaths.AllCoords.Count} locations");
-
             int done = 0;
             int loops = 0;
             long total = 0;
@@ -134,13 +132,9 @@ namespace HexMage.Simulator {
                     done = 0;
                     long elapsed = sw.ElapsedMilliseconds;
                     total += elapsed;
-                    //Console.WriteLine($"Done 100 in {sw.ElapsedTicks * 10}us");
-                    Console.WriteLine($"Done 100 in {elapsed}ms");
                     sw.Restart();
                 }
             }
-
-            Console.WriteLine($"Pathfinder initialized, took {total}, avg: {total/loops}");
         }
 
         public void PathfindDistanceOnlyFrom(HexMap<Path> distanceMap, AxialCoord start) {

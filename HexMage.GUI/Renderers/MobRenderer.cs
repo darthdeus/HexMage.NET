@@ -1,3 +1,4 @@
+using System;
 using HexMage.GUI.Components;
 using HexMage.GUI.Core;
 using HexMage.Simulator;
@@ -34,16 +35,20 @@ namespace HexMage.GUI.Renderers {
             var mobInfo = _gameInstance.MobManager.MobInfoForId(_mobId);
             var mobInstance = _gameInstance.MobManager.MobInstanceForId(_mobId);
 
+            if (mobInfo.Team == TeamColor.Red) {
+                Console.WriteLine($"{entity.GetType()} Drawing at {entity.RenderPosition}, pos {entity.Position}\t\t{entity.GetHashCode()}");
+            }
+
             var color = mobInfo.Team == TeamColor.Red ? Color.OrangeRed : Color.Blue;
             if (mobInstance.Hp > 0) {
                 _animationController.CurrentAnimation.RenderFrame(null, pos, color, batch, assetManager);
 
                 var hbPos = pos.ToPoint() + _healthbarOffset;
-                DrawHealthbar((double)mobInstance.Hp/mobInfo.MaxHp,
+                DrawHealthbar((double) mobInstance.Hp/mobInfo.MaxHp,
                               batch, assetManager, hbPos, Color.DarkGreen, Color.LightGreen);
 
                 var apPos = hbPos + new Point(_healthbarWidth, 0);
-                DrawHealthbar((double)mobInstance.Ap/mobInfo.MaxAp,
+                DrawHealthbar((double) mobInstance.Ap/mobInfo.MaxAp,
                               batch, assetManager, apPos, Color.DarkBlue, Color.LightBlue);
             } else {
                 batch.Draw(assetManager[AssetManager.DarkMageDeath], pos, color);

@@ -250,7 +250,8 @@ namespace HexMage.GUI.Components {
 
             Debug.Assert(mobId != null);
             var abilityId = _gameInstance.MobManager.MobInfos[mobId.Value].Abilities[abilityIndex].Id;
-            _gameInstance.FastUse(new AbilityId(abilityId), new MobId(mobId.Value), targetId);
+
+            _eventHub.BroadcastAbilityUsed(new MobId(mobId.Value), targetId, new AbilityId(abilityId));
         }
 
         private void HandleLeftClick() {

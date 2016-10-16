@@ -85,7 +85,7 @@ namespace HexMage.GUI.Scenes {
                     SortOrder = Camera2D.SortUI
                 };
                 AddAndInitializeRootEntity(mobEntity, _assetManager);
-                MobEntities.Add(mobId, mobEntity);
+                MobEntities[mobId] = mobEntity;
             }
         }
 
@@ -223,8 +223,6 @@ namespace HexMage.GUI.Scenes {
             abilityDetail.AddComponent(abilityUpdater);
 
             abilityUpdater.OnClick += index => {
-                Console.WriteLine($"ABILITY EVENT, time {DateTime.Now.Millisecond}");
-
                 _gameBoardController.SelectAbility(index);
             };
 

@@ -3,7 +3,7 @@
 namespace HexMage.Simulator.Model {
     public struct MobId {
         public static MobId Invalid = new MobId(-1);
-        public int Id;
+        public readonly int Id;
 
         public MobId(int id) {
             Id = id;
@@ -23,7 +23,7 @@ namespace HexMage.Simulator.Model {
         }
 
         public override int GetHashCode() {
-            return Id;
+            return Id.GetHashCode();
         }
 
         public static bool operator ==(MobId left, MobId right) {
