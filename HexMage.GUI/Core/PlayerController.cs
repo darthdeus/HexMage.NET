@@ -43,7 +43,7 @@ namespace HexMage.GUI.Core {
         public void FastPlayTurn(GameEventHub eventHub) {
             Debug.Assert(_tcs == null);
             _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-            _tcs.Task.Wait();
+            _tcs.Task.Wait(Program.CancellationToken);
         }
 
         public void FastRandomAction(GameEventHub eventHub) {

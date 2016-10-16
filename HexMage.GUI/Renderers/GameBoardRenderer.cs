@@ -3,17 +3,25 @@ using System.Collections.Generic;
 using HexMage.GUI.Components;
 using HexMage.GUI.Core;
 using HexMage.Simulator;
+using HexMage.Simulator.Model;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Renderers {
+    public enum BoardRenderMode {
+        Default,
+        HoverHeatmap,
+        GlobalHeatmap
+    }
+
     public class GameBoardRenderer : IRenderer {
         private readonly GameInstance _gameInstance;
         private readonly GameBoardController _gameBoardController;
         private readonly Camera2D _camera;
         private SpriteBatch _spriteBatch;
         private AssetManager _assetManager;
+        public BoardRenderMode Mode { get; set; }
 
         public GameBoardRenderer(GameInstance gameInstance, GameBoardController gameBoardController, Camera2D camera) {
             _gameInstance = gameInstance;
@@ -27,6 +35,16 @@ namespace HexMage.GUI.Renderers {
 
             DrawBackground();
             if (_gameInstance.TurnManager.CurrentController is PlayerController) {
+                var currentMob = _gameInstance.TurnManager.CurrentMob;
+                if (currentMob.HasValue) {
+                    if (Mode == BoardRenderMode.HoverHeatmap) {
+                        DrawHoverHeatmap(currentMob.Value);
+                    } else if (Mode == BoardRenderMode.GlobalHeatmap) {
+                        DrawGlobalHeatmap(currentMob.Value);
+                    }
+                }
+
+
                 DrawHoverPath();
             } else {
                 var hexTooFar = _assetManager[AssetManager.HexPathSprite];
@@ -55,7 +73,8 @@ namespace HexMage.GUI.Renderers {
                 }
 
                 var pos = _camera.HexToPixel(coord);
-                _spriteBatch.DrawString(_assetManager.Font, _gameInstance.Pathfinder.Distance(coord).ToString(), pos, Color.Black);
+                _spriteBatch.DrawString(_assetManager.Font, _gameInstance.Pathfinder.Distance(coord).ToString(), pos,
+                                        Color.Black);
 
                 var hexBuffs = map.BuffsAt(coord);
 
@@ -84,26 +103,109 @@ namespace HexMage.GUI.Renderers {
             }
         }
 
+        private void DrawHoverHeatmap(MobId currentMob) {
+            if (_gameInstance.Pathfinder.IsValidCoord(_camera.MouseHex)) {
+                var mobManager = _gameInstance.MobManager;
+                var mouseMob = mobManager.AtCoord(_camera.MouseHex);
+
+                if (mouseMob.HasValue) {
+                    var heatmap = new HexMap<int>(_gameInstance.Map.Size);
+                    var mobInfo = mobManager.MobInfos[mouseMob.Value];
+                    var mobInstance = mobManager.MobInstances[mouseMob.Value];
+
+                    int maxDmg = 0;
+
+                    foreach (var coord in heatmap.AllCoords) {
+                        int maxAbilityDmg = 0;
+
+                        foreach (var abilityId in mobInfo.Abilities) {
+                            var abilityInfo = mobManager.AbilityForId(abilityId);
+
+                            if (coord.Distance(mobInstance.Coord) <= abilityInfo.Range &&
+                                abilityInfo.Cost <= mobInstance.Ap) {
+                                if (abilityInfo.Dmg > maxAbilityDmg) {
+                                    maxAbilityDmg = abilityInfo.Dmg;
+                                }
+                            }
+                        }
+
+                        heatmap[coord] += maxAbilityDmg;
+
+                        if (heatmap[coord] > maxDmg) maxDmg = heatmap[coord];
+                    }
+
+                    _spriteBatch.Begin(transformMatrix: _camera.Transform);
+                    foreach (var coord in heatmap.AllCoords) {
+                        float percent = heatmap[coord]/(float) maxDmg;
+                        DrawAt(_assetManager[AssetManager.HexHoverSprite], coord, Color.Red*percent*percent);
+                    }
+                    _spriteBatch.End();
+                }
+            }
+        }
+
+
+        private void DrawGlobalHeatmap(MobId currentMob) {
+            var mobManager = _gameInstance.MobManager;
+            var heatmap = new HexMap<int>(_gameInstance.Map.Size);
+            int maxDmg = 0;
+
+            foreach (var mobId in mobManager.Mobs) {
+                var playerTeam = mobManager.MobInfos[currentMob].Team;
+                var mobInfo = mobManager.MobInfos[mobId];
+                var mobInstance = mobManager.MobInstances[mobId];
+
+                if (playerTeam != mobInfo.Team) {
+                    foreach (var coord in heatmap.AllCoords) {
+                        int maxAbilityDmg = 0;
+                        foreach (var abilityId in mobInfo.Abilities) {
+                            var abilityInfo = mobManager.AbilityForId(abilityId);
+
+                            if (coord.Distance(mobInstance.Coord) <= abilityInfo.Range &&
+                                abilityInfo.Cost <= mobInstance.Ap) {
+                                if (abilityInfo.Dmg > maxAbilityDmg) {
+                                    maxAbilityDmg = abilityInfo.Dmg;
+                                }
+                            }
+                        }
+
+                        heatmap[coord] += maxAbilityDmg;
+                        if (heatmap[coord] > maxDmg) maxDmg = heatmap[coord];
+                    }
+                }
+            }
+
+            _spriteBatch.Begin(transformMatrix: _camera.Transform);
+            foreach (var coord in heatmap.AllCoords) {
+                float percent = heatmap[coord]/(float) maxDmg;
+                DrawAt(_assetManager[AssetManager.HexHoverSprite], coord, Color.Red*percent*percent);
+            }
+            _spriteBatch.End();
+        }
+
+
         private void DrawHoverPath() {
             _spriteBatch.Begin(transformMatrix: _camera.Transform);
 
             var hexUsable = _assetManager[AssetManager.HexWithinDistance];
             var hexTooFar = _assetManager[AssetManager.HexPathSprite];
 
-            if (_gameInstance.Pathfinder.IsValidCoord(_camera.MouseHex)) {
+            if (_gameInstance.TurnManager.CurrentMob.HasValue && _gameInstance.Pathfinder.IsValidCoord(_camera.MouseHex)) {
                 IList<AxialCoord> path;
+
                 var mouseMob = _gameInstance.MobManager.AtCoord(_camera.MouseHex);
-                //if (mouseMob != null) {
-                //    path = _gameInstance.Pathfinder.PathToMob(mouseMob);
-                //} else {
-                //    path = _gameInstance.Pathfinder.PathTo(_camera.MouseHex);
-                //}
+                if (mouseMob != null) {
+                    path =
+                        _gameInstance.Pathfinder.PathToMob(_gameInstance.MobManager.MobInstances[mouseMob.Value].Coord);
+                } else {
+                    path = _gameInstance.Pathfinder.PathTo(_camera.MouseHex);
+                }
 
 
                 var currentMob = _gameInstance.TurnManager.CurrentMob;
                 var abilityIndex = _gameBoardController.SelectedAbilityIndex;
 
-                if (abilityIndex.HasValue && currentMob.HasValue) {
+                if (abilityIndex.HasValue) {
                     var mobInfo = _gameInstance.MobManager.MobInfos[currentMob.Value];
                     var mobInstance = _gameInstance.MobManager.MobInstances[currentMob.Value];
 
@@ -132,14 +234,16 @@ namespace HexMage.GUI.Renderers {
                         distance++;
                     }
                 } else {
-                    //Utils.Log(LogSeverity.Warning, nameof(GameBoardRenderer), "Pathfinder only calculates distance at the moment.");
-                    //foreach (var coord in path) {
-                    //    if (currentMob.Coord.Distance(coord) <= currentMob.Ap) {
-                    //        DrawAt(hexUsable, coord);
-                    //    } else {
-                    //        DrawAt(hexTooFar, coord);
-                    //    }
-                    //}
+                    if (!mouseMob.HasValue || mouseMob.Value != currentMob.Value) {
+                        var mobInstance = _gameInstance.MobManager.MobInstances[currentMob.Value];
+                        foreach (var coord in path) {
+                            if (mobInstance.Coord.Distance(coord) <= mobInstance.Ap) {
+                                DrawAt(hexUsable, coord);
+                            } else {
+                                DrawAt(hexTooFar, coord);
+                            }
+                        }
+                    }
                 }
             }
             _spriteBatch.End();

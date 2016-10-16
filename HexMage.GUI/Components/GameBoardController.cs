@@ -215,6 +215,14 @@ namespace HexMage.GUI.Components {
             else if (inputManager.IsKeyJustReleased(Keys.D4)) SelectAbility(3);
             else if (inputManager.IsKeyJustReleased(Keys.D5)) SelectAbility(4);
             else if (inputManager.IsKeyJustReleased(Keys.D6)) SelectAbility(5);
+
+            if (inputManager.IsKeyJustReleased(Keys.F1)) {
+                ((GameBoardRenderer) Entity.Renderer).Mode = BoardRenderMode.Default;
+            } else if (inputManager.IsKeyJustReleased(Keys.F2)) {
+                ((GameBoardRenderer) Entity.Renderer).Mode = BoardRenderMode.HoverHeatmap;
+            } else if (inputManager.IsKeyJustReleased(Keys.F3)) {
+                ((GameBoardRenderer) Entity.Renderer).Mode = BoardRenderMode.GlobalHeatmap;
+            }
         }
 
         public void SelectAbility(int index) {
