@@ -6,5 +6,7 @@ namespace HexMage.Simulator {
         void EventAbilityUsed(MobId mobId, MobId targetId, Ability ability);
         void EventMobMoved(MobId mobId, AxialCoord pos);
         void EventDefenseDesireAcquired(MobId mobId, DefenseDesire defenseDesireResult);
+        Task SlowEventMobMoved(MobId mobId, AxialCoord pos);
+        Task SlowEventAbilityUsed(MobId mobId, MobId targetId, Ability ability);
     }
 }

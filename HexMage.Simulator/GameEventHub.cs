@@ -21,7 +21,7 @@ namespace HexMage.Simulator {
         public int FastMainLoop(TimeSpan turnDelay) {
             var turnManager = _gameInstance.TurnManager;
             turnManager.StartNextTurn(_gameInstance.Pathfinder);
-            
+
             int totalTurns = 0;
             _gameInstance.SlowUpdateIsFinished();
 
@@ -46,7 +46,13 @@ namespace HexMage.Simulator {
             _subscribers.Add(subscriber);
         }
 
-        public void BroadcastMobMoved(MobId mob, AxialCoord pos) {
+        public async Task SlowBroadcastMobMoved(MobId mob, AxialCoord pos) {
+            await Task.WhenAll(_subscribers.Select(x => x.SlowEventMobMoved(mob, pos)));
+
+            _gameInstance.MobManager.FastMoveMob(_gameInstance.Map, _gameInstance.Pathfinder, mob, pos);
+        }
+
+        public void FastBroadcastMobMoved(MobId mob, AxialCoord pos) {
             foreach (var subscriber in _subscribers) {
                 subscriber.EventMobMoved(mob, pos);
             }
@@ -54,7 +60,16 @@ namespace HexMage.Simulator {
             _gameInstance.MobManager.FastMoveMob(_gameInstance.Map, _gameInstance.Pathfinder, mob, pos);
         }
 
-        public void BroadcastAbilityUsed(MobId mobId, MobId targetId, AbilityId abilityId) {
+        public async Task SlowBroadcastAbilityUsed(MobId mobId, MobId targetId, AbilityId abilityId) {
+            var ability = _gameInstance.MobManager.AbilityForId(abilityId);
+            await Task.WhenAll(_subscribers.Select(x => x.SlowEventAbilityUsed(mobId, targetId, ability)));
+
+            var defenseDesireResult = await _gameInstance.SlowUse(abilityId, mobId, targetId);
+
+            BroadcastDefenseDesire(targetId, defenseDesireResult);
+        }
+
+        public void FastBroadcastAbilityUsed(MobId mobId, MobId targetId, AbilityId abilityId) {
             var ability = _gameInstance.MobManager.AbilityForId(abilityId);
             foreach (var subscriber in _subscribers) {
                 subscriber.EventAbilityUsed(mobId, targetId, ability);
@@ -66,7 +81,7 @@ namespace HexMage.Simulator {
         }
 
         public void BroadcastAbilityUsedWithDefense(MobId mob, MobId target, AbilityId abilityId,
-            DefenseDesire defenseDesire) {
+                                                    DefenseDesire defenseDesire) {
             var ability = _gameInstance.MobManager.AbilityForId(abilityId);
 
             foreach (var subscriber in _subscribers) {

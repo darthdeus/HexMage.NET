@@ -114,6 +114,14 @@ namespace HexMage.GUI.Components {
             ShowMessage($"{nameof(GameBoardController)} got defense {defenseDesireResult}");
         }
 
+        public Task SlowEventMobMoved(MobId mobId, AxialCoord pos) {
+            throw new NotImplementedException();
+        }
+
+        public Task SlowEventAbilityUsed(MobId mobId, MobId targetId, Ability ability) {
+            throw new NotImplementedException();
+        }
+
         public override void Initialize(AssetManager assetManager) {
             AssertNotInitialized();
             _assetManager = assetManager;
@@ -237,7 +245,7 @@ namespace HexMage.GUI.Components {
             Debug.Assert(mobId != null);
             var abilityId = _gameInstance.MobManager.MobInfos[mobId.Value].Abilities[abilityIndex].Id;
 
-            _eventHub.BroadcastAbilityUsed(new MobId(mobId.Value), targetId, new AbilityId(abilityId));
+            _eventHub.SlowBroadcastAbilityUsed(new MobId(mobId.Value), targetId, new AbilityId(abilityId));
         }
 
         private void HandleLeftClick() {
@@ -283,7 +291,7 @@ namespace HexMage.GUI.Components {
                             if (distance > mobInstance.Ap) {
                                 ShowMessage("You don't have enough AP.");
                             } else {
-                                _eventHub.BroadcastMobMoved(currentMob.Value, mouseHex);
+                                _eventHub.SlowBroadcastMobMoved(currentMob.Value, mouseHex);
                             }
                         } else {
                             ShowMessage("You can't walk into a wall.");

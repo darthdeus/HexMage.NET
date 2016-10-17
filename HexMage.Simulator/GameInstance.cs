@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
@@ -97,9 +98,7 @@ namespace HexMage.Simulator {
                 var res = controller.FastRequestDesireToDefend(targetId, abilityId);
 
                 if (res == DefenseDesire.Block) {
-                    throw new NotImplementedException();
-#warning TODO - tohle je spatne, AP se neaktualizuje
-                    //target.Ap -= target.DefenseCost;
+                    MobManager.ChangeMobAp(targetId, MobManager.MobInfoForId(targetId).DefenseCost);
                     return DefenseDesire.Block;
                 } else {
                     TargetHit(abilityId, mobId, targetId);
@@ -114,6 +113,36 @@ namespace HexMage.Simulator {
             return result;
         }
 
+        public async Task<DefenseDesire> SlowUse(AbilityId abilityId, MobId mobId, MobId targetId) {
+            var target = MobManager.MobInstanceForId(targetId);
+            var targetInfo = MobManager.MobInfoForId(targetId);
+            Debug.Assert(MobManager.CooldownFor(abilityId) == 0, "Trying to use an ability with non-zero cooldown.");
+            Debug.Assert(target.Hp > 0, "Target is dead.");
+
+            DefenseDesire result;
+
+            var ability = MobManager.AbilityForId(abilityId);
+
+            MobManager.SetCooldownFor(abilityId, ability.Cooldown);
+            if (target.Ap >= targetInfo.DefenseCost) {
+                var controller = MobManager.Teams[targetInfo.Team];
+                var res = await controller.SlowRequestDesireToDefend(targetId, abilityId);
+
+                if (res == DefenseDesire.Block) {
+                    MobManager.ChangeMobAp(targetId, MobManager.MobInfoForId(targetId).DefenseCost);
+                    return DefenseDesire.Block;
+                } else {
+                    TargetHit(abilityId, mobId, targetId);
+
+                    result = DefenseDesire.Pass;
+                }
+            } else {
+                TargetHit(abilityId, mobId, targetId);
+                result = DefenseDesire.Pass;
+            }
+
+            return result;
+        }
 
         private void TargetHit(AbilityId abilityId, MobId mobId, MobId targetId) {
             var ability = MobManager.AbilityForId(abilityId);

@@ -63,9 +63,6 @@ namespace HexMage.Simulator {
                 _gameInstance.FastUse(ability.AbilityId, mobId.Value, spellTarget);
             }
             else if (moveTarget != MobId.Invalid) {
-                var fromCoord = _gameInstance.MobManager.MobInstanceForId(mobId.Value).Coord;
-                var targetCoord = _gameInstance.MobManager.MobInstanceForId(moveTarget).Coord;
-                //Utils.Log(LogSeverity.Debug, nameof(AiRandomController), $"There are no targets, moving towards a random enemy from {fromCoord} to {targetCoord}");
                 FastMoveTowardsEnemy(mobId.Value, moveTarget);
             } else {
                 throw new InvalidOperationException("No targets, game should be over.");
@@ -88,5 +85,12 @@ namespace HexMage.Simulator {
         }
 
         public string Name => nameof(AiRandomController);
+        public Task<DefenseDesire> SlowRequestDesireToDefend(MobId targetId, AbilityId abilityId) {
+            throw new NotImplementedException();
+        }
+
+        public Task SlowPlayTurn(GameEventHub eventHub) {
+            throw new NotImplementedException();
+        }
     }
 }

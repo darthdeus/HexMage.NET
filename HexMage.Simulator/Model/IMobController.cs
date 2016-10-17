@@ -8,5 +8,7 @@ namespace HexMage.Simulator {
         void FastRandomAction(GameEventHub eventHub);
 
         string Name { get; }
+        Task<DefenseDesire> SlowRequestDesireToDefend(MobId targetId, AbilityId abilityId);
+        Task SlowPlayTurn(GameEventHub eventHub);
     }
 }

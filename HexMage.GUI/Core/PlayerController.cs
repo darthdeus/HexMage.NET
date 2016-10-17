@@ -51,5 +51,12 @@ namespace HexMage.GUI.Core {
         }
 
         public string Name => nameof(PlayerController);
+        public Task<DefenseDesire> SlowRequestDesireToDefend(MobId targetId, AbilityId abilityId) {
+            throw new System.NotImplementedException();
+        }
+
+        public Task SlowPlayTurn(GameEventHub eventHub) {
+            throw new System.NotImplementedException();
+        }
     }
 }
