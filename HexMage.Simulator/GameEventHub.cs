@@ -18,6 +18,23 @@ namespace HexMage.Simulator {
 
         private TimeSpan _pauseDelay = TimeSpan.FromMilliseconds(200);
 
+        public async Task<int> SlowMainLoop(TimeSpan turnDelay) {
+            var turnManager = _gameInstance.TurnManager;
+            turnManager.StartNextTurn(_gameInstance.Pathfinder);
+
+            int totalTurns = 0;
+            _gameInstance.SlowUpdateIsFinished();
+
+            while (!_gameInstance.IsFinished) {
+                totalTurns++;
+
+                await turnManager.CurrentController.SlowPlayTurn(this);
+                turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder);
+            }
+
+            return totalTurns;
+        }
+
         public int FastMainLoop(TimeSpan turnDelay) {
             var turnManager = _gameInstance.TurnManager;
             turnManager.StartNextTurn(_gameInstance.Pathfinder);

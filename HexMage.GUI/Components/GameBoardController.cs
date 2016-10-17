@@ -42,8 +42,31 @@ namespace HexMage.GUI.Components {
             _arenaScene = arenaScene;
         }
 
-#warning TODO - async void with no error handling
-        public async void EventAbilityUsed(MobId mobId, MobId targetId, Ability ability) {
+        public void EventAbilityUsed(MobId mobId, MobId targetId, Ability ability) {
+            SlowEventAbilityUsed(mobId, targetId, ability).Wait();
+        }
+
+        public void EventMobMoved(MobId mobId, AxialCoord pos) {
+            SlowEventMobMoved(mobId, pos).Wait();
+        }
+
+        public void EventDefenseDesireAcquired(MobId mob, DefenseDesire defenseDesireResult) {
+            ShowMessage($"{nameof(GameBoardController)} got defense {defenseDesireResult}");
+        }
+
+        public async Task SlowEventMobMoved(MobId mobId, AxialCoord pos) {
+            var mobEntity = _arenaScene.MobEntities[mobId];
+            Debug.Assert(mobEntity != null, "Trying to move a mob without an associated entity.");
+
+            var from = _gameInstance.MobManager.MobInstanceForId(mobId).Coord;
+            var path = _gameInstance.Pathfinder.PathTo(pos).Reverse();
+            foreach (var coord in path) {
+                await mobEntity.MoveTo(from, coord);
+                from = coord;
+            }
+        }
+
+        public async Task SlowEventAbilityUsed(MobId mobId, MobId targetId, Ability ability) {
             Utils.Log(LogSeverity.Info, nameof(GameBoardController), "EventAbilityUsed");
 
             var mobInstance = _gameInstance.MobManager.MobInstanceForId(mobId);
@@ -54,9 +77,9 @@ namespace HexMage.GUI.Components {
             var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
 
             var projectileAnimation = new Animation(projectileSprite,
-                                                    TimeSpan.FromMilliseconds(50),
-                                                    AssetManager.TileSize,
-                                                    4);
+                TimeSpan.FromMilliseconds(50),
+                AssetManager.TileSize,
+                4);
 
             projectileAnimation.Origin = new Vector2(AssetManager.TileSize/2, AssetManager.TileSize/2);
 
@@ -100,35 +123,14 @@ namespace HexMage.GUI.Components {
             Entity.Scene.DestroyEntity(projectile);
         }
 
-        public async void EventMobMoved(MobId mob, AxialCoord pos) {
-            var mobEntity = _arenaScene.MobEntities[mob];
-            Debug.Assert(mobEntity != null, "Trying to move a mob without an associated entity.");
-
-            var path = _gameInstance.Pathfinder.PathTo(pos).Reverse();
-            foreach (var coord in path) {
-                await mobEntity.MoveTo(_gameInstance.MobManager.MobInstanceForId(mob).Coord, coord);
-            }
-        }
-
-        public void EventDefenseDesireAcquired(MobId mob, DefenseDesire defenseDesireResult) {
-            ShowMessage($"{nameof(GameBoardController)} got defense {defenseDesireResult}");
-        }
-
-        public Task SlowEventMobMoved(MobId mobId, AxialCoord pos) {
-            throw new NotImplementedException();
-        }
-
-        public Task SlowEventAbilityUsed(MobId mobId, MobId targetId, Ability ability) {
-            throw new NotImplementedException();
-        }
-
         public override void Initialize(AssetManager assetManager) {
             AssertNotInitialized();
             _assetManager = assetManager;
 
             BuildPopovers();
 
-            new Thread(() => { _eventHub.FastMainLoop(TimeSpan.FromMilliseconds(500)); }).Start();
+            _eventHub.SlowMainLoop(TimeSpan.FromMilliseconds(500))
+                .LogContinuation();
         }
 
         public Task ShowMessage(string message, int displayForSeconds = 5) {
@@ -237,7 +239,7 @@ namespace HexMage.GUI.Components {
 
         private void AttackMob(MobId targetId) {
             Debug.Assert(SelectedAbilityIndex != null,
-                         "_gameInstance.TurnManager.SelectedAbilityIndex != null");
+                "_gameInstance.TurnManager.SelectedAbilityIndex != null");
 
             var abilityIndex = SelectedAbilityIndex.Value;
             var mobId = _gameInstance.TurnManager.CurrentMob;
@@ -291,7 +293,8 @@ namespace HexMage.GUI.Components {
                             if (distance > mobInstance.Ap) {
                                 ShowMessage("You don't have enough AP.");
                             } else {
-                                _eventHub.SlowBroadcastMobMoved(currentMob.Value, mouseHex);
+                                _eventHub.SlowBroadcastMobMoved(currentMob.Value, mouseHex)
+                                    .LogContinuation();
                             }
                         } else {
                             ShowMessage("You can't walk into a wall.");
@@ -337,7 +340,7 @@ namespace HexMage.GUI.Components {
 
                     var buffs = map.BuffsAt(mouseHex);
                     Debug.Assert(buffs != null,
-                                 "Buffs can't be null since we're only using valid map coords (and those are all initialized).");
+                        "Buffs can't be null since we're only using valid map coords (and those are all initialized).");
 
                     foreach (var buff in buffs)
                         labelText.AppendLine($"{buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");

@@ -21,7 +21,17 @@ namespace HexMage.GUI.Core {
         private TaskCompletionSource<bool> _tcs;
 
         public Task<bool> PlayTurn(GameEventHub eventHub) {
-            Debug.Assert(_tcs == null);            
+            Debug.Assert(_tcs == null);
+            _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            return _tcs.Task;
+        }
+
+        public Task<DefenseDesire> SlowRequestDesireToDefend(MobId targetId, AbilityId abilityId) {
+            return Task.FromResult(DefenseDesire.Pass);
+        }
+
+        public Task SlowPlayTurn(GameEventHub eventHub) {
+            Debug.Assert(_tcs == null);
             _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             return _tcs.Task;
         }
@@ -51,12 +61,5 @@ namespace HexMage.GUI.Core {
         }
 
         public string Name => nameof(PlayerController);
-        public Task<DefenseDesire> SlowRequestDesireToDefend(MobId targetId, AbilityId abilityId) {
-            throw new System.NotImplementedException();
-        }
-
-        public Task SlowPlayTurn(GameEventHub eventHub) {
-            throw new System.NotImplementedException();
-        }
     }
 }
