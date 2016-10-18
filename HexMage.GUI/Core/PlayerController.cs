@@ -27,7 +27,7 @@ namespace HexMage.GUI.Core {
         }
 
         public Task<DefenseDesire> SlowRequestDesireToDefend(MobId targetId, AbilityId abilityId) {
-            return Task.FromResult(DefenseDesire.Pass);
+            return _arenaScene.RequestDesireToDefend(targetId, _gameInstance.MobManager.AbilityForId(abilityId));
         }
 
         public Task SlowPlayTurn(GameEventHub eventHub) {

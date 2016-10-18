@@ -98,7 +98,7 @@ namespace HexMage.Simulator {
                 var res = controller.FastRequestDesireToDefend(targetId, abilityId);
 
                 if (res == DefenseDesire.Block) {
-                    MobManager.ChangeMobAp(targetId, MobManager.MobInfoForId(targetId).DefenseCost);
+                    MobManager.ChangeMobAp(targetId, -MobManager.MobInfoForId(targetId).DefenseCost);
                     return DefenseDesire.Block;
                 } else {
                     TargetHit(abilityId, mobId, targetId);
@@ -129,7 +129,7 @@ namespace HexMage.Simulator {
                 var res = await controller.SlowRequestDesireToDefend(targetId, abilityId);
 
                 if (res == DefenseDesire.Block) {
-                    MobManager.ChangeMobAp(targetId, MobManager.MobInfoForId(targetId).DefenseCost);
+                    MobManager.ChangeMobAp(targetId, -MobManager.MobInfoForId(targetId).DefenseCost);
                     return DefenseDesire.Block;
                 } else {
                     TargetHit(abilityId, mobId, targetId);
