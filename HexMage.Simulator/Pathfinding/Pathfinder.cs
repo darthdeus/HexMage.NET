@@ -169,7 +169,7 @@ namespace HexMage.Simulator {
                 foreach (var diff in _diffs) {
                     var neighbour = current + diff;
 
-                    if (IsValidCoord(neighbour)) {
+                    if (IsValidCoord(neighbour) && _map[neighbour] != HexType.Wall) {
                         // We can immediately skip the starting position
                         if (neighbour == start) continue;
 

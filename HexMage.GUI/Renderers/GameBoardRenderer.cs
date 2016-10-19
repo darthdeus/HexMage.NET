@@ -74,7 +74,7 @@ namespace HexMage.GUI.Renderers {
 
                 var pos = _camera.HexToPixel(coord);
                 _spriteBatch.DrawString(_assetManager.Font, _gameInstance.Pathfinder.Distance(coord).ToString(), pos,
-                                        Color.Black);
+                    Color.Black);
 
                 var hexBuffs = map.BuffsAt(coord);
 
@@ -217,7 +217,7 @@ namespace HexMage.GUI.Renderers {
                     foreach (var cubeCoord in cubepath) {
                         if (!_gameInstance.Pathfinder.IsValidCoord(cubeCoord)) {
                             Utils.Log(LogSeverity.Warning, nameof(GameBoardRenderer),
-                                      $"Computed invalid cube visibility path of {cubeCoord}.");
+                                $"Computed invalid cube visibility path of {cubeCoord}.");
                             continue;
                         }
                         if (_gameInstance.Map[cubeCoord] == HexType.Wall) {
@@ -235,13 +235,15 @@ namespace HexMage.GUI.Renderers {
                         distance++;
                     }
                 } else {
-                    if (!mouseMob.HasValue || mouseMob.Value != currentMob.Value) {
-                        var mobInstance = _gameInstance.MobManager.MobInstances[currentMob.Value];
-                        foreach (var coord in path) {
-                            if (mobInstance.Coord.Distance(coord) <= mobInstance.Ap) {
-                                DrawAt(hexUsable, coord);
-                            } else {
-                                DrawAt(hexTooFar, coord);
+                    if (_gameInstance.Map[_camera.MouseHex] != HexType.Wall) {
+                        if (!mouseMob.HasValue || mouseMob.Value != currentMob.Value) {
+                            var mobInstance = _gameInstance.MobManager.MobInstances[currentMob.Value];
+                            foreach (var coord in path) {
+                                if (mobInstance.Coord.Distance(coord) <= mobInstance.Ap) {
+                                    DrawAt(hexUsable, coord);
+                                } else {
+                                    DrawAt(hexTooFar, coord);
+                                }
                             }
                         }
                     }
