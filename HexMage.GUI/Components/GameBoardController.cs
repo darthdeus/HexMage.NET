@@ -291,9 +291,11 @@ namespace HexMage.GUI.Components {
                         var mobInfo = _gameInstance.MobManager.MobInfoForId(currentMob.Value);
 
                         if (_gameInstance.Map[mouseHex] == HexType.Empty) {
-                            var distance = mobInstance.Coord.Distance(mouseHex);
+                            var distance = _gameInstance.Pathfinder.Distance(mouseHex);
 
-                            if (distance > mobInstance.Ap) {
+                            if (distance == int.MaxValue) {
+                                ShowMessage("Target is unreachable");
+                            } else if (distance > mobInstance.Ap) {
                                 ShowMessage("You don't have enough AP.");
                             } else {
                                 _eventHub.SlowBroadcastMobMoved(currentMob.Value, mouseHex)
@@ -326,6 +328,7 @@ namespace HexMage.GUI.Components {
                     var map = _gameInstance.Map;
 
                     var labelText = new StringBuilder();
+                    labelText.AppendLine($"Distance: {_gameInstance.Pathfinder.Distance(mouseHex)}");
 
                     switch (map[mouseHex]) {
                         case HexType.Empty:

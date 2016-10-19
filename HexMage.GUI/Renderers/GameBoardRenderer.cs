@@ -191,7 +191,7 @@ namespace HexMage.GUI.Renderers {
             var hexUsable = _assetManager[AssetManager.HexWithinDistance];
             var hexTooFar = _assetManager[AssetManager.HexPathSprite];
 
-            if (_gameInstance.TurnManager.CurrentMob.HasValue && _gameInstance.Pathfinder.IsValidCoord(_camera.MouseHex)) {
+            if (_gameInstance.TurnManager.CurrentMob.HasValue && _gameInstance.Pathfinder.IsValidCoord(_camera.MouseHex) && _gameInstance.Pathfinder.Distance(_camera.MouseHex) != int.MaxValue) {
                 IList<AxialCoord> path;
 
                 var mouseMob = _gameInstance.MobManager.AtCoord(_camera.MouseHex);
@@ -201,7 +201,6 @@ namespace HexMage.GUI.Renderers {
                 } else {
                     path = _gameInstance.Pathfinder.PathTo(_camera.MouseHex);
                 }
-
 
                 var currentMob = _gameInstance.TurnManager.CurrentMob;
                 var abilityIndex = _gameBoardController.SelectedAbilityIndex;
