@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using HexMage.Simulator.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace HexMage.Simulator {
     public class GameInstance : IDeepCopyable<GameInstance>, IResettable {
@@ -245,6 +247,54 @@ namespace HexMage.Simulator {
         public void FastUseWithDefenseDesire(MobId mob, MobId target, AbilityId ability,
                                              DefenseDesire defenseDesire) {
             throw new NotImplementedException();
+        }
+
+        public static GameInstance FromJSON(string jsonStr) {
+            var mapRepresentation = JsonConvert.DeserializeObject<MapRepresentation>(jsonStr);
+
+            var map = new Map(5);
+
+            var result = new GameInstance(map);
+            return result;
+        }
+    }
+
+
+    public class MapItem {
+        public AxialCoord Coord { get; set; }
+        public HexType HexType { get; set; }
+
+        public MapItem() {}
+
+        public MapItem(AxialCoord coord, HexType hexType) {
+            Coord = coord;
+            HexType = hexType;
+        }
+    }
+
+    public class MapRepresentation {
+        public int Size { get; set; }
+        public MapItem[] Hexes { get; set; }
+
+        public MapRepresentation() {}
+
+        public MapRepresentation(Map map) {
+            Hexes = new MapItem[map.AllCoords.Count];
+            Size = map.Size;
+
+            for (int i = 0; i < map.AllCoords.Count; i++) {
+                var coord = map.AllCoords[i];
+                Hexes[i] = new MapItem(coord, map[coord]);
+            }
+        }
+
+        public void UpdateMap(Map map) {
+            if (map.Size != Size) {
+                throw new NotImplementedException("Map needs to be resized, not implemented yet");
+            }
+            foreach (var hex in Hexes) {
+                map[hex.Coord] = hex.HexType;
+            }
         }
     }
 }

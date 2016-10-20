@@ -33,6 +33,8 @@ namespace HexMage.Simulator {
 
         public AbilityId AbilityId => new AbilityId(Id);
 
+        public Ability() {}
+
         public Ability(int id, int dmg, int cost, int range, int cooldown, AbilityElement element)
             : this(id, dmg, cost, range, cooldown, element, new List<Buff>(), new List<AreaBuff>()) {
         }
@@ -65,7 +67,7 @@ namespace HexMage.Simulator {
                         throw new InvalidOperationException("Invalid element type");
                 }
             }
-        }
+        }        
 
         //public Ability DeepCopy() {
         //    var buffsCopy = new List<Buff>();

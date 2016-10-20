@@ -1,12 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
     public class HexMap<T> : IDeepCopyable<HexMap<T>> {
         private readonly T[,] _data;
 
         private readonly int _size;
+
+        [JsonConstructor]
+        public HexMap() {}
 
         public HexMap(int size) {
             Debug.Assert(size > 0);
@@ -25,7 +29,6 @@ namespace HexMage.Simulator {
         }        
 
         private static Dictionary<int, List<AxialCoord>> _allCoordDictionary = new Dictionary<int, List<AxialCoord>>();
-        private List<AxialCoord> _allCoords;
 
         private List<AxialCoord> CalculateAllCoords(int size) {
             var result = new List<AxialCoord>();

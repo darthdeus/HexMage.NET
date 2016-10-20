@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -12,6 +13,7 @@ using HexMage.Simulator;
 using HexMage.Simulator.Model;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Newtonsoft.Json;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Components {
@@ -77,9 +79,9 @@ namespace HexMage.GUI.Components {
             var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
 
             var projectileAnimation = new Animation(projectileSprite,
-                TimeSpan.FromMilliseconds(50),
-                AssetManager.TileSize,
-                4);
+                                                    TimeSpan.FromMilliseconds(50),
+                                                    AssetManager.TileSize,
+                                                    4);
 
             projectileAnimation.Origin = new Vector2(AssetManager.TileSize/2, AssetManager.TileSize/2);
 
@@ -130,7 +132,7 @@ namespace HexMage.GUI.Components {
             BuildPopovers();
 
             _eventHub.SlowMainLoop(TimeSpan.FromMilliseconds(500))
-                .LogContinuation();
+                     .LogContinuation();
         }
 
         public Task ShowMessage(string message, int displayForSeconds = 5) {
@@ -206,6 +208,28 @@ namespace HexMage.GUI.Components {
         private void HandleKeyboardAbilitySelect() {
             var inputManager = InputManager.Instance;
 
+            string mapFilename = "map.json";
+            if (inputManager.IsKeyJustReleased(Keys.F10)) {
+                var repr = new MapRepresentation(_gameInstance.Map);
+
+                using (var writer = new StreamWriter(mapFilename))
+                using (var mobWriter = new StreamWriter("mobs.json")) {
+                    writer.Write(JsonConvert.SerializeObject(repr));
+                    mobWriter.Write(JsonConvert.SerializeObject(_gameInstance.MobManager));
+                }
+            }
+
+            if (inputManager.IsKeyJustReleased(Keys.F11)) {
+                using (var reader = new StreamReader(mapFilename))
+                using (var mobReader = new StreamReader("mobs.json")) {
+                    var mapRepr = JsonConvert.DeserializeObject<MapRepresentation>(reader.ReadToEnd());
+                    mapRepr.UpdateMap(_gameInstance.Map);
+
+                    //var mobManager = JsonConvert.DeserializeObject<MobManager>(mobReader.ReadToEnd());
+                    //Console.WriteLine(mobManager);
+                }
+            }
+
             if (inputManager.IsKeyJustReleased(Keys.D1)) SelectAbility(0);
             else if (inputManager.IsKeyJustReleased(Keys.D2)) SelectAbility(1);
             else if (inputManager.IsKeyJustReleased(Keys.D3)) SelectAbility(2);
@@ -242,7 +266,7 @@ namespace HexMage.GUI.Components {
 
         private void AttackMob(MobId targetId) {
             Debug.Assert(SelectedAbilityIndex != null,
-                "_gameInstance.TurnManager.SelectedAbilityIndex != null");
+                         "_gameInstance.TurnManager.SelectedAbilityIndex != null");
 
             var abilityIndex = SelectedAbilityIndex.Value;
             var mobId = _gameInstance.TurnManager.CurrentMob;
@@ -299,7 +323,7 @@ namespace HexMage.GUI.Components {
                                 ShowMessage("You don't have enough AP.");
                             } else {
                                 _eventHub.SlowBroadcastMobMoved(currentMob.Value, mouseHex)
-                                    .LogContinuation();
+                                         .LogContinuation();
                             }
                         } else {
                             ShowMessage("You can't walk into a wall.");
@@ -346,7 +370,7 @@ namespace HexMage.GUI.Components {
 
                     var buffs = map.BuffsAt(mouseHex);
                     Debug.Assert(buffs != null,
-                        "Buffs can't be null since we're only using valid map coords (and those are all initialized).");
+                                 "Buffs can't be null since we're only using valid map coords (and those are all initialized).");
 
                     foreach (var buff in buffs)
                         labelText.AppendLine($"{buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");
