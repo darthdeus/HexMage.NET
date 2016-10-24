@@ -225,8 +225,8 @@ namespace HexMage.GUI.Components {
                     var mapRepr = JsonConvert.DeserializeObject<MapRepresentation>(reader.ReadToEnd());
                     mapRepr.UpdateMap(_gameInstance.Map);
 
-                    //var mobManager = JsonConvert.DeserializeObject<MobManager>(mobReader.ReadToEnd());
-                    //Console.WriteLine(mobManager);
+                    var mobManager = JsonConvert.DeserializeObject<MobManager>(mobReader.ReadToEnd());
+                    Console.WriteLine(mobManager);
                 }
             }
 
@@ -274,7 +274,8 @@ namespace HexMage.GUI.Components {
             Debug.Assert(mobId != null);
             var abilityId = _gameInstance.MobManager.MobInfos[mobId.Value].Abilities[abilityIndex].Id;
 
-            _eventHub.SlowBroadcastAbilityUsed(new MobId(mobId.Value), targetId, new AbilityId(abilityId));
+            _eventHub.SlowBroadcastAbilityUsed(new MobId(mobId.Value), targetId, new AbilityId(abilityId))
+                     .LogTask();
         }
 
         private void HandleLeftClick() {

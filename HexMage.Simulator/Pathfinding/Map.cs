@@ -14,6 +14,9 @@ namespace HexMage.Simulator {
 
         public List<AxialCoord> AllCoords => _hexes.AllCoords;
 
+        private readonly Dictionary<CoordPair, List<AxialCoord>> _visibilityLines =
+            new Dictionary<CoordPair, List<AxialCoord>>();
+
         public Map(int size, HexMap<HexType> hexes, List<AreaBuff> buffs) {
             Size = size;
             _hexes = hexes;
@@ -68,20 +71,18 @@ namespace HexMage.Simulator {
                                  LerpRound(a.Z, b.Z, t, -0.000002f));
         }
 
-        private readonly Dictionary<CoordPair, List<AxialCoord>> _cubeLines =
-            new Dictionary<CoordPair, List<AxialCoord>>();
 
         public void PrecomputeCubeLinedraw() {
             foreach (var a in AllCoords) {
                 foreach (var b in AllCoords) {
                     var result = ComputeCubeLinedraw(a, b);
-                    _cubeLines[new CoordPair(a, b)] = result.Select(x => x.ToAxial()).ToList();
+                    _visibilityLines[new CoordPair(a, b)] = result.Select(x => x.ToAxial()).ToList();
                 }
             }
         }
 
         public List<AxialCoord> AxialLinedraw(AxialCoord a, AxialCoord b) {
-            return _cubeLines[new CoordPair(a, b)];
+            return _visibilityLines[new CoordPair(a, b)];
         }
 
         private List<CubeCoord> ComputeCubeLinedraw(CubeCoord a, CubeCoord b) {

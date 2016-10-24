@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using HexMage.Simulator.Model;
+using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
     public class MobManager : IDeepCopyable<MobManager>, IResettable {
@@ -13,8 +14,10 @@ namespace HexMage.Simulator {
         public MobInstance[] MobInstances = new MobInstance[0];
         public List<int> Cooldowns = new List<int>();
 
+        [JsonIgnore]
         public HexMap<MobId?> MobPositions;
 
+        [JsonIgnore]
         public readonly Dictionary<TeamColor, IMobController> Teams = new Dictionary<TeamColor, IMobController>();
 
         //public bool MoveOneHex(Mob mob, AxialCoord to) {
