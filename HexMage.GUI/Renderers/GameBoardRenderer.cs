@@ -109,7 +109,7 @@ namespace HexMage.GUI.Renderers {
                 var mouseMob = mobManager.AtCoord(_camera.MouseHex);
 
                 if (mouseMob.HasValue) {
-                    var heatmap = new HexMap<int>(_gameInstance.Map.Size);
+                    var heatmap = new HexMap<int>(_gameInstance.Size);
                     var mobInfo = mobManager.MobInfos[mouseMob.Value];
                     var mobInstance = mobManager.MobInstances[mouseMob.Value];
 
@@ -147,7 +147,7 @@ namespace HexMage.GUI.Renderers {
 
         private void DrawGlobalHeatmap(MobId currentMob) {
             var mobManager = _gameInstance.MobManager;
-            var heatmap = new HexMap<int>(_gameInstance.Map.Size);
+            var heatmap = new HexMap<int>(_gameInstance.Size);
             int maxDmg = 0;
 
             foreach (var mobId in mobManager.Mobs) {

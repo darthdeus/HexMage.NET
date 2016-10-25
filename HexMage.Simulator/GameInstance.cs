@@ -21,6 +21,26 @@ namespace HexMage.Simulator {
 
         public bool IsFinished => RedAlive <= 0 || BlueAlive <= 0;
 
+        public GameInstance(Map map, MobManager mobManager) {
+            Map = map;
+            MobManager = mobManager;
+
+            Size = map.Size;
+            Pathfinder = new Pathfinder(this);
+            TurnManager = new TurnManager(this);
+        }
+
+        public GameInstance(int size) : this(new Map(size)) {}
+        public GameInstance(Map map) : this(map, new MobManager()) {}
+
+        private GameInstance(int size, Map map, MobManager mobManager, Pathfinder pathfinder) {
+            Size = size;
+            MobManager = mobManager;
+            Map = map;
+            Pathfinder = pathfinder;
+            TurnManager = new TurnManager(this);
+        }
+
         public void SlowUpdateIsFinished() {
             RedAlive = 0;
             BlueAlive = 0;
@@ -35,26 +55,6 @@ namespace HexMage.Simulator {
                     BlueAlive++;
                 }
             }
-        }
-
-        public GameInstance(Map map, MobManager mobManager) {
-            Map = map;
-            MobManager = mobManager;
-
-            Size = map.Size;
-            Pathfinder = new Pathfinder(Map, MobManager);
-            TurnManager = new TurnManager(this);
-        }
-
-        public GameInstance(int size) : this(new Map(size)) {}
-        public GameInstance(Map map) : this(map, new MobManager()) {}
-
-        private GameInstance(int size, Map map, MobManager mobManager, Pathfinder pathfinder) {
-            Size = size;
-            MobManager = mobManager;
-            Map = map;
-            Pathfinder = pathfinder;
-            TurnManager = new TurnManager(this);
         }
 
         public bool IsAbilityUsable(MobId mobId, AbilityId abilityId) {
@@ -188,7 +188,7 @@ namespace HexMage.Simulator {
 #warning TODO - tohle prepsat poradne
             var mapCopy = Map.DeepCopy();
             var mobManagerCopy = MobManager.DeepCopy();
-            var game = new GameInstance(Size, mapCopy, mobManagerCopy, new Pathfinder(mapCopy, mobManagerCopy));
+            var game = new GameInstance(mapCopy, mobManagerCopy);
 
             return game;
         }

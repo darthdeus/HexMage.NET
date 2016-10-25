@@ -17,16 +17,14 @@ namespace HexMage.Simulator {
     }
 
     public class Pathfinder : IResettable {
+        private readonly GameInstance _gameInstance;
         private readonly List<AxialCoord> _diffs;
-        private readonly Map _map;
-        private readonly MobManager _mobManager;
         readonly HexMap<HexMap<Path>> _allPaths;
         private HexMap<Path> _current;
 
-        public Pathfinder(Map map, MobManager mobManager) {
-            _map = map;
-            _mobManager = mobManager;
-            _allPaths = new HexMap<HexMap<Path>>(_map.Size);
+        public Pathfinder(GameInstance gameInstance) {
+            _gameInstance = gameInstance;
+            _allPaths = new HexMap<HexMap<Path>>(_gameInstance.Size);
 
             _diffs = new List<AxialCoord> {
                 new AxialCoord(-1, 0),
@@ -39,7 +37,7 @@ namespace HexMage.Simulator {
         }
 
 
-        private int Size => _map.Size;
+        private int Size => _gameInstance.Size;
 
         public void Reset() {
             // Right now we're not caching anything, so there's nothing to reset
@@ -103,7 +101,7 @@ namespace HexMage.Simulator {
 
 
         private bool IsWalkable(AxialCoord coord) {
-            return IsValidCoord(coord) && (_map[coord] == HexType.Empty) && (_mobManager.AtCoord(coord) == null);
+            return IsValidCoord(coord) && (_gameInstance.Map[coord] == HexType.Empty) && (_gameInstance.MobManager.AtCoord(coord) == null);
         }
 
         public int Distance(AxialCoord c) {
@@ -113,7 +111,7 @@ namespace HexMage.Simulator {
 
         public void PathfindFromCurrentMob(TurnManager turnManager) {
             if (turnManager.CurrentMob != null)
-                PathfindFrom(_mobManager.MobInstanceForId(turnManager.CurrentMob.Value).Coord);
+                PathfindFrom(_gameInstance.MobManager.MobInstanceForId(turnManager.CurrentMob.Value).Coord);
         }
 
 
@@ -124,7 +122,7 @@ namespace HexMage.Simulator {
             var sw = Stopwatch.StartNew();
 
             foreach (var source in _allPaths.AllCoords) {
-                _allPaths[source] = new HexMap<Path>(_map.Size);
+                _allPaths[source] = new HexMap<Path>(_gameInstance.Size);
                 PathfindDistanceOnlyFrom(_allPaths[source], source);
                 done++;
                 if (done == 100) {
@@ -139,7 +137,7 @@ namespace HexMage.Simulator {
 
         public void PathfindDistanceOnlyFrom(HexMap<Path> distanceMap, AxialCoord start) {
             var queue = new Queue<AxialCoord>();
-            var states = new HexMap<VertexState>(_map.Size);
+            var states = new HexMap<VertexState>(_gameInstance.Size);
 
             foreach (var coord in distanceMap.AllCoords) {
                 distanceMap[coord] = new Path() {Reachable = false, Distance = int.MaxValue};
@@ -169,7 +167,7 @@ namespace HexMage.Simulator {
                 foreach (var diff in _diffs) {
                     var neighbour = current + diff;
 
-                    if (IsValidCoord(neighbour) && _map[neighbour] != HexType.Wall) {
+                    if (IsValidCoord(neighbour) && _gameInstance.Map[neighbour] != HexType.Wall) {
                         // We can immediately skip the starting position
                         if (neighbour == start) continue;
 
@@ -223,7 +221,7 @@ namespace HexMage.Simulator {
             //int distance = (Math.Abs(c.X)
             //                + Math.Abs(c.X + c.Y)
             //                + Math.Abs(c.Y)) / 2;
-            return distance <= _map.Size;
+            return distance <= _gameInstance.Size;
 
             //return _map.AxialDistance(c, new AxialCoord(0, 0)) <= _map.Size;
             //return _map.CubeDistance(new CubeCoord(0, 0, 0), c) <= _map.Size;
