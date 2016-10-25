@@ -12,7 +12,7 @@ namespace HexMage.Simulator {
             _gameInstance = gameInstance;
         }
 
-        public DefenseDesire FastRequestDesireToDefend(MobId mobId, AbilityId ability) {
+        public DefenseDesire FastRequestDesireToDefend(int mobId, int ability) {
             return DefenseDesire.Pass;
         }
 
@@ -40,8 +40,8 @@ namespace HexMage.Simulator {
                 }
             }
 
-            MobId spellTarget = MobId.Invalid;
-            MobId moveTarget = MobId.Invalid;
+            int spellTarget = MobInstance.InvalidId;
+            int moveTarget = MobInstance.InvalidId;
 
             foreach (var possibleTarget in _gameInstance.MobManager.Mobs) {
                 var possibleTargetInstance = _gameInstance.MobManager.MobInstanceForId(possibleTarget);
@@ -59,17 +59,17 @@ namespace HexMage.Simulator {
                 }
             }
 
-            if (spellTarget != MobId.Invalid) {
-                _gameInstance.FastUse(ability.AbilityId, mobId.Value, spellTarget);
+            if (spellTarget != MobInstance.InvalidId) {
+                _gameInstance.FastUse(ability.Id, mobId.Value, spellTarget);
             }
-            else if (moveTarget != MobId.Invalid) {
+            else if (moveTarget != MobInstance.InvalidId) {
                 FastMoveTowardsEnemy(mobId.Value, moveTarget);
             } else {
                 throw new InvalidOperationException("No targets, game should be over.");
             }
         }
 
-        private void FastMoveTowardsEnemy(MobId mobId, MobId targetId) {
+        private void FastMoveTowardsEnemy(int mobId, int targetId) {
             var pathfinder = _gameInstance.Pathfinder;
             var mobInstance = _gameInstance.MobManager.MobInstanceForId(mobId);
             var targetInstance = _gameInstance.MobManager.MobInstanceForId(targetId);
@@ -85,7 +85,7 @@ namespace HexMage.Simulator {
         }
 
         public string Name => nameof(AiRandomController);
-        public Task<DefenseDesire> SlowRequestDesireToDefend(MobId targetId, AbilityId abilityId) {
+        public Task<DefenseDesire> SlowRequestDesireToDefend(int targetId, int abilityId) {
             throw new NotImplementedException();
         }
 

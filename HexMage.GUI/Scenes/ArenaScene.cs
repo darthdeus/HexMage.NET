@@ -16,7 +16,7 @@ namespace HexMage.GUI.Scenes {
         private readonly GameInstance _gameInstance;
         private readonly Entity _defenseModal;
         private readonly GameEventHub _gameEventHub;
-        public readonly Dictionary<MobId, MobEntity> MobEntities = new Dictionary<MobId, MobEntity>();
+        public readonly Dictionary<int, MobEntity> MobEntities = new Dictionary<int, MobEntity>();
 
         public ArenaScene(GameManager gameManager, GameInstance gameInstance) : base(gameManager) {
             _gameInstance = gameInstance;
@@ -33,13 +33,14 @@ namespace HexMage.GUI.Scenes {
         }
 
         public override void Initialize() {
-            _gameInstance.MobManager.Reset();
-            _gameInstance.Map.PrecomputeCubeLinedraw();
-            _gameInstance.Pathfinder.PathfindDistanceAll();
+            _gameInstance.PrepareEverything();
+            //_gameInstance.MobManager.Reset();
+            //_gameInstance.Map.PrecomputeCubeLinedraw();
+            //_gameInstance.Pathfinder.PathfindDistanceAll();
 
-            // TODO - vyresit kdy presne volat presort (mozna nejaky unifikovany initialize?)
-            _gameInstance.TurnManager.PresortTurnOrder();
-            _gameInstance.TurnManager.StartNextTurn(_gameInstance.Pathfinder);
+            //// TODO - vyresit kdy presne volat presort (mozna nejaky unifikovany initialize?)
+            //_gameInstance.TurnManager.PresortTurnOrder();
+            //_gameInstance.TurnManager.StartNextTurn(_gameInstance.Pathfinder);
 
             Camera2D.Instance.Translate = new Vector3(600, 500, 0);
 
@@ -130,8 +131,8 @@ namespace HexMage.GUI.Scenes {
 
 #warning TODO - this shouldn't be a func, but rater pass it directly
             Func<GameInstance> gameFunc = () => _gameInstance;
-            Func<MobId?> currentMobFunc = () => _gameInstance.TurnManager.CurrentMob;
-            Func<MobId?> hoverMobFunc = () => {
+            Func<int?> currentMobFunc = () => _gameInstance.TurnManager.CurrentMob;
+            Func<int?> hoverMobFunc = () => {
                 var mouseHex = Camera2D.Instance.MouseHex;
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
                     return _gameInstance.MobManager.AtCoord(mouseHex);
@@ -146,7 +147,7 @@ namespace HexMage.GUI.Scenes {
             }
         }
 
-        private Entity AbilityDetail(Func<GameInstance> gameFunc, Func<MobId?> mobFunc, int abilityIndex, ParticleEffectSettings particleEffectSettings) {
+        private Entity AbilityDetail(Func<GameInstance> gameFunc, Func<int?> mobFunc, int abilityIndex, ParticleEffectSettings particleEffectSettings) {
             var abilityDetailWrapper = new Entity {
                 SizeFunc = () => new Vector2(120, 80)
             };
@@ -246,7 +247,7 @@ namespace HexMage.GUI.Scenes {
         private GameBoardController _gameBoardController;
         private LogBox _logBox;
 
-        public Task<DefenseDesire> RequestDesireToDefend(MobId mobId, Ability ability) {
+        public Task<DefenseDesire> RequestDesireToDefend(int mobId, Ability ability) {
             _defenseModal.Active = true;
             _defenseDesireSource = new TaskCompletionSource<DefenseDesire>();
 

@@ -12,13 +12,12 @@ namespace HexMage.Simulator {
 
     public class TurnManager : IResettable {
         private readonly GameInstance _gameInstance;
-        private readonly Map _map;
-        public MobManager MobManager { get; set; }
+        private MobManager _mobManager => _gameInstance.MobManager;
 
         public IMobController CurrentController
-            => CurrentMob != null ? MobManager.Teams[MobManager.MobInfoForId(CurrentMob.Value).Team] : null;
+            => CurrentMob != null ? _mobManager.Teams[_mobManager.MobInfoForId(CurrentMob.Value).Team] : null;
 
-        public MobId? CurrentMob {
+        public int? CurrentMob {
             get {
                 if (_current < _turnOrder.Count) {
                     return _turnOrder[_current];
@@ -33,19 +32,17 @@ namespace HexMage.Simulator {
 
         public TurnManager(GameInstance gameInstance) {
             _gameInstance = gameInstance;
-            MobManager = gameInstance.MobManager;
-            _map = gameInstance.Map;
         }
 
-        private List<MobId> _turnOrder;
-        private List<MobId> _presortedOrder;
+        private List<int> _turnOrder;
+        private List<int> _presortedOrder;
 
 
         public void PresortTurnOrder() {
-            _presortedOrder = MobManager.Mobs.ToList();
+            _presortedOrder = _mobManager.Mobs.ToList();
             _presortedOrder.Sort((a, b) => {
-                                     var aInfo = MobManager.MobInfoForId(a);
-                                     var bInfo = MobManager.MobInfoForId(b);
+                                     var aInfo = _mobManager.MobInfoForId(a);
+                                     var bInfo = _mobManager.MobInfoForId(b);
                                      return aInfo.Iniciative.CompareTo(bInfo.Iniciative);
                                  });
 
@@ -55,8 +52,8 @@ namespace HexMage.Simulator {
         public void StartNextTurn(Pathfinder pathfinder) {
             TurnNumber++;
 
-            for (int i = 0; i < MobManager.MobInstances.Length; i++) {
-                MobManager.MobInstances[i].Ap = MobManager.MobInfos[i].MaxAp;
+            for (int i = 0; i < _mobManager.MobInstances.Length; i++) {
+                _mobManager.MobInstances[i].Ap = _mobManager.MobInfos[i].MaxAp;
             }
 
             //foreach (var mobId in MobManager.Mobs) {
@@ -66,15 +63,18 @@ namespace HexMage.Simulator {
             //    }
             //}
 
-            _turnOrder.RemoveAll(x => MobManager.MobInstances[x].Hp <= 0);
+            _turnOrder.RemoveAll(x => _mobManager.MobInstances[x].Hp <= 0);
 
-            MobManager.ApplyDots(_map, _gameInstance);
-            MobManager.LowerCooldowns();
+            _mobManager.ApplyDots(_gameInstance.Map, _gameInstance);
+            _mobManager.LowerCooldowns();
 
             _current = 0;
 
             if (CurrentMob != null) {
-                pathfinder.PathfindFrom(MobManager.MobInstanceForId(CurrentMob.Value).Coord);
+                Utils.Log(LogSeverity.Debug, nameof(Pathfinder), "CurrentMob set SUCCESS");
+                pathfinder.PathfindFrom(_mobManager.MobInstanceForId(CurrentMob.Value).Coord);
+            } else {
+                Utils.Log(LogSeverity.Warning, nameof(Pathfinder), "CurrentMob is NULL, pathfind current failed");
             }
         }
 
@@ -88,7 +88,7 @@ namespace HexMage.Simulator {
                 _current++;
 
                 Debug.Assert(CurrentMob.HasValue, "There's no current mob but still trying to move to one.");
-                var mobInstance = MobManager.MobInstanceForId(CurrentMob.Value);
+                var mobInstance = _mobManager.MobInstanceForId(CurrentMob.Value);
                 if (mobInstance.Hp <= 0) return NextMobOrNewTurn(pathfinder);
 
                 pathfinder.PathfindFrom(mobInstance.Coord);
@@ -102,7 +102,6 @@ namespace HexMage.Simulator {
         }
 
         private void CopyTurnOrderFromPresort() {
-
             //_presortedOrder = MobManager.Mobs.ToList();
             //_presortedOrder.Sort((a, b) => {
             //    var aInfo = MobManager.MobInfoForId(a);
@@ -111,7 +110,7 @@ namespace HexMage.Simulator {
             //});
 
             //_turnOrder = _presortedOrder;
-            _turnOrder = new List<MobId>();
+            _turnOrder = new List<int>();
 
             foreach (var id in _presortedOrder) {
                 _turnOrder.Add(id);

@@ -41,6 +41,15 @@ namespace HexMage.Simulator {
             TurnManager = new TurnManager(this);
         }
 
+        public void PrepareEverything() {
+            MobManager.MobPositions = new HexMap<int?>(Size);
+            MobManager.Reset();
+            Map.PrecomputeCubeLinedraw();
+            Pathfinder.PathfindDistanceAll();
+            TurnManager.PresortTurnOrder();
+            TurnManager.StartNextTurn(Pathfinder);
+        }
+
         public void SlowUpdateIsFinished() {
             RedAlive = 0;
             BlueAlive = 0;
@@ -57,13 +66,13 @@ namespace HexMage.Simulator {
             }
         }
 
-        public bool IsAbilityUsable(MobId mobId, AbilityId abilityId) {
+        public bool IsAbilityUsable(int mobId, int abilityId) {
             var ability = MobManager.AbilityForId(abilityId);
             var mob = MobManager.MobInstanceForId(mobId);
             return mob.Ap >= ability.Cost && MobManager.CooldownFor(abilityId) == 0;
         }
 
-        public bool IsAbilityUsable(MobId mobId, MobId targetId, AbilityId abilityId) {
+        public bool IsAbilityUsable(int mobId, int targetId, int abilityId) {
             var mob = MobManager.MobInstanceForId(mobId);
             var target = MobManager.MobInstanceForId(targetId);
 
@@ -84,7 +93,7 @@ namespace HexMage.Simulator {
         }
 
 
-        public DefenseDesire FastUse(AbilityId abilityId, MobId mobId, MobId targetId) {
+        public DefenseDesire FastUse(int abilityId, int mobId, int targetId) {
             var target = MobManager.MobInstanceForId(targetId);
             var targetInfo = MobManager.MobInfoForId(targetId);
             Debug.Assert(MobManager.CooldownFor(abilityId) == 0, "Trying to use an ability with non-zero cooldown.");
@@ -115,7 +124,7 @@ namespace HexMage.Simulator {
             return result;
         }
 
-        public async Task<DefenseDesire> SlowUse(AbilityId abilityId, MobId mobId, MobId targetId) {
+        public async Task<DefenseDesire> SlowUse(int abilityId, int mobId, int targetId) {
             var target = MobManager.MobInstanceForId(targetId);
             var targetInfo = MobManager.MobInfoForId(targetId);
             Debug.Assert(MobManager.CooldownFor(abilityId) == 0, "Trying to use an ability with non-zero cooldown.");
@@ -146,7 +155,7 @@ namespace HexMage.Simulator {
             return result;
         }
 
-        private void TargetHit(AbilityId abilityId, MobId mobId, MobId targetId) {
+        private void TargetHit(int abilityId, int mobId, int targetId) {
             var ability = MobManager.AbilityForId(abilityId);
 
             MobManager.ChangeMobHp(this, targetId, -ability.Dmg);
@@ -244,7 +253,7 @@ namespace HexMage.Simulator {
             }
         }
 
-        public void FastUseWithDefenseDesire(MobId mob, MobId target, AbilityId ability,
+        public void FastUseWithDefenseDesire(int mobId, int targetId, int ability,
                                              DefenseDesire defenseDesire) {
             throw new NotImplementedException();
         }

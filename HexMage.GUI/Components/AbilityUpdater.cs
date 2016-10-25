@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 namespace HexMage.GUI.Components {
     public class AbilityUpdater : Component {
         private readonly Func<GameInstance> _gameFunc;
-        private readonly Func<MobId?> _mobFunc;
+        private readonly Func<int?> _mobFunc;
         private readonly int _abilityIndex;
         private readonly Label _dmgLabel;
         private readonly Label _rangeLabel;
@@ -20,7 +20,7 @@ namespace HexMage.GUI.Components {
 
         public event Action<int> OnClick;
 
-        public AbilityUpdater(Func<GameInstance> gameFunc, Func<MobId?> mobFunc, int abilityIndex, Label dmgLabel, Label rangeLabel,
+        public AbilityUpdater(Func<GameInstance> gameFunc, Func<int?> mobFunc, int abilityIndex, Label dmgLabel, Label rangeLabel,
                               Label elementLabel, Label cooldownLabel, Label buffsLabel) {
             _gameFunc = gameFunc;
             _mobFunc = mobFunc;

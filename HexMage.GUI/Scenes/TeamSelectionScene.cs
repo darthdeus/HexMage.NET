@@ -27,7 +27,7 @@ namespace HexMage.GUI.Scenes {
             _map = map;
             _gameInstance = new GameInstance(_map, _mobManager);
             // TODO - tohle je fuj, inicializovat to poradne
-            _mobManager.MobPositions = new HexMap<MobId?>(map.Size);
+            _mobManager.MobPositions = new HexMap<int?>(map.Size);
             _arenaScene = new ArenaScene(_gameManager, _gameInstance);
 
             _controllerList = new List<IMobController> {
@@ -164,7 +164,7 @@ namespace HexMage.GUI.Scenes {
             _gameInstance.BlueAlive = t2size;
         }
 
-        public Entity BuildMobPreview(Func<MobId> mobFunc) {
+        public Entity BuildMobPreview(Func<int> mobFunc) {
             Func<string> textFunc = () => {
                 var builder = new StringBuilder();
 

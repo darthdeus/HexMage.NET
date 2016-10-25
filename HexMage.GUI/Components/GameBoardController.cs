@@ -44,19 +44,19 @@ namespace HexMage.GUI.Components {
             _arenaScene = arenaScene;
         }
 
-        public void EventAbilityUsed(MobId mobId, MobId targetId, Ability ability) {
+        public void EventAbilityUsed(int mobId, int targetId, Ability ability) {
             SlowEventAbilityUsed(mobId, targetId, ability).Wait();
         }
 
-        public void EventMobMoved(MobId mobId, AxialCoord pos) {
+        public void EventMobMoved(int mobId, AxialCoord pos) {
             SlowEventMobMoved(mobId, pos).Wait();
         }
 
-        public void EventDefenseDesireAcquired(MobId mob, DefenseDesire defenseDesireResult) {
+        public void EventDefenseDesireAcquired(int mob, DefenseDesire defenseDesireResult) {
             ShowMessage($"{nameof(GameBoardController)} got defense {defenseDesireResult}");
         }
 
-        public async Task SlowEventMobMoved(MobId mobId, AxialCoord pos) {
+        public async Task SlowEventMobMoved(int mobId, AxialCoord pos) {
             var mobEntity = _arenaScene.MobEntities[mobId];
             Debug.Assert(mobEntity != null, "Trying to move a mob without an associated entity.");
 
@@ -68,7 +68,7 @@ namespace HexMage.GUI.Components {
             }
         }
 
-        public async Task SlowEventAbilityUsed(MobId mobId, MobId targetId, Ability ability) {
+        public async Task SlowEventAbilityUsed(int mobId, int targetId, Ability ability) {
             Utils.Log(LogSeverity.Info, nameof(GameBoardController), "EventAbilityUsed");
 
             var mobInstance = _gameInstance.MobManager.MobInstanceForId(mobId);
@@ -230,6 +230,14 @@ namespace HexMage.GUI.Components {
                 }
             }
 
+            if (inputManager.IsKeyJustReleased(Keys.F12)) {
+                foreach (var mobId in _gameInstance.MobManager.Mobs) {
+                    var mobInfo = _gameInstance.MobManager.MobInfos[mobId];
+                    var mobInstance = _gameInstance.MobManager.MobInstances[mobId];
+                    Console.WriteLine($"#{mobId} {mobInstance.Coord} {mobInfo}");
+                }
+            }
+
             if (inputManager.IsKeyJustReleased(Keys.D1)) SelectAbility(0);
             else if (inputManager.IsKeyJustReleased(Keys.D2)) SelectAbility(1);
             else if (inputManager.IsKeyJustReleased(Keys.D3)) SelectAbility(2);
@@ -264,7 +272,7 @@ namespace HexMage.GUI.Components {
             }
         }
 
-        private void AttackMob(MobId targetId) {
+        private void AttackMob(int targetId) {
             Debug.Assert(SelectedAbilityIndex != null,
                          "_gameInstance.TurnManager.SelectedAbilityIndex != null");
 
@@ -272,9 +280,9 @@ namespace HexMage.GUI.Components {
             var mobId = _gameInstance.TurnManager.CurrentMob;
 
             Debug.Assert(mobId != null);
-            var abilityId = _gameInstance.MobManager.MobInfos[mobId.Value].Abilities[abilityIndex].Id;
+            var abilityId = _gameInstance.MobManager.MobInfos[mobId.Value].Abilities[abilityIndex];
 
-            _eventHub.SlowBroadcastAbilityUsed(new MobId(mobId.Value), targetId, new AbilityId(abilityId))
+            _eventHub.SlowBroadcastAbilityUsed(mobId.Value, targetId, abilityId)
                      .LogTask();
         }
 
@@ -454,7 +462,7 @@ namespace HexMage.GUI.Components {
 
         private readonly TimeSpan _abilityPopoverDisplayTime = TimeSpan.FromSeconds(3);
 
-        private async Task BuildUsedAbilityPopover(MobId mobId, Ability ability) {
+        private async Task BuildUsedAbilityPopover(int mobId, Ability ability) {
             var result = new VerticalLayout {
                 Renderer = new ColorRenderer(Color.LightGray),
                 Padding = _popoverPadding,

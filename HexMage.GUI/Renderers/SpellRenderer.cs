@@ -10,10 +10,10 @@ namespace HexMage.GUI.Renderers {
     public class SpellRenderer : IRenderer {
         private readonly GameInstance _gameInstance;
         private readonly GameBoardController _gameBoardController;
-        private readonly Func<MobId?> _mobFunc;
+        private readonly Func<int?> _mobFunc;
         private readonly int _abilityIndex;
 
-        public SpellRenderer(GameInstance gameInstance, GameBoardController gameBoardController, Func<MobId?> mobFunc , int abilityIndex) {
+        public SpellRenderer(GameInstance gameInstance, GameBoardController gameBoardController, Func<int?> mobFunc , int abilityIndex) {
             _gameInstance = gameInstance;
             _gameBoardController = gameBoardController;
             _mobFunc = mobFunc;

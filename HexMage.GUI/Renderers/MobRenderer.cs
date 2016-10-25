@@ -10,7 +10,7 @@ using Color = Microsoft.Xna.Framework.Color;
 namespace HexMage.GUI.Renderers {
     public class MobRenderer : IRenderer {
         private readonly GameInstance _gameInstance;
-        private readonly MobId _mobId;
+        private readonly int _mobId;
         private readonly MobAnimationController _animationController;
 
         private readonly int _healthbarWidth = (int) (1.0/6*AssetManager.TileSize);
@@ -19,7 +19,7 @@ namespace HexMage.GUI.Renderers {
         private readonly Point _healthbarOffset = new Point((int) (9.0/10*AssetManager.TileSize),
                                                             (int) (1.0/7*AssetManager.TileSize));
 
-        public MobRenderer(GameInstance gameInstance, MobId mobId, MobAnimationController animationController) {
+        public MobRenderer(GameInstance gameInstance, int mobId, MobAnimationController animationController) {
             _gameInstance = gameInstance;
             _mobId = mobId;
             _animationController = animationController;

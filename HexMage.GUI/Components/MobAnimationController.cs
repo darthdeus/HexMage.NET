@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 namespace HexMage.GUI.Components {
     public class MobAnimationController : Component {
         private MobEntity _mobEntity;
-        private MobId _mobId;
+        private int _mobId;
         private GameInstance _gameInstance;
 
         private TimeSpan _time;

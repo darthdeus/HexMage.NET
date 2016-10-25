@@ -145,9 +145,15 @@ namespace HexMage.GUI.Scenes {
 
                 var mobManager = JsonConvert.DeserializeObject<MobManager>(mobReader.ReadToEnd());
                 game.MobManager = mobManager;
-                // TODO - figure out a uniform way of initialization
-                mobManager.Reset();
-                Console.WriteLine(mobManager);
+                game.PrepareEverything();
+                //// TODO - figure out a uniform way of initialization
+                //mobManager.Reset();
+
+                //game.TurnManager.PresortTurnOrder();
+                //game.TurnManager.StartNextTurn(game.Pathfinder);
+                //game.Pathfinder.PathfindDistanceAll();
+                //game.Pathfinder.PathfindFromCurrentMob(game.TurnManager);
+                //Console.WriteLine(mobManager);
 
                 var arenaScene = new ArenaScene(_gameManager, game);
 

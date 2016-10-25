@@ -4,14 +4,6 @@ using System.Collections.Generic;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
-    public struct AbilityId {
-        public readonly int Id;
-
-        public AbilityId(int id) {
-            Id = id;
-        }
-    }
-
     // TODO - rename
     public enum AbilityElement {
         Earth,
@@ -30,8 +22,6 @@ namespace HexMage.Simulator {
         public AbilityElement Element { get; set; }
         public List<Buff> Buffs { get; set; }
         public List<AreaBuff> AreaBuffs { get; set; }
-
-        public AbilityId AbilityId => new AbilityId(Id);
 
         public Ability() {}
 

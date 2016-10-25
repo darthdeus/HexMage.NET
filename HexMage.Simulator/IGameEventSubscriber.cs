@@ -3,10 +3,10 @@ using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public interface IGameEventSubscriber {
-        void EventAbilityUsed(MobId mobId, MobId targetId, Ability ability);
-        void EventMobMoved(MobId mobId, AxialCoord pos);
-        void EventDefenseDesireAcquired(MobId mobId, DefenseDesire defenseDesireResult);
-        Task SlowEventMobMoved(MobId mobId, AxialCoord pos);
-        Task SlowEventAbilityUsed(MobId mobId, MobId targetId, Ability ability);
+        void EventAbilityUsed(int mobId, int targetId, Ability ability);
+        void EventMobMoved(int mobId, AxialCoord pos);
+        void EventDefenseDesireAcquired(int mobId, DefenseDesire defenseDesireResult);
+        Task SlowEventMobMoved(int mobId, AxialCoord pos);
+        Task SlowEventAbilityUsed(int mobId, int targetId, Ability ability);
     }
 }

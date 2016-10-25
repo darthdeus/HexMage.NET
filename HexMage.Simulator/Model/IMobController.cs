@@ -3,12 +3,12 @@ using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public interface IMobController {
-        DefenseDesire FastRequestDesireToDefend(MobId mobId, AbilityId abilityId);
+        DefenseDesire FastRequestDesireToDefend(int mobId, int abilityId);
         void FastPlayTurn(GameEventHub eventHub);
         void FastRandomAction(GameEventHub eventHub);
 
         string Name { get; }
-        Task<DefenseDesire> SlowRequestDesireToDefend(MobId targetId, AbilityId abilityId);
+        Task<DefenseDesire> SlowRequestDesireToDefend(int targetId, int abilityId);
         Task SlowPlayTurn(GameEventHub eventHub);
     }
 }

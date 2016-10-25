@@ -14,7 +14,7 @@ namespace HexMage.GUI.Core {
             _gameInstance = gameInstance;
         }
 
-        public Task<DefenseDesire> RequestDesireToDefend(MobId mobId, Ability ability) {
+        public Task<DefenseDesire> RequestDesireToDefend(int mobId, Ability ability) {
             return _arenaScene.RequestDesireToDefend(mobId, ability);
         }
 
@@ -26,7 +26,7 @@ namespace HexMage.GUI.Core {
             return _tcs.Task;
         }
 
-        public Task<DefenseDesire> SlowRequestDesireToDefend(MobId targetId, AbilityId abilityId) {
+        public Task<DefenseDesire> SlowRequestDesireToDefend(int targetId, int abilityId) {
             return _arenaScene.RequestDesireToDefend(targetId, _gameInstance.MobManager.AbilityForId(abilityId));
         }
 
@@ -46,7 +46,7 @@ namespace HexMage.GUI.Core {
             new AiRandomController(_gameInstance).FastPlayTurn(eventHub);
         }
 
-        public DefenseDesire FastRequestDesireToDefend(MobId mob, AbilityId abilityId) {
+        public DefenseDesire FastRequestDesireToDefend(int mob, int abilityId) {
             return DefenseDesire.Pass;
         }
 

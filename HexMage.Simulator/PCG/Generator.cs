@@ -66,7 +66,7 @@ namespace HexMage.Simulator.PCG {
         //    return game;
         //}
 
-        public static void RandomPlaceMob(MobManager mobManager, MobId mob, Map map) {
+        public static void RandomPlaceMob(MobManager mobManager, int mob, Map map) {
             int size = map.Size;
 
             Predicate<AxialCoord> isCoordAvailable = c => {
@@ -103,7 +103,7 @@ namespace HexMage.Simulator.PCG {
                 AbilityElement.Earth, AbilityElement.Fire, AbilityElement.Air, AbilityElement.Water
             };
 
-            var abilities = new List<AbilityId>();
+            var abilities = new List<int>();
             var maxHp = Random.Next(7, 12);
             var maxAp = Random.Next(7, 12);
 
@@ -138,7 +138,7 @@ namespace HexMage.Simulator.PCG {
                 mobManager.Abilities.Add(ability);
                 mobManager.Cooldowns.Add(0);
 
-                abilities.Add(ability.AbilityId);
+                abilities.Add(ability.Id);
             }
 
             int iniciative = Random.Next(10);

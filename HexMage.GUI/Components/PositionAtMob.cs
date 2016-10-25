@@ -5,9 +5,9 @@ using Microsoft.Xna.Framework;
 namespace HexMage.GUI.Components {
     public class PositionAtMob : Component {
         private readonly MobManager _mobManager;
-        private readonly MobId _mobId;
+        private readonly int _mobId;
 
-        public PositionAtMob(MobManager mobManager, MobId mobId) {
+        public PositionAtMob(MobManager mobManager, int mobId) {
             _mobManager = mobManager;
             _mobId = mobId;
         }

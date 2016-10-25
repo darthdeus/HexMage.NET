@@ -9,13 +9,13 @@ using Newtonsoft.Json;
 namespace HexMage.Simulator {
     public class MobManager : IDeepCopyable<MobManager>, IResettable {
         public List<Ability> Abilities = new List<Ability>();
-        public List<MobId> Mobs = new List<MobId>();
+        public List<int> Mobs = new List<int>();
         public List<MobInfo> MobInfos = new List<MobInfo>();
         public MobInstance[] MobInstances = new MobInstance[0];
         public List<int> Cooldowns = new List<int>();
 
         [JsonIgnore]
-        public HexMap<MobId?> MobPositions;
+        public HexMap<int?> MobPositions;
 
         [JsonIgnore]
         public readonly Dictionary<TeamColor, IMobController> Teams = new Dictionary<TeamColor, IMobController>();
@@ -38,19 +38,19 @@ namespace HexMage.Simulator {
         //    }
         //}
 
-        public Ability AbilityForId(AbilityId id) {
-            return Abilities[id.Id];
+        public Ability AbilityForId(int id) {
+            return Abilities[id];
         }
 
-        public int CooldownFor(AbilityId id) {
-            return Cooldowns[id.Id];
+        public int CooldownFor(int id) {
+            return Cooldowns[id];
         }
 
-        public void SetCooldownFor(AbilityId id, int cooldown) {
-            Cooldowns[id.Id] = cooldown;
+        public void SetCooldownFor(int id, int cooldown) {
+            Cooldowns[id] = cooldown;
         }
 
-        public MobId? AtCoord(AxialCoord c) {
+        public int? AtCoord(AxialCoord c) {
             return MobPositions[c];
             //foreach (var mobId in Mobs) {
             //    var mobInstance = MobInstanceForId(mobId);
@@ -62,8 +62,8 @@ namespace HexMage.Simulator {
             //return null;
         }
 
-        public MobId AddMobWithInfo(MobInfo mobInfo) {
-            var id = new MobId(Mobs.Count);
+        public int AddMobWithInfo(MobInfo mobInfo) {
+            var id = Mobs.Count;
             Mobs.Add(id);
 
             MobInfos.Add(mobInfo);
@@ -73,13 +73,13 @@ namespace HexMage.Simulator {
             return id;
         }
 
-        public void ChangeMobHp(GameInstance gameInstance, MobId mobId, int hpChange) {
+        public void ChangeMobHp(GameInstance gameInstance, int mobId, int hpChange) {
             MobInstances[mobId].Hp += hpChange;
 
             gameInstance.MobHpChanged(MobInstances[mobId].Hp, MobInfos[mobId].Team);
         }
 
-        public void ChangeMobAp(MobId mobId, int apChange) {
+        public void ChangeMobAp(int mobId, int apChange) {
             MobInstances[mobId].Ap += apChange;
         }
 
@@ -134,7 +134,7 @@ namespace HexMage.Simulator {
             map.AreaBuffs = newBuffs;
         }
 
-        public void FastMoveMob(Map map, Pathfinder pathfinder, MobId mobId, AxialCoord pos) {
+        public void FastMoveMob(Map map, Pathfinder pathfinder, int mobId, AxialCoord pos) {
             var mobInstance = MobInstanceForId(mobId);
 
             int distance = mobInstance.Coord.Distance(pos);
@@ -192,19 +192,19 @@ namespace HexMage.Simulator {
             }
         }
 
-        public MobInfo MobInfoForId(MobId mobId) {
-            return MobInfos[mobId.Id];
+        public MobInfo MobInfoForId(int mobId) {
+            return MobInfos[mobId];
         }
 
-        public MobInstance MobInstanceForId(MobId mobId) {
-            return MobInstances[mobId.Id];
+        public MobInstance MobInstanceForId(int mobId) {
+            return MobInstances[mobId];
         }
 
-        public void ResetAp(MobId mobId) {
+        public void ResetAp(int mobId) {
             MobInstances[mobId].Ap = MobInfoForId(mobId).MaxAp;
         }
 
-        public void SetMobPosition(MobId mobId, AxialCoord coord) {
+        public void SetMobPosition(int mobId, AxialCoord coord) {
             var instance = MobInstances[mobId];
             MobPositions[instance.Coord] = null;
             MobPositions[coord] = mobId;

@@ -14,9 +14,9 @@ namespace HexMage.GUI.Components {
         private AxialCoord _destination;
         private AxialCoord _source;
         private bool _animateMovement;
-        public MobId MobId { get; set; }
+        public int MobId { get; set; }
 
-        public MobEntity(MobId mobId, GameInstance gameInstance) {
+        public MobEntity(int mobId, GameInstance gameInstance) {
             _gameInstance = gameInstance;
             MobId = mobId;
         }

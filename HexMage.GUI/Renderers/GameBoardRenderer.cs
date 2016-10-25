@@ -103,7 +103,7 @@ namespace HexMage.GUI.Renderers {
             }
         }
 
-        private void DrawHoverHeatmap(MobId currentMob) {
+        private void DrawHoverHeatmap(int currentMob) {
             if (_gameInstance.Pathfinder.IsValidCoord(_camera.MouseHex)) {
                 var mobManager = _gameInstance.MobManager;
                 var mouseMob = mobManager.AtCoord(_camera.MouseHex);
@@ -145,7 +145,7 @@ namespace HexMage.GUI.Renderers {
         }
 
 
-        private void DrawGlobalHeatmap(MobId currentMob) {
+        private void DrawGlobalHeatmap(int currentMob) {
             var mobManager = _gameInstance.MobManager;
             var heatmap = new HexMap<int>(_gameInstance.Size);
             int maxDmg = 0;

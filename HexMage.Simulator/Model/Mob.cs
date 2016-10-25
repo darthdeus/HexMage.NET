@@ -1,44 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace HexMage.Simulator.Model {
-    public struct MobId {
-        public static MobId Invalid = new MobId(-1);
-        public readonly int Id;
-
-        public MobId(int id) {
-            Id = id;
-        }
-
-        public static implicit operator int(MobId mobId) {
-            return mobId.Id;
-        }
-
-        public bool Equals(MobId other) {
-            return Id == other.Id;
-        }
-
-        public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            return obj is MobId && Equals((MobId) obj);
-        }
-
-        public override int GetHashCode() {
-            return Id.GetHashCode();
-        }
-
-        public static bool operator ==(MobId left, MobId right) {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(MobId left, MobId right) {
-            return !left.Equals(right);
-        }
-
-        public override string ToString() {
-            return $"MobId#{Id}";
-        }
-    }
-
     public struct MobInfo {
         public static readonly int NumberOfAbilities = 6;
 
@@ -51,12 +15,12 @@ namespace HexMage.Simulator.Model {
         public int DefenseCost { get; set; }
         public int Iniciative { get; set; }
 
-        public List<AbilityId> Abilities { get; set; }
+        public List<int> Abilities { get; set; }
         public TeamColor Team { get; set; }
 
         public static int AbilityCount => 6;
 
-        public MobInfo(TeamColor team, int maxHp, int maxAp, int defenseCost, int iniciative, List<AbilityId> abilities) {
+        public MobInfo(TeamColor team, int maxHp, int maxAp, int defenseCost, int iniciative, List<int> abilities) {
             Team = team;
             MaxHp = maxHp;
             MaxAp = maxAp;
@@ -68,14 +32,15 @@ namespace HexMage.Simulator.Model {
     }
 
     public struct MobInstance {
-        public MobId Id;
+        public static readonly int InvalidId = -1;
+        public int Id;
         public AxialCoord Coord;
         public AxialCoord OrigCoord;
         public int Hp;
         public int Ap;
         public List<Buff> Buffs { get; set; }
 
-        public MobInstance(MobId id) : this() {
+        public MobInstance(int id) : this() {
             Id = id;
             Buffs = new List<Buff>();
         }
