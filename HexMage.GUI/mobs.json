@@ -1,0 +1,903 @@
+{
+  "Abilities": [
+    {
+      "Id": 0,
+      "Dmg": 3,
+      "Cost": 4,
+      "Range": 4,
+      "Cooldown": 1,
+      "Element": 0,
+      "Buffs": [{ "Element": 0, "HpChange": -2, "ApChange": 0, "Lifetime": 2 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 1,
+        "Effect": { "Element": 0, "HpChange": -1, "ApChange": -1, "Lifetime": 1 }
+      }
+      ],
+      "ElementalEffect": { "Element": 0, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 1,
+      "Dmg": 4,
+      "Cost": 5,
+      "Range": 5,
+      "Cooldown": 0,
+      "Element": 1,
+      "Buffs": [],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 3,
+        "Effect": { "Element": 1, "HpChange": -2, "ApChange": 0, "Lifetime": 2 }
+      }
+      ],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 2,
+      "Dmg": 1,
+      "Cost": 4,
+      "Range": 6,
+      "Cooldown": 2,
+      "Element": 0,
+      "Buffs": [],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 0,
+        "Effect": { "Element": 0, "HpChange": -2, "ApChange": 0, "Lifetime": 1 }
+      }
+      ],
+      "ElementalEffect": { "Element": 0, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 3,
+      "Dmg": 7,
+      "Cost": 6,
+      "Range": 5,
+      "Cooldown": 0,
+      "Element": 3,
+      "Buffs": [{ "Element": 3, "HpChange": -2, "ApChange": 0, "Lifetime": 2 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 3,
+        "Effect": { "Element": 3, "HpChange": -2, "ApChange": 0, "Lifetime": 2 }
+      }
+      ],
+      "ElementalEffect": { "Element": 3, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 4,
+      "Dmg": 3,
+      "Cost": 4,
+      "Range": 7,
+      "Cooldown": 1,
+      "Element": 0,
+      "Buffs": [],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 3,
+        "Effect": { "Element": 0, "HpChange": 0, "ApChange": -1, "Lifetime": 1 }
+      }
+      ],
+      "ElementalEffect": { "Element": 0, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 5,
+      "Dmg": 8,
+      "Cost": 3,
+      "Range": 8,
+      "Cooldown": 0,
+      "Element": 0,
+      "Buffs": [{ "Element": 0, "HpChange": -2, "ApChange": 0, "Lifetime": 1 }],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 0, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 6,
+      "Dmg": 3,
+      "Cost": 4,
+      "Range": 4,
+      "Cooldown": 0,
+      "Element": 1,
+      "Buffs": [],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 7,
+      "Dmg": 5,
+      "Cost": 3,
+      "Range": 6,
+      "Cooldown": 1,
+      "Element": 0,
+      "Buffs": [],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 0, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 8,
+      "Dmg": 5,
+      "Cost": 6,
+      "Range": 8,
+      "Cooldown": 1,
+      "Element": 1,
+      "Buffs": [{ "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 1 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 1,
+        "Effect": { "Element": 1, "HpChange": 0, "ApChange": -1, "Lifetime": 2 }
+      }
+      ],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 9,
+      "Dmg": 9,
+      "Cost": 6,
+      "Range": 3,
+      "Cooldown": 0,
+      "Element": 3,
+      "Buffs": [],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 1,
+        "Effect": { "Element": 3, "HpChange": 0, "ApChange": -1, "Lifetime": 2 }
+      }
+      ],
+      "ElementalEffect": { "Element": 3, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 10,
+      "Dmg": 6,
+      "Cost": 5,
+      "Range": 3,
+      "Cooldown": 0,
+      "Element": 1,
+      "Buffs": [{ "Element": 1, "HpChange": -1, "ApChange": -1, "Lifetime": 1 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 0,
+        "Effect": { "Element": 1, "HpChange": -2, "ApChange": 0, "Lifetime": 1 }
+      }
+      ],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 11,
+      "Dmg": 5,
+      "Cost": 5,
+      "Range": 4,
+      "Cooldown": 2,
+      "Element": 2,
+      "Buffs": [],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 0,
+        "Effect": { "Element": 2, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+      }
+      ],
+      "ElementalEffect": { "Element": 2, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 12,
+      "Dmg": 6,
+      "Cost": 3,
+      "Range": 4,
+      "Cooldown": 0,
+      "Element": 1,
+      "Buffs": [],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 3,
+        "Effect": { "Element": 1, "HpChange": -2, "ApChange": -1, "Lifetime": 2 }
+      }
+      ],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 13,
+      "Dmg": 7,
+      "Cost": 3,
+      "Range": 4,
+      "Cooldown": 0,
+      "Element": 2,
+      "Buffs": [{ "Element": 2, "HpChange": -2, "ApChange": -1, "Lifetime": 2 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 3,
+        "Effect": { "Element": 2, "HpChange": -2, "ApChange": -1, "Lifetime": 2 }
+      }
+      ],
+      "ElementalEffect": { "Element": 2, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 14,
+      "Dmg": 2,
+      "Cost": 5,
+      "Range": 5,
+      "Cooldown": 1,
+      "Element": 3,
+      "Buffs": [],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 3,
+        "Effect": { "Element": 3, "HpChange": 0, "ApChange": -1, "Lifetime": 2 }
+      }
+      ],
+      "ElementalEffect": { "Element": 3, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 15,
+      "Dmg": 4,
+      "Cost": 4,
+      "Range": 9,
+      "Cooldown": 1,
+      "Element": 2,
+      "Buffs": [],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 2, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 16,
+      "Dmg": 1,
+      "Cost": 6,
+      "Range": 5,
+      "Cooldown": 2,
+      "Element": 1,
+      "Buffs": [],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 17,
+      "Dmg": 8,
+      "Cost": 5,
+      "Range": 6,
+      "Cooldown": 0,
+      "Element": 0,
+      "Buffs": [{ "Element": 0, "HpChange": -1, "ApChange": -1, "Lifetime": 2 }],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 0, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 18,
+      "Dmg": 8,
+      "Cost": 5,
+      "Range": 7,
+      "Cooldown": 0,
+      "Element": 1,
+      "Buffs": [{ "Element": 1, "HpChange": -2, "ApChange": 0, "Lifetime": 2 }],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 19,
+      "Dmg": 7,
+      "Cost": 5,
+      "Range": 4,
+      "Cooldown": 0,
+      "Element": 2,
+      "Buffs": [],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 2,
+        "Effect": { "Element": 2, "HpChange": -1, "ApChange": -1, "Lifetime": 1 }
+      }
+      ],
+      "ElementalEffect": { "Element": 2, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 20,
+      "Dmg": 8,
+      "Cost": 4,
+      "Range": 5,
+      "Cooldown": 1,
+      "Element": 3,
+      "Buffs": [],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 3,
+        "Effect": { "Element": 3, "HpChange": -1, "ApChange": -1, "Lifetime": 2 }
+      }
+      ],
+      "ElementalEffect": { "Element": 3, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 21,
+      "Dmg": 2,
+      "Cost": 6,
+      "Range": 4,
+      "Cooldown": 1,
+      "Element": 2,
+      "Buffs": [{ "Element": 2, "HpChange": -2, "ApChange": -1, "Lifetime": 2 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 1,
+        "Effect": { "Element": 2, "HpChange": -2, "ApChange": 0, "Lifetime": 1 }
+      }
+      ],
+      "ElementalEffect": { "Element": 2, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 22,
+      "Dmg": 2,
+      "Cost": 5,
+      "Range": 5,
+      "Cooldown": 1,
+      "Element": 2,
+      "Buffs": [],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 2, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 23,
+      "Dmg": 6,
+      "Cost": 5,
+      "Range": 5,
+      "Cooldown": 0,
+      "Element": 0,
+      "Buffs": [],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 0, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 24,
+      "Dmg": 6,
+      "Cost": 4,
+      "Range": 7,
+      "Cooldown": 1,
+      "Element": 0,
+      "Buffs": [],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 0, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 25,
+      "Dmg": 6,
+      "Cost": 3,
+      "Range": 3,
+      "Cooldown": 2,
+      "Element": 1,
+      "Buffs": [{ "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 26,
+      "Dmg": 6,
+      "Cost": 3,
+      "Range": 5,
+      "Cooldown": 1,
+      "Element": 1,
+      "Buffs": [{ "Element": 1, "HpChange": -1, "ApChange": -1, "Lifetime": 1 }],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 27,
+      "Dmg": 2,
+      "Cost": 3,
+      "Range": 8,
+      "Cooldown": 0,
+      "Element": 3,
+      "Buffs": [{ "Element": 3, "HpChange": -1, "ApChange": 0, "Lifetime": 1 }],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 3, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 28,
+      "Dmg": 9,
+      "Cost": 4,
+      "Range": 7,
+      "Cooldown": 0,
+      "Element": 2,
+      "Buffs": [{ "Element": 2, "HpChange": -2, "ApChange": 0, "Lifetime": 2 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 1,
+        "Effect": { "Element": 2, "HpChange": -2, "ApChange": -1, "Lifetime": 1 }
+      }
+      ],
+      "ElementalEffect": { "Element": 2, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 29,
+      "Dmg": 6,
+      "Cost": 5,
+      "Range": 3,
+      "Cooldown": 2,
+      "Element": 2,
+      "Buffs": [{ "Element": 2, "HpChange": -2, "ApChange": 0, "Lifetime": 1 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 2,
+        "Effect": { "Element": 2, "HpChange": -1, "ApChange": -1, "Lifetime": 2 }
+      }
+      ],
+      "ElementalEffect": { "Element": 2, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 30,
+      "Dmg": 6,
+      "Cost": 3,
+      "Range": 5,
+      "Cooldown": 0,
+      "Element": 3,
+      "Buffs": [{ "Element": 3, "HpChange": -2, "ApChange": 0, "Lifetime": 1 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 1,
+        "Effect": { "Element": 3, "HpChange": 0, "ApChange": -1, "Lifetime": 1 }
+      }
+      ],
+      "ElementalEffect": { "Element": 3, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 31,
+      "Dmg": 1,
+      "Cost": 5,
+      "Range": 4,
+      "Cooldown": 1,
+      "Element": 1,
+      "Buffs": [{ "Element": 1, "HpChange": -1, "ApChange": -1, "Lifetime": 1 }],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 32,
+      "Dmg": 1,
+      "Cost": 3,
+      "Range": 5,
+      "Cooldown": 0,
+      "Element": 0,
+      "Buffs": [{ "Element": 0, "HpChange": -1, "ApChange": -1, "Lifetime": 2 }],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 0, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 33,
+      "Dmg": 9,
+      "Cost": 5,
+      "Range": 8,
+      "Cooldown": 1,
+      "Element": 3,
+      "Buffs": [{ "Element": 3, "HpChange": -2, "ApChange": -1, "Lifetime": 2 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 1,
+        "Effect": { "Element": 3, "HpChange": -1, "ApChange": -1, "Lifetime": 1 }
+      }
+      ],
+      "ElementalEffect": { "Element": 3, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 34,
+      "Dmg": 2,
+      "Cost": 5,
+      "Range": 8,
+      "Cooldown": 2,
+      "Element": 3,
+      "Buffs": [],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 3,
+        "Effect": { "Element": 3, "HpChange": 0, "ApChange": -1, "Lifetime": 1 }
+      }
+      ],
+      "ElementalEffect": { "Element": 3, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 35,
+      "Dmg": 3,
+      "Cost": 3,
+      "Range": 6,
+      "Cooldown": 1,
+      "Element": 2,
+      "Buffs": [],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 2, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 36,
+      "Dmg": 2,
+      "Cost": 4,
+      "Range": 7,
+      "Cooldown": 2,
+      "Element": 1,
+      "Buffs": [],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 37,
+      "Dmg": 2,
+      "Cost": 4,
+      "Range": 4,
+      "Cooldown": 0,
+      "Element": 1,
+      "Buffs": [],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 3,
+        "Effect": { "Element": 1, "HpChange": -2, "ApChange": -1, "Lifetime": 1 }
+      }
+      ],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 38,
+      "Dmg": 2,
+      "Cost": 4,
+      "Range": 9,
+      "Cooldown": 0,
+      "Element": 2,
+      "Buffs": [],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 2, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 39,
+      "Dmg": 6,
+      "Cost": 4,
+      "Range": 9,
+      "Cooldown": 1,
+      "Element": 1,
+      "Buffs": [{ "Element": 1, "HpChange": -2, "ApChange": -1, "Lifetime": 2 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 0,
+        "Effect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 1 }
+      }
+      ],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 40,
+      "Dmg": 9,
+      "Cost": 3,
+      "Range": 9,
+      "Cooldown": 0,
+      "Element": 1,
+      "Buffs": [{ "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 41,
+      "Dmg": 8,
+      "Cost": 3,
+      "Range": 7,
+      "Cooldown": 0,
+      "Element": 0,
+      "Buffs": [],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 0, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 42,
+      "Dmg": 1,
+      "Cost": 4,
+      "Range": 6,
+      "Cooldown": 0,
+      "Element": 1,
+      "Buffs": [],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 2,
+        "Effect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+      }
+      ],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 43,
+      "Dmg": 3,
+      "Cost": 4,
+      "Range": 9,
+      "Cooldown": 0,
+      "Element": 1,
+      "Buffs": [{ "Element": 1, "HpChange": -2, "ApChange": -1, "Lifetime": 2 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 3,
+        "Effect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 1 }
+      }
+      ],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 44,
+      "Dmg": 4,
+      "Cost": 3,
+      "Range": 4,
+      "Cooldown": 0,
+      "Element": 2,
+      "Buffs": [{ "Element": 2, "HpChange": 0, "ApChange": -1, "Lifetime": 2 }],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 2, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 45,
+      "Dmg": 6,
+      "Cost": 5,
+      "Range": 8,
+      "Cooldown": 1,
+      "Element": 0,
+      "Buffs": [],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 2,
+        "Effect": { "Element": 0, "HpChange": -2, "ApChange": -1, "Lifetime": 2 }
+      }
+      ],
+      "ElementalEffect": { "Element": 0, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 46,
+      "Dmg": 3,
+      "Cost": 5,
+      "Range": 8,
+      "Cooldown": 2,
+      "Element": 1,
+      "Buffs": [{ "Element": 1, "HpChange": -2, "ApChange": -1, "Lifetime": 1 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 1,
+        "Effect": { "Element": 1, "HpChange": 0, "ApChange": -1, "Lifetime": 2 }
+      }
+      ],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 47,
+      "Dmg": 6,
+      "Cost": 6,
+      "Range": 4,
+      "Cooldown": 1,
+      "Element": 0,
+      "Buffs": [{ "Element": 0, "HpChange": -2, "ApChange": 0, "Lifetime": 1 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 2,
+        "Effect": { "Element": 0, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+      }
+      ],
+      "ElementalEffect": { "Element": 0, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 48,
+      "Dmg": 7,
+      "Cost": 3,
+      "Range": 7,
+      "Cooldown": 2,
+      "Element": 1,
+      "Buffs": [{ "Element": 1, "HpChange": -2, "ApChange": 0, "Lifetime": 1 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 1,
+        "Effect": { "Element": 1, "HpChange": -2, "ApChange": 0, "Lifetime": 2 }
+      }
+      ],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 49,
+      "Dmg": 2,
+      "Cost": 6,
+      "Range": 9,
+      "Cooldown": 0,
+      "Element": 1,
+      "Buffs": [{ "Element": 1, "HpChange": -2, "ApChange": 0, "Lifetime": 1 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 3,
+        "Effect": { "Element": 1, "HpChange": 0, "ApChange": -1, "Lifetime": 1 }
+      }
+      ],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 50,
+      "Dmg": 2,
+      "Cost": 6,
+      "Range": 9,
+      "Cooldown": 2,
+      "Element": 1,
+      "Buffs": [{ "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 1 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 2,
+        "Effect": { "Element": 1, "HpChange": -2, "ApChange": -1, "Lifetime": 1 }
+      }
+      ],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 51,
+      "Dmg": 9,
+      "Cost": 6,
+      "Range": 6,
+      "Cooldown": 1,
+      "Element": 2,
+      "Buffs": [{ "Element": 2, "HpChange": -2, "ApChange": -1, "Lifetime": 2 }],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 2, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 52,
+      "Dmg": 7,
+      "Cost": 5,
+      "Range": 5,
+      "Cooldown": 0,
+      "Element": 1,
+      "Buffs": [{ "Element": 1, "HpChange": -1, "ApChange": -1, "Lifetime": 2 }],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }, {
+      "Id": 53,
+      "Dmg": 5,
+      "Cost": 4,
+      "Range": 4,
+      "Cooldown": 1,
+      "Element": 0,
+      "Buffs": [{ "Element": 0, "HpChange": -2, "ApChange": -1, "Lifetime": 2 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 2,
+        "Effect": { "Element": 0, "HpChange": 0, "ApChange": -1, "Lifetime": 2 }
+      }
+      ],
+      "ElementalEffect": { "Element": 0, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 54,
+      "Dmg": 6,
+      "Cost": 3,
+      "Range": 8,
+      "Cooldown": 1,
+      "Element": 0,
+      "Buffs": [],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 0, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 55,
+      "Dmg": 6,
+      "Cost": 4,
+      "Range": 8,
+      "Cooldown": 1,
+      "Element": 2,
+      "Buffs": [],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 2,
+        "Effect": { "Element": 2, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+      }
+      ],
+      "ElementalEffect": { "Element": 2, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 56,
+      "Dmg": 1,
+      "Cost": 6,
+      "Range": 8,
+      "Cooldown": 2,
+      "Element": 2,
+      "Buffs": [],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 2, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 57,
+      "Dmg": 2,
+      "Cost": 4,
+      "Range": 3,
+      "Cooldown": 1,
+      "Element": 0,
+      "Buffs": [{ "Element": 0, "HpChange": -2, "ApChange": -1, "Lifetime": 2 }],
+      "AreaBuffs": [
+      {
+        "Coord": { "X": 0, "Y": 0 },
+        "Radius": 0,
+        "Effect": { "Element": 0, "HpChange": 0, "ApChange": -1, "Lifetime": 2 }
+      }
+      ],
+      "ElementalEffect": { "Element": 0, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 58,
+      "Dmg": 8,
+      "Cost": 6,
+      "Range": 6,
+      "Cooldown": 0,
+      "Element": 0,
+      "Buffs": [],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 0, "HpChange": 0, "ApChange": 0, "Lifetime": 1 }
+    }, {
+      "Id": 59,
+      "Dmg": 3,
+      "Cost": 5,
+      "Range": 7,
+      "Cooldown": 0,
+      "Element": 1,
+      "Buffs": [{ "Element": 1, "HpChange": 0, "ApChange": -1, "Lifetime": 1 }],
+      "AreaBuffs": [],
+      "ElementalEffect": { "Element": 1, "HpChange": -1, "ApChange": 0, "Lifetime": 2 }
+    }
+  ],
+  "Mobs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  "MobInfos": [
+  {
+    "Id": 4412,
+    "MaxHp": 9,
+    "MaxAp": 11,
+    "DefenseCost": 3,
+    "Iniciative": 8,
+    "Abilities": [0, 1, 2, 3, 4, 5],
+    "Team": 0
+  }, {
+    "Id": 4413,
+    "MaxHp": 7,
+    "MaxAp": 10,
+    "DefenseCost": 3,
+    "Iniciative": 6,
+    "Abilities": [6, 7, 8, 9, 10, 11],
+    "Team": 0
+  }, {
+    "Id": 4414,
+    "MaxHp": 8,
+    "MaxAp": 10,
+    "DefenseCost": 3,
+    "Iniciative": 7,
+    "Abilities": [12, 13, 14, 15, 16, 17],
+    "Team": 0
+  }, {
+    "Id": 4415,
+    "MaxHp": 7,
+    "MaxAp": 7,
+    "DefenseCost": 3,
+    "Iniciative": 1,
+    "Abilities": [18, 19, 20, 21, 22, 23],
+    "Team": 0
+  }, {
+    "Id": 4416,
+    "MaxHp": 8,
+    "MaxAp": 11,
+    "DefenseCost": 3,
+    "Iniciative": 1,
+    "Abilities": [24, 25, 26, 27, 28, 29],
+    "Team": 0
+  }, {
+    "Id": 4417,
+    "MaxHp": 9,
+    "MaxAp": 7,
+    "DefenseCost": 3,
+    "Iniciative": 7,
+    "Abilities": [30, 31, 32, 33, 34, 35],
+    "Team": 1
+  }, {
+    "Id": 4418,
+    "MaxHp": 8,
+    "MaxAp": 11,
+    "DefenseCost": 3,
+    "Iniciative": 9,
+    "Abilities": [36, 37, 38, 39, 40, 41],
+    "Team": 1
+  }, {
+    "Id": 4419,
+    "MaxHp": 10,
+    "MaxAp": 11,
+    "DefenseCost": 3,
+    "Iniciative": 5,
+    "Abilities": [42, 43, 44, 45, 46, 47],
+    "Team": 1
+  }, {
+    "Id": 4420,
+    "MaxHp": 10,
+    "MaxAp": 8,
+    "DefenseCost": 3,
+    "Iniciative": 1,
+    "Abilities": [48, 49, 50, 51, 52, 53],
+    "Team": 1
+  }, {
+    "Id": 4421,
+    "MaxHp": 9,
+    "MaxAp": 10,
+    "DefenseCost": 3,
+    "Iniciative": 7,
+    "Abilities": [54, 55, 56, 57, 58, 59],
+    "Team": 1
+  }
+  ],
+  "MobInstances": [
+    { "Id": 0, "Coord": { "X": -3, "Y": 0 }, "OrigCoord": { "X": -3, "Y": 0 }, "Hp": 9, "Ap": 11, "Buffs": [] },
+    { "Id": 1, "Coord": { "X": -3, "Y": -2 }, "OrigCoord": { "X": -3, "Y": -2 }, "Hp": 7, "Ap": 10, "Buffs": [] },
+    { "Id": 2, "Coord": { "X": -4, "Y": 1 }, "OrigCoord": { "X": -4, "Y": 1 }, "Hp": 8, "Ap": 10, "Buffs": [] },
+    { "Id": 3, "Coord": { "X": -5, "Y": 2 }, "OrigCoord": { "X": -5, "Y": 2 }, "Hp": 7, "Ap": 7, "Buffs": [] },
+    { "Id": 4, "Coord": { "X": -3, "Y": -1 }, "OrigCoord": { "X": -3, "Y": -1 }, "Hp": 8, "Ap": 11, "Buffs": [] },
+    { "Id": 5, "Coord": { "X": 4, "Y": -1 }, "OrigCoord": { "X": 4, "Y": -1 }, "Hp": 9, "Ap": 6, "Buffs": [] },
+    { "Id": 6, "Coord": { "X": 3, "Y": 2 }, "OrigCoord": { "X": 3, "Y": 2 }, "Hp": 8, "Ap": 10, "Buffs": [] },
+    { "Id": 7, "Coord": { "X": 5, "Y": -2 }, "OrigCoord": { "X": 5, "Y": -2 }, "Hp": 10, "Ap": 10, "Buffs": [] },
+    { "Id": 8, "Coord": { "X": 3, "Y": 0 }, "OrigCoord": { "X": 3, "Y": 0 }, "Hp": 10, "Ap": 7, "Buffs": [] },
+    { "Id": 9, "Coord": { "X": 3, "Y": 1 }, "OrigCoord": { "X": 3, "Y": 1 }, "Hp": 9, "Ap": 10, "Buffs": [] }
+  ],
+  "Cooldowns": [
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  ]
+}

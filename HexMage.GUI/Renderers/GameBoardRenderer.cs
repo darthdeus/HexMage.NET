@@ -73,8 +73,8 @@ namespace HexMage.GUI.Renderers {
                 }
 
                 var pos = _camera.HexToPixel(coord);
-                _spriteBatch.DrawString(_assetManager.Font, _gameInstance.Pathfinder.Distance(coord).ToString(), pos,
-                    Color.Black);
+                //_spriteBatch.DrawString(_assetManager.Font, _gameInstance.Pathfinder.Distance(coord).ToString(), pos + new Vector2(15, 10),
+                    //Color.Black);
 
                 var hexBuffs = map.BuffsAt(coord);
 

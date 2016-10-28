@@ -136,8 +136,8 @@ namespace HexMage.GUI.Scenes {
         public override void Cleanup() {}
 
         public void LoadWorldFromSave() {
-            using (var reader = new StreamReader("map.json"))
-            using (var mobReader = new StreamReader("mobs.json")) {
+            using (var reader = new StreamReader(GameInstance.MapSaveFilename))
+            using (var mobReader = new StreamReader(GameInstance.MobsSaveFilename)) {
                 var mapRepr = JsonConvert.DeserializeObject<MapRepresentation>(reader.ReadToEnd());
 
                 var game = new GameInstance(mapRepr.Size);

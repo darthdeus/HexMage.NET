@@ -88,7 +88,8 @@ namespace HexMage.Simulator.PCG {
                 var coord = new AxialCoord(x, y);
 
                 if (isCoordAvailable(coord) && coord.Distance(zero) < size) {
-                    if (mobManager.AtCoord(coord) == null) {
+                    if (mobManager.AtCoord(coord) == null || mobManager.AtCoord(coord).Value == mob)
+                {
                         mobManager.SetMobPosition(mob, coord);
                         break;
                     } else {

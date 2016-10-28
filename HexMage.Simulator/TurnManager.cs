@@ -71,7 +71,6 @@ namespace HexMage.Simulator {
             _current = 0;
 
             if (CurrentMob != null) {
-                Utils.Log(LogSeverity.Debug, nameof(Pathfinder), "CurrentMob set SUCCESS");
                 pathfinder.PathfindFrom(_mobManager.MobInstanceForId(CurrentMob.Value).Coord);
             } else {
                 Utils.Log(LogSeverity.Warning, nameof(Pathfinder), "CurrentMob is NULL, pathfind current failed");

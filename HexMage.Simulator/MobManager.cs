@@ -180,7 +180,14 @@ namespace HexMage.Simulator {
 
         public void Clear() {
             Mobs.Clear();
+            MobInstances = new MobInstance[0];
+            MobInfos.Clear();
+            Cooldowns.Clear();
+            Abilities.Clear();
             Teams.Clear();
+            foreach (var coord in MobPositions.AllCoords) {
+                MobPositions[coord] = null;
+            }
         }
 
         public void Reset() {

@@ -10,6 +10,9 @@ using Newtonsoft.Json.Linq;
 
 namespace HexMage.Simulator {
     public class GameInstance : IDeepCopyable<GameInstance>, IResettable {
+        public static string MapSaveFilename = @"C:\dev\HexMage\HexMage\HexMage.GUI\map.json";
+        public static string MobsSaveFilename = @"C:\dev\HexMage\HexMage\HexMage.GUI\mobs.json";
+
         public Map Map { get; set; }
         public MobManager MobManager { get; set; }
         public Pathfinder Pathfinder { get; set; }
@@ -88,7 +91,6 @@ namespace HexMage.Simulator {
 
             var ability = MobManager.AbilityForId(abilityId);
 
-            // TODO - neni tohle extra lookupovani AbilityForId zbytecny?
             return ability.Range >= distance && IsAbilityUsable(mobId, abilityId);
         }
 

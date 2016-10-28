@@ -208,20 +208,19 @@ namespace HexMage.GUI.Components {
         private void HandleKeyboardAbilitySelect() {
             var inputManager = InputManager.Instance;
 
-            string mapFilename = "map.json";
             if (inputManager.IsKeyJustReleased(Keys.F10)) {
                 var repr = new MapRepresentation(_gameInstance.Map);
 
-                using (var writer = new StreamWriter(mapFilename))
-                using (var mobWriter = new StreamWriter("mobs.json")) {
+                using (var writer = new StreamWriter(GameInstance.MapSaveFilename))
+                using (var mobWriter = new StreamWriter(GameInstance.MobsSaveFilename)) {
                     writer.Write(JsonConvert.SerializeObject(repr));
                     mobWriter.Write(JsonConvert.SerializeObject(_gameInstance.MobManager));
                 }
             }
 
             if (inputManager.IsKeyJustReleased(Keys.F11)) {
-                using (var reader = new StreamReader(mapFilename))
-                using (var mobReader = new StreamReader("mobs.json")) {
+                using (var reader = new StreamReader(GameInstance.MapSaveFilename))
+                using (var mobReader = new StreamReader(GameInstance.MobsSaveFilename)) {
                     var mapRepr = JsonConvert.DeserializeObject<MapRepresentation>(reader.ReadToEnd());
                     mapRepr.UpdateMap(_gameInstance.Map);
 
@@ -259,6 +258,10 @@ namespace HexMage.GUI.Components {
             if (currentMob == null) return;
 
             var mobInfo = _gameInstance.MobManager.MobInfoForId(currentMob.Value);
+            if (index >= mobInfo.Abilities.Count) {
+                Utils.Log(LogSeverity.Info, nameof(GameBoardController), "Trying to select an ability index higher than the number of abilities.");
+                return;
+            }    
             var ability = mobInfo.Abilities[index];
 
             if (SelectedAbilityIndex.HasValue) {

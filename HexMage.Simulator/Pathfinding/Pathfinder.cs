@@ -111,7 +111,6 @@ namespace HexMage.Simulator {
 
         public void PathfindFromCurrentMob(TurnManager turnManager) {
             if (turnManager.CurrentMob != null) {
-                Utils.Log(LogSeverity.Debug, nameof(Pathfinder), "CurrentMob set SUCCESS");
                 PathfindFrom(_gameInstance.MobManager.MobInstanceForId(turnManager.CurrentMob.Value).Coord);
             } else {
                 Utils.Log(LogSeverity.Warning, nameof(Pathfinder), "CurrentMob is NULL, pathfind current failed");
