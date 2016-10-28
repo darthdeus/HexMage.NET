@@ -20,7 +20,8 @@ namespace HexMage.GUI.Components {
 
         public event Action<int> OnClick;
 
-        public AbilityUpdater(Func<GameInstance> gameFunc, Func<int?> mobFunc, int abilityIndex, Label dmgLabel, Label rangeLabel,
+        public AbilityUpdater(Func<GameInstance> gameFunc, Func<int?> mobFunc, int abilityIndex, Label dmgLabel,
+                              Label rangeLabel,
                               Label elementLabel, Label cooldownLabel, Label buffsLabel) {
             _gameFunc = gameFunc;
             _mobFunc = mobFunc;
@@ -40,8 +41,13 @@ namespace HexMage.GUI.Components {
                 var mobInstance = mobManager.MobInstanceForId(mobId.Value);
                 var mobInfo = mobManager.MobInfoForId(mobId.Value);
 
-                Debug.Assert(mobInfo.Abilities.Count == MobInfo.AbilityCount);
-                Debug.Assert(_abilityIndex < mobInfo.Abilities.Count);
+                // Update and rendering ale skipped if the ability isn't present
+                if (_abilityIndex < mobInfo.Abilities.Count) {
+                    Entity.Hidden = false;
+                } else {
+                    Entity.Hidden = true;
+                    return;
+                }
 
                 var abilityId = mobInfo.Abilities[_abilityIndex];
                 _ability = mobManager.AbilityForId(abilityId);

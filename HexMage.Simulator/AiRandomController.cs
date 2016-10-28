@@ -5,6 +5,10 @@ using System.Threading.Tasks;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
+    public class AiMCTSController : IMobController {
+        
+    }
+
     public class AiRandomController : IMobController {
         private readonly GameInstance _gameInstance;
 
