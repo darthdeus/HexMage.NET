@@ -133,270 +133,6 @@
       "Buffs": [],
       "AreaBuffs": [
       ]
-    },
-    {
-      "Id": 12,
-      "Dmg": 6,
-      "Cost": 3,
-      "Range": 4,
-      "Cooldown": 0,
-      "Element": 1,
-      "Buffs": [],
-      "AreaBuffs": [
-      ]
-    },
-    {
-      "Id": 13,
-      "Dmg": 7,
-      "Cost": 3,
-      "Range": 4,
-      "Cooldown": 0,
-      "Element": 2,
-      "Buffs": [
-      ],
-      "AreaBuffs": [
-      ]
-    },
-    {
-      "Id": 14,
-      "Dmg": 2,
-      "Cost": 5,
-      "Range": 5,
-      "Cooldown": 1,
-      "Element": 3,
-      "Buffs": [],
-      "AreaBuffs": [
-      ]
-    },
-    {
-      "Id": 15,
-      "Dmg": 4,
-      "Cost": 4,
-      "Range": 9,
-      "Cooldown": 1,
-      "Element": 2,
-      "Buffs": [],
-      "AreaBuffs": []
-    },
-    {
-      "Id": 16,
-      "Dmg": 1,
-      "Cost": 6,
-      "Range": 5,
-      "Cooldown": 2,
-      "Element": 1,
-      "Buffs": [],
-      "AreaBuffs": []
-    },
-    {
-      "Id": 17,
-      "Dmg": 8,
-      "Cost": 5,
-      "Range": 6,
-      "Cooldown": 0,
-      "Element": 0,
-      "Buffs": [
-      ],
-      "AreaBuffs": []
-    },
-    {
-      "Id": 18,
-      "Dmg": 8,
-      "Cost": 5,
-      "Range": 7,
-      "Cooldown": 0,
-      "Element": 1,
-      "Buffs": [
-      ],
-      "AreaBuffs": []
-    },
-    {
-      "Id": 19,
-      "Dmg": 7,
-      "Cost": 5,
-      "Range": 4,
-      "Cooldown": 0,
-      "Element": 2,
-      "Buffs": [],
-      "AreaBuffs": [
-      ]
-    },
-    {
-      "Id": 20,
-      "Dmg": 8,
-      "Cost": 4,
-      "Range": 5,
-      "Cooldown": 1,
-      "Element": 3,
-      "Buffs": [],
-      "AreaBuffs": [
-      ]
-    },
-    {
-      "Id": 21,
-      "Dmg": 2,
-      "Cost": 6,
-      "Range": 4,
-      "Cooldown": 1,
-      "Element": 2,
-      "Buffs": [
-      ],
-      "AreaBuffs": [
-      ]
-    },
-    {
-      "Id": 22,
-      "Dmg": 2,
-      "Cost": 5,
-      "Range": 5,
-      "Cooldown": 1,
-      "Element": 2,
-      "Buffs": [],
-      "AreaBuffs": []
-    },
-    {
-      "Id": 23,
-      "Dmg": 6,
-      "Cost": 5,
-      "Range": 5,
-      "Cooldown": 0,
-      "Element": 0,
-      "Buffs": [],
-      "AreaBuffs": []
-    },
-    {
-      "Id": 24,
-      "Dmg": 6,
-      "Cost": 4,
-      "Range": 7,
-      "Cooldown": 1,
-      "Element": 0,
-      "Buffs": [],
-      "AreaBuffs": []
-    },
-    {
-      "Id": 25,
-      "Dmg": 6,
-      "Cost": 3,
-      "Range": 3,
-      "Cooldown": 2,
-      "Element": 1,
-      "Buffs": [
-      ],
-      "AreaBuffs": []
-    },
-    {
-      "Id": 26,
-      "Dmg": 6,
-      "Cost": 3,
-      "Range": 5,
-      "Cooldown": 1,
-      "Element": 1,
-      "Buffs": [
-      ],
-      "AreaBuffs": []
-    },
-    {
-      "Id": 27,
-      "Dmg": 2,
-      "Cost": 3,
-      "Range": 8,
-      "Cooldown": 0,
-      "Element": 3,
-      "Buffs": [
-      ],
-      "AreaBuffs": []
-    },
-    {
-      "Id": 28,
-      "Dmg": 9,
-      "Cost": 4,
-      "Range": 7,
-      "Cooldown": 0,
-      "Element": 2,
-      "Buffs": [
-      ],
-      "AreaBuffs": [
-      ]
-    },
-    {
-      "Id": 29,
-      "Dmg": 6,
-      "Cost": 5,
-      "Range": 3,
-      "Cooldown": 2,
-      "Element": 2,
-      "Buffs": [
-      ],
-      "AreaBuffs": [
-      ]
-    },
-    {
-      "Id": 30,
-      "Dmg": 6,
-      "Cost": 3,
-      "Range": 5,
-      "Cooldown": 0,
-      "Element": 3,
-      "Buffs": [
-      ],
-      "AreaBuffs": [
-      ]
-    },
-    {
-      "Id": 31,
-      "Dmg": 1,
-      "Cost": 5,
-      "Range": 4,
-      "Cooldown": 1,
-      "Element": 1,
-      "Buffs": [
-      ],
-      "AreaBuffs": []
-    },
-    {
-      "Id": 32,
-      "Dmg": 1,
-      "Cost": 3,
-      "Range": 5,
-      "Cooldown": 0,
-      "Element": 0,
-      "Buffs": [
-      ],
-      "AreaBuffs": []
-    },
-    {
-      "Id": 33,
-      "Dmg": 9,
-      "Cost": 5,
-      "Range": 8,
-      "Cooldown": 1,
-      "Element": 3,
-      "Buffs": [
-      ],
-      "AreaBuffs": [
-      ]
-    },
-    {
-      "Id": 34,
-      "Dmg": 2,
-      "Cost": 5,
-      "Range": 8,
-      "Cooldown": 2,
-      "Element": 3,
-      "Buffs": [],
-      "AreaBuffs": [
-      ]
-    },
-    {
-      "Id": 35,
-      "Dmg": 3,
-      "Cost": 3,
-      "Range": 6,
-      "Cooldown": 1,
-      "Element": 2,
-      "Buffs": [],
-      "AreaBuffs": []
     }
   ],
   "Mobs": [
@@ -414,14 +150,7 @@
       "MaxAp": 11,
       "DefenseCost": 3,
       "Iniciative": 0,
-      "Abilities": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5
-      ],
+      "Abilities": [ 0, 1 ],
       "Team": 0
     },
     {
@@ -430,14 +159,7 @@
       "MaxAp": 10,
       "DefenseCost": 3,
       "Iniciative": 2,
-      "Abilities": [
-        6,
-        7,
-        8,
-        9,
-        10,
-        11
-      ],
+      "Abilities": [ 2, 3 ],
       "Team": 0
     },
     {
@@ -446,14 +168,7 @@
       "MaxAp": 10,
       "DefenseCost": 3,
       "Iniciative": 4,
-      "Abilities": [
-        12,
-        13,
-        14,
-        15,
-        16,
-        17
-      ],
+      "Abilities": [ 4, 5 ],
       "Team": 0
     },
     {
@@ -462,14 +177,7 @@
       "MaxAp": 7,
       "DefenseCost": 3,
       "Iniciative": 1,
-      "Abilities": [
-        18,
-        19,
-        20,
-        21,
-        22,
-        23
-      ],
+      "Abilities": [ 6, 7 ],
       "Team": 1
     },
     {
@@ -478,14 +186,7 @@
       "MaxAp": 11,
       "DefenseCost": 3,
       "Iniciative": 3,
-      "Abilities": [
-        24,
-        25,
-        26,
-        27,
-        28,
-        29
-      ],
+      "Abilities": [ 8, 9 ],
       "Team": 1
     },
     {
@@ -494,14 +195,7 @@
       "MaxAp": 7,
       "DefenseCost": 3,
       "Iniciative": 5,
-      "Abilities": [
-        30,
-        31,
-        32,
-        33,
-        34,
-        35
-      ],
+      "Abilities": [ 10, 11 ],
       "Team": 1
     }
   ],
@@ -592,54 +286,6 @@
     }
   ],
   "Cooldowns": [
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
     0,
     0,
     0,
