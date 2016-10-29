@@ -186,13 +186,13 @@ namespace HexMage.GUI.Components {
 
         private void UnselectAbilityIfNeeded() {
             var mobId = _gameInstance.TurnManager.CurrentMob;
-            if (mobId != null && SelectedAbilityIndex.HasValue) {
-                var mobInfo = _gameInstance.MobManager.MobInfoForId(mobId.Value);
-                var selectedAbility = mobInfo.Abilities[SelectedAbilityIndex.Value];
+            if (mobId == null || !SelectedAbilityIndex.HasValue) return;
 
-                if (!_gameInstance.IsAbilityUsable(mobId.Value, selectedAbility)) {
-                    SelectedAbilityIndex = null;
-                }
+            var mobInfo = _gameInstance.MobManager.MobInfoForId(mobId.Value);
+            var selectedAbility = mobInfo.Abilities[SelectedAbilityIndex.Value];
+
+            if (!_gameInstance.IsAbilityUsable(mobId.Value, selectedAbility)) {
+                SelectedAbilityIndex = null;
             }
         }
 

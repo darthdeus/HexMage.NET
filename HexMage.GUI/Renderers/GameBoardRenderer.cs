@@ -74,7 +74,7 @@ namespace HexMage.GUI.Renderers {
 
                 var pos = _camera.HexToPixel(coord);
                 //_spriteBatch.DrawString(_assetManager.Font, _gameInstance.Pathfinder.Distance(coord).ToString(), pos + new Vector2(15, 10),
-                    //Color.Black);
+                //Color.Black);
 
                 var hexBuffs = map.BuffsAt(coord);
 
@@ -191,7 +191,8 @@ namespace HexMage.GUI.Renderers {
             var hexUsable = _assetManager[AssetManager.HexWithinDistance];
             var hexTooFar = _assetManager[AssetManager.HexPathSprite];
 
-            if (_gameInstance.TurnManager.CurrentMob.HasValue && _gameInstance.Pathfinder.IsValidCoord(_camera.MouseHex) && _gameInstance.Pathfinder.Distance(_camera.MouseHex) != int.MaxValue) {
+            if (_gameInstance.TurnManager.CurrentMob.HasValue && _gameInstance.Pathfinder.IsValidCoord(_camera.MouseHex) &&
+                _gameInstance.Pathfinder.Distance(_camera.MouseHex) != int.MaxValue) {
                 IList<AxialCoord> path;
 
                 var mouseMob = _gameInstance.MobManager.AtCoord(_camera.MouseHex);
@@ -216,7 +217,7 @@ namespace HexMage.GUI.Renderers {
                     foreach (var cubeCoord in cubepath) {
                         if (!_gameInstance.Pathfinder.IsValidCoord(cubeCoord)) {
                             Utils.Log(LogSeverity.Warning, nameof(GameBoardRenderer),
-                                $"Computed invalid cube visibility path of {cubeCoord}.");
+                                      $"Computed invalid cube visibility path of {cubeCoord}.");
                             continue;
                         }
                         if (_gameInstance.Map[cubeCoord] == HexType.Wall) {
@@ -238,7 +239,7 @@ namespace HexMage.GUI.Renderers {
                         if (!mouseMob.HasValue || mouseMob.Value != currentMob.Value) {
                             var mobInstance = _gameInstance.MobManager.MobInstances[currentMob.Value];
                             foreach (var coord in path) {
-                                if (mobInstance.Coord.Distance(coord) <= mobInstance.Ap) {
+                                if (_gameInstance.Pathfinder.Distance(coord) <= mobInstance.Ap) {
                                     DrawAt(hexUsable, coord);
                                 } else {
                                     DrawAt(hexTooFar, coord);

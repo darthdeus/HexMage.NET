@@ -46,7 +46,12 @@ namespace HexMage.GUI.Renderers {
                 var apPos = hbPos + new Point(_healthbarWidth, 0);
                 DrawHealthbar((double) mobInstance.Ap/mobInfo.MaxAp,
                               batch, assetManager, apPos, Color.DarkBlue, Color.LightBlue);
-            } else {
+
+                batch.DrawString(assetManager.Font, $"{mobInstance.Hp}/{mobInfo.MaxHp}HP", hbPos.ToVector2(), Color.Black);
+                batch.DrawString(assetManager.Font, $"{mobInstance.Ap}/{mobInfo.MaxAp}AP", hbPos.ToVector2() + new Vector2(0, 14), Color.Black);
+                batch.DrawString(assetManager.Font, $"{mobInfo.DefenseCost}def", hbPos.ToVector2() + new Vector2(0, 28), Color.Black);
+            }
+            else {
                 batch.Draw(assetManager[AssetManager.DarkMageDeath], pos, color);
             }
         }
@@ -62,6 +67,7 @@ namespace HexMage.GUI.Renderers {
                        new Rectangle(pos + new Point(0, _healthbarHeight - percentageHeight),
                                      new Point(_healthbarWidth, percentageHeight)),
                        fullColor);
+
         }
     }
 }
