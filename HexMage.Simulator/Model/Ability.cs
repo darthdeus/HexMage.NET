@@ -2,6 +2,7 @@
 using System.CodeDom;
 using System.Collections.Generic;
 using HexMage.Simulator.Model;
+using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
     // TODO - rename
@@ -42,6 +43,7 @@ namespace HexMage.Simulator {
         }
 
 #warning TODO - ulozit je do nejaky tabulky a jenom referencovat
+        [JsonIgnore]
         public Buff ElementalEffect {
             get {
                 switch (Element) {
