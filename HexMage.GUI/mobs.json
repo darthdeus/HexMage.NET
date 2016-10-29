@@ -413,7 +413,7 @@
       "MaxHp": 9,
       "MaxAp": 11,
       "DefenseCost": 3,
-      "Iniciative": 8,
+      "Iniciative": 0,
       "Abilities": [
         0,
         1,
@@ -429,7 +429,7 @@
       "MaxHp": 7,
       "MaxAp": 10,
       "DefenseCost": 3,
-      "Iniciative": 6,
+      "Iniciative": 2,
       "Abilities": [
         6,
         7,
@@ -445,7 +445,7 @@
       "MaxHp": 8,
       "MaxAp": 10,
       "DefenseCost": 3,
-      "Iniciative": 7,
+      "Iniciative": 4,
       "Abilities": [
         12,
         13,
@@ -477,7 +477,7 @@
       "MaxHp": 8,
       "MaxAp": 11,
       "DefenseCost": 3,
-      "Iniciative": 1,
+      "Iniciative": 3,
       "Abilities": [
         24,
         25,
@@ -493,7 +493,7 @@
       "MaxHp": 9,
       "MaxAp": 7,
       "DefenseCost": 3,
-      "Iniciative": 7,
+      "Iniciative": 5,
       "Abilities": [
         30,
         31,
