@@ -5,10 +5,6 @@ using System.Threading.Tasks;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
-    //public class AiMCTSController : IMobController {
-        
-    //}
-
     public class AiRandomController : IMobController {
         private readonly GameInstance _gameInstance;
 
@@ -19,7 +15,6 @@ namespace HexMage.Simulator {
         public DefenseDesire FastRequestDesireToDefend(int mobId, int ability) {
             return DefenseDesire.Pass;
         }
-
 
         public void FastPlayTurn(GameEventHub eventHub) {
             FastRandomAction(eventHub);

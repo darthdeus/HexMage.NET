@@ -35,12 +35,14 @@ namespace HexMage.GUI.Core {
         public Task SlowPlayTurn(GameEventHub eventHub) {
             Debug.Assert(_tcs == null, "Starting a new turn while there's an existing TCS");
             _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            eventHub.State = GameEventState.TurnInProgress;
             return _tcs.Task;
         }
 
-        public void PlayerEndedTurn() {
+        public void PlayerEndedTurn(GameEventHub eventHub) {
             Debug.Assert(_tcs != null, "PlayerController.TaskCompletionSource wasn't properly initialized.");
-            var tcs = _tcs;
+            var tcs = _tcs;           
+            eventHub.State = GameEventState.SettingUpTurn; 
             _tcs = null;
             tcs.SetResult(true);
         }

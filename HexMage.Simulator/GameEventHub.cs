@@ -7,18 +7,28 @@ using System.Threading.Tasks;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
-    public class GameEventHub {        
+    public enum GameEventState {
+        NotStarted,
+        TurnInProgress,
+        SettingUpTurn
+    }
+
+    public class GameEventHub {
         private readonly GameInstance _gameInstance;
         private readonly List<IGameEventSubscriber> _subscribers = new List<IGameEventSubscriber>();
         public bool IsPaused { get; set; } = false;
+
+        private TimeSpan _pauseDelay = TimeSpan.FromMilliseconds(200);
+
+        public GameEventState State { get; set; } = GameEventState.NotStarted;
 
         public GameEventHub(GameInstance gameInstance) {
             _gameInstance = gameInstance;
         }
 
-        private TimeSpan _pauseDelay = TimeSpan.FromMilliseconds(200);
-
         public async Task<int> SlowMainLoop(TimeSpan turnDelay) {
+            State = GameEventState.SettingUpTurn;
+
             var turnManager = _gameInstance.TurnManager;
             turnManager.StartNextTurn(_gameInstance.Pathfinder);
 
@@ -29,6 +39,7 @@ namespace HexMage.Simulator {
                 totalTurns++;
 
                 await turnManager.CurrentController.SlowPlayTurn(this);
+                await Task.Delay(TimeSpan.FromMilliseconds(1000));
                 turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder);
             }
 

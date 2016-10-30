@@ -74,7 +74,7 @@ namespace HexMage.GUI.Scenes {
             var gameBoardController = new GameBoardController(_gameInstance, _gameEventHub, this);
             _gameBoardController = gameBoardController;
             gameBoardEntity.AddComponent(gameBoardController);
-            gameBoardEntity.Renderer = new GameBoardRenderer(_gameInstance, gameBoardController, _camera);
+            gameBoardEntity.Renderer = new GameBoardRenderer(_gameInstance, gameBoardController, _gameEventHub, _camera);
             gameBoardEntity.CustomBatch = true;
 
             _gameEventHub.AddSubscriber(gameBoardController);

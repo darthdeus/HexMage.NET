@@ -135,13 +135,6 @@ namespace HexMage.GUI.Components {
                      .LogContinuation();
         }
 
-        public Task ShowMessage(string message, int displayForSeconds = 5) {
-            _messageBoxLabel.Text = message;
-            _displayMessageBoxUntil = DateTime.Now.Add(TimeSpan.FromSeconds(displayForSeconds));
-
-            return Task.Delay(TimeSpan.FromSeconds(displayForSeconds));
-        }
-
         public override void Update(GameTime time) {
             UnselectAbilityIfNeeded();
 
@@ -165,14 +158,13 @@ namespace HexMage.GUI.Components {
                     if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
                         _gameInstance.Map.Toogle(mouseHex);
 
-                        //_gameInstance.Pathfinder.PathfindFromCurrentMob(_gameInstance.TurnManager);
                         _gameInstance.Pathfinder.PathfindDistanceAll();
                         _gameInstance.Pathfinder.PathfindFromCurrentMob(_gameInstance.TurnManager);
                         _gameInstance.Map.PrecomputeCubeLinedraw();
                     }
 
                 if (inputManager.IsKeyJustPressed(Keys.Space)) {
-                    controller.PlayerEndedTurn();
+                    controller.PlayerEndedTurn(_eventHub);
                     SelectedAbilityIndex = null;
                     ShowMessage("Starting new turn!");
                 }
@@ -183,18 +175,6 @@ namespace HexMage.GUI.Components {
             }
 
             UpdatePopovers(time, mouseHex);
-        }
-
-        private void UnselectAbilityIfNeeded() {
-            var mobId = _gameInstance.TurnManager.CurrentMob;
-            if (mobId == null || !SelectedAbilityIndex.HasValue) return;
-
-            var mobInfo = _gameInstance.MobManager.MobInfoForId(mobId.Value);
-            var selectedAbility = mobInfo.Abilities[SelectedAbilityIndex.Value];
-
-            if (!_gameInstance.IsAbilityUsable(mobId.Value, selectedAbility)) {
-                SelectedAbilityIndex = null;
-            }
         }
 
         private void HandleKeyboardAbilitySelect() {
@@ -359,13 +339,8 @@ namespace HexMage.GUI.Components {
         }
 
         private void UpdatePopovers(GameTime time, AxialCoord mouseHex) {
-            var camera = Camera2D.Instance;
-            var position = camera.MousePixelPos + _mouseHoverPopoverOffset;
-            var sin = (float) Math.Sin(time.TotalGameTime.TotalSeconds);
-            var offset = sin*sin*new Vector2(0, -5);
-
-            _emptyHexPopover.Position = position + offset;
-            _mobPopover.Position = position + offset;
+            _emptyHexPopover.Position = new Vector2(1050, 830);
+            _mobPopover.Position = new Vector2(1050, 830);
 
             _emptyHexPopover.Active = false;
             _mobPopover.Active = false;
@@ -503,6 +478,25 @@ namespace HexMage.GUI.Components {
             await Task.Delay(_abilityPopoverDisplayTime);
 
             Entity.Scene.DestroyEntity(result);
+        }
+
+        private void UnselectAbilityIfNeeded() {
+            var mobId = _gameInstance.TurnManager.CurrentMob;
+            if (mobId == null || !SelectedAbilityIndex.HasValue) return;
+
+            var mobInfo = _gameInstance.MobManager.MobInfoForId(mobId.Value);
+            var selectedAbility = mobInfo.Abilities[SelectedAbilityIndex.Value];
+
+            if (!_gameInstance.IsAbilityUsable(mobId.Value, selectedAbility)) {
+                SelectedAbilityIndex = null;
+            }
+        }
+
+        public Task ShowMessage(string message, int displayForSeconds = 5) {
+            _messageBoxLabel.Text = message;
+            _displayMessageBoxUntil = DateTime.Now.Add(TimeSpan.FromSeconds(displayForSeconds));
+
+            return Task.Delay(TimeSpan.FromSeconds(displayForSeconds));
         }
     }
 }

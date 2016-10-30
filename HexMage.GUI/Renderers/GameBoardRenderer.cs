@@ -18,14 +18,16 @@ namespace HexMage.GUI.Renderers {
     public class GameBoardRenderer : IRenderer {
         private readonly GameInstance _gameInstance;
         private readonly GameBoardController _gameBoardController;
+        private readonly GameEventHub _eventHub;
         private readonly Camera2D _camera;
         private SpriteBatch _spriteBatch;
         private AssetManager _assetManager;
         public BoardRenderMode Mode { get; set; }
 
-        public GameBoardRenderer(GameInstance gameInstance, GameBoardController gameBoardController, Camera2D camera) {
+        public GameBoardRenderer(GameInstance gameInstance, GameBoardController gameBoardController, GameEventHub eventHub, Camera2D camera) {
             _gameInstance = gameInstance;
             _gameBoardController = gameBoardController;
+            _eventHub = eventHub;
             _camera = camera;
         }
 
@@ -55,6 +57,10 @@ namespace HexMage.GUI.Renderers {
                     _spriteBatch.End();
                 }
             }
+
+            batch.Begin();
+            batch.DrawString(assetManager.Font, $"State: {_eventHub.State}", new Vector2(800, 30), Color.Black);
+            batch.End();
         }
 
         private void DrawBackground() {
