@@ -22,7 +22,7 @@ namespace HexMage.GUI.Scenes {
             _gameInstance = gameInstance;
 
             _defenseModal = new VerticalLayout {
-                SortOrder = Camera2D.SortUI,
+                SortOrder = Camera2D.SortUI + 1000,
                 Padding = new Vector4(20),
                 Renderer = new ColorRenderer(Color.LightGray),
                 Position = new Vector2(500, 250),

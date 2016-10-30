@@ -197,16 +197,17 @@ namespace HexMage.GUI.Renderers {
             var hexUsable = _assetManager[AssetManager.HexWithinDistance];
             var hexTooFar = _assetManager[AssetManager.HexPathSprite];
 
-            if (_gameInstance.TurnManager.CurrentMob.HasValue && _gameInstance.Pathfinder.IsValidCoord(_camera.MouseHex) &&
-                _gameInstance.Pathfinder.Distance(_camera.MouseHex) != int.MaxValue) {
+            var mouseHex = _camera.MouseHex;
+            if (_gameInstance.TurnManager.CurrentMob.HasValue && _gameInstance.Pathfinder.IsValidCoord(mouseHex) &&
+                _gameInstance.Pathfinder.Distance(mouseHex) != int.MaxValue) {
                 IList<AxialCoord> path;
 
-                var mouseMob = _gameInstance.MobManager.AtCoord(_camera.MouseHex);
+                var mouseMob = _gameInstance.MobManager.AtCoord(mouseHex);
                 if (mouseMob != null) {
                     path =
                         _gameInstance.Pathfinder.PathToMob(_gameInstance.MobManager.MobInstances[mouseMob.Value].Coord);
                 } else {
-                    path = _gameInstance.Pathfinder.PathTo(_camera.MouseHex);
+                    path = _gameInstance.Pathfinder.PathTo(mouseHex);
                 }
 
                 var currentMob = _gameInstance.TurnManager.CurrentMob;
@@ -216,7 +217,7 @@ namespace HexMage.GUI.Renderers {
                     var mobInfo = _gameInstance.MobManager.MobInfos[currentMob.Value];
                     var mobInstance = _gameInstance.MobManager.MobInstances[currentMob.Value];
 
-                    var cubepath = _gameInstance.Map.AxialLinedraw(mobInstance.Coord, _camera.MouseHex);
+                    var cubepath = _gameInstance.Map.AxialLinedraw(mobInstance.Coord, mouseHex);
 
                     int distance = 1;
                     bool walled = false;
@@ -241,7 +242,7 @@ namespace HexMage.GUI.Renderers {
                         distance++;
                     }
                 } else {
-                    if (_gameInstance.Map[_camera.MouseHex] != HexType.Wall) {
+                    if (_gameInstance.Pathfinder.IsValidCoord(mouseHex) && _gameInstance.Map[mouseHex] != HexType.Wall) {
                         if (!mouseMob.HasValue || mouseMob.Value != currentMob.Value) {
                             var mobInstance = _gameInstance.MobManager.MobInstances[currentMob.Value];
                             foreach (var coord in path) {
