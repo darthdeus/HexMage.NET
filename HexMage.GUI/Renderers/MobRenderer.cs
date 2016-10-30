@@ -50,12 +50,12 @@ namespace HexMage.GUI.Renderers {
                 DrawHealthbar((double) mobInstance.Ap/mobInfo.MaxAp,
                               batch, assetManager, apPos, Color.DarkBlue, Color.LightBlue);
 
-                const int textOffset = 5;
+                const int textOffset = 20;
 
-                batch.DrawString(assetManager.Font, $"{mobInstance.Hp}/{mobInfo.MaxHp}HP",
+                batch.DrawString(assetManager.Font, $"{mobInstance.Hp}/{mobInfo.MaxHp}",
                                  hbPos.ToVector2() + new Vector2(textOffset, 0),
                                  Color.Black);
-                batch.DrawString(assetManager.Font, $"{mobInstance.Ap}/{mobInfo.MaxAp}AP",
+                batch.DrawString(assetManager.Font, $"{mobInstance.Ap}/{mobInfo.MaxAp}",
                                  hbPos.ToVector2() + new Vector2(textOffset, 14),
                                  Color.Black);
                 batch.DrawString(assetManager.Font, $"{mobInfo.DefenseCost}def",

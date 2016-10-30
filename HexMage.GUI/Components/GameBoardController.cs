@@ -151,7 +151,7 @@ namespace HexMage.GUI.Components {
             }
 
             var controller = _gameInstance.TurnManager.CurrentController as PlayerController;
-            if (controller != null && inputManager.UserInputEnabled) {
+            if (controller != null && inputManager.UserInputEnabled && _eventHub.State == GameEventState.TurnInProgress) {
                 HandleKeyboardAbilitySelect();
 
                 if (inputManager.JustRightClicked())
