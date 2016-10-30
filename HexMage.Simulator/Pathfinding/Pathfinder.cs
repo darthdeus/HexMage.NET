@@ -63,7 +63,6 @@ namespace HexMage.Simulator {
             // Return an empty path if the coord is invalid
             if (!IsValidCoord(target)) return result;
 
-
             var current = target;
             result.Add(current);
 

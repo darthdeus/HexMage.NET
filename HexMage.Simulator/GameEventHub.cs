@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
-    public class GameEventHub {
+    public class GameEventHub {        
         private readonly GameInstance _gameInstance;
         private readonly List<IGameEventSubscriber> _subscribers = new List<IGameEventSubscriber>();
         public bool IsPaused { get; set; } = false;

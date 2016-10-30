@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 namespace HexMage.GUI {
     public class InputManager {
         public static readonly InputManager Instance = new InputManager();
+        public bool UserInputEnabled = true;
 
         private Game _game;
 

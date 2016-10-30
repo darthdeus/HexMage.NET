@@ -40,6 +40,9 @@ namespace HexMage.GUI.Renderers {
                 _animationController.CurrentAnimation.RenderFrame(null, pos, color, batch, assetManager);
 
                 var hbPos = pos.ToPoint() + _healthbarOffset;
+                var gray = assetManager[AssetManager.SolidGrayColor];
+                batch.Draw(gray, new Rectangle(hbPos.X, hbPos.Y, 55, 40), new Color(0.7f, 0.6f, 0.5f));
+
                 DrawHealthbar((double) mobInstance.Hp/mobInfo.MaxHp,
                               batch, assetManager, hbPos, Color.DarkGreen, Color.LightGreen);
 
@@ -47,11 +50,18 @@ namespace HexMage.GUI.Renderers {
                 DrawHealthbar((double) mobInstance.Ap/mobInfo.MaxAp,
                               batch, assetManager, apPos, Color.DarkBlue, Color.LightBlue);
 
-                batch.DrawString(assetManager.Font, $"{mobInstance.Hp}/{mobInfo.MaxHp}HP", hbPos.ToVector2(), Color.Black);
-                batch.DrawString(assetManager.Font, $"{mobInstance.Ap}/{mobInfo.MaxAp}AP", hbPos.ToVector2() + new Vector2(0, 14), Color.Black);
-                batch.DrawString(assetManager.Font, $"{mobInfo.DefenseCost}def", hbPos.ToVector2() + new Vector2(0, 28), Color.Black);
-            }
-            else {
+                const int textOffset = 5;
+
+                batch.DrawString(assetManager.Font, $"{mobInstance.Hp}/{mobInfo.MaxHp}HP",
+                                 hbPos.ToVector2() + new Vector2(textOffset, 0),
+                                 Color.Black);
+                batch.DrawString(assetManager.Font, $"{mobInstance.Ap}/{mobInfo.MaxAp}AP",
+                                 hbPos.ToVector2() + new Vector2(textOffset, 14),
+                                 Color.Black);
+                batch.DrawString(assetManager.Font, $"{mobInfo.DefenseCost}def",
+                                 hbPos.ToVector2() + new Vector2(textOffset, 28),
+                                 Color.Black);
+            } else {
                 batch.Draw(assetManager[AssetManager.DarkMageDeath], pos, color);
             }
         }
@@ -67,7 +77,6 @@ namespace HexMage.GUI.Renderers {
                        new Rectangle(pos + new Point(0, _healthbarHeight - percentageHeight),
                                      new Point(_healthbarWidth, percentageHeight)),
                        fullColor);
-
         }
     }
 }

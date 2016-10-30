@@ -165,8 +165,6 @@ namespace HexMage.GUI.Components {
                     if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
                         _gameInstance.Map.Toogle(mouseHex);
 
-                        // TODO - podivat se na generickou implementaci pathfinderu
-                        // TODO - pathfindovani ze zdi najde cesty
                         //_gameInstance.Pathfinder.PathfindFromCurrentMob(_gameInstance.TurnManager);
                         _gameInstance.Pathfinder.PathfindDistanceAll();
                         _gameInstance.Pathfinder.PathfindFromCurrentMob(_gameInstance.TurnManager);
@@ -260,9 +258,10 @@ namespace HexMage.GUI.Components {
 
             var mobInfo = _gameInstance.MobManager.MobInfoForId(currentMob.Value);
             if (index >= mobInfo.Abilities.Count) {
-                Utils.Log(LogSeverity.Info, nameof(GameBoardController), "Trying to select an ability index higher than the number of abilities.");
+                Utils.Log(LogSeverity.Info, nameof(GameBoardController),
+                          "Trying to select an ability index higher than the number of abilities.");
                 return;
-            }    
+            }
             var ability = mobInfo.Abilities[index];
 
             if (SelectedAbilityIndex.HasValue) {
@@ -286,8 +285,23 @@ namespace HexMage.GUI.Components {
             Debug.Assert(mobId != null);
             var abilityId = _gameInstance.MobManager.MobInfos[mobId.Value].Abilities[abilityIndex];
 
-            _eventHub.SlowBroadcastAbilityUsed(mobId.Value, targetId, abilityId)
-                     .LogTask();
+            var visibilityPath =
+                _gameInstance.Map.AxialLinedraw(_gameInstance.MobManager.MobInstances[mobId.Value].Coord,
+                                                _gameInstance.MobManager.MobInstances[targetId].Coord);
+
+            bool isVisible = true;
+            foreach (var coord in visibilityPath) {
+                if (_gameInstance.Map[coord] == HexType.Wall) {
+                    isVisible = false;
+                }
+            }
+
+            if (isVisible) {
+                _eventHub.SlowBroadcastAbilityUsed(mobId.Value, targetId, abilityId)
+                         .LogTask();
+            } else {
+                ShowMessage("The target is not visible.");
+            }
         }
 
         private void HandleLeftClick() {
@@ -312,6 +326,7 @@ namespace HexMage.GUI.Components {
                             if (mobInfo.Team == targetInfo.Team) {
                                 ShowMessage("You can't target your team.");
                             } else if (SelectedAbilityIndex.HasValue) {
+                                // TODO - tohle by se melo kontrolovat mnohem driv
                                 if (abilitySelected) {
                                     AttackMob(targetId.Value);
                                 } else {

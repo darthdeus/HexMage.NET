@@ -12,6 +12,7 @@ namespace HexMage.GUI.Core {
         public PlayerController(ArenaScene arenaScene, GameInstance gameInstance) {
             _arenaScene = arenaScene;
             _gameInstance = gameInstance;
+            _aiRandomController = new AiRandomController(_gameInstance);
         }
 
         public Task<DefenseDesire> RequestDesireToDefend(int mobId, Ability ability) {
@@ -19,6 +20,7 @@ namespace HexMage.GUI.Core {
         }
 
         private TaskCompletionSource<bool> _tcs;
+        private readonly AiRandomController _aiRandomController;
 
         public Task<bool> PlayTurn(GameEventHub eventHub) {
             Debug.Assert(_tcs == null);
@@ -31,19 +33,20 @@ namespace HexMage.GUI.Core {
         }
 
         public Task SlowPlayTurn(GameEventHub eventHub) {
-            Debug.Assert(_tcs == null);
+            Debug.Assert(_tcs == null, "Starting a new turn while there's an existing TCS");
             _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             return _tcs.Task;
         }
 
         public void PlayerEndedTurn() {
             Debug.Assert(_tcs != null, "PlayerController.TaskCompletionSource wasn't properly initialized.");
-            _tcs.SetResult(true);
+            var tcs = _tcs;
             _tcs = null;
+            tcs.SetResult(true);
         }
 
         public void RandomAction(GameEventHub eventHub) {
-            new AiRandomController(_gameInstance).FastPlayTurn(eventHub);
+            _aiRandomController.FastPlayTurn(eventHub);
         }
 
         public DefenseDesire FastRequestDesireToDefend(int mob, int abilityId) {
