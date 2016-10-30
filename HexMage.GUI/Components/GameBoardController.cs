@@ -143,8 +143,6 @@ namespace HexMage.GUI.Components {
         }
 
         public override void Update(GameTime time) {
-            HandleKeyboardAbilitySelect();
-
             UnselectAbilityIfNeeded();
 
             var inputManager = InputManager.Instance;
@@ -160,7 +158,9 @@ namespace HexMage.GUI.Components {
             }
 
             var controller = _gameInstance.TurnManager.CurrentController as PlayerController;
-            if (controller != null) {
+            if (controller != null && inputManager.UserInputEnabled) {
+                HandleKeyboardAbilitySelect();
+
                 if (inputManager.JustRightClicked())
                     if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
                         _gameInstance.Map.Toogle(mouseHex);
@@ -177,7 +177,9 @@ namespace HexMage.GUI.Components {
                     ShowMessage("Starting new turn!");
                 }
 
-                HandleUserTurnInput(inputManager);
+                if (inputManager.JustLeftClickReleased()) {
+                    EnqueueClickEvent(HandleLeftClick);
+                }
             }
 
             UpdatePopovers(time, mouseHex);
@@ -192,15 +194,6 @@ namespace HexMage.GUI.Components {
 
             if (!_gameInstance.IsAbilityUsable(mobId.Value, selectedAbility)) {
                 SelectedAbilityIndex = null;
-            }
-        }
-
-        private void HandleUserTurnInput(InputManager inputManager) {
-            if (inputManager.JustLeftClickReleased()) {
-                EnqueueClickEvent(HandleLeftClick);
-            } else if (inputManager.IsKeyJustReleased(Keys.R)) {
-#warning TODO - implement this
-                //_gameInstance.TurnManager.CurrentController.RandomAction(_eventHub);
             }
         }
 
@@ -297,7 +290,9 @@ namespace HexMage.GUI.Components {
             }
 
             if (isVisible) {
+                InputManager.Instance.UserInputEnabled = false;
                 _eventHub.SlowBroadcastAbilityUsed(mobId.Value, targetId, abilityId)
+                         .ContinueWith(t => { InputManager.Instance.UserInputEnabled = true; })
                          .LogTask();
             } else {
                 ShowMessage("The target is not visible.");
@@ -350,7 +345,9 @@ namespace HexMage.GUI.Components {
                             } else if (distance > mobInstance.Ap) {
                                 ShowMessage("You don't have enough AP.");
                             } else {
+                                InputManager.Instance.UserInputEnabled = false;
                                 _eventHub.SlowBroadcastMobMoved(currentMob.Value, mouseHex)
+                                         .ContinueWith(t => { InputManager.Instance.UserInputEnabled = true; })
                                          .LogContinuation();
                             }
                         } else {
@@ -493,8 +490,9 @@ namespace HexMage.GUI.Components {
 
             result.AddComponent(
                 () => {
-                    result.Position = camera.HexToPixelWorld(_gameInstance.MobManager.MobInstanceForId(mobId).Coord) +
-                                      _usedAbilityOffset;
+                    result.Position =
+                        camera.HexToPixelWorld(_gameInstance.MobManager.MobInstanceForId(mobId).Coord) +
+                        _usedAbilityOffset;
                 });
 
             string labelText = $"{ability.Dmg}DMG cost {ability.Cost}";
