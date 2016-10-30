@@ -2,10 +2,13 @@ using System;
 using System.Diagnostics;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace HexMage.GUI {
     public class Camera2D {
+        public static SamplerState SamplerState = null;
+
         public static readonly int SortUI = 1000;
         public static readonly int SortMobs = 100;
         public static readonly int SortProjectiles = 200;

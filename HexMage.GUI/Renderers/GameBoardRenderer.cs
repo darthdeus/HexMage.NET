@@ -50,7 +50,7 @@ namespace HexMage.GUI.Renderers {
                 var hexTooFar = _assetManager[AssetManager.HexPathSprite];
                 var mouseHex = Camera2D.Instance.MouseHex;
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                    _spriteBatch.Begin(transformMatrix: _camera.Transform);
+                    _spriteBatch.Begin(transformMatrix: _camera.Transform, samplerState: Camera2D.SamplerState);
                     DrawAt(hexTooFar, mouseHex);
                     _spriteBatch.End();
                 }
@@ -58,7 +58,7 @@ namespace HexMage.GUI.Renderers {
         }
 
         private void DrawBackground() {
-            _spriteBatch.Begin(transformMatrix: _camera.Transform);
+            _spriteBatch.Begin(transformMatrix: _camera.Transform, samplerState: Camera2D.SamplerState);
 
             var hexGreen = _assetManager[AssetManager.HexEmptySprite];
             var hexWall = _assetManager[AssetManager.HexWallSprite];
@@ -134,7 +134,7 @@ namespace HexMage.GUI.Renderers {
                         if (heatmap[coord] > maxDmg) maxDmg = heatmap[coord];
                     }
 
-                    _spriteBatch.Begin(transformMatrix: _camera.Transform);
+                    _spriteBatch.Begin(transformMatrix: _camera.Transform, samplerState: Camera2D.SamplerState);
                     foreach (var coord in heatmap.AllCoords) {
                         float percent = heatmap[coord]/(float) maxDmg;
                         DrawAt(_assetManager[AssetManager.HexHoverSprite], coord, Color.Red*percent*percent);
@@ -176,7 +176,7 @@ namespace HexMage.GUI.Renderers {
                 }
             }
 
-            _spriteBatch.Begin(transformMatrix: _camera.Transform);
+            _spriteBatch.Begin(transformMatrix: _camera.Transform, samplerState: Camera2D.SamplerState);
             foreach (var coord in heatmap.AllCoords) {
                 float percent = heatmap[coord]/(float) maxDmg;
                 DrawAt(_assetManager[AssetManager.HexHoverSprite], coord, Color.Red*percent*percent);
@@ -186,7 +186,7 @@ namespace HexMage.GUI.Renderers {
 
 
         private void DrawHoverPath() {
-            _spriteBatch.Begin(transformMatrix: _camera.Transform);
+            _spriteBatch.Begin(transformMatrix: _camera.Transform, samplerState: Camera2D.SamplerState);
 
             var hexUsable = _assetManager[AssetManager.HexWithinDistance];
             var hexTooFar = _assetManager[AssetManager.HexPathSprite];

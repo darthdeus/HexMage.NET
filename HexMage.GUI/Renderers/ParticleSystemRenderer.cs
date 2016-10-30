@@ -15,7 +15,7 @@ namespace HexMage.GUI.Renderers {
 
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
             foreach (var particle in _particleSystem.Particles.OrderBy(p => p.Age)) {
-                batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null,
+                batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null,
                     null, entity.RenderTransform);
 
                 var tintColor = _particleSystem.ColorFunc?.Invoke() ?? Color.White;

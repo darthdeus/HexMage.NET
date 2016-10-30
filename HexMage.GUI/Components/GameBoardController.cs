@@ -175,6 +175,7 @@ namespace HexMage.GUI.Components {
 
                 if (inputManager.IsKeyJustPressed(Keys.Space)) {
                     controller.PlayerEndedTurn();
+                    SelectedAbilityIndex = null;
                     ShowMessage("Starting new turn!");
                 }
 

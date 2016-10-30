@@ -37,7 +37,7 @@ namespace HexMage.GUI
             if (!double.IsInfinity(AverageFramesPerSecond)) {
                 string fpsStr = $"FPS: {AverageFramesPerSecond}";
 
-                spriteBatch.Begin();
+                spriteBatch.Begin(samplerState: Camera2D.SamplerState);
                 spriteBatch.DrawString(font, fpsStr, new Vector2(0), Color.White);
                 spriteBatch.End();
             }

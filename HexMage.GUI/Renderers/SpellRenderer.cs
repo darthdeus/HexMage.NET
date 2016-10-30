@@ -26,7 +26,7 @@ namespace HexMage.GUI.Renderers {
             var time = ((float) DateTime.Now.Millisecond)/1000*2 - 1;
 
             //effect.Parameters["Time"].SetValue(time);
-            batch.Begin(effect: effect);
+            batch.Begin(effect: effect, samplerState: Camera2D.SamplerState);
 
             var mobId = _mobFunc();
             if (mobId != null) {
