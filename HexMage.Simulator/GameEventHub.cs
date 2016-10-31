@@ -39,7 +39,9 @@ namespace HexMage.Simulator {
                 totalTurns++;
 
                 await turnManager.CurrentController.SlowPlayTurn(this);
-                await Task.Delay(TimeSpan.FromMilliseconds(1000));
+
+                // Delay used to find random race conditions
+                //await Task.Delay(TimeSpan.FromMilliseconds(1000));
                 turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder);
             }
 

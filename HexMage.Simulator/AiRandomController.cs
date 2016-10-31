@@ -83,13 +83,16 @@ namespace HexMage.Simulator {
             }
         }
 
-        public string Name => nameof(AiRandomController);
         public Task<DefenseDesire> SlowRequestDesireToDefend(int targetId, int abilityId) {
-            throw new NotImplementedException();
+            return Task.FromResult(DefenseDesire.Pass);
         }
 
         public Task SlowPlayTurn(GameEventHub eventHub) {
-            throw new NotImplementedException();
+            FastRandomAction(eventHub);
+            return Task.CompletedTask;
         }
+
+        public string Name => nameof(AiRandomController);
+
     }
 }

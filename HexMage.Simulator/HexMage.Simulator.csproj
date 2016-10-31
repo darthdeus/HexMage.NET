@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AiRandomController.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="GameEventHub.cs" />
     <Compile Include="IDeepCopyable.cs" />
     <Compile Include="IGameEventSubscriber.cs" />
