@@ -93,7 +93,14 @@ namespace HexMage.GUI.Scenes {
                 Position = new Vector2(250, 20)
             };
 
-            btnStart.OnClick += _ => { LoadNewScene(_arenaScene); };
+            btnStart.OnClick += _ => {
+                if (_leftController != null && _rightController != null) {
+                    LoadNewScene(_arenaScene);
+                } else {
+                    Utils.Log(LogSeverity.Warning, nameof(TeamSelectionScene),
+                              "Failed to start a game, no controllers selected.");
+                }
+            };
 
             var btnRegenerate = new TextButton("Regenerate teams", _assetManager.Font) {
                 SortOrder = Camera2D.SortUI,
