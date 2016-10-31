@@ -14,11 +14,10 @@ namespace HexMage.Simulator {
         public MobInstance[] MobInstances = new MobInstance[0];
         public List<int> Cooldowns = new List<int>();
 
-        [JsonIgnore]
-        public HexMap<int?> MobPositions;
+        [JsonIgnore] public HexMap<int?> MobPositions;
 
-        [JsonIgnore]
-        public readonly Dictionary<TeamColor, IMobController> Teams = new Dictionary<TeamColor, IMobController>();
+        [JsonIgnore] public readonly Dictionary<TeamColor, IMobController> Teams =
+            new Dictionary<TeamColor, IMobController>();
 
         //public bool MoveOneHex(Mob mob, AxialCoord to) {
         //    if (mob.Coord == to) {
@@ -75,7 +74,6 @@ namespace HexMage.Simulator {
 
         public void ChangeMobHp(GameInstance gameInstance, int mobId, int hpChange) {
             MobInstances[mobId].Hp += hpChange;
-
             gameInstance.MobHpChanged(MobInstances[mobId].Hp, MobInfos[mobId].Team);
         }
 

@@ -339,8 +339,8 @@ namespace HexMage.GUI.Components {
         }
 
         private void UpdatePopovers(GameTime time, AxialCoord mouseHex) {
-            _emptyHexPopover.Position = new Vector2(1050, 830);
-            _mobPopover.Position = new Vector2(1050, 830);
+            _emptyHexPopover.Position = new Vector2(900, 800);
+            _mobPopover.Position = new Vector2(900, 800);
 
             _emptyHexPopover.Active = false;
             _mobPopover.Active = false;
