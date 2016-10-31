@@ -352,7 +352,11 @@ namespace HexMage.GUI.Components {
                     var map = _gameInstance.Map;
 
                     var labelText = new StringBuilder();
-                    labelText.AppendLine($"Distance: {_gameInstance.Pathfinder.Distance(mouseHex)}");
+
+                    // If there's no mob we can't calculate a distance from it
+                    if (_gameInstance.TurnManager.CurrentMob.HasValue) {
+                        labelText.AppendLine($"Distance: {_gameInstance.Pathfinder.Distance(mouseHex)}");
+                    }
 
                     switch (map[mouseHex]) {
                         case HexType.Empty:
