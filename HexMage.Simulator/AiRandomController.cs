@@ -7,6 +7,18 @@ using System.Threading.Tasks;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
+    public class GameState {
+        public MobInstance[] MobInstances = new MobInstance[0];
+        public List<int> Cooldowns = new List<int>();
+        public HexMap<int?> MobPositions;
+        public int? CurrentMobIndex;
+        public int TurnNumber;
+    }
+
+    public class GameInfo {
+        
+    }
+
     public class UctAction {}
 
     public class UctNode {
@@ -167,10 +179,17 @@ namespace HexMage.Simulator {
                 possibleStates.Add(moveForwardCopy);
             }
 
+            foreach (var state in possibleStates) {
+                var hub = new GameEventHub(state);
+                state.MobManager.Teams[TeamColor.Red] = new AiRandomController(state);
+                state.MobManager.Teams[TeamColor.Blue] = new AiRandomController(state);
+
+                var rounds = hub.FastMainLoop(TimeSpan.Zero);
+                Console.WriteLine($"Took {rounds} rounds");
+            }            
 
             return null;
         }
-
 
         private void FastMoveTowardsEnemy(GameInstance state, int mobId, int targetId) {
             var pathfinder = state.Pathfinder;

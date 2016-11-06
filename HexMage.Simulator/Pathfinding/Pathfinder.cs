@@ -51,14 +51,18 @@ namespace HexMage.Simulator {
 
         public AxialCoord? FurthestPointToTarget(MobInstance mob, MobInstance target) {
             int iterations = 0;
+
+            AxialCoord coord = target.Coord;
             while (true) {
                 if (iterations++ > 1000)
                     throw new InvalidOperationException("Pathfinding got stuck searching for a shorter path");
-                var closer = NearestEmpty(target.Coord);
+                var closer = NearestEmpty(coord);
                 if (closer == null) return null;
 
                 if (Distance(closer.Value) <= mob.Ap) {
                     return closer;
+                } else {
+                    coord = closer.Value;
                 }
             }
         }
