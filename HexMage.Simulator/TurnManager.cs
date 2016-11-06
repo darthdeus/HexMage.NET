@@ -37,7 +37,6 @@ namespace HexMage.Simulator {
         private List<int> _turnOrder;
         private List<int> _presortedOrder;
 
-
         public void PresortTurnOrder() {
             _presortedOrder = _mobManager.Mobs.ToList();
             _presortedOrder.Sort((a, b) => {
@@ -55,13 +54,6 @@ namespace HexMage.Simulator {
             for (int i = 0; i < _mobManager.MobInstances.Length; i++) {
                 _mobManager.MobInstances[i].Ap = _mobManager.MobInfos[i].MaxAp;
             }
-
-            //foreach (var mobId in MobManager.Mobs) {
-            //    var mob = MobManager.MobInstanceForId(mobId);
-            //    if (mob.Hp > 0) {
-            //        MobManager.ResetAp(mobId);
-            //    }
-            //}
 
             _turnOrder.RemoveAll(x => _mobManager.MobInstances[x].Hp <= 0);
 
@@ -101,14 +93,6 @@ namespace HexMage.Simulator {
         }
 
         private void CopyTurnOrderFromPresort() {
-            //_presortedOrder = MobManager.Mobs.ToList();
-            //_presortedOrder.Sort((a, b) => {
-            //    var aInfo = MobManager.MobInfoForId(a);
-            //    var bInfo = MobManager.MobInfoForId(b);
-            //    return aInfo.Iniciative.CompareTo(bInfo.Iniciative);
-            //});
-
-            //_turnOrder = _presortedOrder;
             _turnOrder = new List<int>();
 
             foreach (var id in _presortedOrder) {

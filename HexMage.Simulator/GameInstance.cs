@@ -202,6 +202,7 @@ namespace HexMage.Simulator {
             var mapCopy = Map.DeepCopy();
             var mobManagerCopy = MobManager.DeepCopy();
             var game = new GameInstance(mapCopy, mobManagerCopy);
+            game.TurnManager.PresortTurnOrder();
 
             return game;
         }
