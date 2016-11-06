@@ -21,6 +21,7 @@ namespace HexMage.Simulator {
         private readonly List<AxialCoord> _diffs;
         readonly HexMap<HexMap<Path>> _allPaths;
         private HexMap<Path> _current;
+        private int Size => _gameInstance.Size;
 
         public Pathfinder(GameInstance gameInstance) {
             _gameInstance = gameInstance;
@@ -36,8 +37,13 @@ namespace HexMage.Simulator {
             };
         }
 
-
-        private int Size => _gameInstance.Size;
+        public Pathfinder(GameInstance gameInstance, List<AxialCoord> diffs, HexMap<HexMap<Path>> allPaths,
+                          HexMap<Path> current) {
+            _gameInstance = gameInstance;
+            _diffs = diffs;
+            _allPaths = allPaths;
+            _current = current;
+        }
 
         public void Reset() {
             // Right now we're not caching anything, so there's nothing to reset
@@ -100,7 +106,8 @@ namespace HexMage.Simulator {
 
 
         private bool IsWalkable(AxialCoord coord) {
-            return IsValidCoord(coord) && (_gameInstance.Map[coord] == HexType.Empty) && (_gameInstance.MobManager.AtCoord(coord) == null);
+            return IsValidCoord(coord) && (_gameInstance.Map[coord] == HexType.Empty) &&
+                   (_gameInstance.MobManager.AtCoord(coord) == null);
         }
 
         public int Distance(AxialCoord c) {
@@ -227,6 +234,13 @@ namespace HexMage.Simulator {
 
             //return _map.AxialDistance(c, new AxialCoord(0, 0)) <= _map.Size;
             //return _map.CubeDistance(new CubeCoord(0, 0, 0), c) <= _map.Size;
+        }
+
+        public Pathfinder DeepCopy(GameInstance gameInstanceCopy) {
+            var copy = new Pathfinder(gameInstanceCopy,
+                                      _diffs, _allPaths, _current);
+
+            return copy;
         }
     }
 }

@@ -12,6 +12,11 @@ namespace HexMage.Simulator {
 
     public class TurnManager : IResettable {
         private readonly GameInstance _gameInstance;
+        public int TurnNumber { get; private set; }
+        private int _current = 0;
+        private List<int> _turnOrder;
+        private List<int> _presortedOrder;
+
         private MobManager _mobManager => _gameInstance.MobManager;
 
         public IMobController CurrentController
@@ -27,15 +32,10 @@ namespace HexMage.Simulator {
             }
         }
 
-        public int TurnNumber { get; private set; }
-        private int _current = 0;
-
         public TurnManager(GameInstance gameInstance) {
             _gameInstance = gameInstance;
         }
 
-        private List<int> _turnOrder;
-        private List<int> _presortedOrder;
 
         public void PresortTurnOrder() {
             _presortedOrder = _mobManager.Mobs.ToList();
@@ -98,6 +98,16 @@ namespace HexMage.Simulator {
             foreach (var id in _presortedOrder) {
                 _turnOrder.Add(id);
             }
+        }
+        public TurnManager DeepCopy(GameInstance gameInstanceCopy) {
+            var copy = new TurnManager(gameInstanceCopy);
+
+            copy._presortedOrder = _presortedOrder.ToList();
+            copy._turnOrder = _turnOrder.ToList();
+            copy._current = _current;
+            copy.TurnNumber = TurnNumber;
+
+            return copy;
         }
     }
 }
