@@ -198,7 +198,7 @@ namespace HexMage.Simulator {
 
 
         public GameInstance DeepCopy() {
-#warning TODO - tohle prepsat poradne
+#warning TODO - tohle prepsat poradne!
             var mapCopy = Map.DeepCopy();
             var mobManagerCopy = MobManager.DeepCopy();
             var game = new GameInstance(mapCopy, mobManagerCopy);
@@ -257,9 +257,25 @@ namespace HexMage.Simulator {
             }
         }
 
-        public void FastUseWithDefenseDesire(int mobId, int targetId, int ability,
-                                             DefenseDesire defenseDesire) {
-            throw new NotImplementedException();
+        public void FastUseWithDefenseDesire(int mobId, int targetId, int abilityId, DefenseDesire defenseDesire) {
+            var target = MobManager.MobInstanceForId(targetId);
+            var targetInfo = MobManager.MobInfoForId(targetId);
+            Debug.Assert(MobManager.CooldownFor(abilityId) == 0, "Trying to use an ability with non-zero cooldown.");
+            Debug.Assert(target.Hp > 0, "Target is dead.");
+
+            var ability = MobManager.AbilityForId(abilityId);
+
+            MobManager.SetCooldownFor(abilityId, ability.Cooldown);
+            if (target.Ap >= targetInfo.DefenseCost) {
+                if (defenseDesire == DefenseDesire.Block) {
+                    MobManager.ChangeMobAp(mobId, -MobManager.AbilityForId(abilityId).Cost);
+                    MobManager.ChangeMobAp(targetId, -MobManager.MobInfoForId(targetId).DefenseCost);
+                } else {
+                    TargetHit(abilityId, mobId, targetId);
+                }
+            } else {
+                TargetHit(abilityId, mobId, targetId);
+            }
         }
 
         public static GameInstance FromJSON(string jsonStr) {

@@ -174,6 +174,11 @@ namespace HexMage.Simulator {
 
             mobManagerCopy.MobInstances = new MobInstance[MobInstances.Length];
 
+            mobManagerCopy.MobPositions = new HexMap<int?>(MobPositions.Size);
+            foreach (var coord in MobPositions.AllCoords) {
+                mobManagerCopy.MobPositions[coord] = MobPositions[coord];
+            }
+
             for (int i = 0; i < MobInstances.Length; i++) {
                 mobManagerCopy.MobInstances[i] = MobInstances[i].DeepCopy();
             }

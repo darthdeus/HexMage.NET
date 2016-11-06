@@ -160,6 +160,10 @@ namespace HexMage.GUI.Scenes {
                 game.MobManager.Teams[TeamColor.Red] = new PlayerController(arenaScene, game);
                 game.MobManager.Teams[TeamColor.Blue] = new PlayerController(arenaScene, game);
 
+                game.PrepareEverything();
+
+                new FlatMonteCarlo().Run(game);
+
                 LoadNewScene(arenaScene);
             }
         }

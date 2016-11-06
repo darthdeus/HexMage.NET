@@ -95,6 +95,7 @@ namespace HexMage.GUI.Scenes {
 
             btnStart.OnClick += _ => {
                 if (_leftController != null && _rightController != null) {
+                    _gameInstance.PrepareEverything();
                     LoadNewScene(_arenaScene);
                 } else {
                     Utils.Log(LogSeverity.Warning, nameof(TeamSelectionScene),

@@ -33,7 +33,6 @@ namespace HexMage.GUI.Scenes {
         }
 
         public override void Initialize() {
-            _gameInstance.PrepareEverything();
             //_gameInstance.MobManager.Reset();
             //_gameInstance.Map.PrecomputeCubeLinedraw();
             //_gameInstance.Pathfinder.PathfindDistanceAll();

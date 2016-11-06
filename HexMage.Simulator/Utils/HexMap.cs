@@ -7,20 +7,20 @@ namespace HexMage.Simulator {
     public class HexMap<T> : IDeepCopyable<HexMap<T>> {
         private readonly T[,] _data;
 
-        private readonly int _size;
+        public readonly int Size;
 
         [JsonConstructor]
         public HexMap() {}
 
         public HexMap(int size) {
             Debug.Assert(size > 0);
-            _size = size;
-            _data = new T[_size*2 + 1, _size*2 + 1];
+            Size = size;
+            _data = new T[Size*2 + 1, Size*2 + 1];
         }
 
         public T this[AxialCoord c] {
-            get { return _data[c.X + _size, c.Y + _size]; }
-            set { _data[c.X + _size, c.Y + _size] = value; }
+            get { return _data[c.X + Size, c.Y + Size]; }
+            set { _data[c.X + Size, c.Y + Size] = value; }
         }
 
         public T this[int x, int y] {
@@ -50,10 +50,10 @@ namespace HexMage.Simulator {
 
         public List<AxialCoord> AllCoords {
             get {
-                if (!_allCoordDictionary.ContainsKey(_size)) {
-                    _allCoordDictionary[_size] = CalculateAllCoords(_size);
+                if (!_allCoordDictionary.ContainsKey(Size)) {
+                    _allCoordDictionary[Size] = CalculateAllCoords(Size);
                 }
-                return _allCoordDictionary[_size];
+                return _allCoordDictionary[Size];
             }
         }
 
@@ -67,9 +67,9 @@ namespace HexMage.Simulator {
             AllCoords.Clear();
 
             // TODO - go from -Size
-            for (var i = -_size; i < _size; i++) {
-                for (var j = -_size; j < _size; j++) {
-                    for (var k = -_size; k < _size; k++) {
+            for (var i = -Size; i < Size; i++) {
+                for (var j = -Size; j < Size; j++) {
+                    for (var k = -Size; k < Size; k++) {
                         if (i + j + k == 0) {
                             AllCoords.Add(new AxialCoord(j, i));
                         }
@@ -79,7 +79,7 @@ namespace HexMage.Simulator {
         }
 
         public HexMap<T> DeepCopy() {
-            var copy = new HexMap<T>(_size);
+            var copy = new HexMap<T>(Size);
 
             foreach (var coord in AllCoords) {
                 copy[coord] = this[coord];
