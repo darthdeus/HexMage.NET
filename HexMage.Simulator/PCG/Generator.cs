@@ -88,8 +88,7 @@ namespace HexMage.Simulator.PCG {
                 var coord = new AxialCoord(x, y);
 
                 if (isCoordAvailable(coord) && coord.Distance(zero) < size) {
-                    if (mobManager.AtCoord(coord) == null || mobManager.AtCoord(coord).Value == mob)
-                {
+                    if (mobManager.AtCoord(coord) == null || mobManager.AtCoord(coord).Value == mob) {
                         mobManager.SetMobPosition(mob, coord);
                         break;
                     } else {
@@ -112,7 +111,7 @@ namespace HexMage.Simulator.PCG {
                 var element = elements[Random.Next(0, 4)];
                 var buffs = RandomBuffs(element);
 
-            
+
                 var areaBuffs = RandomAreaBuffs(element);
 
                 int id = mobManager.Abilities.Count;
@@ -124,7 +123,6 @@ namespace HexMage.Simulator.PCG {
                 int score = 0;
                 score += dmg;
                 score += (dmg - cost)*2;
-                 
 
 
                 var ability = new Ability(id,

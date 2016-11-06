@@ -20,7 +20,6 @@ namespace HexMage.Simulator {
         private readonly GameInstance _gameInstance;
         private readonly List<AxialCoord> _diffs;
         readonly HexMap<HexMap<Path>> _allPaths;
-        private HexMap<Path> _current;
         private int Size => _gameInstance.Size;
 
         public Pathfinder(GameInstance gameInstance) {
@@ -37,12 +36,10 @@ namespace HexMage.Simulator {
             };
         }
 
-        public Pathfinder(GameInstance gameInstance, List<AxialCoord> diffs, HexMap<HexMap<Path>> allPaths,
-                          HexMap<Path> current) {
+        public Pathfinder(GameInstance gameInstance, List<AxialCoord> diffs, HexMap<HexMap<Path>> allPaths) {
             _gameInstance = gameInstance;
             _diffs = diffs;
             _allPaths = allPaths;
-            _current = current;
         }
 
         public void Reset() {
@@ -111,7 +108,7 @@ namespace HexMage.Simulator {
 
         private bool IsWalkable(AxialCoord coord) {
             return IsValidCoord(coord) && (_gameInstance.Map[coord] == HexType.Empty) &&
-                   (_gameInstance.MobManager.AtCoord(coord) == null);
+                   (_gameInstance.State.AtCoord(coord) == null);
         }
 
         public int Distance(AxialCoord c) {
@@ -121,7 +118,7 @@ namespace HexMage.Simulator {
 
         public void PathfindFromCurrentMob(TurnManager turnManager) {
             if (turnManager.CurrentMob != null) {
-                PathfindFrom(_gameInstance.MobManager.MobInstanceForId(turnManager.CurrentMob.Value).Coord);
+                PathfindFrom(_gameInstance.State.MobInstances[turnManager.CurrentMob.Value].Coord);
             } else {
                 Utils.Log(LogSeverity.Warning, nameof(Pathfinder), "CurrentMob is NULL, pathfind current failed");
             }

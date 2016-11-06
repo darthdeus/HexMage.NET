@@ -13,19 +13,20 @@ namespace HexMage.Simulator {
     public class TurnManager : IResettable {
         private readonly GameInstance _gameInstance;
         public int TurnNumber { get; private set; }
-        private int _current = 0;
         private List<int> _turnOrder;
         private List<int> _presortedOrder;
 
-        private MobManager _mobManager => _gameInstance.MobManager;
+        private MobManager MobManager => _gameInstance.MobManager;
+        private GameState State => _gameInstance.State;
 
         public IMobController CurrentController
-            => CurrentMob != null ? _mobManager.Teams[_mobManager.MobInfoForId(CurrentMob.Value).Team] : null;
+            => CurrentMob != null ? MobManager.Teams[MobManager.MobInfos[CurrentMob.Value].Team] : null;
 
         public int? CurrentMob {
             get {
-                if (_current < _turnOrder.Count) {
-                    return _turnOrder[_current];
+                if (!State.CurrentMobIndex.HasValue) return null;
+                if (State.CurrentMobIndex.Value < _turnOrder.Count) {
+                    return _turnOrder[State.CurrentMobIndex.Value];
                 } else {
                     return null;
                 }
@@ -38,49 +39,51 @@ namespace HexMage.Simulator {
 
 
         public void PresortTurnOrder() {
-            _presortedOrder = _mobManager.Mobs.ToList();
+            _presortedOrder = MobManager.Mobs.ToList();
             _presortedOrder.Sort((a, b) => {
-                                     var aInfo = _mobManager.MobInfoForId(a);
-                                     var bInfo = _mobManager.MobInfoForId(b);
+                                     var aInfo = MobManager.MobInfos[a];
+                                     var bInfo = MobManager.MobInfos[b];
                                      return aInfo.Iniciative.CompareTo(bInfo.Iniciative);
                                  });
 
             CopyTurnOrderFromPresort();
         }
 
-        public void StartNextTurn(Pathfinder pathfinder) {
+        public void StartNextTurn(Pathfinder pathfinder, GameState state) {
             TurnNumber++;
 
-            for (int i = 0; i < _mobManager.MobInstances.Length; i++) {
-                _mobManager.MobInstances[i].Ap = _mobManager.MobInfos[i].MaxAp;
+            for (int i = 0; i < state.MobInstances.Length; i++) {
+                state.MobInstances[i].Ap = MobManager.MobInfos[i].MaxAp;
             }
 
-            _turnOrder.RemoveAll(x => _mobManager.MobInstances[x].Hp <= 0);
+            _turnOrder.RemoveAll(x => state.MobInstances[x].Hp <= 0);
 
-            _mobManager.ApplyDots(_gameInstance.Map, _gameInstance);
-            _mobManager.LowerCooldowns();
+            state.ApplyDots(_gameInstance.Map, _gameInstance);
+            state.LowerCooldowns();
 
-            _current = 0;
+            state.CurrentMobIndex = 0;
 
             if (CurrentMob != null) {
-                pathfinder.PathfindFrom(_mobManager.MobInstanceForId(CurrentMob.Value).Coord);
+                pathfinder.PathfindFrom(state.MobInstances[CurrentMob.Value].Coord);
             } else {
                 Utils.Log(LogSeverity.Warning, nameof(Pathfinder), "CurrentMob is NULL, pathfind current failed");
             }
         }
 
-        public TurnEndResult NextMobOrNewTurn(Pathfinder pathfinder) {
-            if (_current >= _turnOrder.Count - 1) {
+        public TurnEndResult NextMobOrNewTurn(Pathfinder pathfinder, GameState state) {
+            Debug.Assert(state.CurrentMobIndex.HasValue, "state.CurrentMobIndex.HasValue");
+
+            if (state.CurrentMobIndex.Value >= _turnOrder.Count - 1) {
                 //Utils.Log(LogSeverity.Info, nameof(TurnManager), "Starting next turn");
-                StartNextTurn(pathfinder);
+                StartNextTurn(pathfinder, state);
                 return TurnEndResult.NextTurn;
             } else {
                 //Utils.Log(LogSeverity.Info, nameof(TurnManager), "Moving to next mob (same turn)");
-                _current++;
+                state.CurrentMobIndex = state.CurrentMobIndex.Value + 1;
 
                 Debug.Assert(CurrentMob.HasValue, "There's no current mob but still trying to move to one.");
-                var mobInstance = _mobManager.MobInstanceForId(CurrentMob.Value);
-                if (mobInstance.Hp <= 0) return NextMobOrNewTurn(pathfinder);
+                var mobInstance = state.MobInstances[CurrentMob.Value];
+                if (mobInstance.Hp <= 0) return NextMobOrNewTurn(pathfinder, state);
 
                 pathfinder.PathfindFrom(mobInstance.Coord);
                 return TurnEndResult.NextMob;
@@ -99,12 +102,12 @@ namespace HexMage.Simulator {
                 _turnOrder.Add(id);
             }
         }
+
         public TurnManager DeepCopy(GameInstance gameInstanceCopy) {
             var copy = new TurnManager(gameInstanceCopy);
 
             copy._presortedOrder = _presortedOrder.ToList();
             copy._turnOrder = _turnOrder.ToList();
-            copy._current = _current;
             copy.TurnNumber = TurnNumber;
 
             return copy;

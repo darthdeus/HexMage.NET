@@ -19,6 +19,9 @@ namespace HexMage.Simulator {
         public TurnManager TurnManager { get; set; }
         public int Size { get; set; }
 
+        public GameState State { get; set; }
+
+        public bool IsFinished => State.IsFinished;
 
         public GameInstance(Map map, MobManager mobManager) {
             Map = map;
@@ -41,39 +44,24 @@ namespace HexMage.Simulator {
         }
 
         public void PrepareEverything() {
-            MobManager.MobPositions = new HexMap<int?>(Size);
-            MobManager.Reset();
+            State.MobPositions = new HexMap<int?>(Size);
+            State.Reset();
             Map.PrecomputeCubeLinedraw();
             Pathfinder.PathfindDistanceAll();
             TurnManager.PresortTurnOrder();
-            TurnManager.StartNextTurn(Pathfinder);
+            TurnManager.StartNextTurn(Pathfinder, State);
         }
 
-        public void SlowUpdateIsFinished() {
-            RedAlive = 0;
-            BlueAlive = 0;
-            foreach (var mobId in MobManager.Mobs) {
-                var mobInfo = MobManager.MobInfoForId(mobId);
-                var mobInstance = MobManager.MobInstanceForId(mobId);
-
-                if (mobInstance.Hp > 0 && mobInfo.Team == TeamColor.Red) {
-                    RedAlive++;
-                }
-                if (mobInstance.Hp > 0 && mobInfo.Team == TeamColor.Blue) {
-                    BlueAlive++;
-                }
-            }
-        }
-
+     
         public bool IsAbilityUsable(int mobId, int abilityId) {
             var ability = MobManager.AbilityForId(abilityId);
-            var mob = MobManager.MobInstanceForId(mobId);
-            return mob.Ap >= ability.Cost && MobManager.CooldownFor(abilityId) == 0;
+            var mob = State.MobInstances[mobId];
+            return mob.Ap >= ability.Cost && State.Cooldowns[abilityId] == 0;
         }
 
         public bool IsAbilityUsable(int mobId, int targetId, int abilityId) {
-            var mob = MobManager.MobInstanceForId(mobId);
-            var target = MobManager.MobInstanceForId(targetId);
+            var mob = State.MobInstances[mobId];
+            var target = State.MobInstances[targetId];
 
             var line = Map.AxialLinedraw(mob.Coord, target.Coord);
             int distance = line.Count - 1;
@@ -92,23 +80,24 @@ namespace HexMage.Simulator {
 
 
         public DefenseDesire FastUse(int abilityId, int mobId, int targetId) {
-            var target = MobManager.MobInstanceForId(targetId);
-            var targetInfo = MobManager.MobInfoForId(targetId);
-            Debug.Assert(MobManager.CooldownFor(abilityId) == 0, "Trying to use an ability with non-zero cooldown.");
+            var target = State.MobInstances[targetId];
+            var targetInfo = MobManager.MobInfos[targetId];
+            Debug.Assert(State.Cooldowns[abilityId] == 0, "Trying to use an ability with non-zero cooldown.");
             Debug.Assert(target.Hp > 0, "Target is dead.");
 
             DefenseDesire result;
 
             var ability = MobManager.AbilityForId(abilityId);
 
-            MobManager.SetCooldownFor(abilityId, ability.Cooldown);
+            State.Cooldowns[abilityId] = ability.Cooldown;
+
             if (target.Ap >= targetInfo.DefenseCost) {
                 var controller = MobManager.Teams[targetInfo.Team];
                 var res = controller.FastRequestDesireToDefend(targetId, abilityId);
 
                 if (res == DefenseDesire.Block) {
-                    MobManager.ChangeMobAp(mobId, -MobManager.AbilityForId(abilityId).Cost);
-                    MobManager.ChangeMobAp(targetId, -MobManager.MobInfoForId(targetId).DefenseCost);
+                    State.ChangeMobAp(mobId, -MobManager.AbilityForId(abilityId).Cost);
+                    State.ChangeMobAp(targetId, -MobManager.MobInfos[targetId].DefenseCost);
                     return DefenseDesire.Block;
                 } else {
                     TargetHit(abilityId, mobId, targetId);
@@ -124,23 +113,24 @@ namespace HexMage.Simulator {
         }
 
         public async Task<DefenseDesire> SlowUse(int abilityId, int mobId, int targetId) {
-            var target = MobManager.MobInstanceForId(targetId);
-            var targetInfo = MobManager.MobInfoForId(targetId);
-            Debug.Assert(MobManager.CooldownFor(abilityId) == 0, "Trying to use an ability with non-zero cooldown.");
+            var target = State.MobInstances[targetId];
+            var targetInfo = MobManager.MobInfos[targetId];
+            Debug.Assert(State.Cooldowns[abilityId] == 0, "Trying to use an ability with non-zero cooldown.");
             Debug.Assert(target.Hp > 0, "Target is dead.");
 
             DefenseDesire result;
 
             var ability = MobManager.AbilityForId(abilityId);
 
-            MobManager.SetCooldownFor(abilityId, ability.Cooldown);
+            State.Cooldowns[abilityId] = ability.Cooldown;
+
             if (target.Ap >= targetInfo.DefenseCost) {
                 var controller = MobManager.Teams[targetInfo.Team];
                 var res = await controller.SlowRequestDesireToDefend(targetId, abilityId);
 
                 if (res == DefenseDesire.Block) {
-                    MobManager.ChangeMobAp(mobId, -MobManager.AbilityForId(abilityId).Cost);
-                    MobManager.ChangeMobAp(targetId, -MobManager.MobInfoForId(targetId).DefenseCost);
+                    State.ChangeMobAp(mobId, -MobManager.AbilityForId(abilityId).Cost);
+                    State.ChangeMobAp(targetId, -MobManager.MobInfos[targetId].DefenseCost);
                     return DefenseDesire.Block;
                 } else {
                     TargetHit(abilityId, mobId, targetId);
@@ -155,13 +145,35 @@ namespace HexMage.Simulator {
             return result;
         }
 
+        public void FastUseWithDefenseDesire(int mobId, int targetId, int abilityId, DefenseDesire defenseDesire) {
+            var target = State.MobInstances[targetId];
+            var targetInfo = MobManager.MobInfos[targetId];
+            Debug.Assert(State.Cooldowns[abilityId] == 0, "Trying to use an ability with non-zero cooldown.");
+            Debug.Assert(target.Hp > 0, "Target is dead.");
+
+            var ability = MobManager.AbilityForId(abilityId);
+
+            State.Cooldowns[abilityId] = ability.Cooldown;
+
+            if (target.Ap >= targetInfo.DefenseCost) {
+                if (defenseDesire == DefenseDesire.Block) {
+                    State.ChangeMobAp(mobId, -MobManager.AbilityForId(abilityId).Cost);
+                    State.ChangeMobAp(targetId, -MobManager.MobInfos[targetId].DefenseCost);
+                } else {
+                    TargetHit(abilityId, mobId, targetId);
+                }
+            } else {
+                TargetHit(abilityId, mobId, targetId);
+            }
+        }
+
         private void TargetHit(int abilityId, int mobId, int targetId) {
             var ability = MobManager.AbilityForId(abilityId);
 
-            MobManager.ChangeMobHp(this, targetId, -ability.Dmg);
+            State.ChangeMobHp(this, targetId, -ability.Dmg);
 
-            var targetInstance = MobManager.MobInstanceForId(targetId);
-            var targetInfo = MobManager.MobInfoForId(targetId);
+            var targetInstance = State.MobInstances[targetId];
+            var targetInfo = MobManager.MobInfos[targetId];
 
             targetInstance.Buffs.Add(ability.ElementalEffect);
             foreach (var abilityBuff in ability.Buffs) {
@@ -176,22 +188,8 @@ namespace HexMage.Simulator {
             }
 
             // TODO - handle negative AP
-            MobManager.ChangeMobAp(mobId, -ability.Cost);
+            State.ChangeMobAp(mobId, -ability.Cost);
         }
-
-        public void MobHpChanged(int hp, TeamColor team) {
-            if (hp <= 0) {
-                switch (team) {
-                    case TeamColor.Red:
-                        RedAlive--;
-                        break;
-                    case TeamColor.Blue:
-                        BlueAlive--;
-                        break;
-                }
-            }
-        }
-
 
         public GameInstance DeepCopy() {
 #warning TODO - tohle prepsat poradne!
@@ -212,18 +210,19 @@ namespace HexMage.Simulator {
             TurnManager.Reset();
             Pathfinder.Reset();
 
-            RedAlive = 0;
-            BlueAlive = 0;
+            State.SlowUpdateIsFinished(MobManager);
+            //RedAlive = 0;
+            //BlueAlive = 0;
 
-            foreach (var mob in MobManager.MobInfos) {
-                if (mob.Team == TeamColor.Red) {
-                    RedAlive++;
-                }
+            //foreach (var mob in MobManager.MobInfos) {
+            //    if (mob.Team == TeamColor.Red) {
+            //        RedAlive++;
+            //    }
 
-                if (mob.Team == TeamColor.Blue) {
-                    BlueAlive++;
-                }
-            }
+            //    if (mob.Team == TeamColor.Blue) {
+            //        BlueAlive++;
+            //    }
+            //}
         }
 
         private AbilityElement BonusElement(AbilityElement element) {
@@ -256,27 +255,6 @@ namespace HexMage.Simulator {
             }
         }
 
-        public void FastUseWithDefenseDesire(int mobId, int targetId, int abilityId, DefenseDesire defenseDesire) {
-            var target = MobManager.MobInstanceForId(targetId);
-            var targetInfo = MobManager.MobInfoForId(targetId);
-            Debug.Assert(MobManager.CooldownFor(abilityId) == 0, "Trying to use an ability with non-zero cooldown.");
-            Debug.Assert(target.Hp > 0, "Target is dead.");
-
-            var ability = MobManager.AbilityForId(abilityId);
-
-            MobManager.SetCooldownFor(abilityId, ability.Cooldown);
-            if (target.Ap >= targetInfo.DefenseCost) {
-                if (defenseDesire == DefenseDesire.Block) {
-                    MobManager.ChangeMobAp(mobId, -MobManager.AbilityForId(abilityId).Cost);
-                    MobManager.ChangeMobAp(targetId, -MobManager.MobInfoForId(targetId).DefenseCost);
-                } else {
-                    TargetHit(abilityId, mobId, targetId);
-                }
-            } else {
-                TargetHit(abilityId, mobId, targetId);
-            }
-        }
-
         public static GameInstance FromJSON(string jsonStr) {
             var mapRepresentation = JsonConvert.DeserializeObject<MapRepresentation>(jsonStr);
 
@@ -285,44 +263,19 @@ namespace HexMage.Simulator {
             var result = new GameInstance(map);
             return result;
         }
-    }
 
 
-    public class MapItem {
-        public AxialCoord Coord { get; set; }
-        public HexType HexType { get; set; }
+        /// TODO - fix stuff below
+        public int AddMobWithInfo(MobInfo mobInfo) {
+            var id = MobManager.Mobs.Count;
+            MobManager.Mobs.Add(id);
 
-        public MapItem() {}
+            MobManager.MobInfos.Add(mobInfo);
 
-        public MapItem(AxialCoord coord, HexType hexType) {
-            Coord = coord;
-            HexType = hexType;
-        }
-    }
+            Array.Resize(ref State.MobInstances, State.MobInstances.Length + 1);
+            State.MobInstances[State.MobInstances.Length - 1] = new MobInstance(id);
 
-    public class MapRepresentation {
-        public int Size { get; set; }
-        public MapItem[] Hexes { get; set; }
-
-        public MapRepresentation() {}
-
-        public MapRepresentation(Map map) {
-            Hexes = new MapItem[map.AllCoords.Count];
-            Size = map.Size;
-
-            for (int i = 0; i < map.AllCoords.Count; i++) {
-                var coord = map.AllCoords[i];
-                Hexes[i] = new MapItem(coord, map[coord]);
-            }
-        }
-
-        public void UpdateMap(Map map) {
-            if (map.Size != Size) {
-                throw new NotImplementedException("Map needs to be resized, not implemented yet");
-            }
-            foreach (var hex in Hexes) {
-                map[hex.Coord] = hex.HexType;
-            }
+            return id;
         }
     }
 }

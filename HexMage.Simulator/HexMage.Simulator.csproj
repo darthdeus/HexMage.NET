@@ -46,9 +46,13 @@
   <ItemGroup>
     <Compile Include="AiRandomController.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="FlatMonteCarlo.cs" />
     <Compile Include="GameEventHub.cs" />
+    <Compile Include="GameState.cs" />
     <Compile Include="IDeepCopyable.cs" />
     <Compile Include="IGameEventSubscriber.cs" />
+    <Compile Include="MapItem.cs" />
+    <Compile Include="MapRepresentation.cs" />
     <Compile Include="Model\AreaBuff.cs" />
     <Compile Include="Model\Buff.cs" />
     <Compile Include="Model\IMobController.cs" />
@@ -58,6 +62,7 @@
     <Compile Include="Pathfinding\CoordPair.cs" />
     <Compile Include="Pathfinding\CoordRadiusCache.cs" />
     <Compile Include="Pathfinding\Map.cs" />
+    <Compile Include="UctAlgorithm.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Utils\Color.cs" />
     <Compile Include="Model\Ability.cs" />

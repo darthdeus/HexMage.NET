@@ -30,10 +30,11 @@ namespace HexMage.Simulator {
             State = GameEventState.SettingUpTurn;
 
             var turnManager = _gameInstance.TurnManager;
-            turnManager.StartNextTurn(_gameInstance.Pathfinder);
+            var state = _gameInstance.State;
+            turnManager.StartNextTurn(_gameInstance.Pathfinder, state);
 
             int totalTurns = 0;
-            _gameInstance.SlowUpdateIsFinished();
+            state.SlowUpdateIsFinished(_gameInstance.MobManager);
 
             while (!_gameInstance.IsFinished) {
                 totalTurns++;
@@ -42,7 +43,7 @@ namespace HexMage.Simulator {
 
                 // Delay used to find random race conditions
                 //await Task.Delay(TimeSpan.FromMilliseconds(1000));
-                turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder);
+                turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder, state);
             }
 
             return totalTurns;
@@ -50,16 +51,16 @@ namespace HexMage.Simulator {
 
         public int FastMainLoop(TimeSpan turnDelay) {
             var turnManager = _gameInstance.TurnManager;
-            turnManager.StartNextTurn(_gameInstance.Pathfinder);
+            turnManager.StartNextTurn(_gameInstance.Pathfinder, _gameInstance.State);
 
             int totalTurns = 0;
-            _gameInstance.SlowUpdateIsFinished();
+            _gameInstance.State.SlowUpdateIsFinished(_gameInstance.MobManager);
 
             while (!_gameInstance.IsFinished) {
                 totalTurns++;
 
                 turnManager.CurrentController.FastPlayTurn(this);
-                turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder);
+                turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder, _gameInstance.State);
 
                 if (turnDelay != TimeSpan.Zero) {
                     Thread.Sleep(turnDelay);
@@ -79,7 +80,7 @@ namespace HexMage.Simulator {
         public async Task SlowBroadcastMobMoved(int mob, AxialCoord pos) {
             await Task.WhenAll(_subscribers.Select(x => x.SlowEventMobMoved(mob, pos)));
 
-            _gameInstance.MobManager.FastMoveMob(_gameInstance.Map, _gameInstance.Pathfinder, mob, pos);
+            _gameInstance.State.FastMoveMob(_gameInstance.Map, _gameInstance.Pathfinder, mob, pos);
         }
 
         public void FastBroadcastMobMoved(int mob, AxialCoord pos) {
@@ -87,7 +88,7 @@ namespace HexMage.Simulator {
                 subscriber.EventMobMoved(mob, pos);
             }
 
-            _gameInstance.MobManager.FastMoveMob(_gameInstance.Map, _gameInstance.Pathfinder, mob, pos);
+            _gameInstance.State.FastMoveMob(_gameInstance.Map, _gameInstance.Pathfinder, mob, pos);
         }
 
         public async Task SlowBroadcastAbilityUsed(int mobId, int targetId, int abilityId) {
