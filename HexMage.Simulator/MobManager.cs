@@ -11,42 +11,12 @@ namespace HexMage.Simulator {
         public List<Ability> Abilities = new List<Ability>();
         public List<int> Mobs = new List<int>();
         public List<MobInfo> MobInfos = new List<MobInfo>();
-        public MobInstance[] MobInstances = new MobInstance[0];
-        public List<int> Cooldowns = new List<int>();
-
-        [JsonIgnore] public HexMap<int?> MobPositions;
 
         [JsonIgnore] public readonly Dictionary<TeamColor, IMobController> Teams =
             new Dictionary<TeamColor, IMobController>();
 
-        //public bool MoveOneHex(Mob mob, AxialCoord to) {
-        //    if (mob.Coord == to) {
-        //        Utils.Log(LogSeverity.Debug, nameof(MobManager), "MoveMob failed trying to move zero distance.");
-        //        return false;
-        //    }
-        //    Debug.Assert(mob.Coord != to, "Trying to move zero distance.");
-        //    Debug.Assert(mob.Coord.Distance(to) == 1, "Trying to walk more than 1 hex");
-
-        //    if (mob.Ap > 0) {
-        //        mob.Coord = to;
-        //        mob.Ap--;
-
-        //        return true;
-        //    } else {
-        //        return false;
-        //    }
-        //}
-
         public Ability AbilityForId(int id) {
             return Abilities[id];
-        }
-
-        public int CooldownFor(int id) {
-            return Cooldowns[id];
-        }
-
-        public void SetCooldownFor(int id, int cooldown) {
-            Cooldowns[id] = cooldown;
         }
 
         public int? AtCoord(AxialCoord c) {
@@ -66,6 +36,7 @@ namespace HexMage.Simulator {
             Mobs.Add(id);
 
             MobInfos.Add(mobInfo);
+            
             Array.Resize(ref MobInstances, MobInstances.Length + 1);
             MobInstances[MobInstances.Length - 1] = new MobInstance(id);
 

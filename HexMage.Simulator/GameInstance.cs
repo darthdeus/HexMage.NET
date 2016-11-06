@@ -19,10 +19,6 @@ namespace HexMage.Simulator {
         public TurnManager TurnManager { get; set; }
         public int Size { get; set; }
 
-        public int RedAlive = 0;
-        public int BlueAlive = 0;
-
-        public bool IsFinished => RedAlive <= 0 || BlueAlive <= 0;
 
         public GameInstance(Map map, MobManager mobManager) {
             Map = map;
