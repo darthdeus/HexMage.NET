@@ -42,8 +42,8 @@ namespace HexMage.Simulator {
                         moveTargetInstance = possibleTargetInstance;
                     }
 
-                    if (pathfinder.Distance(moveTargetInstance.Coord) >
-                        pathfinder.Distance(possibleTargetInstance.Coord)) {
+                    if (pathfinder.Distance(mobInstance.Coord, moveTargetInstance.Coord) >
+                        pathfinder.Distance(mobInstance.Coord, possibleTargetInstance.Coord)) {
                         moveTarget = possibleTargetId;
                         moveTargetInstance = possibleTargetInstance;
                     }
@@ -74,7 +74,7 @@ namespace HexMage.Simulator {
 
             var moveTarget = pathfinder.FurthestPointToTarget(mobInstance, targetInstance);
 
-            if (moveTarget != null && pathfinder.Distance(moveTarget.Value) <= mobInstance.Ap) {
+            if (moveTarget != null && pathfinder.Distance(mobInstance.Coord, moveTarget.Value) <= mobInstance.Ap) {
                 state.State.FastMoveMob(state.Map, state.Pathfinder, mobId,
                                         moveTarget.Value);
             } else {

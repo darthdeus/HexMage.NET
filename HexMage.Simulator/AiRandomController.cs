@@ -53,7 +53,7 @@ namespace HexMage.Simulator {
 
                 // TODO - mela by to byt viditelna vzdalenost
                 if (possibleTargetInfo.Team != mobInfo.Team) {
-                    if (pathfinder.Distance(possibleTargetInstance.Coord) <= ability.Range) {
+                    if (pathfinder.Distance(mobInstance.Coord, possibleTargetInstance.Coord) <= ability.Range) {
                         spellTarget = possibleTarget;
                         break;
                     }
@@ -78,7 +78,7 @@ namespace HexMage.Simulator {
 
             var moveTarget = pathfinder.FurthestPointToTarget(mobInstance, targetInstance);
 
-            if (moveTarget != null && pathfinder.Distance(moveTarget.Value) <= mobInstance.Ap) {
+            if (moveTarget != null && pathfinder.Distance(mobInstance.Coord, moveTarget.Value) <= mobInstance.Ap) {
                 _gameInstance.State.FastMoveMob(_gameInstance.Map, _gameInstance.Pathfinder, mobId,
                                                 moveTarget.Value);
             } else {
