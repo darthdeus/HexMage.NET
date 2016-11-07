@@ -42,7 +42,7 @@ namespace HexMage.GUI.Components {
             base.Update(time);
 
             var mouseHex = Camera2D.Instance.MouseHex;
-            if (_gameInstance.MobManager.MobInstances[_mobId].Coord.Equals(mouseHex)) {
+            if (_gameInstance.State.MobInstances[_mobId].Coord.Equals(mouseHex)) {
                 SwitchAnimation(_animationClicked);
             }
 

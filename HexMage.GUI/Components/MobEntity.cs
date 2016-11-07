@@ -46,7 +46,7 @@ namespace HexMage.GUI.Components {
             } else {
                 var posBefore = Position;
 
-                var coord = _gameInstance.MobManager.MobInstanceForId(MobId).Coord;
+                var coord = _gameInstance.State.MobInstances[MobId].Coord;
                 Position = camera.HexToPixel(coord);
             }
         }

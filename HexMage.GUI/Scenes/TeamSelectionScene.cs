@@ -27,7 +27,7 @@ namespace HexMage.GUI.Scenes {
             _map = map;
             _gameInstance = new GameInstance(_map, _mobManager);
             // TODO - tohle je fuj, inicializovat to poradne
-            _mobManager.MobPositions = new HexMap<int?>(map.Size);
+            _gameInstance.State.MobPositions = new HexMap<int?>(map.Size);
             _arenaScene = new ArenaScene(_gameManager, _gameInstance);
 
             _controllerList = new List<IMobController> {
@@ -152,24 +152,24 @@ namespace HexMage.GUI.Scenes {
             _t2Preview.ClearChildren();
 
             for (int i = 0; i < t1size; i++) {
-                var mobInfo = Generator.RandomMob(_mobManager, t1);
-                var mobId = _mobManager.AddMobWithInfo(mobInfo);
-                Generator.RandomPlaceMob(_gameInstance.MobManager, mobId, _map);
+                var mobInfo = Generator.RandomMob(_mobManager, t1, _gameInstance.State);
+                var mobId = _gameInstance.AddMobWithInfo(mobInfo);
+                Generator.RandomPlaceMob(_gameInstance.MobManager, mobId, _map, _gameInstance.State);
 
 
                 _t1Preview.AddChild(BuildMobPreview(() => mobId));
             }
 
             for (int i = 0; i < t2size; i++) {
-                var mobInfo = Generator.RandomMob(_mobManager, t2);
-                var mobId = _mobManager.AddMobWithInfo(mobInfo);
-                Generator.RandomPlaceMob(_gameInstance.MobManager, mobId, _map);
+                var mobInfo = Generator.RandomMob(_mobManager, t2, _gameInstance.State);
+                var mobId = _gameInstance.AddMobWithInfo(mobInfo);
+                Generator.RandomPlaceMob(_gameInstance.MobManager, mobId, _map, _gameInstance.State);
 
                 _t2Preview.AddChild(BuildMobPreview(() => mobId));
             }
 
-            _gameInstance.RedAlive = t1size;
-            _gameInstance.BlueAlive = t2size;
+            _gameInstance.State.RedAlive = t1size;
+            _gameInstance.State.BlueAlive = t2size;
         }
 
         public Entity BuildMobPreview(Func<int> mobFunc) {

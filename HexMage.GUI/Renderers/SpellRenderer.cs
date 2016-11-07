@@ -30,7 +30,7 @@ namespace HexMage.GUI.Renderers {
 
             var mobId = _mobFunc();
             if (mobId != null) {
-                var mobInfo = _gameInstance.MobManager.MobInfoForId(mobId.Value);
+                var mobInfo = _gameInstance.MobManager.MobInfos[mobId.Value];
                 var abilityId = mobInfo.Abilities[_abilityIndex];
 
                 var isActive = _gameBoardController.SelectedAbilityIndex == _abilityIndex;

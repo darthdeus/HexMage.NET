@@ -33,20 +33,20 @@ namespace HexMage.Benchmarks {
             var mobManager = gameInstance.MobManager;
             var pathfinder = gameInstance.Pathfinder;
 
-            mobManager.MobPositions = new HexMap<int?>(size);
+            gameInstance.State.MobPositions = new HexMap<int?>(size);
 
             Generator.Random = new Random(1234);
             //Generator.Random = new Random();            
 
             for (int i = 0; i < 5; i++) {
-                MobInfo mi1 = Generator.RandomMob(mobManager, t1);
-                MobInfo mi2 = Generator.RandomMob(mobManager, t2);
+                MobInfo mi1 = Generator.RandomMob(mobManager, t1, gameInstance.State);
+                MobInfo mi2 = Generator.RandomMob(mobManager, t2, gameInstance.State);
 
-                int m1 = mobManager.AddMobWithInfo(mi1);
-                int m2 = mobManager.AddMobWithInfo(mi2);
+                int m1 = gameInstance.AddMobWithInfo(mi1);
+                int m2 = gameInstance.AddMobWithInfo(mi2);
 
-                Generator.RandomPlaceMob(mobManager, m1, gameInstance.Map);
-                Generator.RandomPlaceMob(mobManager, m2, gameInstance.Map);
+                Generator.RandomPlaceMob(mobManager, m1, gameInstance.Map, gameInstance.State);
+                Generator.RandomPlaceMob(mobManager, m2, gameInstance.Map, gameInstance.State);
             }
 
             mobManager.Teams[t1] = new AiRandomController(gameInstance);
@@ -58,12 +58,12 @@ namespace HexMage.Benchmarks {
             }
 
             foreach (var coord in gameInstance.Map.AllCoords) {
-                if (mobManager.MobInstances.Count(x => x.Coord == coord) > 1) {
+                if (gameInstance.State.MobInstances.Count(x => x.Coord == coord) > 1) {
                     throw new InvalidOperationException("There are duplicate mobs on the same coord.");
                 }
             }
 
-            mobManager.Reset();
+            gameInstance.State.Reset();
             turnManager.PresortTurnOrder();
 
             goto SKIP_COPY_BENCH;
@@ -118,7 +118,7 @@ namespace HexMage.Benchmarks {
                 while (iterations < totalIterations) {
                     iterations++;
 
-                    turnManager.StartNextTurn(pathfinder);
+                    turnManager.StartNextTurn(pathfinder, gameInstance.State);
 
                     stopwatch.Start();
 #if FAST

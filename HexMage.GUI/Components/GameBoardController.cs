@@ -60,7 +60,7 @@ namespace HexMage.GUI.Components {
             var mobEntity = _arenaScene.MobEntities[mobId];
             Debug.Assert(mobEntity != null, "Trying to move a mob without an associated entity.");
 
-            var from = _gameInstance.MobManager.MobInstanceForId(mobId).Coord;
+            var from = _gameInstance.State.MobInstances[mobId].Coord;
             var path = _gameInstance.Pathfinder.PathTo(pos).Reverse();
             foreach (var coord in path) {
                 await mobEntity.MoveTo(from, coord);
@@ -71,8 +71,8 @@ namespace HexMage.GUI.Components {
         public async Task SlowEventAbilityUsed(int mobId, int targetId, Ability ability) {
             Utils.Log(LogSeverity.Info, nameof(GameBoardController), "EventAbilityUsed");
 
-            var mobInstance = _gameInstance.MobManager.MobInstanceForId(mobId);
-            var targetInstance = _gameInstance.MobManager.MobInstanceForId(targetId);
+            var mobInstance = _gameInstance.State.MobInstances[mobId];
+            var targetInstance = _gameInstance.State.MobInstances[targetId];
 
             BuildUsedAbilityPopover(mobId, ability).LogContinuation();
 
@@ -105,7 +105,7 @@ namespace HexMage.GUI.Components {
                 SortOrder = Camera2D.SortProjectiles
             };
 
-            explosion.AddComponent(new PositionAtMob(_gameInstance.MobManager, targetId));
+            explosion.AddComponent(new PositionAtMob(_gameInstance.MobManager, targetId, _gameInstance));
 
             var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(ability.Element);
 
@@ -204,7 +204,7 @@ namespace HexMage.GUI.Components {
             if (inputManager.IsKeyJustReleased(Keys.F12)) {
                 foreach (var mobId in _gameInstance.MobManager.Mobs) {
                     var mobInfo = _gameInstance.MobManager.MobInfos[mobId];
-                    var mobInstance = _gameInstance.MobManager.MobInstances[mobId];
+                    var mobInstance = _gameInstance.State.MobInstances[mobId];
                     Console.WriteLine($"#{mobId} {mobInstance.Coord} {mobInfo}");
                 }
             }
@@ -229,7 +229,7 @@ namespace HexMage.GUI.Components {
             var currentMob = _gameInstance.TurnManager.CurrentMob;
             if (currentMob == null) return;
 
-            var mobInfo = _gameInstance.MobManager.MobInfoForId(currentMob.Value);
+            var mobInfo = _gameInstance.MobManager.MobInfos[currentMob.Value];
             if (index >= mobInfo.Abilities.Count) {
                 Utils.Log(LogSeverity.Info, nameof(GameBoardController),
                           "Trying to select an ability index higher than the number of abilities.");
@@ -259,8 +259,8 @@ namespace HexMage.GUI.Components {
             var abilityId = _gameInstance.MobManager.MobInfos[mobId.Value].Abilities[abilityIndex];
 
             var visibilityPath =
-                _gameInstance.Map.AxialLinedraw(_gameInstance.MobManager.MobInstances[mobId.Value].Coord,
-                                                _gameInstance.MobManager.MobInstances[targetId].Coord);
+                _gameInstance.Map.AxialLinedraw(_gameInstance.State.MobInstances[mobId.Value].Coord,
+                                                _gameInstance.State.MobInstances[targetId].Coord);
 
             bool isVisible = true;
             foreach (var coord in visibilityPath) {
@@ -286,14 +286,14 @@ namespace HexMage.GUI.Components {
             var currentMob = _gameInstance.TurnManager.CurrentMob;
 
             if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                var targetId = _gameInstance.MobManager.AtCoord(mouseHex);
+                var targetId = _gameInstance.State.AtCoord(mouseHex);
                 if (targetId != null) {
                     if (targetId == currentMob) {
                         ShowMessage("You can't target yourself.");
                     } else {
-                        var mobInfo = _gameInstance.MobManager.MobInfoForId(currentMob.Value);
-                        var targetInstance = _gameInstance.MobManager.MobInstanceForId(targetId.Value);
-                        var targetInfo = _gameInstance.MobManager.MobInfoForId(targetId.Value);
+                        var mobInfo = _gameInstance.MobManager.MobInfos[currentMob.Value];
+                        var targetInstance = _gameInstance.State.MobInstances[targetId.Value];
+                        var targetInfo = _gameInstance.MobManager.MobInfos[targetId.Value];
 
                         if (targetInstance.Hp == 0) {
                             ShowMessage("This mob is already dead.");
@@ -314,8 +314,7 @@ namespace HexMage.GUI.Components {
                     if (abilitySelected) {
                         ShowMessage("You can't cast spells on the ground.");
                     } else {
-                        var mobInstance = _gameInstance.MobManager.MobInstanceForId(currentMob.Value);
-                        var mobInfo = _gameInstance.MobManager.MobInfoForId(currentMob.Value);
+                        var mobInstance = _gameInstance.State.MobInstances[currentMob.Value];
 
                         if (_gameInstance.Map[mouseHex] == HexType.Empty) {
                             var distance = _gameInstance.Pathfinder.Distance(mouseHex);
@@ -346,7 +345,7 @@ namespace HexMage.GUI.Components {
             _mobPopover.Active = false;
 
             if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                var mobId = _gameInstance.MobManager.AtCoord(mouseHex);
+                var mobId = _gameInstance.State.AtCoord(mouseHex);
 
                 if (mobId == null) {
                     var map = _gameInstance.Map;
@@ -383,8 +382,8 @@ namespace HexMage.GUI.Components {
                 } else {
                     _mobPopover.Active = true;
                     var mobTextBuilder = new StringBuilder();
-                    var mobInstance = _gameInstance.MobManager.MobInstanceForId(mobId.Value);
-                    var mobInfo = _gameInstance.MobManager.MobInfoForId(mobId.Value);
+                    var mobInstance = _gameInstance.State.MobInstances[mobId.Value];
+                    var mobInfo = _gameInstance.MobManager.MobInfos[mobId.Value];
 
                     mobTextBuilder.AppendLine(
                         $"HP {mobInstance.Hp}/{mobInfo.MaxHp}\nAP {mobInstance.Ap}/{mobInfo.MaxAp}");
@@ -470,7 +469,7 @@ namespace HexMage.GUI.Components {
             result.AddComponent(
                 () => {
                     result.Position =
-                        camera.HexToPixelWorld(_gameInstance.MobManager.MobInstanceForId(mobId).Coord) +
+                        camera.HexToPixelWorld(_gameInstance.State.MobInstances[mobId].Coord) +
                         _usedAbilityOffset;
                 });
 
@@ -488,7 +487,7 @@ namespace HexMage.GUI.Components {
             var mobId = _gameInstance.TurnManager.CurrentMob;
             if (mobId == null || !SelectedAbilityIndex.HasValue) return;
 
-            var mobInfo = _gameInstance.MobManager.MobInfoForId(mobId.Value);
+            var mobInfo = _gameInstance.MobManager.MobInfos[mobId.Value];
             var selectedAbility = mobInfo.Abilities[SelectedAbilityIndex.Value];
 
             if (!_gameInstance.IsAbilityUsable(mobId.Value, selectedAbility)) {

@@ -36,10 +36,11 @@ namespace HexMage.GUI.Components {
         public override void Update(GameTime time) {
             var mobId = _mobFunc();
             if (mobId != null) {
-                var mobManager = _gameFunc().MobManager;
+                var gameInstance = _gameFunc();
+                var mobManager = gameInstance.MobManager;
 
-                var mobInstance = mobManager.MobInstanceForId(mobId.Value);
-                var mobInfo = mobManager.MobInfoForId(mobId.Value);
+                var mobInstance = gameInstance.State.MobInstances[mobId.Value];
+                var mobInfo = mobManager.MobInfos[mobId.Value];
 
                 // Update and rendering ale skipped if the ability isn't present
                 if (_abilityIndex < mobInfo.Abilities.Count) {
@@ -67,7 +68,7 @@ namespace HexMage.GUI.Components {
                 _rangeLabel.Text = $"Range {_ability.Range}";
                 _elementLabel.Text = _ability.Element.ToString();
 
-                var cooldown = mobManager.CooldownFor(abilityId);
+                var cooldown = gameInstance.State.Cooldowns[abilityId];
                 if (cooldown == 0) {
                     _cooldownLabel.Text = $"Cooldown: {_ability.Cooldown} turns";
                 } else {

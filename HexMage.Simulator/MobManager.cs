@@ -7,7 +7,7 @@ using HexMage.Simulator.Model;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
-    public class MobManager : IDeepCopyable<MobManager>, IResettable {
+    public class MobManager {
         public List<Ability> Abilities = new List<Ability>();
         public List<int> Mobs = new List<int>();
         public List<MobInfo> MobInfos = new List<MobInfo>();
@@ -18,6 +18,10 @@ namespace HexMage.Simulator {
 
         public Ability AbilityForId(int id) {
             return Abilities[id];
+        }
+
+        public void Clear() {
+            
         }
     }
 }

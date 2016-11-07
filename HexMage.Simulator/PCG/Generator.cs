@@ -66,19 +66,19 @@ namespace HexMage.Simulator.PCG {
         //    return game;
         //}
 
-        public static void RandomPlaceMob(MobManager mobManager, int mob, Map map) {
+        public static void RandomPlaceMob(MobManager mobManager, int mob, Map map, GameState state) {
             int size = map.Size;
 
             Predicate<AxialCoord> isCoordAvailable = c => {
                 bool isWall = map[c] == HexType.Wall;
-                var atCoord = mobManager.AtCoord(c);
+                var atCoord = state.AtCoord(c);
 
                 return !isWall && (!atCoord.HasValue || (atCoord.HasValue && atCoord.Value == mob));
             };
 
-            var copy = mobManager.MobInstances[mob];
+            var copy = state.MobInstances[mob];
             copy.Coord = AxialCoord.Zero;
-            mobManager.MobInstances[mob] = copy;
+            state.MobInstances[mob] = copy;
 
             while (true) {
                 var x = Random.Next(-size, size);
@@ -88,8 +88,8 @@ namespace HexMage.Simulator.PCG {
                 var coord = new AxialCoord(x, y);
 
                 if (isCoordAvailable(coord) && coord.Distance(zero) < size) {
-                    if (mobManager.AtCoord(coord) == null || mobManager.AtCoord(coord).Value == mob) {
-                        mobManager.SetMobPosition(mob, coord);
+                    if (state.AtCoord(coord) == null || state.AtCoord(coord).Value == mob) {
+                        state.SetMobPosition(mob, coord);
                         break;
                     } else {
                         throw new InvalidOperationException($"There already is a mob at {coord}");
@@ -98,7 +98,7 @@ namespace HexMage.Simulator.PCG {
             }
         }
 
-        public static MobInfo RandomMob(MobManager mobManager, TeamColor team) {
+        public static MobInfo RandomMob(MobManager mobManager, TeamColor team, GameState state) {
             var elements = new[] {
                 AbilityElement.Earth, AbilityElement.Fire, AbilityElement.Air, AbilityElement.Water
             };
@@ -135,7 +135,7 @@ namespace HexMage.Simulator.PCG {
                                           areaBuffs);
 
                 mobManager.Abilities.Add(ability);
-                mobManager.Cooldowns.Add(0);
+                state.Cooldowns.Add(0);
 
                 abilities.Add(ability.Id);
             }

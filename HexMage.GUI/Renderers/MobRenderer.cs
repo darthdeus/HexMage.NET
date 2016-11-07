@@ -32,8 +32,8 @@ namespace HexMage.GUI.Renderers {
                 batch.Draw(assetManager[AssetManager.HexHoverSprite], pos, Color.White);
             }
 
-            var mobInfo = _gameInstance.MobManager.MobInfoForId(_mobId);
-            var mobInstance = _gameInstance.MobManager.MobInstanceForId(_mobId);
+            var mobInfo = _gameInstance.MobManager.MobInfos[_mobId];
+            var mobInstance = _gameInstance.State.MobInstances[_mobId];
 
             var color = mobInfo.Team == TeamColor.Red ? Color.OrangeRed : Color.Blue;
             if (mobInstance.Hp > 0) {

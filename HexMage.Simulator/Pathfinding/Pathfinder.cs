@@ -19,12 +19,12 @@ namespace HexMage.Simulator {
     public class Pathfinder : IResettable {
         private readonly GameInstance _gameInstance;
         private readonly List<AxialCoord> _diffs;
-        readonly HexMap<HexMap<Path>> _allPaths;
+        public readonly HexMap<HexMap<Path>> AllPaths;
         private int Size => _gameInstance.Size;
 
         public Pathfinder(GameInstance gameInstance) {
             _gameInstance = gameInstance;
-            _allPaths = new HexMap<HexMap<Path>>(_gameInstance.Size);
+            AllPaths = new HexMap<HexMap<Path>>(_gameInstance.Size);
 
             _diffs = new List<AxialCoord> {
                 new AxialCoord(-1, 0),
@@ -39,7 +39,7 @@ namespace HexMage.Simulator {
         public Pathfinder(GameInstance gameInstance, List<AxialCoord> diffs, HexMap<HexMap<Path>> allPaths) {
             _gameInstance = gameInstance;
             _diffs = diffs;
-            _allPaths = allPaths;
+            AllPaths = allPaths;
         }
 
         public void Reset() {
@@ -53,10 +53,11 @@ namespace HexMage.Simulator {
             while (true) {
                 if (iterations++ > 1000)
                     throw new InvalidOperationException("Pathfinding got stuck searching for a shorter path");
-                var closer = NearestEmpty(coord);
+                var closer = NearestEmpty(mob.Coord, coord);
                 if (closer == null) return null;
 
-                if (Distance(closer.Value) <= mob.Ap) {
+
+                if (Distance(mob.Coord, closer.Value) <= mob.Ap) {
                     return closer;
                 } else {
                     coord = closer.Value;
@@ -64,7 +65,7 @@ namespace HexMage.Simulator {
             }
         }
 
-        public IList<AxialCoord> PathTo(AxialCoord target) {
+        public IList<AxialCoord> PathTo(AxialCoord from, AxialCoord target) {
             var result = new List<AxialCoord>();
 
             // Return an empty path if the coord is invalid
@@ -73,7 +74,9 @@ namespace HexMage.Simulator {
             var current = target;
             result.Add(current);
 
-            var path = _current[current];
+            var paths = AllPaths[from];
+            Debug.Assert(paths != null);
+            var path = paths[current];
 
             if (!path.Reachable) return result;
 
@@ -81,7 +84,7 @@ namespace HexMage.Simulator {
             while ((path.Distance > 0) && (--iterations > 0)) {
                 if (path.Source != null) {
                     result.Add(path.Source.Value);
-                    path = _current[path.Source.Value];
+                    path = paths[path.Source.Value];
                 } else {
                     result.Clear();
                     break;
@@ -96,10 +99,10 @@ namespace HexMage.Simulator {
         /// <summary>
         /// Finds a path to a hex closest to the target coord.
         /// </summary>
-        public IList<AxialCoord> PathToMob(AxialCoord coord) {
-            var target = NearestEmpty(coord);
+        public IList<AxialCoord> PathToMob(AxialCoord from, AxialCoord to) {
+            var target = NearestEmpty(from, to);
             if (target.HasValue) {
-                return PathTo(target.Value);
+                return PathTo(from, target.Value);
             } else {
                 return null;
             }
@@ -111,29 +114,15 @@ namespace HexMage.Simulator {
                    (_gameInstance.State.AtCoord(coord) == null);
         }
 
-        public int Distance(AxialCoord c) {
-            Debug.Assert(_current != null);
-            return _current[c].Distance;
-        }
-
-        public void PathfindFromCurrentMob(TurnManager turnManager) {
-            if (turnManager.CurrentMob != null) {
-                PathfindFrom(_gameInstance.State.MobInstances[turnManager.CurrentMob.Value].Coord);
-            } else {
-                Utils.Log(LogSeverity.Warning, nameof(Pathfinder), "CurrentMob is NULL, pathfind current failed");
-            }
-        }
-
-
         public void PathfindDistanceAll() {
             int done = 0;
             int loops = 0;
             long total = 0;
             var sw = Stopwatch.StartNew();
 
-            foreach (var source in _allPaths.AllCoords) {
-                _allPaths[source] = new HexMap<Path>(_gameInstance.Size);
-                PathfindDistanceOnlyFrom(_allPaths[source], source);
+            foreach (var source in AllPaths.AllCoords) {
+                AllPaths[source] = new HexMap<Path>(_gameInstance.Size);
+                PathfindDistanceOnlyFrom(AllPaths[source], source);
                 done++;
                 if (done == 100) {
                     loops++;
@@ -197,23 +186,38 @@ namespace HexMage.Simulator {
                     }
                 }
             }
-
-            //Console.WriteLine("Pathfinder done");
         }
 
-        public void PathfindFrom(AxialCoord start) {
-            Debug.Assert(_allPaths[start] != null, "Trying to pathfind from an uninitialized location");
-            _current = _allPaths[start];
+
+        public int Distance(AxialCoord from, AxialCoord to) {
+            var current = AllPaths[from];
+            Debug.Assert(current != null);
+            return current[to].Distance;
         }
 
-        private AxialCoord? NearestEmpty(AxialCoord coord) {
+        public void PathfindFromCurrentMob(TurnManager turnManager, Pathfinder pathfinder)
+        {
+            throw new NotImplementedException();
+            //if (turnManager.CurrentMob != null)
+            //{
+            //    PathfindFrom(pathfinder, MobInstances[turnManager.CurrentMob.Value].Coord);
+            //}
+            //else
+            //{
+            //    Utils.Log(LogSeverity.Warning, nameof(Pathfinder), "CurrentMob is NULL, pathfind current failed");
+            //}
+        }
+
+
+
+        private AxialCoord? NearestEmpty(AxialCoord from, AxialCoord to) {
             AxialCoord? result = null;
             foreach (var diff in _diffs) {
-                var neighbour = coord + diff;
+                var neighbour = to + diff;
                 if (IsWalkable(neighbour)) {
                     if (!result.HasValue) result = neighbour;
 
-                    if (Distance(neighbour) < Distance(result.Value)) {
+                    if (Distance(from, neighbour) < Distance(from, result.Value)) {
                         result = neighbour;
                     }
                 }
@@ -239,7 +243,7 @@ namespace HexMage.Simulator {
 
         public Pathfinder DeepCopy(GameInstance gameInstanceCopy) {
             var copy = new Pathfinder(gameInstanceCopy,
-                                      _diffs, _allPaths, _current);
+                _diffs, AllPaths);
 
             return copy;
         }

@@ -194,9 +194,9 @@ namespace HexMage.Simulator {
         public GameInstance DeepCopy() {
 #warning TODO - tohle prepsat poradne!
             var mapCopy = Map.DeepCopy();
-            var mobManagerCopy = MobManager.DeepCopy();
 
-            var game = new GameInstance(mapCopy, mobManagerCopy);
+            // TODO - should the MobManager be copied here?                                                           
+            var game = new GameInstance(mapCopy, MobManager);
             game.TurnManager = TurnManager.DeepCopy(game);
             game.Pathfinder = Pathfinder.DeepCopy(game);
 
@@ -206,7 +206,7 @@ namespace HexMage.Simulator {
 #warning TODO - funguje tohle jeste?
         public void Reset() {
             Map.Reset();
-            MobManager.Reset();
+            State.Reset();
             TurnManager.Reset();
             Pathfinder.Reset();
 

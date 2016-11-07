@@ -37,7 +37,13 @@ namespace HexMage.Simulator {
             MobInstances[mobId] = mobInstance;
             SetMobPosition(mobId, pos);
 
-            pathfinder.PathfindFrom(pos);
+            PathfindFrom(pathfinder, pos);
+        }
+
+
+        public void PathfindFrom(Pathfinder pathfinder, AxialCoord start) {
+            Debug.Assert(pathfinder.AllPaths[start] != null, "Trying to pathfind from an uninitialized location");
+            CurrentPaths = pathfinder.AllPaths[start];
         }
 
         public void LowerCooldowns() {
