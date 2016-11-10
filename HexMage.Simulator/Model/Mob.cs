@@ -9,7 +9,6 @@ namespace HexMage.Simulator.Model {
         private static int _lastId = 0;
         public int Id { get; private set; }
 
-
         public int MaxHp { get; set; }
         public int MaxAp { get; set; }
         public int DefenseCost { get; set; }
@@ -17,6 +16,7 @@ namespace HexMage.Simulator.Model {
 
         public List<int> Abilities { get; set; }
         public TeamColor Team { get; set; }
+        public AxialCoord OrigCoord;
 
         public static int AbilityCount => 6;
 
@@ -27,6 +27,8 @@ namespace HexMage.Simulator.Model {
             DefenseCost = defenseCost;
             Iniciative = iniciative;
             Abilities = abilities;
+#warning TODO - shouldn't this be initialized from the constructor?
+            OrigCoord = AxialCoord.Zero;
             Id = _lastId++;
         }
     }
@@ -35,7 +37,6 @@ namespace HexMage.Simulator.Model {
         public static readonly int InvalidId = -1;
         public int Id;
         public AxialCoord Coord;
-        public AxialCoord OrigCoord;
         public int Hp;
         public int Ap;
         public List<Buff> Buffs { get; set; }
@@ -48,7 +49,6 @@ namespace HexMage.Simulator.Model {
         public MobInstance DeepCopy() {
             var copy = new MobInstance(Id) {
                 Coord = Coord,
-                OrigCoord = OrigCoord,
                 Hp = Hp,
                 Ap = Ap
             };

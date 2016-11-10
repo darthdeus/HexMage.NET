@@ -137,6 +137,10 @@
       "DefenseCost": 3,
       "Iniciative": 0,
       "Abilities": [0, 1],
+      "OrigCoord": {
+        "X": -3,
+        "Y": -2
+      },
       "Team": 0
     },
     {
@@ -146,6 +150,10 @@
       "DefenseCost": 3,
       "Iniciative": 2,
       "Abilities": [2, 3],
+      "OrigCoord": {
+        "X": -3,
+        "Y": 0
+      },
       "Team": 0
     },
     {
@@ -155,6 +163,10 @@
       "DefenseCost": 3,
       "Iniciative": 4,
       "Abilities": [4, 5],
+      "OrigCoord": {
+        "X": -5,
+        "Y": 2
+      },
       "Team": 0
     },
     {
@@ -164,6 +176,10 @@
       "DefenseCost": 3,
       "Iniciative": 1,
       "Abilities": [6, 7],
+      "OrigCoord": {
+        "X": 5,
+        "Y": -2
+      },
       "Team": 1
     },
     {
@@ -173,6 +189,10 @@
       "DefenseCost": 3,
       "Iniciative": 3,
       "Abilities": [8, 9],
+      "OrigCoord": {
+        "X": 3,
+        "Y": 0
+      },
       "Team": 1
     },
     {
@@ -182,95 +202,14 @@
       "DefenseCost": 3,
       "Iniciative": 5,
       "Abilities": [10, 11],
+      "OrigCoord": {
+        "X": 3,
+        "Y": 2
+      },
       "Team": 1
     }
   ],
-  "MobInstances": [
-    {
-      "Id": 0,
-      "Coord": {
-        "X": -3,
-        "Y": -2
-      },
-      "OrigCoord": {
-        "X": -3,
-        "Y": -2
-      },
-      "Hp": 9,
-      "Ap": 11,
-      "Buffs": []
-    },
-    {
-      "Id": 1,
-      "Coord": {
-        "X": -3,
-        "Y": 0
-      },
-      "OrigCoord": {
-        "X": -3,
-        "Y": 0
-      },
-      "Hp": 7,
-      "Ap": 10,
-      "Buffs": []
-    },
-    {
-      "Id": 2,
-      "Coord": {
-        "X": -5,
-        "Y": 2
-      },
-      "OrigCoord": {
-        "X": -5,
-        "Y": 2
-      },
-      "Hp": 8,
-      "Ap": 10,
-      "Buffs": []
-    },
-    {
-      "Id": 3,
-      "Coord": {
-        "X": 5,
-        "Y": -2
-      },
-      "OrigCoord": {
-        "X": 5,
-        "Y": -2
-      },
-      "Hp": 7,
-      "Ap": 7,
-      "Buffs": []
-    },
-    {
-      "Id": 4,
-      "Coord": {
-        "X": 3,
-        "Y": 0
-      },
-      "OrigCoord": {
-        "X": 3,
-        "Y": 0
-      },
-      "Hp": 8,
-      "Ap": 11,
-      "Buffs": []
-    },
-    {
-      "Id": 5,
-      "Coord": {
-        "X": 3,
-        "Y": 2
-      },
-      "OrigCoord": {
-        "X": 3,
-        "Y": 2
-      },
-      "Hp": 9,
-      "Ap": 6,
-      "Buffs": []
-    }
-  ],
+
   "Cooldowns": [
     0,
     0,

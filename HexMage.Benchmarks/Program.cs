@@ -63,7 +63,7 @@ namespace HexMage.Benchmarks {
                 }
             }
 
-            gameInstance.State.Reset();
+            gameInstance.State.Reset(gameInstance.MobManager);
             turnManager.PresortTurnOrder();
 
             goto SKIP_COPY_BENCH;

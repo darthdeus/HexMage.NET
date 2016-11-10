@@ -84,8 +84,7 @@ namespace HexMage.Simulator {
                 var mobInstance = state.MobInstances[CurrentMob.Value];
                 if (mobInstance.Hp <= 0) return NextMobOrNewTurn(pathfinder, state);
 
-                // TODO - isn't this still needed?
-                throw new NotImplementedException();
+#warning TODO - isn't this still needed?
                 //pathfinder.PathfindFrom(mobInstance.Coord);
                 return TurnEndResult.NextMob;
             }

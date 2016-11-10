@@ -83,7 +83,7 @@ namespace HexMage.Simulator {
             MobPositions[coord] = mobId;
 
             MobInstances[mobId].Coord = coord;
-            MobInstances[mobId].OrigCoord = coord;
+            //mobinfo[mobId].OrigCoord = coord;
         }
 
 
@@ -194,7 +194,7 @@ namespace HexMage.Simulator {
                 var mobInfo = mobManager.MobInfos[mobId];
                 MobInstances[mobId].Hp = mobInfo.MaxHp;
                 MobInstances[mobId].Ap = mobInfo.MaxAp;
-                SetMobPosition(mobId, MobInstances[mobId].OrigCoord);
+                SetMobPosition(mobId, mobInfo.OrigCoord);
             }
         }
     }
