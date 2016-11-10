@@ -51,7 +51,6 @@ namespace HexMage.Simulator {
             TurnManager.PresortTurnOrder();
             TurnManager.StartNextTurn(Pathfinder, State);
         }
-
      
         public bool IsAbilityUsable(int mobId, int abilityId) {
             var ability = MobManager.AbilityForId(abilityId);

@@ -24,7 +24,8 @@ namespace HexMage.GUI.Renderers {
         private AssetManager _assetManager;
         public BoardRenderMode Mode { get; set; }
 
-        public GameBoardRenderer(GameInstance gameInstance, GameBoardController gameBoardController, GameEventHub eventHub, Camera2D camera) {
+        public GameBoardRenderer(GameInstance gameInstance, GameBoardController gameBoardController,
+            GameEventHub eventHub, Camera2D camera) {
             _gameInstance = gameInstance;
             _gameBoardController = gameBoardController;
             _eventHub = eventHub;
@@ -193,7 +194,6 @@ namespace HexMage.GUI.Renderers {
             _spriteBatch.End();
         }
 
-
         private void DrawHoverPath() {
             _spriteBatch.Begin(transformMatrix: _camera.Transform, samplerState: Camera2D.SamplerState);
 
@@ -201,58 +201,60 @@ namespace HexMage.GUI.Renderers {
             var hexTooFar = _assetManager[AssetManager.HexPathSprite];
 
             var mouseHex = _camera.MouseHex;
-            if (_gameInstance.TurnManager.CurrentMob.HasValue && _gameInstance.Pathfinder.IsValidCoord(mouseHex) &&
-                _gameInstance.Pathfinder.Distance(mouseHex) != int.MaxValue) {
-                IList<AxialCoord> path;
-
-                var mouseMob = _gameInstance.State.AtCoord(mouseHex);
-                if (mouseMob != null) {
-                    path =
-                        _gameInstance.Pathfinder.PathToMob(_gameInstance.State.MobInstances[mouseMob.Value].Coord);
-                } else {
-                    path = _gameInstance.Pathfinder.PathTo(mouseHex);
-                }
-
+            if (_gameInstance.TurnManager.CurrentMob.HasValue) {
                 var currentMob = _gameInstance.TurnManager.CurrentMob;
-                var abilityIndex = _gameBoardController.SelectedAbilityIndex;
+                var mobInfo = _gameInstance.MobManager.MobInfos[currentMob.Value];
+                var mobInstance = _gameInstance.State.MobInstances[currentMob.Value];
 
-                if (abilityIndex.HasValue) {
-                    var mobInfo = _gameInstance.MobManager.MobInfos[currentMob.Value];
-                    var mobInstance = _gameInstance.State.MobInstances[currentMob.Value];
+                if (_gameInstance.Pathfinder.IsValidCoord(mouseHex) &&
+                    _gameInstance.Pathfinder.Distance(mobInstance.Coord, mouseHex) != int.MaxValue) {
+                    IList<AxialCoord> path;
 
-                    var cubepath = _gameInstance.Map.AxialLinedraw(mobInstance.Coord, mouseHex);
-
-                    int distance = 1;
-                    bool walled = false;
-                    foreach (var cubeCoord in cubepath) {
-                        if (!_gameInstance.Pathfinder.IsValidCoord(cubeCoord)) {
-                            Utils.Log(LogSeverity.Warning, nameof(GameBoardRenderer),
-                                      $"Computed invalid cube visibility path of {cubeCoord}.");
-                            continue;
-                        }
-                        if (_gameInstance.Map[cubeCoord] == HexType.Wall) {
-                            walled = true;
-                        }
-
-                        var abilityId = mobInfo.Abilities[abilityIndex.Value];
-                        var ability = _gameInstance.MobManager.AbilityForId(abilityId);
-                        if (distance <= ability.Range && !walled) {
-                            DrawAt(hexUsable, cubeCoord);
-                        } else {
-                            DrawAt(hexTooFar, cubeCoord);
-                        }
-
-                        distance++;
+                    var mouseMob = _gameInstance.State.AtCoord(mouseHex);
+                    if (mouseMob != null) {
+                        path =
+                            _gameInstance.Pathfinder.PathToMob(mobInstance.Coord, _gameInstance.State.MobInstances[mouseMob.Value].Coord);
+                    } else {
+                        path = _gameInstance.Pathfinder.PathTo(mobInstance.Coord, mouseHex);
                     }
-                } else {
-                    if (_gameInstance.Pathfinder.IsValidCoord(mouseHex) && _gameInstance.Map[mouseHex] != HexType.Wall) {
-                        if (!mouseMob.HasValue || mouseMob.Value != currentMob.Value) {
-                            var mobInstance = _gameInstance.State.MobInstances[currentMob.Value];
-                            foreach (var coord in path) {
-                                if (_gameInstance.Pathfinder.Distance(coord) <= mobInstance.Ap) {
-                                    DrawAt(hexUsable, coord);
-                                } else {
-                                    DrawAt(hexTooFar, coord);
+
+                    var abilityIndex = _gameBoardController.SelectedAbilityIndex;
+
+                    if (abilityIndex.HasValue) {
+                        var cubepath = _gameInstance.Map.AxialLinedraw(mobInstance.Coord, mouseHex);
+
+                        int distance = 1;
+                        bool walled = false;
+                        foreach (var cubeCoord in cubepath) {
+                            if (!_gameInstance.Pathfinder.IsValidCoord(cubeCoord)) {
+                                Utils.Log(LogSeverity.Warning, nameof(GameBoardRenderer),
+                                    $"Computed invalid cube visibility path of {cubeCoord}.");
+                                continue;
+                            }
+                            if (_gameInstance.Map[cubeCoord] == HexType.Wall) {
+                                walled = true;
+                            }
+
+                            var abilityId = mobInfo.Abilities[abilityIndex.Value];
+                            var ability = _gameInstance.MobManager.AbilityForId(abilityId);
+                            if (distance <= ability.Range && !walled) {
+                                DrawAt(hexUsable, cubeCoord);
+                            } else {
+                                DrawAt(hexTooFar, cubeCoord);
+                            }
+
+                            distance++;
+                        }
+                    } else {
+                        if (_gameInstance.Pathfinder.IsValidCoord(mouseHex) &&
+                            _gameInstance.Map[mouseHex] != HexType.Wall) {
+                            if (!mouseMob.HasValue || mouseMob.Value != currentMob.Value) {
+                                foreach (var coord in path) {
+                                    if (_gameInstance.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
+                                        DrawAt(hexUsable, coord);
+                                    } else {
+                                        DrawAt(hexTooFar, coord);
+                                    }
                                 }
                             }
                         }
