@@ -30,6 +30,8 @@ namespace HexMage.Simulator {
             Size = map.Size;
             Pathfinder = new Pathfinder(this);
             TurnManager = new TurnManager(this);
+            State = new GameState();
+            State.MobPositions = new HexMap<int?>(Size);
         }
 
         public GameInstance(int size) : this(new Map(size)) {}
@@ -41,11 +43,12 @@ namespace HexMage.Simulator {
             Map = map;
             Pathfinder = pathfinder;
             TurnManager = new TurnManager(this);
+            State = new GameState();
+            State.MobPositions = new HexMap<int?>(Size);
         }
 
         public void PrepareEverything() {
-            State.MobPositions = new HexMap<int?>(Size);
-            State.Reset();
+            State.Reset(MobManager);
             Map.PrecomputeCubeLinedraw();
             Pathfinder.PathfindDistanceAll();
             TurnManager.PresortTurnOrder();
@@ -205,7 +208,7 @@ namespace HexMage.Simulator {
 #warning TODO - funguje tohle jeste?
         public void Reset() {
             Map.Reset();
-            State.Reset();
+            State.Reset(MobManager);
             TurnManager.Reset();
             Pathfinder.Reset();
 

@@ -25,7 +25,6 @@ namespace HexMage.Simulator {
 
                     if (possibleTargetInstance.Hp <= 0) continue;
 
-
                     foreach (var abilityId in mobInfo.Abilities) {
                         if (initialState.IsAbilityUsable(mobId, abilityId, possibleTargetId)) {
                             var stateWithUsedAbility = initialState.DeepCopy();

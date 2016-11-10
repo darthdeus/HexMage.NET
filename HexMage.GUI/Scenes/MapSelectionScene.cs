@@ -146,6 +146,8 @@ namespace HexMage.GUI.Scenes {
                 var mobManager = JsonConvert.DeserializeObject<MobManager>(mobReader.ReadToEnd());
                 game.MobManager = mobManager;
 
+                mobManager.InitializeState(game.State);
+
                 var arenaScene = new ArenaScene(_gameManager, game);
 
                 game.MobManager.Teams[TeamColor.Red] = new PlayerController(arenaScene, game);
@@ -153,7 +155,8 @@ namespace HexMage.GUI.Scenes {
 
                 game.PrepareEverything();
 
-                new FlatMonteCarlo().Run(game);
+#warning TODO - run montecarlo to see that it works
+                //new FlatMonteCarlo().Run(game);
 
                 LoadNewScene(arenaScene);
             }

@@ -37,7 +37,6 @@ namespace HexMage.Simulator {
             _gameInstance = gameInstance;
         }
 
-
         public void PresortTurnOrder() {
             _presortedOrder = MobManager.Mobs.ToList();
             _presortedOrder.Sort((a, b) => {

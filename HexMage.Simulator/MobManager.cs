@@ -8,20 +8,32 @@ using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
     public class MobManager {
-        public List<Ability> Abilities = new List<Ability>();
-        public List<int> Mobs = new List<int>();
-        public List<MobInfo> MobInfos = new List<MobInfo>();
+        public readonly List<Ability> Abilities = new List<Ability>();
+        public readonly List<int> Mobs = new List<int>();
+        public readonly List<MobInfo> MobInfos = new List<MobInfo>();
 
         [JsonIgnore] public readonly Dictionary<TeamColor, IMobController> Teams =
             new Dictionary<TeamColor, IMobController>();
-
 
         public Ability AbilityForId(int id) {
             return Abilities[id];
         }
 
-        public void Clear() {
-            
+        public void InitializeState(GameState state) {
+            state.Cooldowns.Clear();
+            state.MobInstances = new MobInstance[Mobs.Count];
+
+            foreach (var mobId in Mobs) {
+                state.MobInstances[mobId] = new MobInstance(mobId);
+            }
+
+            foreach (var ability in Abilities) {
+                state.Cooldowns.Add(0);
+            }
+
+            state.Reset(this);
         }
+
+        public void Clear() {}
     }
 }

@@ -189,14 +189,13 @@ namespace HexMage.Simulator {
             }
         }
 
-        public void Reset() {
-            throw new NotImplementedException();
-            //foreach (var mobId in Mobs) {
-            //    var mobInfo = MobInfoForId(mobId);
-            //    MobInstances[mobId].Hp = mobInfo.MaxHp;
-            //    MobInstances[mobId].Ap = mobInfo.MaxAp;
-            //    SetMobPosition(mobId, MobInstances[mobId].OrigCoord);
-            //}
+        public void Reset(MobManager mobManager) {
+            foreach (var mobId in mobManager.Mobs) {
+                var mobInfo = mobManager.MobInfos[mobId];
+                MobInstances[mobId].Hp = mobInfo.MaxHp;
+                MobInstances[mobId].Ap = mobInfo.MaxAp;
+                SetMobPosition(mobId, MobInstances[mobId].OrigCoord);
+            }
         }
     }
 }
