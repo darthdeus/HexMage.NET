@@ -269,9 +269,12 @@ namespace HexMage.Simulator {
 
         /// TODO - fix stuff below
         public int AddMobWithInfo(MobInfo mobInfo) {
-            var id = MobManager.Mobs.Count;
-            MobManager.Mobs.Add(id);
+            Debug.Assert(State.MobInstances.Length == MobManager.MobInfos.Count, "State.MobInstances.Length == MobManager.MobInfos.Count");
+            Debug.Assert(State.MobInstances.Length == MobManager.Mobs.Count, "State.MobInstances.Length == MobManager.Mobs.Count");
 
+            var id = MobManager.Mobs.Count;
+
+            MobManager.Mobs.Add(id);
             MobManager.MobInfos.Add(mobInfo);
 
             Array.Resize(ref State.MobInstances, State.MobInstances.Length + 1);

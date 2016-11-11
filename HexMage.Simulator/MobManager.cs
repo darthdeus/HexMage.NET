@@ -34,6 +34,10 @@ namespace HexMage.Simulator {
             state.Reset(this);
         }
 
-        public void Clear() {}
+        public void Clear() {
+            Abilities.Clear();
+            MobInfos.Clear();
+            Mobs.Clear();
+        }
     }
 }

@@ -7,7 +7,6 @@ namespace HexMage.Simulator.Model {
         public static readonly int NumberOfAbilities = 6;
 
         private static int _lastId = 0;
-        public int Id { get; private set; }
 
         public int MaxHp { get; set; }
         public int MaxAp { get; set; }
@@ -29,7 +28,6 @@ namespace HexMage.Simulator.Model {
             Abilities = abilities;
 #warning TODO - shouldn't this be initialized from the constructor?
             OrigCoord = AxialCoord.Zero;
-            Id = _lastId++;
         }
     }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
@@ -141,6 +142,7 @@ namespace HexMage.GUI.Scenes {
             Utils.Log(LogSeverity.Info, nameof(TeamSelectionScene), $"Genearting mobs, {t1size} vs {t2size}");
 
             _mobManager.Clear();
+            _gameInstance.State.Clear();
 
             const TeamColor t1 = TeamColor.Red;
             const TeamColor t2 = TeamColor.Blue;
@@ -154,8 +156,7 @@ namespace HexMage.GUI.Scenes {
             for (int i = 0; i < t1size; i++) {
                 var mobInfo = Generator.RandomMob(_mobManager, t1, _gameInstance.State);
                 var mobId = _gameInstance.AddMobWithInfo(mobInfo);
-                Generator.RandomPlaceMob(_gameInstance.MobManager, mobId, _map, _gameInstance.State);
-
+               Generator.RandomPlaceMob(_gameInstance.MobManager, mobId, _map, _gameInstance.State);
 
                 _t1Preview.AddChild(BuildMobPreview(() => mobId));
             }
@@ -168,8 +169,11 @@ namespace HexMage.GUI.Scenes {
                 _t2Preview.AddChild(BuildMobPreview(() => mobId));
             }
 
-            _gameInstance.State.RedAlive = t1size;
-            _gameInstance.State.BlueAlive = t2size;
+            _mobManager.InitializeState(_gameInstance.State);
+
+            _gameInstance.State.SlowUpdateIsFinished(_mobManager);
+            //_gameInstance.State.RedAlive = t1size;
+            //_gameInstance.State.BlueAlive = t2size;
         }
 
         public Entity BuildMobPreview(Func<int> mobFunc) {

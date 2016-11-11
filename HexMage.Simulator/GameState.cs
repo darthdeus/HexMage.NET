@@ -7,11 +7,12 @@ using Newtonsoft.Json;
 namespace HexMage.Simulator {
     public class GameState {
         public MobInstance[] MobInstances = new MobInstance[0];
-        public List<int> Cooldowns = new List<int>();
+        public readonly List<int> Cooldowns = new List<int>();
         public int? CurrentMobIndex;
         public int TurnNumber;
 
-        [JsonIgnore] public HexMap<Path> CurrentPaths;
+        [JsonIgnore]
+        public HexMap<Path> CurrentPaths;
 
         [JsonIgnore] public HexMap<int?> MobPositions;
         public int RedAlive = 0;
@@ -184,6 +185,11 @@ namespace HexMage.Simulator {
         public void Clear() {
             MobInstances = new MobInstance[0];
             Cooldowns.Clear();
+            CurrentMobIndex = null;
+            CurrentPaths = null;
+            RedAlive = 0;
+            BlueAlive = 0;
+
             foreach (var coord in MobPositions.AllCoords) {
                 MobPositions[coord] = null;
             }

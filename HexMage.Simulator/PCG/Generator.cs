@@ -76,11 +76,13 @@ namespace HexMage.Simulator.PCG {
                 return !isWall && (!atCoord.HasValue || (atCoord.HasValue && atCoord.Value == mob));
             };
 
-            var copy = state.MobInstances[mob];
-            copy.Coord = AxialCoord.Zero;
-            state.MobInstances[mob] = copy;
+            var mobInstance = state.MobInstances[mob];
+            mobInstance.Coord = AxialCoord.Zero;
+            state.MobInstances[mob] = mobInstance;
+            
+            int iterations = 10000;
 
-            while (true) {
+            while (--iterations > 0) {
                 var x = Random.Next(-size, size);
                 var y = Random.Next(-size, size);
 
@@ -89,12 +91,19 @@ namespace HexMage.Simulator.PCG {
 
                 if (isCoordAvailable(coord) && coord.Distance(zero) < size) {
                     if (state.AtCoord(coord) == null || state.AtCoord(coord).Value == mob) {
-                        state.SetMobPosition(mob, coord);
+                        var infoCopy = mobManager.MobInfos[mob];
+                        infoCopy.OrigCoord = coord;
+                        mobManager.MobInfos[mob] = infoCopy;
+                        //state.SetMobPosition(mob, coord);
                         break;
                     } else {
                         throw new InvalidOperationException($"There already is a mob at {coord}");
                     }
                 }
+            }
+
+            if (iterations == 0) {
+                throw new InvalidOperationException($"Failed to place a mob");
             }
         }
 
