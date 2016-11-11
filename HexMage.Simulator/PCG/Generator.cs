@@ -73,7 +73,7 @@ namespace HexMage.Simulator.PCG {
                 bool isWall = map[c] == HexType.Wall;
                 var atCoord = state.AtCoord(c);
 
-                return !isWall && (!atCoord.HasValue || (atCoord.HasValue && atCoord.Value == mob));
+                return !isWall && (!atCoord.HasValue || atCoord.Value == mob);
             };
 
             var mobInstance = state.MobInstances[mob];
@@ -94,7 +94,6 @@ namespace HexMage.Simulator.PCG {
                         var infoCopy = mobManager.MobInfos[mob];
                         infoCopy.OrigCoord = coord;
                         mobManager.MobInfos[mob] = infoCopy;
-                        //state.SetMobPosition(mob, coord);
                         break;
                     } else {
                         throw new InvalidOperationException($"There already is a mob at {coord}");

@@ -63,7 +63,7 @@ namespace HexMage.Simulator.Model {
         }
 
         public override string ToString() {
-            return $"{Hp}HP {Ap}AP";
+            return $"{Hp}HP {Ap}AP {Coord}";
         }
     }
 

@@ -57,9 +57,12 @@ namespace HexMage.Benchmarks {
                 Console.WriteLine();
             }
 
+            mobManager.InitializeState(gameInstance.State);
+
             foreach (var coord in gameInstance.Map.AllCoords) {
-                if (gameInstance.State.MobInstances.Count(x => x.Coord == coord) > 1) {
-                    throw new InvalidOperationException("There are duplicate mobs on the same coord.");
+                var count = gameInstance.State.MobInstances.Count(x => x.Coord == coord);
+                if (count > 1) {
+                    throw new InvalidOperationException($"There are duplicate mobs on the same coord ({coord}), total {count}.");
                 }
             }
 

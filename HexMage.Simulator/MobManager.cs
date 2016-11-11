@@ -25,9 +25,10 @@ namespace HexMage.Simulator {
 
             foreach (var mobId in Mobs) {
                 state.MobInstances[mobId] = new MobInstance(mobId);
+                state.SetMobPosition(mobId, MobInfos[mobId].OrigCoord);
             }
 
-            foreach (var ability in Abilities) {
+            foreach (var _ in Abilities) {
                 state.Cooldowns.Add(0);
             }
 
