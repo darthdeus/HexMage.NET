@@ -61,12 +61,6 @@ namespace HexMage.Simulator {
             state.LowerCooldowns();
 
             state.CurrentMobIndex = 0;
-
-            if (CurrentMob != null) {
-                state.PathfindFrom(pathfinder, state.MobInstances[CurrentMob.Value].Coord);
-            } else {
-                Utils.Log(LogSeverity.Warning, nameof(Pathfinder), "CurrentMob is NULL, pathfind current failed");
-            }
         }
 
         public TurnEndResult NextMobOrNewTurn(Pathfinder pathfinder, GameState state) {

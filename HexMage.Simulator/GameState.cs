@@ -5,14 +5,25 @@ using HexMage.Simulator.Model;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
+    public struct PendingAbility {
+        public int AbilityId { get; set; }
+        public int MobId { get; set; }
+        public int TargetId { get; set; }
+
+        public PendingAbility(int abilityId, int mobId, int targetId) {
+            AbilityId = abilityId;
+            MobId = mobId;
+            TargetId = targetId;
+        }
+    }
+
     public class GameState {
         public MobInstance[] MobInstances = new MobInstance[0];
         public readonly List<int> Cooldowns = new List<int>();
         public int? CurrentMobIndex;
         public int TurnNumber;
 
-        [JsonIgnore]
-        public HexMap<Path> CurrentPaths;
+        public PendingAbility? PendingAbility;
 
         [JsonIgnore] public HexMap<int?> MobPositions;
         public int RedAlive = 0;
@@ -37,14 +48,6 @@ namespace HexMage.Simulator {
             mobInstance.Ap -= distance;
             MobInstances[mobId] = mobInstance;
             SetMobPosition(mobId, pos);
-
-            PathfindFrom(pathfinder, pos);
-        }
-
-
-        public void PathfindFrom(Pathfinder pathfinder, AxialCoord start) {
-            Debug.Assert(pathfinder.AllPaths[start] != null, "Trying to pathfind from an uninitialized location");
-            CurrentPaths = pathfinder.AllPaths[start];
         }
 
         public void LowerCooldowns() {
@@ -68,7 +71,6 @@ namespace HexMage.Simulator {
             }
         }
 
-
         public void ChangeMobHp(GameInstance gameInstance, int mobId, int hpChange) {
             MobInstances[mobId].Hp += hpChange;
             MobHpChanged(MobInstances[mobId].Hp, gameInstance.MobManager.MobInfos[mobId].Team);
@@ -87,11 +89,9 @@ namespace HexMage.Simulator {
             //mobinfo[mobId].OrigCoord = coord;
         }
 
-
         public int? AtCoord(AxialCoord c) {
             return MobPositions[c];
         }
-
 
         public void ApplyDots(Map map, GameInstance gameInstance) {
             foreach (var mobId in gameInstance.MobManager.Mobs) {
@@ -110,7 +110,6 @@ namespace HexMage.Simulator {
 
                 buffs.RemoveAll(x => x.Lifetime == 0);
             }
-
 
             for (int i = 0; i < map.AreaBuffs.Count; i++) {
                 var areaBuff = map.AreaBuffs[i];
@@ -161,7 +160,6 @@ namespace HexMage.Simulator {
             }
         }
 
-
         public GameState DeepCopy() {
             var gameStateCopy = new GameState();
             for (int i = 0; i < Cooldowns.Count; i++) {
@@ -186,7 +184,6 @@ namespace HexMage.Simulator {
             MobInstances = new MobInstance[0];
             Cooldowns.Clear();
             CurrentMobIndex = null;
-            CurrentPaths = null;
             RedAlive = 0;
             BlueAlive = 0;
 
