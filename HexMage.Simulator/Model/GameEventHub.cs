@@ -61,12 +61,6 @@ namespace HexMage.Simulator {
 
                 turnManager.CurrentController.FastPlayTurn(this);
                 turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder, _gameInstance.State);
-
-                if (turnDelay != TimeSpan.Zero) {
-                    Thread.Sleep(turnDelay);
-                }
-
-                //_gameInstance.SlowUpdateIsFinished();
             }
 
             return totalTurns;

@@ -67,19 +67,15 @@ namespace HexMage.Simulator {
             Debug.Assert(state.CurrentMobIndex.HasValue, "state.CurrentMobIndex.HasValue");
 
             if (state.CurrentMobIndex.Value >= _turnOrder.Count - 1) {
-                //Utils.Log(LogSeverity.Info, nameof(TurnManager), "Starting next turn");
                 StartNextTurn(pathfinder, state);
                 return TurnEndResult.NextTurn;
             } else {
-                //Utils.Log(LogSeverity.Info, nameof(TurnManager), "Moving to next mob (same turn)");
                 state.CurrentMobIndex = state.CurrentMobIndex.Value + 1;
 
                 Debug.Assert(CurrentMob.HasValue, "There's no current mob but still trying to move to one.");
                 var mobInstance = state.MobInstances[CurrentMob.Value];
                 if (mobInstance.Hp <= 0) return NextMobOrNewTurn(pathfinder, state);
 
-#warning TODO - isn't this still needed?
-                //pathfinder.PathfindFrom(mobInstance.Coord);
                 return TurnEndResult.NextMob;
             }
         }

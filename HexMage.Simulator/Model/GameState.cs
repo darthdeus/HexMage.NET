@@ -132,7 +132,6 @@ namespace HexMage.Simulator {
                 map.AreaBuffs[i] = buff;
             }
 
-
             var newBuffs = new List<AreaBuff>();
 
             foreach (var buff in map.AreaBuffs) {

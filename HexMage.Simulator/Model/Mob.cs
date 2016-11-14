@@ -6,8 +6,6 @@ namespace HexMage.Simulator.Model {
     public struct MobInfo {
         public static readonly int NumberOfAbilities = 6;
 
-        private static int _lastId = 0;
-
         public int MaxHp { get; set; }
         public int MaxAp { get; set; }
         public int DefenseCost { get; set; }
@@ -26,7 +24,6 @@ namespace HexMage.Simulator.Model {
             DefenseCost = defenseCost;
             Iniciative = iniciative;
             Abilities = abilities;
-#warning TODO - shouldn't this be initialized from the constructor?
             OrigCoord = AxialCoord.Zero;
         }
     }
@@ -66,31 +63,4 @@ namespace HexMage.Simulator.Model {
             return $"{Hp}HP {Ap}AP {Coord}";
         }
     }
-
-    //public class Mobb : IResettable {
-    //    public void Reset() {
-    //        Buffs.Clear();
-    //        Coord = OrigCoord;
-    //        Hp = MaxHp;
-    //        Ap = MaxAp;
-    //        Metadata = null;
-    //    }
-
-    //    public Mob DeepCopy() {
-    //        var abilitiesCopy = new List<AbilityId>();
-    //        foreach (var ability in Abilities) {
-    //            abilitiesCopy.Add(ability);
-    //        }
-
-    //        var copy = new Mob(Team, MaxHp, MaxAp, DefenseCost, Iniciative, abilitiesCopy);
-    //        copy.Coord = Coord;
-    //        copy.Metadata = null;
-
-    //        foreach (var buff in Buffs) {
-    //            copy.Buffs.Add(buff);
-    //        }
-
-    //        return copy;
-    //    }
-    //}
 }
