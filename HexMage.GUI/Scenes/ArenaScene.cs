@@ -18,6 +18,9 @@ namespace HexMage.GUI.Scenes {
         private readonly GameEventHub _gameEventHub;
         public readonly Dictionary<int, MobEntity> MobEntities = new Dictionary<int, MobEntity>();
 
+        private GameBoardController _gameBoardController;
+        private LogBox _logBox;
+
         public ArenaScene(GameManager gameManager, GameInstance gameInstance) : base(gameManager) {
             _gameInstance = gameInstance;
 
@@ -48,26 +51,6 @@ namespace HexMage.GUI.Scenes {
             _logBox.SortOrder = Camera2D.SortUI + 100;
 
             AddAndInitializeRootEntity(_logBox, _assetManager);
-
-            var buttons = new Panel();
-
-            var btnYes = new TextButton("Yes", _assetManager.Font) {
-                Position = new Vector2(40, 10)
-            };
-            var btnNo = new TextButton("No", _assetManager.Font) {
-                Position = new Vector2(100, 10)
-            };
-
-            btnYes.OnClick += _ => FinalizeDefenseModal(DefenseDesire.Block);
-            btnNo.OnClick += _ => FinalizeDefenseModal(DefenseDesire.Pass);
-
-            buttons.AddChild(btnYes);
-            buttons.AddChild(btnNo);
-
-            _defenseModal.AddChild(new Label("Do you want to defend?", _assetManager.Font));
-            _defenseModal.AddChild(buttons);
-
-            AddAndInitializeRootEntity(_defenseModal, _assetManager);
 
             var gameBoardEntity = CreateRootEntity(Camera2D.SortBackground);
             var gameBoardController = new GameBoardController(_gameInstance, _gameEventHub, this);
@@ -235,23 +218,6 @@ namespace HexMage.GUI.Scenes {
             return abilityDetailWrapper;
         }
 
-        private void FinalizeDefenseModal(DefenseDesire desire) {
-            Debug.Assert(_defenseDesireSource != null, "Defense desire modal wasn't properly initialized");
-            _defenseDesireSource.SetResult(desire);
-            _defenseDesireSource = null;
-            _defenseModal.Active = false;
-        }
-
-        private TaskCompletionSource<DefenseDesire> _defenseDesireSource;
-        private GameBoardController _gameBoardController;
-        private LogBox _logBox;
-
-        public Task<DefenseDesire> RequestDesireToDefend(int mobId, Ability ability) {
-            _defenseModal.Active = true;
-            _defenseDesireSource = new TaskCompletionSource<DefenseDesire>();
-
-            return _defenseDesireSource.Task;
-        }
 
         private Color ElementColor(AbilityElement element) {
             switch (element) {

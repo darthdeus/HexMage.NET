@@ -14,15 +14,7 @@ namespace HexMage.Simulator {
             _gameInstance = gameInstance;
         }
 
-        public DefenseDesire FastRequestDesireToDefend(int mobId, int ability) {
-            return DefenseDesire.Pass;
-        }
-
         public void FastPlayTurn(GameEventHub eventHub) {
-            FastRandomAction(eventHub);
-        }
-
-        public void FastRandomAction(GameEventHub eventHub) {
             var mobId = _gameInstance.TurnManager.CurrentMob;
 
             if (mobId == null)
@@ -87,12 +79,8 @@ namespace HexMage.Simulator {
             }
         }
 
-        public Task<DefenseDesire> SlowRequestDesireToDefend(int targetId, int abilityId) {
-            return Task.FromResult(DefenseDesire.Pass);
-        }
-
         public Task SlowPlayTurn(GameEventHub eventHub) {
-            FastRandomAction(eventHub);
+            FastPlayTurn(eventHub);
             return Task.CompletedTask;
         }
 

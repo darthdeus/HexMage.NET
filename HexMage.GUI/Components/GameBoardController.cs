@@ -52,10 +52,6 @@ namespace HexMage.GUI.Components {
             SlowEventMobMoved(mobId, pos).Wait();
         }
 
-        public void EventDefenseDesireAcquired(int mob, DefenseDesire defenseDesireResult) {
-            ShowMessage($"{nameof(GameBoardController)} got defense {defenseDesireResult}");
-        }
-
         public async Task SlowEventMobMoved(int mobId, AxialCoord pos) {
             var mobEntity = _arenaScene.MobEntities[mobId];
             Debug.Assert(mobEntity != null, "Trying to move a mob without an associated entity.");

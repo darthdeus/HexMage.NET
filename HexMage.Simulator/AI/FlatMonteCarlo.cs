@@ -29,8 +29,8 @@ namespace HexMage.Simulator {
                         if (initialState.IsAbilityUsable(mobId, abilityId, possibleTargetId)) {
                             var stateWithUsedAbility = initialState.DeepCopy();
 
-                            stateWithUsedAbility.FastUseWithDefenseDesire(mobId, possibleTargetId, abilityId,
-                                                                          DefenseDesire.Pass);
+                            stateWithUsedAbility.FastUse(abilityId, mobId, possibleTargetId);
+                            //stateWithUsedAbility.FastUse(mobId, possibleTargetId, abilityId);
 
                             possibleStates.Add(stateWithUsedAbility);
                         }

@@ -5,25 +5,11 @@ using HexMage.Simulator.Model;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
-    public struct PendingAbility {
-        public int AbilityId { get; set; }
-        public int MobId { get; set; }
-        public int TargetId { get; set; }
-
-        public PendingAbility(int abilityId, int mobId, int targetId) {
-            AbilityId = abilityId;
-            MobId = mobId;
-            TargetId = targetId;
-        }
-    }
-
     public class GameState {
         public MobInstance[] MobInstances = new MobInstance[0];
         public readonly List<int> Cooldowns = new List<int>();
         public int? CurrentMobIndex;
         public int TurnNumber;
-
-        public PendingAbility? PendingAbility;
 
         [JsonIgnore] public HexMap<int?> MobPositions;
         public int RedAlive = 0;

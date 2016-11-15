@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using HexMage.Simulator.Model;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace HexMage.Simulator {
     public class GameInstance : IDeepCopyable<GameInstance>, IResettable {
@@ -54,7 +53,7 @@ namespace HexMage.Simulator {
             TurnManager.PresortTurnOrder();
             TurnManager.StartNextTurn(Pathfinder, State);
         }
-     
+
         public bool IsAbilityUsable(int mobId, int abilityId) {
             var ability = MobManager.AbilityForId(abilityId);
             var mob = State.MobInstances[mobId];
@@ -81,73 +80,7 @@ namespace HexMage.Simulator {
         }
 
 
-        public DefenseDesire FastUse(int abilityId, int mobId, int targetId) {
-            var target = State.MobInstances[targetId];
-            var targetInfo = MobManager.MobInfos[targetId];
-            Debug.Assert(State.Cooldowns[abilityId] == 0, "Trying to use an ability with non-zero cooldown.");
-            Debug.Assert(target.Hp > 0, "Target is dead.");
-
-            DefenseDesire result;
-
-            var ability = MobManager.AbilityForId(abilityId);
-
-            State.Cooldowns[abilityId] = ability.Cooldown;
-
-            if (target.Ap >= targetInfo.DefenseCost) {
-                var controller = MobManager.Teams[targetInfo.Team];
-                var res = controller.FastRequestDesireToDefend(targetId, abilityId);
-
-                if (res == DefenseDesire.Block) {
-                    State.ChangeMobAp(mobId, -MobManager.AbilityForId(abilityId).Cost);
-                    State.ChangeMobAp(targetId, -MobManager.MobInfos[targetId].DefenseCost);
-                    return DefenseDesire.Block;
-                } else {
-                    TargetHit(abilityId, mobId, targetId);
-
-                    result = DefenseDesire.Pass;
-                }
-            } else {
-                TargetHit(abilityId, mobId, targetId);
-                result = DefenseDesire.Pass;
-            }
-
-            return result;
-        }
-
-        public async Task<DefenseDesire> SlowUse(int abilityId, int mobId, int targetId) {
-            var target = State.MobInstances[targetId];
-            var targetInfo = MobManager.MobInfos[targetId];
-            Debug.Assert(State.Cooldowns[abilityId] == 0, "Trying to use an ability with non-zero cooldown.");
-            Debug.Assert(target.Hp > 0, "Target is dead.");
-
-            DefenseDesire result;
-
-            var ability = MobManager.AbilityForId(abilityId);
-
-            State.Cooldowns[abilityId] = ability.Cooldown;
-
-            if (target.Ap >= targetInfo.DefenseCost) {
-                var controller = MobManager.Teams[targetInfo.Team];
-                var res = await controller.SlowRequestDesireToDefend(targetId, abilityId);
-
-                if (res == DefenseDesire.Block) {
-                    State.ChangeMobAp(mobId, -MobManager.AbilityForId(abilityId).Cost);
-                    State.ChangeMobAp(targetId, -MobManager.MobInfos[targetId].DefenseCost);
-                    return DefenseDesire.Block;
-                } else {
-                    TargetHit(abilityId, mobId, targetId);
-
-                    result = DefenseDesire.Pass;
-                }
-            } else {
-                TargetHit(abilityId, mobId, targetId);
-                result = DefenseDesire.Pass;
-            }
-
-            return result;
-        }
-
-        public void FastUseWithDefenseDesire(int mobId, int targetId, int abilityId, DefenseDesire defenseDesire) {
+        public void FastUse(int abilityId, int mobId, int targetId) {
             var target = State.MobInstances[targetId];
             var targetInfo = MobManager.MobInfos[targetId];
             Debug.Assert(State.Cooldowns[abilityId] == 0, "Trying to use an ability with non-zero cooldown.");
@@ -157,16 +90,7 @@ namespace HexMage.Simulator {
 
             State.Cooldowns[abilityId] = ability.Cooldown;
 
-            if (target.Ap >= targetInfo.DefenseCost) {
-                if (defenseDesire == DefenseDesire.Block) {
-                    State.ChangeMobAp(mobId, -MobManager.AbilityForId(abilityId).Cost);
-                    State.ChangeMobAp(targetId, -MobManager.MobInfos[targetId].DefenseCost);
-                } else {
-                    TargetHit(abilityId, mobId, targetId);
-                }
-            } else {
-                TargetHit(abilityId, mobId, targetId);
-            }
+            TargetHit(abilityId, mobId, targetId);
         }
 
         private void TargetHit(int abilityId, int mobId, int targetId) {
@@ -269,8 +193,10 @@ namespace HexMage.Simulator {
 
         /// TODO - fix stuff below
         public int AddMobWithInfo(MobInfo mobInfo) {
-            Debug.Assert(State.MobInstances.Length == MobManager.MobInfos.Count, "State.MobInstances.Length == MobManager.MobInfos.Count");
-            Debug.Assert(State.MobInstances.Length == MobManager.Mobs.Count, "State.MobInstances.Length == MobManager.Mobs.Count");
+            Debug.Assert(State.MobInstances.Length == MobManager.MobInfos.Count,
+                         "State.MobInstances.Length == MobManager.MobInfos.Count");
+            Debug.Assert(State.MobInstances.Length == MobManager.Mobs.Count,
+                         "State.MobInstances.Length == MobManager.Mobs.Count");
 
             var id = MobManager.Mobs.Count;
 

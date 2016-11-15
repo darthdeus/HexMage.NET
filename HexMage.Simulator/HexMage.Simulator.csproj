@@ -68,7 +68,6 @@
     <Compile Include="Model\Ability.cs" />
     <Compile Include="Model\HexType.cs" />
     <Compile Include="Model\Mob.cs" />
-    <Compile Include="Model\DefenseDesire.cs" />
     <Compile Include="Utils\AxialCoord.cs" />
     <Compile Include="Utils\PixelCoord.cs" />
     <Compile Include="Utils\CubeCoord.cs" />

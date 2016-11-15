@@ -89,9 +89,7 @@ namespace HexMage.Simulator {
             var ability = _gameInstance.MobManager.AbilityForId(abilityId);
             await Task.WhenAll(_subscribers.Select(x => x.SlowEventAbilityUsed(mobId, targetId, ability)));
 
-            var defenseDesireResult = await _gameInstance.SlowUse(abilityId, mobId, targetId);
-
-            BroadcastDefenseDesire(targetId, defenseDesireResult);
+            _gameInstance.FastUse(abilityId, mobId, targetId);
         }
 
         public void FastBroadcastAbilityUsed(int mobId, int targetId, int abilityId) {
@@ -100,28 +98,7 @@ namespace HexMage.Simulator {
                 subscriber.EventAbilityUsed(mobId, targetId, ability);
             }
 
-            var defenseDesireResult = _gameInstance.FastUse(abilityId, mobId, targetId);
-
-            BroadcastDefenseDesire(targetId, defenseDesireResult);
-        }
-
-        public void BroadcastAbilityUsedWithDefense(int mob, int target, int abilityId,
-                                                    DefenseDesire defenseDesire) {
-            var ability = _gameInstance.MobManager.AbilityForId(abilityId);
-
-            foreach (var subscriber in _subscribers) {
-                subscriber.EventAbilityUsed(mob, target, ability);
-            }
-
-            _gameInstance.FastUseWithDefenseDesire(mob, target, abilityId, defenseDesire);
-
-            BroadcastDefenseDesire(target, defenseDesire);
-        }
-
-        public void BroadcastDefenseDesire(int mob, DefenseDesire defenseDesireResult) {
-            foreach (var subscriber in _subscribers) {
-                subscriber.EventDefenseDesireAcquired(mob, defenseDesireResult);
-            }
+            _gameInstance.FastUse(abilityId, mobId, targetId);
         }
     }
 }

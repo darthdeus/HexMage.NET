@@ -15,10 +15,6 @@ namespace HexMage.GUI.Core {
             _aiRandomController = new AiRandomController(_gameInstance);
         }
 
-        public Task<DefenseDesire> RequestDesireToDefend(int mobId, Ability ability) {
-            return _arenaScene.RequestDesireToDefend(mobId, ability);
-        }
-
         private TaskCompletionSource<bool> _tcs;
         private readonly AiRandomController _aiRandomController;
 
@@ -26,10 +22,6 @@ namespace HexMage.GUI.Core {
             Debug.Assert(_tcs == null);
             _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             return _tcs.Task;
-        }
-
-        public Task<DefenseDesire> SlowRequestDesireToDefend(int targetId, int abilityId) {
-            return _arenaScene.RequestDesireToDefend(targetId, _gameInstance.MobManager.AbilityForId(abilityId));
         }
 
         public Task SlowPlayTurn(GameEventHub eventHub) {
@@ -47,22 +39,10 @@ namespace HexMage.GUI.Core {
             tcs.SetResult(true);
         }
 
-        public void RandomAction(GameEventHub eventHub) {
-            _aiRandomController.FastPlayTurn(eventHub);
-        }
-
-        public DefenseDesire FastRequestDesireToDefend(int mob, int abilityId) {
-            return DefenseDesire.Pass;
-        }
-
         public void FastPlayTurn(GameEventHub eventHub) {
             Debug.Assert(_tcs == null);
             _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             _tcs.Task.Wait(Program.CancellationToken);
-        }
-
-        public void FastRandomAction(GameEventHub eventHub) {
-            throw new System.NotImplementedException();
         }
 
         public string Name => nameof(PlayerController);
