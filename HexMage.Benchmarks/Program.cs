@@ -49,8 +49,9 @@ namespace HexMage.Benchmarks {
                 Generator.RandomPlaceMob(mobManager, m2, gameInstance.Map, gameInstance.State);
             }
 
-            mobManager.Teams[t1] = new AiRandomController(gameInstance);
-            mobManager.Teams[t2] = new AiRandomController(gameInstance);
+            mobManager.Teams[t1] = new MctsController(gameInstance);
+            mobManager.Teams[t2] = new MctsController(gameInstance);
+            //mobManager.Teams[t2] = new AiRandomController(gameInstance);
 
             for (int i = 0; i < 5; i++) {
                 pathfinder.PathfindDistanceAll();
@@ -59,12 +60,12 @@ namespace HexMage.Benchmarks {
 
             mobManager.InitializeState(gameInstance.State);
 
-            foreach (var coord in gameInstance.Map.AllCoords) {
-                var count = gameInstance.State.MobInstances.Count(x => x.Coord == coord);
-                if (count > 1) {
-                    throw new InvalidOperationException($"There are duplicate mobs on the same coord ({coord}), total {count}.");
-                }
-            }
+            //foreach (var coord in gameInstance.Map.AllCoords) {
+            //    var count = gameInstance.State.MobInstances.Count(x => x.Coord == coord);
+            //    if (count > 1) {
+            //        throw new InvalidOperationException($"There are duplicate mobs on the same coord ({coord}), total {count}.");
+            //    }
+            //}
 
             gameInstance.State.Reset(gameInstance.MobManager);
             turnManager.PresortTurnOrder();

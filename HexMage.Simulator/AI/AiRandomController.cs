@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using HexMage.Simulator.Model;
 
-namespace HexMage.Simulator {
+namespace HexMage.Simulator
+{
     public class AiRandomController : IMobController {
         private readonly GameInstance _gameInstance;
 

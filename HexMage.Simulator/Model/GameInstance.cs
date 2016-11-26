@@ -36,11 +36,12 @@ namespace HexMage.Simulator {
 
         public TeamColor? VictoryTeam {
             get {
-                if (State.RedAlive > 0 && State.BlueAlive == 0) {
+#warning TODO - RedAlive/BlueAlive je obcas i zaporne!
+                if (State.RedAlive > 0 && State.BlueAlive <= 0) {
                     return TeamColor.Red;
-                } else if (State.RedAlive == 0 && State.BlueAlive > 0) {
+                } else if (State.RedAlive <= 0 && State.BlueAlive > 0) {
                     return TeamColor.Blue;
-                } else if (State.RedAlive == 0 && State.BlueAlive == 0) {
+                } else if (State.RedAlive <= 0 && State.BlueAlive <= 0) {
                     return null;
                 } else {
                     Debug.Assert(!IsFinished);

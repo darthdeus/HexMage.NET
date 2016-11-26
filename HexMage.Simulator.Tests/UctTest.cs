@@ -39,12 +39,16 @@ namespace HexMage.Simulator.Tests
         {
             var game = new GameInstance(3);
 
-            var ability = new Ability(3, 1, 1, 0, AbilityElement.Fire);
-            var abilityId = game.AddAbilityWithInfo(ability);
+            var ability1 = new Ability(1, 1, 1, 0, AbilityElement.Fire);
+            var a1 = game.AddAbilityWithInfo(ability1);
+
+            var ability2 = new Ability(3, 1, 1, 0, AbilityElement.Fire);
+            var a2 = game.AddAbilityWithInfo(ability2);
 
             var abilities1 = new List<int>();
             var abilities2 = new List<int> {
-                abilityId
+                a1,
+                a2
             };
 
             var info1 = new MobInfo(TeamColor.Red, 5, 1, 0, abilities1);
@@ -66,6 +70,7 @@ namespace HexMage.Simulator.Tests
 
             var node = uct.UctSearch(game);
             Console.WriteLine(node);
+            //node.Parent.Print(0);
         }
 
         [TestMethod]

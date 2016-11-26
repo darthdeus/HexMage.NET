@@ -85,10 +85,16 @@ namespace HexMage.Simulator {
         public override string ToString() {
             return $"[{Id}] {Q}/{N}, {nameof(Action)}: {Action}";
         }
+
+        public void Print(int indentation) {
+            Console.WriteLine(new string('\t', indentation) + this);
+            foreach (var child in Children) {
+                child.Print(indentation + 1);
+            }
+        }
     }
 
     public class UctAlgorithm {
-
         public UctNode UctSearch(GameInstance initialState) {
             var root = new UctNode(0, 1, null, initialState);
 
@@ -96,8 +102,12 @@ namespace HexMage.Simulator {
 
             while (iterations-- > 0) {
                 UctNode v = TreePolicy(root);
-                float delta = DefaultPolicy(v.State);
-                Backup(v, delta);
+                if (v.State.IsFinished) {
+                    Backup(v, 1);
+                } else {
+                    float delta = DefaultPolicy(v.State);
+                    Backup(v, delta);
+                }
             }
 
             return BestChild(root);
@@ -137,6 +147,7 @@ namespace HexMage.Simulator {
 
             var action = node.PossibleActions[node.Children.Count];
             var child = new UctNode(0, 1, action, F(node.State, action));
+            child.Parent = node;
 
             node.Children.Add(child);
 
@@ -181,7 +192,7 @@ namespace HexMage.Simulator {
             }
 
             TeamColor? victoryTeam = copy.VictoryTeam;
-            
+
             if (victoryTeam == null) {
                 // The game was a draw
                 return 0;
@@ -190,7 +201,7 @@ namespace HexMage.Simulator {
             } else if (startingTeam != victoryTeam.Value) {
                 return -1;
             } else {
-                throw new InvalidOperationException("Invalid victory team result when running DefaultPolicy.");                
+                throw new InvalidOperationException("Invalid victory team result when running DefaultPolicy.");
             }
         }
 
@@ -227,13 +238,20 @@ namespace HexMage.Simulator {
                 foreach (var abilityId in mobInfo.Abilities) {
                     var abilityInfo = state.MobManager.Abilities[abilityId];
 
+                    // Skip abilities which are on cooldown
+                    if (state.State.Cooldowns[abilityId] > 0) continue;
+
                     if (abilityInfo.Cost <= mobInstance.Ap) {
                         foreach (var targetId in state.MobManager.Mobs) {
                             var targetInfo = state.MobManager.MobInfos[targetId];
                             var targetInstance = state.State.MobInstances[targetId];
                             int enemyDistance = state.Pathfinder.Distance(mobInstance.Coord, targetInstance.Coord);
 
-                            if (targetInfo.Team != mobInfo.Team && enemyDistance <= abilityInfo.Range) {
+                            bool isEnemy = targetInfo.Team != mobInfo.Team;
+                            bool withinRange = enemyDistance <= abilityInfo.Range;
+                            bool targetAlive = targetInstance.Hp > 0;
+
+                            if (isEnemy && withinRange && targetAlive) {
                                 result.Add(new AbilityUseAction(mobId, targetId, abilityId));
                             }
                         }
