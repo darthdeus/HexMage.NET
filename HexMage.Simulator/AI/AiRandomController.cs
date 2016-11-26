@@ -25,6 +25,7 @@ namespace HexMage.Simulator {
             var mobInfo = _gameInstance.MobManager.MobInfos[mobId.Value];
             var mobInstance = _gameInstance.State.MobInstances[mobId.Value];
 
+            int? abilityId = null;
             Ability ability = null;
             foreach (var possibleAbilityId in mobInfo.Abilities) {
                 var possibleAbility = _gameInstance.MobManager.AbilityForId(possibleAbilityId);
@@ -32,6 +33,7 @@ namespace HexMage.Simulator {
                 if (possibleAbility.Cost <= mobInstance.Ap &&
                     _gameInstance.State.Cooldowns[possibleAbilityId] == 0) {
                     ability = possibleAbility;
+                    abilityId = possibleAbilityId;
                 }
             }
 
@@ -55,7 +57,8 @@ namespace HexMage.Simulator {
             }
 
             if (spellTarget != MobInstance.InvalidId) {
-                _gameInstance.FastUse(ability.Id, mobId.Value, spellTarget);
+                Debug.Assert(abilityId.HasValue);
+                _gameInstance.FastUse(abilityId.Value, mobId.Value, spellTarget);
             } else if (moveTarget != MobInstance.InvalidId) {
                 FastMoveTowardsEnemy(mobId.Value, moveTarget);
             } else {
@@ -71,8 +74,7 @@ namespace HexMage.Simulator {
             var moveTarget = pathfinder.FurthestPointToTarget(mobInstance, targetInstance);
 
             if (moveTarget != null && pathfinder.Distance(mobInstance.Coord, moveTarget.Value) <= mobInstance.Ap) {
-                _gameInstance.State.FastMoveMob(_gameInstance.Map, _gameInstance.Pathfinder, mobId,
-                                                moveTarget.Value);
+                _gameInstance.FastMove(mobId, moveTarget.Value);
             } else {
                 Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
                           $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");

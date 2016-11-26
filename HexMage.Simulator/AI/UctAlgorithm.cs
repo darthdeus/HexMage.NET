@@ -4,6 +4,36 @@ using System.Collections.Generic;
 namespace HexMage.Simulator {
     public class UctAction {}
 
+    public class EndTurnAction : UctAction {
+        public static EndTurnAction Instance = new EndTurnAction();
+    }
+
+    public class NullAction : UctAction {
+        public static NullAction Instance = new NullAction();
+    }
+
+    public class AbilityUseAction : UctAction {
+        public readonly int MobId;
+        public readonly int TargetId;
+        public readonly int AbilityId;
+
+        public AbilityUseAction(int mobId, int targetId, int abilityId) {
+            MobId = mobId;
+            TargetId = targetId;
+            AbilityId = abilityId;
+        }
+    }
+
+    public class MoveAction : UctAction {
+        public readonly int MobId;
+        public readonly AxialCoord Coord;
+
+        public MoveAction(int mobId, AxialCoord coord) {
+            MobId = mobId;
+            Coord = coord;
+        }
+    }
+
     public class UctNode {
         public float Q { get; set; }
         public int N { get; set; }
@@ -24,14 +54,46 @@ namespace HexMage.Simulator {
         }
 
         public void ComputePossibleActions() {
-            PossibleActions = new List<UctAction>();
-        }
-    }
+            PossibleActions = new List<UctAction> {
+                EndTurnAction.Instance
+            };
 
-    public enum PossibleActions {
-        MoveForward,
-        MoveBack,
-        Attack
+            var currentMob = State.TurnManager.CurrentMob;
+            if (currentMob.HasValue) {
+                var mobId = currentMob.Value;
+
+                var mobInstance = State.State.MobInstances[mobId];
+                var mobInfo = State.MobManager.MobInfos[mobId];
+
+                foreach (var coord in State.Map.AllCoords) {
+                    if (coord == mobInstance.Coord) continue;
+
+                    if (State.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
+                        PossibleActions.Add(new MoveAction(mobId, coord));
+                    }
+                }
+
+                foreach (var abilityId in mobInfo.Abilities) {
+                    var abilityInfo = State.MobManager.Abilities[abilityId];
+
+                    if (abilityInfo.Cost <= mobInstance.Ap) {
+                        foreach (var targetId in State.MobManager.Mobs) {
+                            var targetInfo = State.MobManager.MobInfos[targetId];
+                            var targetInstance = State.State.MobInstances[targetId];
+                            int enemyDistance = State.Pathfinder.Distance(mobInstance.Coord, targetInstance.Coord);
+
+                            if (targetInfo.Team != mobInfo.Team && enemyDistance <= abilityInfo.Range) {
+                                PossibleActions.Add(new AbilityUseAction(mobId, targetId, abilityId));
+                            }
+                        }
+                    }
+                }
+            } else {
+                throw new InvalidOperationException();
+                Utils.Log(LogSeverity.Warning, nameof(UctNode),
+                          "Final state reached while trying to compute possible actions.");
+            }
+        }
     }
 
     public class UctAlgorithm {
@@ -77,7 +139,7 @@ namespace HexMage.Simulator {
         }
 
         public float UcbValue(UctNode parent, UctNode node) {
-            return (float) (node.Q/node.N + Math.Sqrt(2*Math.Log(parent.N)/node.N));
+            return (float) (node.Q / node.N + Math.Sqrt(2 * Math.Log(parent.N) / node.N));
         }
 
         public UctNode Expand(UctNode node) {
@@ -93,11 +155,27 @@ namespace HexMage.Simulator {
             return child;
         }
 
-        private GameInstance F(GameInstance state, UctAction action) {
-            throw new NotImplementedException();
+        public static GameInstance F(GameInstance state, UctAction action) {
+            var copy = state.DeepCopy();
+            // TODO - null action
+            // TODO - end turn action
+            
+            if (action is AbilityUseAction use) {
+                copy.FastUse(use.AbilityId, use.MobId, use.TargetId);
+            } else if (action is MoveAction move) {
+                copy.FastMove(move.MobId, move.Coord);
+            } else if (action is EndTurnAction _) {
+                copy.TurnManager.NextMobOrNewTurn(copy.Pathfinder, copy.State);
+            } else if (action is NullAction) {
+                // do nothing
+            }
+
+            return copy;
         }
 
         public float DefaultPolicy(GameInstance game) {
+            var rnd = new Random();
+
             throw new NotImplementedException();
         }
 

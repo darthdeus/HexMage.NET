@@ -122,7 +122,6 @@ namespace HexMage.Simulator.PCG {
 
                 var areaBuffs = RandomAreaBuffs(element);
 
-                int id = mobManager.Abilities.Count;
                 var dmg = Random.Next(1, 10);
                 var cost = Random.Next(3, 7);
                 var range = Random.Next(3, 10);
@@ -133,8 +132,7 @@ namespace HexMage.Simulator.PCG {
                 score += (dmg - cost)*2;
 
 
-                var ability = new Ability(id,
-                                          dmg,
+                var ability = new Ability(dmg,
                                           cost,
                                           range,
                                           cooldown,
@@ -142,16 +140,18 @@ namespace HexMage.Simulator.PCG {
                                           buffs,
                                           areaBuffs);
 
+                // TODO - use GameInstance.AddAbilityWithInfo instead
+                int id = mobManager.Abilities.Count;
                 mobManager.Abilities.Add(ability);
                 state.Cooldowns.Add(0);
 
-                abilities.Add(ability.Id);
+                abilities.Add(id);
             }
 
             int iniciative = Random.Next(10);
 
 #warning TODO - generated mobs do not have their coords assigned
-            return new MobInfo(team, maxHp, maxAp, 3, iniciative, abilities);
+            return new MobInfo(team, maxHp, maxAp, iniciative, abilities);
         }
 
         public static List<Buff> RandomBuffs(AbilityElement element) {

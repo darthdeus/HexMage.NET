@@ -58,9 +58,6 @@ namespace HexMage.GUI.Renderers {
                 batch.DrawString(assetManager.Font, $"{mobInstance.Ap}/{mobInfo.MaxAp}",
                                  hbPos.ToVector2() + new Vector2(textOffset, 14),
                                  Color.Black);
-                batch.DrawString(assetManager.Font, $"{mobInfo.DefenseCost}def",
-                                 hbPos.ToVector2() + new Vector2(textOffset, 28),
-                                 Color.Black);
             } else {
                 batch.Draw(assetManager[AssetManager.DarkMageDeath], pos, color);
             }

@@ -79,7 +79,6 @@ namespace HexMage.Simulator {
             return ability.Range >= distance && IsAbilityUsable(mobId, abilityId);
         }
 
-
         public void FastUse(int abilityId, int mobId, int targetId) {
             var target = State.MobInstances[targetId];
             var targetInfo = MobManager.MobInfos[targetId];
@@ -125,6 +124,7 @@ namespace HexMage.Simulator {
             var game = new GameInstance(mapCopy, MobManager);
             game.TurnManager = TurnManager.DeepCopy(game);
             game.Pathfinder = Pathfinder.DeepCopy(game);
+            game.State = State.DeepCopy();
 
             return game;
         }
@@ -190,7 +190,6 @@ namespace HexMage.Simulator {
             return result;
         }
 
-
         /// TODO - fix stuff below
         public int AddMobWithInfo(MobInfo mobInfo) {
             Debug.Assert(State.MobInstances.Length == MobManager.MobInfos.Count,
@@ -207,6 +206,16 @@ namespace HexMage.Simulator {
             State.MobInstances[State.MobInstances.Length - 1] = new MobInstance(id);
 
             return id;
+        }
+
+        public int AddAbilityWithInfo(Ability ability) {
+            MobManager.Abilities.Add(ability);
+            State.Cooldowns.Add(0);
+            return MobManager.Abilities.Count - 1;
+        }
+
+        public void FastMove(int mobId, AxialCoord coord) {
+            State.FastMoveMob(Map, Pathfinder, mobId, coord);
         }
     }
 }

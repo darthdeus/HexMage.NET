@@ -15,7 +15,6 @@ namespace HexMage.Simulator {
 
 #warning TODO - this should be a struct
     public class Ability {
-        public int Id { get; set; }
         public int Dmg { get; set; }
         public int Cost { get; set; }
         public int Range { get; set; }
@@ -26,13 +25,12 @@ namespace HexMage.Simulator {
 
         public Ability() {}
 
-        public Ability(int id, int dmg, int cost, int range, int cooldown, AbilityElement element)
-            : this(id, dmg, cost, range, cooldown, element, new List<Buff>(), new List<AreaBuff>()) {
+        public Ability(int dmg, int cost, int range, int cooldown, AbilityElement element)
+            : this(dmg, cost, range, cooldown, element, new List<Buff>(), new List<AreaBuff>()) {
         }
 
-        public Ability(int id, int dmg, int cost, int range, int cooldown, AbilityElement element, List<Buff> buffs,
+        public Ability(int dmg, int cost, int range, int cooldown, AbilityElement element, List<Buff> buffs,
             List<AreaBuff> areaBuffs) {
-            Id = id;
             Dmg = dmg;
             Cost = cost;
             Range = range;

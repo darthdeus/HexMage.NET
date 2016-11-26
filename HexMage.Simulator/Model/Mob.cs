@@ -8,7 +8,6 @@ namespace HexMage.Simulator.Model {
 
         public int MaxHp { get; set; }
         public int MaxAp { get; set; }
-        public int DefenseCost { get; set; }
         public int Iniciative { get; set; }
 
         public List<int> Abilities { get; set; }
@@ -17,11 +16,10 @@ namespace HexMage.Simulator.Model {
 
         public static int AbilityCount => 6;
 
-        public MobInfo(TeamColor team, int maxHp, int maxAp, int defenseCost, int iniciative, List<int> abilities) {
+        public MobInfo(TeamColor team, int maxHp, int maxAp, int iniciative, List<int> abilities) {
             Team = team;
             MaxHp = maxHp;
             MaxAp = maxAp;
-            DefenseCost = defenseCost;
             Iniciative = iniciative;
             Abilities = abilities;
             OrigCoord = AxialCoord.Zero;
