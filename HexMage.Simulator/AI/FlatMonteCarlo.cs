@@ -63,7 +63,7 @@ namespace HexMage.Simulator {
                 Console.WriteLine($"Took {rounds} rounds");
             }
 
-            return null;
+            return UctAction.NullAction();
         }
 
         private void FastMoveTowardsEnemy(GameInstance state, int mobId, int targetId) {
@@ -76,6 +76,8 @@ namespace HexMage.Simulator {
             if (moveTarget != null && pathfinder.Distance(mobInstance.Coord, moveTarget.Value) <= mobInstance.Ap) {
                 state.State.FastMoveMob(state.Map, state.Pathfinder, mobId,
                                         moveTarget.Value);
+            } else if (moveTarget == null) {
+                // do nothing intentionally
             } else {
                 Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
                           $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");

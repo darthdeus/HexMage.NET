@@ -51,8 +51,11 @@ namespace HexMage.Simulator {
 
             AxialCoord coord = target.Coord;
             while (true) {
-                if (iterations++ > 1000)
-                    throw new InvalidOperationException("Pathfinding got stuck searching for a shorter path");
+                if (iterations++ > 1000) {
+#warning TODO - throw an exception instead
+                    return null;
+                    //throw new InvalidOperationException("Pathfinding got stuck searching for a shorter path");
+                }
                 var closer = NearestEmpty(mob.Coord, coord);
                 if (closer == null) return null;
 

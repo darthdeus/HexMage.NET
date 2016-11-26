@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 using HexMage.Simulator.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace HexMage.Simulator.Tests
-{
+namespace HexMage.Simulator.Tests {
     [TestClass]
-    public class UctTest
-    {
+    public class UctTest {
         [TestMethod]
         public void StateDeepCopyTest() {
             var game = new GameInstance(3);
@@ -35,8 +33,7 @@ namespace HexMage.Simulator.Tests
         }
 
         [TestMethod]
-        public void DefaultPolicyTest()
-        {
+        public void DefaultPolicyTest() {
             var game = new GameInstance(3);
 
             var ability1 = new Ability(1, 1, 1, 0, AbilityElement.Fire);
@@ -95,23 +92,25 @@ namespace HexMage.Simulator.Tests
             Assert.IsTrue(game.TurnManager.CurrentMob.HasValue);
             Assert.AreEqual(m1, game.TurnManager.CurrentMob.Value);
 
-            var firstNode = new UctNode(0, 0, NullAction.Instance, game);
+            var firstNode = new UctNode(0, 0, UctAction.NullAction(), game);
             firstNode.PrecomputePossibleActions();
 
             Assert.AreEqual(7, firstNode.PossibleActions.Count);
-            var moveActions = firstNode.PossibleActions.Where(x => !(x is EndTurnAction)).ToList();
-            CollectionAssert.AllItemsAreInstancesOfType(moveActions, typeof(MoveAction));
+            var moveActions = firstNode.PossibleActions.Where(x => x.Type != UctActionType.EndTurn).ToList();
+            foreach (var moveAction in moveActions) {
+                Assert.Equals(UctActionType.Move, moveAction.Type);
+            }
 
             game.TurnManager.NextMobOrNewTurn(game.Pathfinder, game.State);
 
             Assert.IsTrue(game.TurnManager.CurrentMob.HasValue);
             Assert.AreEqual(m2, game.TurnManager.CurrentMob.Value);
 
-            var secondNode = new UctNode(0, 0, NullAction.Instance, game);
+            var secondNode = new UctNode(0, 0, UctAction.NullAction(), game);
             secondNode.PrecomputePossibleActions();
 
             Assert.AreEqual(8, secondNode.PossibleActions.Count);
-            var useAction = (AbilityUseAction) secondNode.PossibleActions.First(x => x is AbilityUseAction);
+            var useAction = secondNode.PossibleActions.First(x => x.Type == UctActionType.AbilityUse);
             Assert.AreEqual(m2, useAction.MobId);
             Assert.AreEqual(m1, useAction.TargetId);
             Assert.AreEqual(abilityId, useAction.AbilityId);

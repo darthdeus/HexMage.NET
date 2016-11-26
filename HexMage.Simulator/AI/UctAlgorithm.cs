@@ -4,51 +4,57 @@ using System.Diagnostics;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
-    public class UctAction {}
-
-    public class EndTurnAction : UctAction {
-        public static EndTurnAction Instance = new EndTurnAction();
-
-        public override string ToString() {
-            return $"EndTurnAction";
-        }
+    public enum UctActionType {
+        EndTurn,
+        Null,
+        AbilityUse,
+        Move
     }
 
-    public class NullAction : UctAction {
-        public static NullAction Instance = new NullAction();
-
-        public override string ToString() {
-            return $"NullAction";
-        }
-    }
-
-    public class AbilityUseAction : UctAction {
+    public struct UctAction {
+        public readonly UctActionType Type;
+        public readonly int AbilityId;
         public readonly int MobId;
         public readonly int TargetId;
-        public readonly int AbilityId;
-
-        public AbilityUseAction(int mobId, int targetId, int abilityId) {
-            MobId = mobId;
-            TargetId = targetId;
-            AbilityId = abilityId;
-        }
-
-        public override string ToString() {
-            return $"ABILITY[{AbilityId}]: {MobId} -> {TargetId}";
-        }
-    }
-
-    public class MoveAction : UctAction {
-        public readonly int MobId;
         public readonly AxialCoord Coord;
 
-        public MoveAction(int mobId, AxialCoord coord) {
+        private UctAction(UctActionType type, int abilityId, int mobId, int targetId, AxialCoord coord) {
+            Type = type;
+            AbilityId = abilityId;
             MobId = mobId;
+            TargetId = targetId;
             Coord = coord;
         }
 
+        public static UctAction NullAction() {
+            return new UctAction(UctActionType.Null, -1, -1, -1, AxialCoord.Zero);
+        }
+
+        public static UctAction EndTurnAction() {
+            return new UctAction(UctActionType.EndTurn, -1, -1, -1, AxialCoord.Zero);
+        }
+
+        public static UctAction AbilityUseAction(int abilityId, int mobId, int targetId) {
+            return new UctAction(UctActionType.AbilityUse, abilityId, mobId, targetId, AxialCoord.Zero);
+        }
+
+        public static UctAction MoveAction(int mobId, AxialCoord coord) {
+            return new UctAction(UctActionType.Move, -1, mobId, -1, coord);
+        }
+
         public override string ToString() {
-            return $"MOVE[{MobId}] -> {Coord}";
+            switch (Type) {
+                case UctActionType.Null:
+                    return $"NullAction";
+                case UctActionType.EndTurn:
+                    return $"EndTurnAction";
+                case UctActionType.AbilityUse:
+                    return $"ABILITY[{AbilityId}]: {MobId} -> {TargetId}";
+                case UctActionType.Move:
+                    return $"MOVE[{MobId}] -> {Coord}";
+                default:
+                    throw new InvalidOperationException($"Invalid value of ${Type}");
+            }
         }
     }
 
@@ -96,7 +102,7 @@ namespace HexMage.Simulator {
 
     public class UctAlgorithm {
         public UctNode UctSearch(GameInstance initialState) {
-            var root = new UctNode(0, 1, null, initialState);
+            var root = new UctNode(0, 1, UctAction.NullAction(), initialState);
 
             int iterations = 1000;
 
@@ -155,19 +161,28 @@ namespace HexMage.Simulator {
         }
 
         public static GameInstance F(GameInstance state, UctAction action) {
-            var copy = state.DeepCopy();
+            return FNoCopy(state.DeepCopy(), action);
+        }
 
-            if (action is AbilityUseAction use) {
-                copy.FastUse(use.AbilityId, use.MobId, use.TargetId);
-            } else if (action is MoveAction move) {
-                copy.FastMove(move.MobId, move.Coord);
-            } else if (action is EndTurnAction _) {
-                copy.TurnManager.NextMobOrNewTurn(copy.Pathfinder, copy.State);
-            } else if (action is NullAction) {
-                // do nothing
+        public static GameInstance FNoCopy(GameInstance state, UctAction action) {
+            switch (action.Type) {
+                case UctActionType.Null:
+                    // do nothing
+                    break;
+                case UctActionType.EndTurn:
+                    state.NextMobOrNewTurn();
+                    break;
+                case UctActionType.AbilityUse:
+                    state.FastUse(action.AbilityId, action.MobId, action.TargetId);
+                    break;
+                case UctActionType.Move:
+                    state.FastMove(action.MobId, action.Coord);
+                    break;
+                default:
+                    throw new InvalidOperationException($"Invalid value of {action.Type}");
             }
 
-            return copy;
+            return state;
         }
 
         public float DefaultPolicy(GameInstance game) {
@@ -181,14 +196,20 @@ namespace HexMage.Simulator {
             TeamColor startingTeam = game.CurrentTeam.Value;
 
             var copy = game.DeepCopy();
-            int iterations = 0;
+            int iterations = 10000;
 
-            while (!copy.IsFinished && iterations++ < 10000) {
-                var actions = PossibleActions(copy);
-                int actionIndex = rnd.Next(0, actions.Count);
-                UctAction action = actions[actionIndex];
+            while (!copy.IsFinished && iterations-- > 0) {
+                //var actions = PossibleActions(copy);
+                //int actionIndex = rnd.Next(0, actions.Count);
+                //UctAction action = actions[actionIndex];
 
-                copy = F(copy, action);
+                //copy = FNoCopy(copy, action);
+
+                FNoCopy(copy, SomeAction(copy));
+            }
+
+            if (iterations == 0) {
+                return 0;
             }
 
             TeamColor? victoryTeam = copy.VictoryTeam;
@@ -213,9 +234,101 @@ namespace HexMage.Simulator {
             }
         }
 
+        //public static UctAction RandomAction(GameInstance state) {
+        //    var rnd = new Random();
+
+        //    var value = rnd.Next(3);
+        //    switch (value) {
+        //        case 0:
+        //            break;
+        //        case 1:
+        //            break;
+        //        case 2:
+        //            break;
+        //        default:
+        //            return UctAction.NullAction();
+        //    }
+        //}
+
+        public static UctAction SomeAction(GameInstance state) {
+            var mobId = state.TurnManager.CurrentMob;
+
+            if (mobId == null)
+                throw new InvalidOperationException("Requesting mob action when there is no current mob.");
+
+            var pathfinder = state.Pathfinder;
+
+            var mobInfo = state.MobManager.MobInfos[mobId.Value];
+            var mobInstance = state.State.MobInstances[mobId.Value];
+
+            int? abilityId = null;
+            Ability ability = null;
+            foreach (var possibleAbilityId in mobInfo.Abilities) {
+                var possibleAbility = state.MobManager.AbilityForId(possibleAbilityId);
+
+                if (possibleAbility.Cost <= mobInstance.Ap &&
+                    state.State.Cooldowns[possibleAbilityId] == 0) {
+                    ability = possibleAbility;
+                    abilityId = possibleAbilityId;
+                }
+            }
+
+            int spellTarget = MobInstance.InvalidId;
+            int moveTarget = MobInstance.InvalidId;
+
+            foreach (var possibleTarget in state.MobManager.Mobs) {
+                var possibleTargetInstance = state.State.MobInstances[possibleTarget];
+                var possibleTargetInfo = state.MobManager.MobInfos[possibleTarget];
+                if (possibleTargetInstance.Hp <= 0) continue;
+
+                // TODO - mela by to byt viditelna vzdalenost
+                if (possibleTargetInfo.Team != mobInfo.Team) {
+                    if (abilityId.HasValue &&
+                        pathfinder.Distance(mobInstance.Coord, possibleTargetInstance.Coord) <= ability.Range) {
+                        spellTarget = possibleTarget;
+                        break;
+                    }
+
+                    moveTarget = possibleTarget;
+                }
+            }
+
+            if (spellTarget != MobInstance.InvalidId) {
+                Debug.Assert(abilityId.HasValue);
+                return UctAction.AbilityUseAction(abilityId.Value, mobId.Value, spellTarget);
+                //state.FastUse(abilityId.Value, mobId.Value, spellTarget);
+            } else if (moveTarget != MobInstance.InvalidId) {
+                return FastMoveTowardsEnemy(state, mobId.Value, moveTarget);
+                //FastMoveTowardsEnemy(mobId.Value, moveTarget);
+            } else {
+                throw new InvalidOperationException("No targets, game should be over.");
+            }
+        }
+
+        public static UctAction FastMoveTowardsEnemy(GameInstance state, int mobId, int targetId) {
+            var pathfinder = state.Pathfinder;
+            var mobInstance = state.State.MobInstances[mobId];
+            var targetInstance = state.State.MobInstances[targetId];
+
+            var moveTarget = pathfinder.FurthestPointToTarget(mobInstance, targetInstance);
+
+            if (moveTarget != null && pathfinder.Distance(mobInstance.Coord, moveTarget.Value) <= mobInstance.Ap) {
+                return UctAction.MoveAction(mobId, moveTarget.Value);
+                //state.FastMove(mobId, moveTarget.Value);
+            } else if (moveTarget == null) {
+                // TODO - intentionally doing nothing
+                return UctAction.NullAction();
+            } else {
+                Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
+                          $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
+                return UctAction.NullAction();
+            }
+        }
+
+
         public static List<UctAction> PossibleActions(GameInstance state) {
             var result = new List<UctAction> {
-                EndTurnAction.Instance
+                UctAction.EndTurnAction()
             };
 
             var currentMob = state.TurnManager.CurrentMob;
@@ -230,7 +343,7 @@ namespace HexMage.Simulator {
 
                     if (state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
                         if (state.State.AtCoord(coord) == null) {
-                            result.Add(new MoveAction(mobId, coord));
+                            result.Add(UctAction.MoveAction(mobId, coord));
                         }
                     }
                 }
@@ -252,7 +365,7 @@ namespace HexMage.Simulator {
                             bool targetAlive = targetInstance.Hp > 0;
 
                             if (isEnemy && withinRange && targetAlive) {
-                                result.Add(new AbilityUseAction(mobId, targetId, abilityId));
+                                result.Add(UctAction.AbilityUseAction(abilityId, mobId, targetId));
                             }
                         }
                     }

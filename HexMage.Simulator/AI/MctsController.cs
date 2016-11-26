@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace HexMage.Simulator
-{
+namespace HexMage.Simulator {
     public class MctsController : IMobController {
         private readonly GameInstance _gameInstance;
 
@@ -13,10 +12,17 @@ namespace HexMage.Simulator
             var uct = new UctAlgorithm();
             var node = uct.UctSearch(_gameInstance);
 
-            if (node.Action is AbilityUseAction abilityAction) {
-                _gameInstance.FastUse(abilityAction.AbilityId, abilityAction.MobId, abilityAction.TargetId);
-            } else if (node.Action is MoveAction moveAction) {
-                _gameInstance.FastMove(moveAction.MobId, moveAction.Coord);
+            switch (node.Action.Type) {
+                case UctActionType.AbilityUse:
+                    _gameInstance.FastUse(node.Action.AbilityId, node.Action.MobId, node.Action.TargetId);
+                    break;
+                case UctActionType.Move:
+                    _gameInstance.FastMove(node.Action.MobId, node.Action.Coord);
+                    break;
+                default:
+                    // TODO - check out if there is a need to explicitly end the turn
+                    // intentionally doing nothing
+                    break;
             }
         }
 
