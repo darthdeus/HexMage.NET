@@ -35,6 +35,40 @@ namespace HexMage.Simulator.Tests
         }
 
         [TestMethod]
+        public void DefaultPolicyTest()
+        {
+            var game = new GameInstance(3);
+
+            var ability = new Ability(3, 1, 1, 0, AbilityElement.Fire);
+            var abilityId = game.AddAbilityWithInfo(ability);
+
+            var abilities1 = new List<int>();
+            var abilities2 = new List<int> {
+                abilityId
+            };
+
+            var info1 = new MobInfo(TeamColor.Red, 5, 1, 0, abilities1);
+            var info2 = new MobInfo(TeamColor.Blue, 5, 1, 1, abilities2);
+
+            game.AddMobWithInfo(info1);
+            game.AddMobWithInfo(info2);
+            game.PrepareEverything();
+
+            Assert.IsFalse(game.IsFinished);
+
+            var uct = new UctAlgorithm();
+            var result = uct.DefaultPolicy(game);
+
+            Assert.AreEqual(-1, result);
+            game.NextMobOrNewTurn();
+
+            Assert.AreEqual(TeamColor.Blue, game.CurrentTeam);
+
+            var node = uct.UctSearch(game);
+            Console.WriteLine(node);
+        }
+
+        [TestMethod]
         public void NodeActionComputeTest() {
             var game = new GameInstance(3);
 
@@ -57,7 +91,7 @@ namespace HexMage.Simulator.Tests
             Assert.AreEqual(m1, game.TurnManager.CurrentMob.Value);
 
             var firstNode = new UctNode(0, 0, NullAction.Instance, game);
-            firstNode.ComputePossibleActions();
+            firstNode.PrecomputePossibleActions();
 
             Assert.AreEqual(7, firstNode.PossibleActions.Count);
             var moveActions = firstNode.PossibleActions.Where(x => !(x is EndTurnAction)).ToList();
@@ -69,7 +103,7 @@ namespace HexMage.Simulator.Tests
             Assert.AreEqual(m2, game.TurnManager.CurrentMob.Value);
 
             var secondNode = new UctNode(0, 0, NullAction.Instance, game);
-            secondNode.ComputePossibleActions();
+            secondNode.PrecomputePossibleActions();
 
             Assert.AreEqual(8, secondNode.PossibleActions.Count);
             var useAction = (AbilityUseAction) secondNode.PossibleActions.First(x => x is AbilityUseAction);

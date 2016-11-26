@@ -24,8 +24,9 @@ namespace HexMage.Simulator {
 
         public int? CurrentMob {
             get {
-                if (!State.CurrentMobIndex.HasValue) return null;
-                if (State.CurrentMobIndex.Value < _turnOrder.Count) {
+                if (!State.CurrentMobIndex.HasValue) {
+                    return null;
+                } else if (State.CurrentMobIndex.Value < _turnOrder.Count) {
                     return _turnOrder[State.CurrentMobIndex.Value];
                 } else {
                     return null;
@@ -40,10 +41,10 @@ namespace HexMage.Simulator {
         public void PresortTurnOrder() {
             _presortedOrder = MobManager.Mobs.ToList();
             _presortedOrder.Sort((a, b) => {
-                                     var aInfo = MobManager.MobInfos[a];
-                                     var bInfo = MobManager.MobInfos[b];
-                                     return aInfo.Iniciative.CompareTo(bInfo.Iniciative);
-                                 });
+                var aInfo = MobManager.MobInfos[a];
+                var bInfo = MobManager.MobInfos[b];
+                return aInfo.Iniciative.CompareTo(bInfo.Iniciative);
+            });
 
             CopyTurnOrderFromPresort();
         }

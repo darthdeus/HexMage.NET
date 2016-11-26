@@ -146,11 +146,16 @@ namespace HexMage.Simulator {
         }
 
         public GameState DeepCopy() {
-            var gameStateCopy = new GameState();
+            var gameStateCopy = new GameState {
+                RedAlive = RedAlive,
+                BlueAlive = BlueAlive,
+                CurrentMobIndex = CurrentMobIndex,
+                TurnNumber = TurnNumber 
+            };
+
             for (int i = 0; i < Cooldowns.Count; i++) {
                 gameStateCopy.Cooldowns.Add(Cooldowns[i]);
             }
-
 
             gameStateCopy.MobPositions = new HexMap<int?>(MobPositions.Size);
             foreach (var coord in MobPositions.AllCoords) {

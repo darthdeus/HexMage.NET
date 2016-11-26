@@ -22,6 +22,33 @@ namespace HexMage.Simulator {
 
         public bool IsFinished => State.IsFinished;
 
+        public TeamColor? CurrentTeam {
+            get {
+                var currentMob = TurnManager.CurrentMob;
+                if (currentMob.HasValue) {
+                    var mobInfo = MobManager.MobInfos[currentMob.Value];
+                    return mobInfo.Team;
+                } else {
+                    return null;
+                }
+            }
+        }
+
+        public TeamColor? VictoryTeam {
+            get {
+                if (State.RedAlive > 0 && State.BlueAlive == 0) {
+                    return TeamColor.Red;
+                } else if (State.RedAlive == 0 && State.BlueAlive > 0) {
+                    return TeamColor.Blue;
+                } else if (State.RedAlive == 0 && State.BlueAlive == 0) {
+                    return null;
+                } else {
+                    Debug.Assert(!IsFinished);
+                    throw new InvalidOperationException("Trying to access the victory team before the game is finished.");
+                }
+            }
+        }
+
         public GameInstance(Map map, MobManager mobManager) {
             Map = map;
             MobManager = mobManager;
@@ -52,6 +79,7 @@ namespace HexMage.Simulator {
             Pathfinder.PathfindDistanceAll();
             TurnManager.PresortTurnOrder();
             TurnManager.StartNextTurn(Pathfinder, State);
+            State.SlowUpdateIsFinished(MobManager);
         }
 
         public bool IsAbilityUsable(int mobId, int abilityId) {
@@ -127,6 +155,10 @@ namespace HexMage.Simulator {
             game.State = State.DeepCopy();
 
             return game;
+        }
+
+        public TurnEndResult NextMobOrNewTurn() {
+            return TurnManager.NextMobOrNewTurn(Pathfinder, State);
         }
 
 #warning TODO - funguje tohle jeste?
