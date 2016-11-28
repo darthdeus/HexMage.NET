@@ -185,7 +185,7 @@ namespace HexMage.Simulator {
             return state;
         }
 
-        public float DefaultPolicy(GameInstance game) {
+        public static float DefaultPolicy(GameInstance game) {
             if (game.IsFinished) {
                 throw new InvalidOperationException("The game is already finished.");
             }

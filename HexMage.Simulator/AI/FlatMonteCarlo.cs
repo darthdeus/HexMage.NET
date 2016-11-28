@@ -5,6 +5,33 @@ using HexMage.Simulator.Model;
 namespace HexMage.Simulator {
     public class FlatMonteCarlo {
         public UctAction Run(GameInstance initialState) {
+            var actions = UctAlgorithm.PossibleActions(initialState);
+
+            float max = float.MinValue;
+            UctAction bestAction = UctAction.EndTurnAction();
+
+            foreach (var action in actions) {
+                var copy = UctAlgorithm.F(initialState, action);
+
+                const int iterations = 1000;
+
+                float sum = 0;
+
+                for (int i = 0; i < iterations; i++) {
+                    float result = UctAlgorithm.DefaultPolicy(copy);
+                    sum += result;
+                }
+
+                if (sum > max) {
+                    max = sum;
+                    bestAction = action;
+                }
+            }
+
+            return bestAction;
+        }
+
+        public UctAction Run(GameInstance initialState, int xxdontuse) {
             var possibleStates = new List<GameInstance>();
             if (!initialState.TurnManager.CurrentMob.HasValue) {
                 throw new NotImplementedException();
