@@ -102,7 +102,8 @@ namespace HexMage.Simulator {
             if (task.IsFaulted) {
                 Log(LogSeverity.Error, nameof(task), $"Task {task} failed, exception: {task.Exception}.");
 
-                SynchronizationContext.Current.Post(_ => { throw task.Exception; }, null);
+#warning TODO - sync context se spatne nastavuje
+                //SynchronizationContext.Current.Post(_ => { throw task.Exception; }, null);
                 throw task.Exception;
             } else {
                 Log(LogSeverity.Info, nameof(task),
@@ -114,7 +115,7 @@ namespace HexMage.Simulator {
             if (task.IsFaulted) {
                 Log(LogSeverity.Error, nameof(task), $"Task<T> {task} failed, exception {task.Exception}.");
 
-                SynchronizationContext.Current.Post(_ => { throw task.Exception; }, null);
+                //SynchronizationContext.Current.Post(_ => { throw task.Exception; }, null);
                 throw task.Exception;
             } else {
                 Log(LogSeverity.Info, nameof(task),

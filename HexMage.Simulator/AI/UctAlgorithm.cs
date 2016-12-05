@@ -104,16 +104,12 @@ namespace HexMage.Simulator {
         public UctNode UctSearch(GameInstance initialState) {
             var root = new UctNode(0, 1, UctAction.NullAction(), initialState);
 
-            int iterations = 1000;
+            int iterations = 10;
 
             while (iterations-- > 0) {
                 UctNode v = TreePolicy(root);
-                if (v.State.IsFinished) {
-                    Backup(v, 1);
-                } else {
-                    float delta = DefaultPolicy(v.State);
-                    Backup(v, delta);
-                }
+                float delta = DefaultPolicy(v.State);
+                Backup(v, delta);
             }
 
             return BestChild(root);
@@ -187,7 +183,9 @@ namespace HexMage.Simulator {
 
         public static float DefaultPolicy(GameInstance game) {
             if (game.IsFinished) {
-                throw new InvalidOperationException("The game is already finished.");
+                // TODO - ma to byt 1?
+                return 1;
+                //throw new InvalidOperationException("The game is already finished.");
             }
 
             var rnd = new Random();
@@ -196,19 +194,15 @@ namespace HexMage.Simulator {
             TeamColor startingTeam = game.CurrentTeam.Value;
 
             var copy = game.DeepCopy();
-            int iterations = 10000;
+            int iterations = 100;
 
-            while (!copy.IsFinished && iterations-- > 0) {
-                //var actions = PossibleActions(copy);
-                //int actionIndex = rnd.Next(0, actions.Count);
-                //UctAction action = actions[actionIndex];
-
-                //copy = FNoCopy(copy, action);
-
-                FNoCopy(copy, SomeAction(copy));
+            while (!copy.IsFinished && --iterations > 0) {
+                var action = DefaultPolicyAction(copy);
+                Console.WriteLine(action);
+                FNoCopy(copy, action);
             }
 
-            if (iterations == 0) {
+            if (iterations <= 0) {
                 return 0;
             }
 
@@ -231,6 +225,7 @@ namespace HexMage.Simulator {
                 node.N++;
                 node.Q += delta;
                 node = node.Parent;
+                //delta = -delta;
             }
         }
 
@@ -250,7 +245,7 @@ namespace HexMage.Simulator {
         //    }
         //}
 
-        public static UctAction SomeAction(GameInstance state) {
+        public static UctAction DefaultPolicyAction(GameInstance state) {
             var mobId = state.TurnManager.CurrentMob;
 
             if (mobId == null)
@@ -317,14 +312,13 @@ namespace HexMage.Simulator {
                 //state.FastMove(mobId, moveTarget.Value);
             } else if (moveTarget == null) {
                 // TODO - intentionally doing nothing
-                return UctAction.NullAction();
+                return UctAction.EndTurnAction();
             } else {
                 Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
                           $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
-                return UctAction.NullAction();
+                return UctAction.EndTurnAction();
             }
         }
-
 
         public static List<UctAction> PossibleActions(GameInstance state) {
             var result = new List<UctAction> {

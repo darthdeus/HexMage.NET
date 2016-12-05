@@ -13,7 +13,7 @@ namespace HexMage.Simulator
         }
 
         public void FastPlayTurn(GameEventHub eventHub) {
-            var action = UctAlgorithm.SomeAction(_gameInstance);
+            var action = UctAlgorithm.DefaultPolicyAction(_gameInstance);
 
             // TODO - is this what we want?
             UctAlgorithm.FNoCopy(_gameInstance, action);

@@ -76,7 +76,8 @@ namespace HexMage.Simulator {
                 }
 
                 var moveForwardCopy = initialState.DeepCopy();
-                FastMoveTowardsEnemy(moveForwardCopy, mobId, moveTarget);
+                var moveAction = UctAlgorithm.FastMoveTowardsEnemy(moveForwardCopy, mobId, moveTarget);
+                UctAlgorithm.FNoCopy(moveForwardCopy, moveAction);
 
                 possibleStates.Add(moveForwardCopy);
             }
@@ -91,24 +92,6 @@ namespace HexMage.Simulator {
             }
 
             return UctAction.NullAction();
-        }
-
-        private void FastMoveTowardsEnemy(GameInstance state, int mobId, int targetId) {
-            var pathfinder = state.Pathfinder;
-            var mobInstance = state.State.MobInstances[mobId];
-            var targetInstance = state.State.MobInstances[targetId];
-
-            var moveTarget = pathfinder.FurthestPointToTarget(mobInstance, targetInstance);
-
-            if (moveTarget != null && pathfinder.Distance(mobInstance.Coord, moveTarget.Value) <= mobInstance.Ap) {
-                state.State.FastMoveMob(state.Map, state.Pathfinder, mobId,
-                                        moveTarget.Value);
-            } else if (moveTarget == null) {
-                // do nothing intentionally
-            } else {
-                Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
-                          $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
-            }
         }
     }
 }

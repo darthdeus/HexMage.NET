@@ -51,8 +51,11 @@ namespace HexMage.Simulator.Tests {
             var info1 = new MobInfo(TeamColor.Red, 5, 1, 0, abilities1);
             var info2 = new MobInfo(TeamColor.Blue, 5, 1, 1, abilities2);
 
-            game.AddMobWithInfo(info1);
-            game.AddMobWithInfo(info2);
+            var m1 = game.AddMobWithInfo(info1);
+            var m2 = game.AddMobWithInfo(info2);
+
+            game.State.SetMobPosition(m1, new AxialCoord(1, 1));
+
             game.PrepareEverything();
 
             Assert.IsFalse(game.IsFinished);
@@ -61,12 +64,16 @@ namespace HexMage.Simulator.Tests {
             var result = uct.DefaultPolicy(game);
 
             Assert.AreEqual(-1, result);
-            game.NextMobOrNewTurn();
 
+            game.NextMobOrNewTurn();
             Assert.AreEqual(TeamColor.Blue, game.CurrentTeam);
 
-            var node = uct.UctSearch(game);
-            Console.WriteLine(node);
+            var bestAction = UctAlgorithm.DefaultPolicyAction(game);
+            Console.WriteLine($"Best: {bestAction}");
+
+            //var node = uct.UctSearch(game);
+            //Assert.AreEqual(UctActionType.AbilityUse, node.Action.Type);
+            //Console.WriteLine(node);
             //node.Parent.Print(0);
         }
 
@@ -96,9 +103,12 @@ namespace HexMage.Simulator.Tests {
             firstNode.PrecomputePossibleActions();
 
             Assert.AreEqual(7, firstNode.PossibleActions.Count);
+
             var moveActions = firstNode.PossibleActions.Where(x => x.Type != UctActionType.EndTurn).ToList();
+            Assert.AreEqual(6, moveActions.Count);
+
             foreach (var moveAction in moveActions) {
-                Assert.Equals(UctActionType.Move, moveAction.Type);
+                Assert.AreEqual(UctActionType.Move, moveAction.Type);
             }
 
             game.TurnManager.NextMobOrNewTurn(game.Pathfinder, game.State);
