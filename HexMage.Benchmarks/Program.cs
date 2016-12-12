@@ -109,9 +109,6 @@ namespace HexMage.Benchmarks {
             gameInstance.Map.PrecomputeCubeLinedraw();
             Console.WriteLine("Cubes precomputed");
 
-            var path = gameInstance.Pathfinder.PrecomputedPathTo(AxialCoord.Zero, new AxialCoord(3, 3));
-            Console.WriteLine(path);
-
             {
                 var totalStopwatch = Stopwatch.StartNew();
                 var stopwatch = new Stopwatch();
