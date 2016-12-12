@@ -4,103 +4,9 @@ using System.Diagnostics;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
-    public enum UctActionType {
-        EndTurn,
-        Null,
-        AbilityUse,
-        Move
-    }
-
-    public struct UctAction {
-        public readonly UctActionType Type;
-        public readonly int AbilityId;
-        public readonly int MobId;
-        public readonly int TargetId;
-        public readonly AxialCoord Coord;
-
-        private UctAction(UctActionType type, int abilityId, int mobId, int targetId, AxialCoord coord) {
-            Type = type;
-            AbilityId = abilityId;
-            MobId = mobId;
-            TargetId = targetId;
-            Coord = coord;
-        }
-
-        public static UctAction NullAction() {
-            return new UctAction(UctActionType.Null, -1, -1, -1, AxialCoord.Zero);
-        }
-
-        public static UctAction EndTurnAction() {
-            return new UctAction(UctActionType.EndTurn, -1, -1, -1, AxialCoord.Zero);
-        }
-
-        public static UctAction AbilityUseAction(int abilityId, int mobId, int targetId) {
-            return new UctAction(UctActionType.AbilityUse, abilityId, mobId, targetId, AxialCoord.Zero);
-        }
-
-        public static UctAction MoveAction(int mobId, AxialCoord coord) {
-            return new UctAction(UctActionType.Move, -1, mobId, -1, coord);
-        }
-
-        public override string ToString() {
-            switch (Type) {
-                case UctActionType.Null:
-                    return $"NullAction";
-                case UctActionType.EndTurn:
-                    return $"EndTurnAction";
-                case UctActionType.AbilityUse:
-                    return $"ABILITY[{AbilityId}]: {MobId} -> {TargetId}";
-                case UctActionType.Move:
-                    return $"MOVE[{MobId}] -> {Coord}";
-                default:
-                    throw new InvalidOperationException($"Invalid value of ${Type}");
-            }
-        }
-    }
-
-    public class UctNode {
-        private static int _id = 0;
-        public int Id;
-
-
-        public float Q { get; set; }
-        public int N { get; set; }
-        public UctAction Action { get; set; }
-        public GameInstance State { get; set; }
-        public UctNode Parent { get; set; }
-        public List<UctNode> Children { get; set; } = new List<UctNode>();
-        public List<UctAction> PossibleActions = null;
-
-        public bool IsTerminal => State.State.IsFinished;
-        public bool IsFullyExpanded => PossibleActions != null && PossibleActions.Count == Children.Count;
-
-        public UctNode(float q, int n, UctAction action, GameInstance state) {
-            Id = _id++;
-            Q = q;
-            N = n;
-            Action = action;
-            State = state;
-        }
-
-        public void PrecomputePossibleActions(bool allowMove = true) {
-            if (PossibleActions == null) {
-                PossibleActions = UctAlgorithm.PossibleActions(State, allowMove);
-            }
-        }
-
-        public override string ToString() {
-            return $"[{Id}] {Q}/{N}, {nameof(Action)}: {Action}";
-        }
-
-        public void Print(int indentation) {
-            Console.WriteLine(new string('\t', indentation) + this);
-            foreach (var child in Children) {
-                child.Print(indentation + 1);
-            }
-        }
-    }
-
     public class UctAlgorithm {
+        public static int actions = 0;
+
         public UctNode UctSearch(GameInstance initialState) {
             var root = new UctNode(0, 1, UctAction.NullAction(), initialState);
 
@@ -137,6 +43,10 @@ namespace HexMage.Simulator {
                 }
             }
 
+            if (node.Action.Type == UctActionType.EndTurn && best.Action.Type == UctActionType.EndTurn) {
+                throw new InvalidOperationException();
+            }
+
             return best;
         }
 
@@ -145,7 +55,8 @@ namespace HexMage.Simulator {
         }
 
         public UctNode Expand(UctNode node) {
-            node.PrecomputePossibleActions(allowMove: node.Action.Type != UctActionType.Move);
+            var type = node.Action.Type;
+            node.PrecomputePossibleActions(type != UctActionType.Move, type != UctActionType.EndTurn);
 
             var action = node.PossibleActions[node.Children.Count];
             var child = new UctNode(0, 1, action, F(node.State, action));
@@ -160,7 +71,24 @@ namespace HexMage.Simulator {
             return FNoCopy(state.DeepCopy(), action);
         }
 
+        public static Dictionary<UctActionType, int> ActionCounts = new Dictionary<UctActionType, int>();
+
+        public static string ActionCountString() {
+            return
+                $"EndTurn: {ActionCounts[UctActionType.EndTurn]}, Ability: {ActionCounts[UctActionType.AbilityUse]}, Move: {ActionCounts[UctActionType.Move]}, Null: {ActionCounts[UctActionType.Null]}";
+        }
+
+        static UctAlgorithm() {
+            ActionCounts.Add(UctActionType.Null, 0);
+            ActionCounts.Add(UctActionType.EndTurn, 0);
+            ActionCounts.Add(UctActionType.AbilityUse, 0);
+            ActionCounts.Add(UctActionType.Move, 0);
+        }
+
         public static GameInstance FNoCopy(GameInstance state, UctAction action) {
+            actions++;
+            ActionCounts[action.Type]++;
+
             switch (action.Type) {
                 case UctActionType.Null:
                     // do nothing
@@ -195,12 +123,13 @@ namespace HexMage.Simulator {
 
             var copy = game.DeepCopy();
             int iterations = 100;
-
+            
             while (!copy.IsFinished && iterations-- > 0) {
                 var action = DefaultPolicyAction(copy);
                 if (action.Type == UctActionType.Null) {
                     throw new InvalidOperationException();
                 }
+                
                 FNoCopy(copy, action);
                 copy.State.SlowUpdateIsFinished(copy.MobManager);
             }
@@ -282,6 +211,7 @@ namespace HexMage.Simulator {
                 return UctAction.AbilityUseAction(abilityId.Value, mobId.Value, spellTarget);
             } else if (moveTarget != MobInstance.InvalidId) {
                 var action = FastMoveTowardsEnemy(state, mobId.Value, moveTarget);
+
                 if (action.Type == UctActionType.Null) {
                     return UctAction.EndTurnAction();
                 } else {
@@ -305,13 +235,16 @@ namespace HexMage.Simulator {
                 // TODO - intentionally doing nothing
                 return UctAction.EndTurnAction();
             } else {
+                Console.WriteLine("Move failed!");
+
                 Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
                           $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
                 return UctAction.EndTurnAction();
             }
         }
 
-        public static List<UctAction> PossibleActions(GameInstance state, bool allowMove = true) {
+        public static List<UctAction> PossibleActions(GameInstance state, bool allowMove = true,
+                                                      bool allowEndTurn = true) {
             var result = new List<UctAction>();
 
             var currentMob = state.TurnManager.CurrentMob;
@@ -360,7 +293,9 @@ namespace HexMage.Simulator {
                           "Final state reached while trying to compute possible actions.");
             }
 
-            result.Add(UctAction.EndTurnAction());
+            if (allowEndTurn) {
+                result.Add(UctAction.EndTurnAction());
+            }
 
             return result;
         }

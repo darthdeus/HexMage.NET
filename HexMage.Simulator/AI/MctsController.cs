@@ -13,7 +13,10 @@ namespace HexMage.Simulator {
             var uct = new UctAlgorithm();
             var node = uct.UctSearch(_gameInstance);
 
-            Console.WriteLine($"action: {node.Action}");
+            float endRatio = (float) UctAlgorithm.ActionCounts[UctActionType.EndTurn] /
+                             UctAlgorithm.ActionCounts[UctActionType.AbilityUse];
+            Console.WriteLine(
+                $"action: {node.Action}, total: {UctAlgorithm.actions} [end ratio: {endRatio}]\t{UctAlgorithm.ActionCountString()}");
             switch (node.Action.Type) {
                 case UctActionType.AbilityUse:
                     _gameInstance.FastUse(node.Action.AbilityId, node.Action.MobId, node.Action.TargetId);

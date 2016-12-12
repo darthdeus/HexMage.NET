@@ -58,13 +58,19 @@ namespace HexMage.Simulator {
 
             AxialCoord? furthestPoint = null;
             foreach (var coord in path) {
-                if (Distance(mob.Coord, coord) <= mob.Ap && _gameInstance.State.AtCoord(coord) == null) {
-                    furthestPoint = coord;
+                int distance = Distance(mob.Coord, coord);
+                var mobAtCoord = _gameInstance.State.AtCoord(coord);
+
+                if (distance <= mob.Ap) {
+                    if (mobAtCoord == null) {
+                        furthestPoint = coord;
+                    }
                 } else {
                     break;
-                }
+                }                
             }
 
+            
             return furthestPoint;
 
 //            int iterations = 0;

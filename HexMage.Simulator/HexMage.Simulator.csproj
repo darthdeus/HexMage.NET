@@ -48,6 +48,9 @@
   <ItemGroup>
     <Compile Include="AI\AiRandomController.cs" />
     <Compile Include="AI\MctsController.cs" />
+    <Compile Include="AI\UctAction.cs" />
+    <Compile Include="AI\UctActionType.cs" />
+    <Compile Include="AI\UctNode.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="AI\FlatMonteCarlo.cs" />
     <Compile Include="Model\GameEventHub.cs" />
