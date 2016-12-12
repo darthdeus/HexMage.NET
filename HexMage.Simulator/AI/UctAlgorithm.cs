@@ -280,7 +280,6 @@ namespace HexMage.Simulator {
             if (spellTarget != MobInstance.InvalidId) {
                 Debug.Assert(abilityId.HasValue);
                 return UctAction.AbilityUseAction(abilityId.Value, mobId.Value, spellTarget);
-                //state.FastUse(abilityId.Value, mobId.Value, spellTarget);
             } else if (moveTarget != MobInstance.InvalidId) {
                 var action = FastMoveTowardsEnemy(state, mobId.Value, moveTarget);
                 if (action.Type == UctActionType.Null) {
@@ -288,7 +287,6 @@ namespace HexMage.Simulator {
                 } else {
                     return action;
                 }
-                //FastMoveTowardsEnemy(mobId.Value, moveTarget);
             } else {
                 throw new InvalidOperationException("No targets, game should be over.");
             }
@@ -303,7 +301,6 @@ namespace HexMage.Simulator {
 
             if (moveTarget != null && pathfinder.Distance(mobInstance.Coord, moveTarget.Value) <= mobInstance.Ap) {
                 return UctAction.MoveAction(mobId, moveTarget.Value);
-                //state.FastMove(mobId, moveTarget.Value);
             } else if (moveTarget == null) {
                 // TODO - intentionally doing nothing
                 return UctAction.EndTurnAction();
@@ -315,9 +312,7 @@ namespace HexMage.Simulator {
         }
 
         public static List<UctAction> PossibleActions(GameInstance state, bool allowMove = true) {
-            var result = new List<UctAction> {
-                UctAction.EndTurnAction()
-            };
+            var result = new List<UctAction>();
 
             var currentMob = state.TurnManager.CurrentMob;
             if (currentMob.HasValue) {
@@ -325,18 +320,6 @@ namespace HexMage.Simulator {
 
                 var mobInstance = state.State.MobInstances[mobId];
                 var mobInfo = state.MobManager.MobInfos[mobId];
-
-                if (allowMove) {
-                    foreach (var coord in state.Map.AllCoords) {
-                        if (coord == mobInstance.Coord) continue;
-
-                        if (state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
-                            if (state.State.AtCoord(coord) == null) {
-                                result.Add(UctAction.MoveAction(mobId, coord));
-                            }
-                        }
-                    }
-                }
 
                 foreach (var abilityId in mobInfo.Abilities) {
                     var abilityInfo = state.MobManager.Abilities[abilityId];
@@ -360,11 +343,24 @@ namespace HexMage.Simulator {
                         }
                     }
                 }
+                if (allowMove) {
+                    foreach (var coord in state.Map.AllCoords) {
+                        if (coord == mobInstance.Coord) continue;
+
+                        if (state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
+                            if (state.State.AtCoord(coord) == null) {
+                                result.Add(UctAction.MoveAction(mobId, coord));
+                            }
+                        }
+                    }
+                }
             } else {
                 throw new InvalidOperationException();
                 Utils.Log(LogSeverity.Warning, nameof(UctNode),
                           "Final state reached while trying to compute possible actions.");
             }
+
+            result.Add(UctAction.EndTurnAction());
 
             return result;
         }
