@@ -194,12 +194,12 @@ namespace HexMage.Simulator {
             TeamColor startingTeam = game.CurrentTeam.Value;
 
             var copy = game.DeepCopy();
-            int iterations = 100;
+            int iterations = 1000;
 
-            while (!copy.IsFinished && --iterations > 0) {
+            while (!copy.IsFinished && iterations-- > 0) {
                 var action = DefaultPolicyAction(copy);
-                Console.WriteLine(action);
                 FNoCopy(copy, action);
+                copy.State.SlowUpdateIsFinished(copy.MobManager);
             }
 
             if (iterations <= 0) {
@@ -225,25 +225,14 @@ namespace HexMage.Simulator {
                 node.N++;
                 node.Q += delta;
                 node = node.Parent;
-                //delta = -delta;
+                if (node != null && node.Action.Type == UctActionType.EndTurn)
+                {
+                    delta = -delta;
+                }
+
+                
             }
         }
-
-        //public static UctAction RandomAction(GameInstance state) {
-        //    var rnd = new Random();
-
-        //    var value = rnd.Next(3);
-        //    switch (value) {
-        //        case 0:
-        //            break;
-        //        case 1:
-        //            break;
-        //        case 2:
-        //            break;
-        //        default:
-        //            return UctAction.NullAction();
-        //    }
-        //}
 
         public static UctAction DefaultPolicyAction(GameInstance state) {
             var mobId = state.TurnManager.CurrentMob;
@@ -293,7 +282,12 @@ namespace HexMage.Simulator {
                 return UctAction.AbilityUseAction(abilityId.Value, mobId.Value, spellTarget);
                 //state.FastUse(abilityId.Value, mobId.Value, spellTarget);
             } else if (moveTarget != MobInstance.InvalidId) {
-                return FastMoveTowardsEnemy(state, mobId.Value, moveTarget);
+                var action = FastMoveTowardsEnemy(state, mobId.Value, moveTarget);
+                if (action.Type == UctActionType.Null) {
+                    return UctAction.EndTurnAction();
+                } else {
+                    return action;
+                }
                 //FastMoveTowardsEnemy(mobId.Value, moveTarget);
             } else {
                 throw new InvalidOperationException("No targets, game should be over.");

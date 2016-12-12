@@ -22,6 +22,9 @@ namespace HexMage.Simulator {
         public readonly HexMap<HexMap<Path>> AllPaths;
         private int Size => _gameInstance.Size;
 
+        private Dictionary<CoordPair, List<AxialCoord>> _precomputedPaths =
+            new Dictionary<CoordPair, List<AxialCoord>>();
+
         public Pathfinder(GameInstance gameInstance) {
             _gameInstance = gameInstance;
             AllPaths = new HexMap<HexMap<Path>>(_gameInstance.Size);
@@ -47,28 +50,45 @@ namespace HexMage.Simulator {
         }
 
         public AxialCoord? FurthestPointToTarget(MobInstance mob, MobInstance target) {
-            int iterations = 0;
+            List<AxialCoord> path = PrecomputedPathTo(mob.Coord, target.Coord);
 
-            AxialCoord coord = target.Coord;
-            while (true) {
-                if (iterations++ > 1000) {
-#warning TODO - throw an exception instead
-                    return null;
-                    //throw new InvalidOperationException("Pathfinding got stuck searching for a shorter path");
-                }
-                var closer = NearestEmpty(mob.Coord, coord);
-                if (closer == null) return null;
+            if (path.Count == 0 && mob.Coord.Distance(target.Coord) == 1) {
+                return null;
+            }
 
-
-                if (Distance(mob.Coord, closer.Value) <= mob.Ap) {
-                    return closer;
+            AxialCoord? furthestPoint = null;
+            foreach (var coord in path) {
+                if (Distance(mob.Coord, coord) <= mob.Ap && _gameInstance.State.AtCoord(coord) == null) {
+                    furthestPoint = coord;
                 } else {
-                    coord = closer.Value;
+                    break;
                 }
             }
+
+            return furthestPoint;
+
+//            int iterations = 0;
+
+//            AxialCoord coord = target.Coord;
+//            while (true) {
+//                if (iterations++ > 1000) {
+//#warning TODO - throw an exception instead
+//                    throw new InvalidOperationException("Pathfinding got stuck searching for a shorter path");
+//                    return null;
+//                }
+//                var closer = NearestEmpty(mob.Coord, coord);
+//                if (closer == null) return null;
+
+
+//                if (Distance(mob.Coord, closer.Value) <= mob.Ap) {
+//                    return closer;
+//                } else {
+//                    coord = closer.Value;
+//                }
+//            }
         }
 
-        public IList<AxialCoord> PathTo(AxialCoord from, AxialCoord target) {
+        public List<AxialCoord> PathTo(AxialCoord from, AxialCoord target) {
             var result = new List<AxialCoord>();
 
             // Return an empty path if the coord is invalid
@@ -94,7 +114,6 @@ namespace HexMage.Simulator {
                 }
             }
 
-
             Debug.Assert(iterations > 0);
             return result;
         }
@@ -102,7 +121,7 @@ namespace HexMage.Simulator {
         /// <summary>
         /// Finds a path to a hex closest to the target coord.
         /// </summary>
-        public IList<AxialCoord> PathToMob(AxialCoord from, AxialCoord to) {
+        public List<AxialCoord> PathToMob(AxialCoord from, AxialCoord to) {
             var target = NearestEmpty(from, to);
             if (target.HasValue) {
                 return PathTo(from, target.Value);
@@ -135,6 +154,25 @@ namespace HexMage.Simulator {
                     sw.Restart();
                 }
             }
+
+            _precomputedPaths.Clear();
+            foreach (var source in AllPaths.AllCoords) {
+                foreach (var destination in AllPaths.AllCoords) {
+                    var key = new CoordPair(source, destination);
+
+                    // TODO - path returns a reversed path including the starting point
+                    var path = PathTo(source, destination);
+                    if (path.Count > 0) {
+                        path.RemoveAt(0);
+                    }
+                    path.Reverse();
+                    _precomputedPaths.Add(key, path);
+                }
+            }
+        }
+
+        public List<AxialCoord> PrecomputedPathTo(AxialCoord from, AxialCoord to) {
+            return _precomputedPaths[new CoordPair(from, to)];
         }
 
         public void PathfindDistanceOnlyFrom(HexMap<Path> distanceMap, AxialCoord start) {
@@ -158,7 +196,7 @@ namespace HexMage.Simulator {
 
             while (queue.Count > 0) {
                 iterations++;
-                if ((iterations > Size*Size*10) || (queue.Count > 1000)) {
+                if ((iterations > Size * Size * 10) || (queue.Count > 1000)) {
                     Utils.Log(LogSeverity.Error, nameof(Pathfinder), "Pathfinder stuck when calculating a path.");
                 }
 
@@ -198,8 +236,7 @@ namespace HexMage.Simulator {
             return current[to].Distance;
         }
 
-        public void PathfindFromCurrentMob(TurnManager turnManager, Pathfinder pathfinder)
-        {
+        public void PathfindFromCurrentMob(TurnManager turnManager, Pathfinder pathfinder) {
             throw new NotImplementedException();
             //if (turnManager.CurrentMob != null)
             //{
@@ -210,7 +247,6 @@ namespace HexMage.Simulator {
             //    Utils.Log(LogSeverity.Warning, nameof(Pathfinder), "CurrentMob is NULL, pathfind current failed");
             //}
         }
-
 
 
         private AxialCoord? NearestEmpty(AxialCoord from, AxialCoord to) {
@@ -233,7 +269,7 @@ namespace HexMage.Simulator {
             int a = (c.X + c.Y);
             int distance = ((c.X < 0 ? -c.X : c.X)
                             + (a < 0 ? -a : a)
-                            + (c.Y < 0 ? -c.Y : c.Y))/2;
+                            + (c.Y < 0 ? -c.Y : c.Y)) / 2;
 
             //int distance = (Math.Abs(c.X)
             //                + Math.Abs(c.X + c.Y)
@@ -246,7 +282,9 @@ namespace HexMage.Simulator {
 
         public Pathfinder DeepCopy(GameInstance gameInstanceCopy) {
             var copy = new Pathfinder(gameInstanceCopy,
-                _diffs, AllPaths);
+                                      _diffs, AllPaths);
+
+            copy._precomputedPaths = _precomputedPaths;
 
             return copy;
         }

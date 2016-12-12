@@ -57,7 +57,8 @@ namespace HexMage.GUI.Components {
             Debug.Assert(mobEntity != null, "Trying to move a mob without an associated entity.");
 
             var from = _gameInstance.State.MobInstances[mobId].Coord;
-            var path = _gameInstance.Pathfinder.PathTo(from, pos).Reverse();
+            var path = _gameInstance.Pathfinder.PathTo(from, pos);
+            path.Reverse();
             foreach (var coord in path) {
                 await mobEntity.MoveTo(from, coord);
                 from = coord;

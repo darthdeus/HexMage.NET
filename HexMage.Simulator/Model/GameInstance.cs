@@ -170,18 +170,6 @@ namespace HexMage.Simulator {
             Pathfinder.Reset();
 
             State.SlowUpdateIsFinished(MobManager);
-            //RedAlive = 0;
-            //BlueAlive = 0;
-
-            //foreach (var mob in MobManager.MobInfos) {
-            //    if (mob.Team == TeamColor.Red) {
-            //        RedAlive++;
-            //    }
-
-            //    if (mob.Team == TeamColor.Blue) {
-            //        BlueAlive++;
-            //    }
-            //}
         }
 
         private AbilityElement BonusElement(AbilityElement element) {

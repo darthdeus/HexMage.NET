@@ -51,31 +51,28 @@ namespace HexMage.Simulator.Tests {
             var info1 = new MobInfo(TeamColor.Red, 5, 1, 0, abilities1);
             var info2 = new MobInfo(TeamColor.Blue, 5, 1, 1, abilities2);
 
-            var m1 = game.AddMobWithInfo(info1);
-            var m2 = game.AddMobWithInfo(info2);
-
-            game.State.SetMobPosition(m1, new AxialCoord(1, 1));
-
+            game.AddMobWithInfo(info1);
+            game.AddMobWithInfo(info2);
             game.PrepareEverything();
 
             Assert.IsFalse(game.IsFinished);
 
             var uct = new UctAlgorithm();
-            var result = uct.DefaultPolicy(game);
+            var result = UctAlgorithm.DefaultPolicy(game);
 
             Assert.AreEqual(-1, result);
-
             game.NextMobOrNewTurn();
+
             Assert.AreEqual(TeamColor.Blue, game.CurrentTeam);
 
             var bestAction = UctAlgorithm.DefaultPolicyAction(game);
             Console.WriteLine($"Best: {bestAction}");
 
-            //var node = uct.UctSearch(game);
-            //Assert.AreEqual(UctActionType.AbilityUse, node.Action.Type);
-            //Console.WriteLine(node);
+            var node = uct.UctSearch(game);
+            Console.WriteLine(node);
             //node.Parent.Print(0);
         }
+
 
         [TestMethod]
         public void NodeActionComputeTest() {

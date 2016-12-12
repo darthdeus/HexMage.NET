@@ -109,12 +109,15 @@ namespace HexMage.Benchmarks {
             gameInstance.Map.PrecomputeCubeLinedraw();
             Console.WriteLine("Cubes precomputed");
 
+            var path = gameInstance.Pathfinder.PrecomputedPathTo(AxialCoord.Zero, new AxialCoord(3, 3));
+            Console.WriteLine(path);
+
             {
                 var totalStopwatch = Stopwatch.StartNew();
                 var stopwatch = new Stopwatch();
                 var iterations = 0;
                 int roundsPerThousand = 0;
-                int dumpIterations = 10000;
+                int dumpIterations = 1;
 
                 int totalIterations = 500000;
                 double ratio = 1000000/totalIterations;
