@@ -82,9 +82,9 @@ namespace HexMage.Simulator {
             State = state;
         }
 
-        public void PrecomputePossibleActions() {
+        public void PrecomputePossibleActions(bool allowMove = true) {
             if (PossibleActions == null) {
-                PossibleActions = UctAlgorithm.PossibleActions(State);
+                PossibleActions = UctAlgorithm.PossibleActions(State, allowMove);
             }
         }
 
@@ -104,7 +104,7 @@ namespace HexMage.Simulator {
         public UctNode UctSearch(GameInstance initialState) {
             var root = new UctNode(0, 1, UctAction.NullAction(), initialState);
 
-            int iterations = 10;
+            int iterations = 10000;
 
             while (iterations-- > 0) {
                 UctNode v = TreePolicy(root);
@@ -145,7 +145,7 @@ namespace HexMage.Simulator {
         }
 
         public UctNode Expand(UctNode node) {
-            node.PrecomputePossibleActions();
+            node.PrecomputePossibleActions(allowMove: node.Action.Type != UctActionType.Move);
 
             var action = node.PossibleActions[node.Children.Count];
             var child = new UctNode(0, 1, action, F(node.State, action));
@@ -194,10 +194,13 @@ namespace HexMage.Simulator {
             TeamColor startingTeam = game.CurrentTeam.Value;
 
             var copy = game.DeepCopy();
-            int iterations = 1000;
+            int iterations = 100;
 
             while (!copy.IsFinished && iterations-- > 0) {
                 var action = DefaultPolicyAction(copy);
+                if (action.Type == UctActionType.Null) {
+                    throw new InvalidOperationException();
+                }
                 FNoCopy(copy, action);
                 copy.State.SlowUpdateIsFinished(copy.MobManager);
             }
@@ -225,12 +228,9 @@ namespace HexMage.Simulator {
                 node.N++;
                 node.Q += delta;
                 node = node.Parent;
-                if (node != null && node.Action.Type == UctActionType.EndTurn)
-                {
+                if (node != null && node.Action.Type == UctActionType.EndTurn) {
                     delta = -delta;
                 }
-
-                
             }
         }
 
@@ -314,7 +314,7 @@ namespace HexMage.Simulator {
             }
         }
 
-        public static List<UctAction> PossibleActions(GameInstance state) {
+        public static List<UctAction> PossibleActions(GameInstance state, bool allowMove = true) {
             var result = new List<UctAction> {
                 UctAction.EndTurnAction()
             };
@@ -326,12 +326,14 @@ namespace HexMage.Simulator {
                 var mobInstance = state.State.MobInstances[mobId];
                 var mobInfo = state.MobManager.MobInfos[mobId];
 
-                foreach (var coord in state.Map.AllCoords) {
-                    if (coord == mobInstance.Coord) continue;
+                if (allowMove) {
+                    foreach (var coord in state.Map.AllCoords) {
+                        if (coord == mobInstance.Coord) continue;
 
-                    if (state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
-                        if (state.State.AtCoord(coord) == null) {
-                            result.Add(UctAction.MoveAction(mobId, coord));
+                        if (state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
+                            if (state.State.AtCoord(coord) == null) {
+                                result.Add(UctAction.MoveAction(mobId, coord));
+                            }
                         }
                     }
                 }

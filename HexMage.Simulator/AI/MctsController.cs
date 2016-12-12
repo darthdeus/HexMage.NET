@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace HexMage.Simulator {
     public class MctsController : IMobController {
@@ -12,6 +13,7 @@ namespace HexMage.Simulator {
             var uct = new UctAlgorithm();
             var node = uct.UctSearch(_gameInstance);
 
+            Console.WriteLine($"action: {node.Action}");
             switch (node.Action.Type) {
                 case UctActionType.AbilityUse:
                     _gameInstance.FastUse(node.Action.AbilityId, node.Action.MobId, node.Action.TargetId);
