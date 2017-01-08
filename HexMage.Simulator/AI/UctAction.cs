@@ -37,7 +37,7 @@ namespace HexMage.Simulator {
                 case UctActionType.Null:
                     return $"NullAction";
                 case UctActionType.EndTurn:
-                    return $"EndTurnAction";
+                    return $"End";
                 case UctActionType.AbilityUse:
                     return $"ABILITY[{AbilityId}]: {MobId} -> {TargetId}";
                 case UctActionType.Move:

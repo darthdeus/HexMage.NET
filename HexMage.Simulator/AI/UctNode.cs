@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public class UctNode {
@@ -33,7 +34,43 @@ namespace HexMage.Simulator {
         }
 
         public override string ToString() {
-            return $"[{Id}] {Q}/{N}, {nameof(Action)}: {Action}";
+            string team;
+            if (State.CurrentTeam.HasValue) {
+                var currentTeam = State.CurrentTeam.Value;
+                team = Action.Type == UctActionType.EndTurn
+                           ? $"{ShortTeam(OtherTeam(currentTeam))}->{ShortTeam(currentTeam)}"
+                           : ShortTeam(currentTeam);
+            } else {
+                team = "";
+            }
+
+            string terminal = IsTerminal ? $"[T]" : "";
+            var value = Math.Round(UcbValue(), 2);
+            return $"[{team}]{terminal}{Q}/{N}/{value}\\n{Action}";
+        }
+
+        private string ShortTeam(TeamColor team) {
+            switch (team) {
+                case TeamColor.Red:
+                    return "R";
+                case TeamColor.Blue:
+                    return "B";
+                default:
+                    throw new ArgumentException();
+            }
+        }
+
+        private TeamColor OtherTeam(TeamColor color) {
+            if (color == TeamColor.Red) {
+                return TeamColor.Blue;
+            } else {
+                return TeamColor.Red;
+            }
+        }
+
+        public float UcbValue() {
+            float parentN = Parent?.N ?? 0;
+            return (float) (Q / N + Math.Sqrt(2 * Math.Log(parentN) / N));
         }
 
         public void Print(int indentation) {

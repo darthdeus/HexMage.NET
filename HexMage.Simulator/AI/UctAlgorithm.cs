@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Text;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
@@ -18,7 +20,27 @@ namespace HexMage.Simulator {
                 Backup(v, delta);
             }
 
+            var builder = new StringBuilder();
+
+            builder.AppendLine("digraph G {");
+            PrintDot(builder, root);
+            builder.AppendLine("}");
+
+            string str = builder.ToString();
+
+            File.WriteAllText("c:\\dev\\graph.dot", str);
+
             return BestChild(root);
+        }
+
+        void PrintDot(StringBuilder builder, UctNode node) {            
+            foreach (var child in node.Children) {
+                builder.AppendLine($"\"{node}\" -> \"{child}\"");
+            }
+
+            foreach (var child in node.Children) {
+                PrintDot(builder, child);
+            }
         }
 
         public UctNode TreePolicy(UctNode node) {
@@ -43,9 +65,9 @@ namespace HexMage.Simulator {
                 }
             }
 
-            if (node.Action.Type == UctActionType.EndTurn && best.Action.Type == UctActionType.EndTurn) {
-                throw new InvalidOperationException();
-            }
+            //if (node.Action.Type == UctActionType.EndTurn && best.Action.Type == UctActionType.EndTurn) {
+            //    throw new InvalidOperationException();
+            //}
 
             return best;
         }
@@ -55,16 +77,21 @@ namespace HexMage.Simulator {
         }
 
         public UctNode Expand(UctNode node) {
-            var type = node.Action.Type;
-            node.PrecomputePossibleActions(type != UctActionType.Move, type != UctActionType.EndTurn);
+            try {
+                var type = node.Action.Type;
+                node.PrecomputePossibleActions(type != UctActionType.Move, true || type != UctActionType.EndTurn);
 
-            var action = node.PossibleActions[node.Children.Count];
-            var child = new UctNode(0, 1, action, F(node.State, action));
-            child.Parent = node;
+                var action = node.PossibleActions[node.Children.Count];
+                var child = new UctNode(0, 1, action, F(node.State, action));
+                child.Parent = node;
 
-            node.Children.Add(child);
+                node.Children.Add(child);
 
-            return child;
+                return child;
+            } catch (ArgumentOutOfRangeException e) {
+                Debugger.Break();
+                throw;
+            }
         }
 
         public static GameInstance F(GameInstance state, UctAction action) {
@@ -123,13 +150,13 @@ namespace HexMage.Simulator {
 
             var copy = game.DeepCopy();
             int iterations = 100;
-            
+
             while (!copy.IsFinished && iterations-- > 0) {
                 var action = DefaultPolicyAction(copy);
                 if (action.Type == UctActionType.Null) {
                     throw new InvalidOperationException();
                 }
-                
+
                 FNoCopy(copy, action);
                 copy.State.SlowUpdateIsFinished(copy.MobManager);
             }
@@ -276,17 +303,18 @@ namespace HexMage.Simulator {
                         }
                     }
                 }
-                if (allowMove) {
-                    foreach (var coord in state.Map.AllCoords) {
-                        if (coord == mobInstance.Coord) continue;
+                //if (allowMove) {
+                //    int count = 4;
+                //    foreach (var coord in state.Map.AllCoords) {
+                //        if (coord == mobInstance.Coord) continue;
 
-                        if (state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
-                            if (state.State.AtCoord(coord) == null) {
-                                result.Add(UctAction.MoveAction(mobId, coord));
-                            }
-                        }
-                    }
-                }
+                //        if (state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
+                //            if (state.State.AtCoord(coord) == null && count-- > 0) {
+                //                result.Add(UctAction.MoveAction(mobId, coord));
+                //            }
+                //        }
+                //    }
+                //}
             } else {
                 throw new InvalidOperationException();
                 Utils.Log(LogSeverity.Warning, nameof(UctNode),

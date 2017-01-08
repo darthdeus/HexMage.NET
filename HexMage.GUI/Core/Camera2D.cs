@@ -40,17 +40,19 @@ namespace HexMage.GUI {
         }
 
         public void Update(GameTime gameTime) {
-            var scrollOff = Mouse.GetState().ScrollWheelValue;
-            var diff = _lastWheel - scrollOff;
-            _lastWheel = scrollOff;
+            if (HexMageGame.Instance.IsActive) {
+                var scrollOff = Mouse.GetState().ScrollWheelValue;
+                var diff = _lastWheel - scrollOff;
+                _lastWheel = scrollOff;
 
-            if (diff > 0) {
-                ZoomLevel -= ScrollAmount;
-            } else if (diff < 0) {
-                ZoomLevel += ScrollAmount;
+                if (diff > 0) {
+                    ZoomLevel -= ScrollAmount;
+                } else if (diff < 0) {
+                    ZoomLevel += ScrollAmount;
+                }
+
+                ZoomLevel = MathHelper.Clamp(ZoomLevel, 0.3f, 3f);
             }
-
-            ZoomLevel = MathHelper.Clamp(ZoomLevel, 0.3f, 3f);
 
             var keyboard = Keyboard.GetState();
 
@@ -77,7 +79,7 @@ namespace HexMage.GUI {
             }
         }
 
-        public Matrix Transform => Matrix.CreateScale(ZoomLevel)*Matrix.CreateTranslation(Translate);
+        public Matrix Transform => Matrix.CreateScale(ZoomLevel) * Matrix.CreateTranslation(Translate);
         public Matrix TransformWithoutScale => Matrix.CreateTranslation(Translate);
 
         public Vector2 HexToPixel(AxialCoord coord) {
@@ -88,8 +90,8 @@ namespace HexMage.GUI {
             int row = coord.Y;
             int col = coord.X;
 
-            var x = (int) (Config.GridSize*scale*(col + row/2.0));
-            var y = (int) (row*Config.HeightOffset*scale);
+            var x = (int) (Config.GridSize * scale * (col + row / 2.0));
+            var y = (int) (row * Config.HeightOffset * scale);
 
             return new Vector2(x, y);
         }
@@ -103,10 +105,10 @@ namespace HexMage.GUI {
         public Vector2 MouseWorldPixelPos => Vector2.Transform(MousePixelPos, Matrix.Invert(Transform));
 
         public AxialCoord PixelToHex(Vector2 pos) {
-            pos = Vector2.Transform(pos, Matrix.Invert(Transform)) - new Vector2(Config.GridSize/2);
+            pos = Vector2.Transform(pos, Matrix.Invert(Transform)) - new Vector2(Config.GridSize / 2);
 
-            var row = (int) Math.Round(pos.Y/Config.HeightOffset);
-            var col = (int) Math.Round(pos.X/Config.GridSize - row/2.0);
+            var row = (int) Math.Round(pos.Y / Config.HeightOffset);
+            var col = (int) Math.Round(pos.X / Config.GridSize - row / 2.0);
 
             return new AxialCoord(col, row);
         }

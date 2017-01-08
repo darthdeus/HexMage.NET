@@ -23,7 +23,10 @@ namespace HexMage.GUI
         private readonly AssetManager _assetManager;
         private GameManager _gameManager;
 
+        public static HexMageGame Instance;
+
         public HexMageGame() {
+            Instance = this;
             _graphics = new GraphicsDeviceManager(this) {
                 PreferredBackBufferWidth = 1280,
                 PreferredBackBufferHeight = 1024

@@ -115,7 +115,7 @@ namespace HexMage.Simulator.PCG {
             var maxHp = Random.Next(7, 12);
             var maxAp = Random.Next(7, 12);
 
-            for (int i = 0; i < MobInfo.AbilityCount; i++) {
+            for (int i = 0; i < 1; i++) {
                 var element = elements[Random.Next(0, 4)];
                 var buffs = RandomBuffs(element);
 
