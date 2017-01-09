@@ -18,7 +18,7 @@ namespace HexMage.Simulator {
                 float sum = 0;
 
                 for (int i = 0; i < iterations; i++) {
-                    float result = UctAlgorithm.DefaultPolicy(copy);
+                    float result = UctAlgorithm.DefaultPolicy(copy, initialState.CurrentTeam.Value);
                     sum += result;
                 }
 

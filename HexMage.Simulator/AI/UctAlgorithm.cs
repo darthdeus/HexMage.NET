@@ -10,13 +10,13 @@ namespace HexMage.Simulator {
         public static int actions = 0;
 
         public UctNode UctSearch(GameInstance initialState) {
-            var root = new UctNode(0, 1, UctAction.NullAction(), initialState);
+            var root = new UctNode(0, 0, UctAction.NullAction(), initialState);
 
             int iterations = 10000;
 
             while (iterations-- > 0) {
                 UctNode v = TreePolicy(root);
-                float delta = DefaultPolicy(v.State);
+                float delta = DefaultPolicy(v.State, initialState.CurrentTeam.Value);
                 Backup(v, delta);
             }
 
@@ -33,7 +33,7 @@ namespace HexMage.Simulator {
             return BestChild(root);
         }
 
-        void PrintDot(StringBuilder builder, UctNode node) {            
+        void PrintDot(StringBuilder builder, UctNode node) {
             foreach (var child in node.Children) {
                 builder.AppendLine($"\"{node}\" -> \"{child}\"");
             }
@@ -82,7 +82,7 @@ namespace HexMage.Simulator {
                 node.PrecomputePossibleActions(type != UctActionType.Move, true || type != UctActionType.EndTurn);
 
                 var action = node.PossibleActions[node.Children.Count];
-                var child = new UctNode(0, 1, action, F(node.State, action));
+                var child = new UctNode(0, 0, action, F(node.State, action));
                 child.Parent = node;
 
                 node.Children.Add(child);
@@ -136,17 +136,22 @@ namespace HexMage.Simulator {
             return state;
         }
 
-        public static float DefaultPolicy(GameInstance game) {
+        public static float DefaultPolicy(GameInstance game, TeamColor startingTeam) {
             if (game.IsFinished) {
-                // TODO - ma to byt 1?
-                return 1;
-                //throw new InvalidOperationException("The game is already finished.");
+                if (game.VictoryTeam.HasValue) {
+                    if (startingTeam == game.VictoryTeam.Value) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                } else {
+                    return 0;
+                }
             }
 
             var rnd = new Random();
 
             Debug.Assert(game.CurrentTeam.HasValue, "game.CurrentTeam.HasValue");
-            TeamColor startingTeam = game.CurrentTeam.Value;
 
             var copy = game.DeepCopy();
             int iterations = 100;
@@ -184,7 +189,9 @@ namespace HexMage.Simulator {
                 node.N++;
                 node.Q += delta;
                 node = node.Parent;
+                // 5. puntik, nema se delta prepnout kdyz ja jsem EndTurn, a ne muj rodic?
                 if (node != null && node.Action.Type == UctActionType.EndTurn) {
+                    // 6. puntik, kdy se ma prepinat?
                     delta = -delta;
                 }
             }
