@@ -30,7 +30,16 @@ namespace HexMage.Simulator {
 
             File.WriteAllText("c:\\dev\\graph.dot", str);
 
-            return BestChild(root);
+            UctNode result = root.Children[0];
+
+            foreach (var child in root.Children) {
+                if (child.Q > result.Q) {
+                    result = child;
+                }
+            }
+
+            return result;
+            //return BestChild(root);
         }
 
         void PrintDot(StringBuilder builder, UctNode node) {
