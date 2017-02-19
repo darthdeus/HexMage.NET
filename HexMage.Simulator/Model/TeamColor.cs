@@ -3,6 +3,5 @@
     {
         Red,
         Blue,
-        Green
     }
 }

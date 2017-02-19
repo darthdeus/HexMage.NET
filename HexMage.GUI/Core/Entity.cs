@@ -148,7 +148,7 @@ namespace HexMage.GUI.Core {
 
             RenderTransform = (Parent?.RenderTransform ?? Matrix.Identity)*Transform();
 
-            if (!CustomBatch) batch.Begin(transformMatrix: RenderTransform);
+            if (!CustomBatch) batch.Begin(transformMatrix: RenderTransform, samplerState: Camera2D.SamplerState);
             Renderer?.Render(this, batch, assetManager);
             if (!CustomBatch) batch.End();
 

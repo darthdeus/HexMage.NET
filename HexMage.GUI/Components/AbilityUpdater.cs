@@ -8,7 +8,8 @@ using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.Components {
     public class AbilityUpdater : Component {
-        private readonly Func<Mob> _mobFunc;
+        private readonly Func<GameInstance> _gameFunc;
+        private readonly Func<int?> _mobFunc;
         private readonly int _abilityIndex;
         private readonly Label _dmgLabel;
         private readonly Label _rangeLabel;
@@ -19,8 +20,10 @@ namespace HexMage.GUI.Components {
 
         public event Action<int> OnClick;
 
-        public AbilityUpdater(Func<Mob> mobFunc, int abilityIndex, Label dmgLabel, Label rangeLabel,
+        public AbilityUpdater(Func<GameInstance> gameFunc, Func<int?> mobFunc, int abilityIndex, Label dmgLabel,
+                              Label rangeLabel,
                               Label elementLabel, Label cooldownLabel, Label buffsLabel) {
+            _gameFunc = gameFunc;
             _mobFunc = mobFunc;
             _abilityIndex = abilityIndex;
             _dmgLabel = dmgLabel;
@@ -31,12 +34,24 @@ namespace HexMage.GUI.Components {
         }
 
         public override void Update(GameTime time) {
-            var mob = _mobFunc();
-            if (mob != null) {
-                Debug.Assert(mob.Abilities.Count == Mob.AbilityCount);
-                Debug.Assert(_abilityIndex < mob.Abilities.Count);
+            var mobId = _mobFunc();
+            if (mobId != null) {
+                var gameInstance = _gameFunc();
+                var mobManager = gameInstance.MobManager;
 
-                _ability = mob.Abilities[_abilityIndex];
+                var mobInstance = gameInstance.State.MobInstances[mobId.Value];
+                var mobInfo = mobManager.MobInfos[mobId.Value];
+
+                // Update and rendering ale skipped if the ability isn't present
+                if (_abilityIndex < mobInfo.Abilities.Count) {
+                    Entity.Hidden = false;
+                } else {
+                    Entity.Hidden = true;
+                    return;
+                }
+
+                var abilityId = mobInfo.Abilities[_abilityIndex];
+                _ability = mobManager.AbilityForId(abilityId);
 
                 var inputManager = InputManager.Instance;
                 var aabb = new Rectangle(Entity.RenderPosition.ToPoint(),
@@ -53,10 +68,11 @@ namespace HexMage.GUI.Components {
                 _rangeLabel.Text = $"Range {_ability.Range}";
                 _elementLabel.Text = _ability.Element.ToString();
 
-                if (_ability.CurrentCooldown == 0) {
+                var cooldown = gameInstance.State.Cooldowns[abilityId];
+                if (cooldown == 0) {
                     _cooldownLabel.Text = $"Cooldown: {_ability.Cooldown} turns";
                 } else {
-                    _cooldownLabel.Text = $"Again in {_ability.CurrentCooldown} turns";
+                    _cooldownLabel.Text = $"Again in {cooldown} turns";
                 }
 
                 var buffTextBuilder = new StringBuilder();

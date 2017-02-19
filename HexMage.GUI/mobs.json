@@ -1,0 +1,227 @@
+{
+  "Abilities": [
+    {
+      "Id": 0,
+      "Dmg": 3,
+      "Cost": 4,
+      "Range": 4,
+      "Cooldown": 1,
+      "Element": 0,
+      "Buffs": [],
+      "AreaBuffs": []
+    },
+    {
+      "Id": 1,
+      "Dmg": 4,
+      "Cost": 5,
+      "Range": 5,
+      "Cooldown": 0,
+      "Element": 1,
+      "Buffs": [],
+      "AreaBuffs": []
+    },
+    {
+      "Id": 2,
+      "Dmg": 1,
+      "Cost": 1,
+      "Range": 6,
+      "Cooldown": 2,
+      "Element": 0,
+      "Buffs": [],
+      "AreaBuffs": []
+    },
+    {
+      "Id": 3,
+      "Dmg": 5,
+      "Cost": 6,
+      "Range": 5,
+      "Cooldown": 0,
+      "Element": 3,
+      "Buffs": [],
+      "AreaBuffs": []
+    },
+    {
+      "Id": 4,
+      "Dmg": 3,
+      "Cost": 5,
+      "Range": 7,
+      "Cooldown": 1,
+      "Element": 0,
+      "Buffs": [],
+      "AreaBuffs": []
+    },
+    {
+      "Id": 5,
+      "Dmg": 2,
+      "Cost": 3,
+      "Range": 8,
+      "Cooldown": 0,
+      "Element": 0,
+      "Buffs": [],
+      "AreaBuffs": []
+    },
+    {
+      "Id": 6,
+      "Dmg": 3,
+      "Cost": 4,
+      "Range": 4,
+      "Cooldown": 0,
+      "Element": 1,
+      "Buffs": [],
+      "AreaBuffs": []
+    },
+    {
+      "Id": 7,
+      "Dmg": 7,
+      "Cost": 3,
+      "Range": 2,
+      "Cooldown": 1,
+      "Element": 0,
+      "Buffs": [],
+      "AreaBuffs": []
+    },
+    {
+      "Id": 8,
+      "Dmg": 5,
+      "Cost": 6,
+      "Range": 4,
+      "Cooldown": 1,
+      "Element": 1,
+      "Buffs": [],
+      "AreaBuffs": []
+    },
+    {
+      "Id": 9,
+      "Dmg": 9,
+      "Cost": 4,
+      "Range": 1,
+      "Cooldown": 0,
+      "Element": 3,
+      "Buffs": [],
+      "AreaBuffs": []
+    },
+    {
+      "Id": 10,
+      "Dmg": 6,
+      "Cost": 5,
+      "Range": 3,
+      "Cooldown": 0,
+      "Element": 1,
+      "Buffs": [],
+      "AreaBuffs": []
+    },
+    {
+      "Id": 11,
+      "Dmg": 5,
+      "Cost": 5,
+      "Range": 4,
+      "Cooldown": 2,
+      "Element": 2,
+      "Buffs": [],
+      "AreaBuffs": []
+    }
+  ],
+  "Mobs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "MobInfos": [
+    {
+      "Id": 0,
+      "MaxHp": 9,
+      "MaxAp": 11,
+      "DefenseCost": 3,
+      "Iniciative": 0,
+      "Abilities": [0, 1],
+      "OrigCoord": {
+        "X": -3,
+        "Y": -2
+      },
+      "Team": 0
+    },
+    {
+      "Id": 1,
+      "MaxHp": 7,
+      "MaxAp": 10,
+      "DefenseCost": 3,
+      "Iniciative": 2,
+      "Abilities": [2, 3],
+      "OrigCoord": {
+        "X": -3,
+        "Y": 0
+      },
+      "Team": 0
+    },
+    {
+      "Id": 2,
+      "MaxHp": 8,
+      "MaxAp": 10,
+      "DefenseCost": 3,
+      "Iniciative": 4,
+      "Abilities": [4, 5],
+      "OrigCoord": {
+        "X": -5,
+        "Y": 2
+      },
+      "Team": 0
+    },
+    {
+      "Id": 3,
+      "MaxHp": 7,
+      "MaxAp": 7,
+      "DefenseCost": 3,
+      "Iniciative": 1,
+      "Abilities": [6, 7],
+      "OrigCoord": {
+        "X": 5,
+        "Y": -2
+      },
+      "Team": 1
+    },
+    {
+      "Id": 4,
+      "MaxHp": 8,
+      "MaxAp": 11,
+      "DefenseCost": 3,
+      "Iniciative": 3,
+      "Abilities": [8, 9],
+      "OrigCoord": {
+        "X": 3,
+        "Y": 0
+      },
+      "Team": 1
+    },
+    {
+      "Id": 5,
+      "MaxHp": 9,
+      "MaxAp": 7,
+      "DefenseCost": 3,
+      "Iniciative": 5,
+      "Abilities": [10, 11],
+      "OrigCoord": {
+        "X": 3,
+        "Y": 2
+      },
+      "Team": 1
+    }
+  ],
+
+  "Cooldowns": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ]
+}

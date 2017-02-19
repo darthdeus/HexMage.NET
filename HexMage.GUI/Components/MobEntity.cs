@@ -1,4 +1,6 @@
+using System;
 using System.Diagnostics;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using HexMage.GUI.Core;
 using HexMage.Simulator;
@@ -12,11 +14,11 @@ namespace HexMage.GUI.Components {
         private AxialCoord _destination;
         private AxialCoord _source;
         private bool _animateMovement;
-        public Mob Mob { get; set; }
+        public int MobId { get; set; }
 
-        public MobEntity(Mob mob, GameInstance gameInstance) {
+        public MobEntity(int mobId, GameInstance gameInstance) {
             _gameInstance = gameInstance;
-            Mob = mob;
+            MobId = mobId;
         }
 
         protected override void Update(GameTime time) {
@@ -35,39 +37,31 @@ namespace HexMage.GUI.Components {
                 if (_moveProgress >= 1.0f) {
                     _moveProgress = 1.0f;
                     _animateMovement = false;
+                    Utils.Log(LogSeverity.Debug, nameof(MobEntity), "Move finished");
                     _tcs.SetResult(true);
                     _tcs = null;
                 }
 
                 Position = sourcePos + _moveProgress*(destinationPos - sourcePos);
             } else {
-                Position = camera.HexToPixel(Mob.Coord);
+                var posBefore = Position;
+
+                var coord = _gameInstance.State.MobInstances[MobId].Coord;
+                Position = camera.HexToPixel(coord);
             }
         }
 
         private TaskCompletionSource<bool> _tcs;
-                                 
-        public Task<bool> MoveTo(AxialCoord source, AxialCoord destination)
-        {
+
+        public Task<bool> MoveTo(AxialCoord source, AxialCoord destination) {
             Debug.Assert(!_animateMovement, "Movement already in progress, can't move until it finishes.");
             Debug.Assert(_tcs == null, "_tcs != null when trying to re-initialize it.");
 
             _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             _moveProgress = 0.0f;
+            Utils.Log(LogSeverity.Info, nameof(MobEntity), $"Moving from {source} to {destination}");
             _destination = destination;
             _source = source;
-            _animateMovement = true;
-
-            return _tcs.Task;
-        }
-        public Task<bool> MoveTo(AxialCoord coord) {
-            Debug.Assert(!_animateMovement, "Movement already in progress, can't move until it finishes.");
-            Debug.Assert(_tcs == null, "_tcs != null when trying to re-initialize it.");
-
-            _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-            _moveProgress = 0.0f;
-            _destination = coord;
-            _source = Mob.Coord;
             _animateMovement = true;
 
             return _tcs.Task;

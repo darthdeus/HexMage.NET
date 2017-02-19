@@ -12,34 +12,39 @@ namespace HexMage.GUI.Core {
         public PlayerController(ArenaScene arenaScene, GameInstance gameInstance) {
             _arenaScene = arenaScene;
             _gameInstance = gameInstance;
-        }
-
-        public Task<DefenseDesire> RequestDesireToDefend(Mob mob, Ability ability) {
-            return _arenaScene.RequestDesireToDefend(mob, ability);
+            _aiRandomController = new AiRandomController(_gameInstance);
         }
 
         private TaskCompletionSource<bool> _tcs;
+        private readonly AiRandomController _aiRandomController;
 
         public bool TurnActive { get; private set; }
 
         public Task<bool> PlayTurn(GameEventHub eventHub) {
-            TurnActive = true;
-            Debug.Assert(_tcs == null);            
+            Debug.Assert(_tcs == null);
             _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             return _tcs.Task;
         }
 
-        public void PlayerEndedTurn() {
-            if (!TurnActive) return;
-
-            Debug.Assert(_tcs != null, "PlayerController.TaskCompletionSource wasn't properly initialized.");
-            _tcs.SetResult(true);
-            _tcs = null;
-            TurnActive = false;
+        public Task SlowPlayTurn(GameEventHub eventHub) {
+            Debug.Assert(_tcs == null, "Starting a new turn while there's an existing TCS");
+            _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            eventHub.State = GameEventState.TurnInProgress;
+            return _tcs.Task;
         }
 
-        public Task<bool> RandomAction(GameEventHub eventHub) {
-            return new AiRandomController(_gameInstance).PlayTurn(eventHub);
+        public void PlayerEndedTurn(GameEventHub eventHub) {
+            Debug.Assert(_tcs != null, "PlayerController.TaskCompletionSource wasn't properly initialized.");
+            var tcs = _tcs;           
+            eventHub.State = GameEventState.SettingUpTurn; 
+            _tcs = null;
+            tcs.SetResult(true);
+        }
+
+        public void FastPlayTurn(GameEventHub eventHub) {
+            Debug.Assert(_tcs == null);
+            _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            _tcs.Task.Wait(Program.CancellationToken);
         }
 
         public string Name => nameof(PlayerController);

@@ -3,8 +3,9 @@ using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public struct AxialCoord : IEquatable<AxialCoord> {
-        public int X { get; set; }
-        public int Y { get; set; }
+        public int X;
+        public int Y;
+        public static AxialCoord Zero { get; } = new AxialCoord(0, 0);
 
         public AxialCoord(int x, int y) {
             X = x;
@@ -31,11 +32,6 @@ namespace HexMage.Simulator {
             return (Math.Abs(X - to.X)
                     + Math.Abs(X + Y - to.X - to.Y)
                     + Math.Abs(Y - to.Y))/2;
-        }
-
-        [Obsolete]
-        public int ModifiedDistance(Mob mob, AxialCoord to) {
-            return (int)Math.Round(Distance(to)*mob.SpeedModifier);
         }
 
         public static AxialCoord operator +(AxialCoord a, AxialCoord b) {

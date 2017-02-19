@@ -43,81 +43,121 @@ namespace HexMage.Simulator.PCG {
     }
 
     public static class Generator {
-        private static readonly Random _random = new Random();
+        public static Random Random = new Random();
 
-        public static GameInstance RandomGame(int size, MapSeed seed, int teamSize,
-                                              Func<GameInstance, IMobController> controllerFunc) {
-            var map = new MapGenerator().Generate(size, seed);
-            var game = new GameInstance(map);
+        //public static GameInstance RandomGame(int size, MapSeed seed, int teamSize, Func<GameInstance, IMobController> controllerFunc) {
+        //    var map = new MapGenerator().Generate(size, seed);
+        //    var game = new GameInstance(map);
 
-            const TeamColor t1 = TeamColor.Red;
-            const TeamColor t2 = TeamColor.Blue;
+        //    const TeamColor t1 = TeamColor.Red;
+        //    const TeamColor t2 = TeamColor.Blue;
 
-            game.MobManager.Teams[t1] = controllerFunc(game);
-            game.MobManager.Teams[t2] = controllerFunc(game);
+        //    game.MobManager.Teams[t1] = controllerFunc(game);
+        //    game.MobManager.Teams[t2] = controllerFunc(game);
 
-            for (int i = 0; i < teamSize; i++) {
-                game.MobManager.AddMob(RandomMob(t1, size, c => game.MobManager.AtCoord(c) == null));
-                game.MobManager.AddMob(RandomMob(t2, size, c => game.MobManager.AtCoord(c) == null));
-            }
+        //    for (int i = 0; i < teamSize; i++) {
+        //        game.MobManager.AddMob(RandomMob(game.MobManager, t1, size, c => game.MobManager.AtCoord(c) == null));
+        //        game.MobManager.AddMob(RandomMob(game.MobManager, t2, size, c => game.MobManager.AtCoord(c) == null));
+        //    }
 
-            return game;
-        }
+        //    game.RedAlive = teamSize;
+        //    game.BlueAlive = teamSize;
 
-        public static Mob RandomMob(TeamColor team, int size) {
-            return RandomMob(team, size, _ => true);
-        }
+        //    return game;
+        //}
 
-        public static Mob RandomMob(TeamColor team, int size, Predicate<AxialCoord> isCoordAvailable) {
-            var abilities = new List<Ability>();
+        public static void RandomPlaceMob(MobManager mobManager, int mob, Map map, GameState state) {
+            int size = map.Size;
 
-            var elements = new[] {
-                AbilityElement.Earth, AbilityElement.Fire, AbilityElement.Air, AbilityElement.Water
+            Predicate<AxialCoord> isCoordAvailable = c => {
+                bool isWall = map[c] == HexType.Wall;
+                var atCoord = state.AtCoord(c);
+
+                return !isWall && (!atCoord.HasValue || atCoord.Value == mob);
             };
 
-            for (int i = 0; i < Mob.AbilityCount; i++) {
-                var element = elements[_random.Next(0, 4)];
-                var buffs = RandomBuffs(element);
+            var mobInstance = state.MobInstances[mob];
+            mobInstance.Coord = AxialCoord.Zero;
+            state.MobInstances[mob] = mobInstance;
+            
+            int iterations = 10000;
 
-                var areaBuffs = RandomAreaBuffs(element);
-
-                abilities.Add(new Ability(_random.Next(1, 10),
-                                          _random.Next(3, 7),
-                                          _random.Next(3, 10),
-                                          _random.Next(0, 3),
-                                          element,
-                                          buffs,
-                                          areaBuffs));
-            }
-
-            int iniciative = _random.Next(10);
-
-            var mob = new Mob(team, 10, 10, 3, iniciative, abilities);
-
-            while (true) {
-                var x = _random.Next(-size, size);
-                var y = _random.Next(-size, size);
-                //var z = -x - y;
-                //var cube = new CubeCoord(x, y, z);
-                //var zero = new CubeCoord(0, 0, 0);
+            while (--iterations > 0) {
+                var x = Random.Next(-size, size);
+                var y = Random.Next(-size, size);
 
                 var zero = new AxialCoord(0, 0);
                 var coord = new AxialCoord(x, y);
 
                 if (isCoordAvailable(coord) && coord.Distance(zero) < size) {
-                    mob.Coord = coord;
-                    mob.OrigCoord = coord;
-                    break;
+                    if (state.AtCoord(coord) == null || state.AtCoord(coord).Value == mob) {
+                        var infoCopy = mobManager.MobInfos[mob];
+                        infoCopy.OrigCoord = coord;
+                        mobManager.MobInfos[mob] = infoCopy;
+                        break;
+                    } else {
+                        throw new InvalidOperationException($"There already is a mob at {coord}");
+                    }
                 }
             }
 
-            return mob;
+            if (iterations == 0) {
+                throw new InvalidOperationException($"Failed to place a mob");
+            }
+        }
+
+        public static MobInfo RandomMob(MobManager mobManager, TeamColor team, GameState state) {
+            var elements = new[] {
+                AbilityElement.Earth, AbilityElement.Fire, AbilityElement.Air, AbilityElement.Water
+            };
+
+            var abilities = new List<int>();
+            var maxHp = Random.Next(7, 12);
+            var maxAp = Random.Next(7, 12);
+
+            for (int i = 0; i < 1; i++) {
+                var element = elements[Random.Next(0, 4)];
+                var buffs = RandomBuffs(element);
+
+
+                var areaBuffs = RandomAreaBuffs(element);
+
+                var dmg = Random.Next(1, 10);
+                var cost = Random.Next(3, 7);
+                var range = Random.Next(3, 10);
+                var cooldown = Random.Next(0, 3);
+
+                int score = 0;
+                score += dmg;
+                score += (dmg - cost)*2;
+
+
+                var ability = new Ability(dmg,
+                                          cost,
+                                          range,
+                                          cooldown,
+                                          element,
+                                          buffs,
+                                          areaBuffs);
+
+                // TODO - use GameInstance.AddAbilityWithInfo instead
+                int id = mobManager.Abilities.Count;
+                mobManager.Abilities.Add(ability);
+                state.Cooldowns.Add(0);
+
+                abilities.Add(id);
+            }
+
+            int iniciative = Random.Next(10);
+
+#warning TODO - generated mobs do not have their coords assigned
+            return new MobInfo(team, maxHp, maxAp, iniciative, abilities);
         }
 
         public static List<Buff> RandomBuffs(AbilityElement element) {
             var result = new List<Buff>();
 
-            int count = _random.Next(2);
+            int count = Random.Next(2);
             for (int i = 0; i < count; i++) {
                 result.Add(RandomBuff(element));
             }
@@ -126,13 +166,13 @@ namespace HexMage.Simulator.PCG {
         }
 
         public static Buff RandomBuff(AbilityElement element) {
-            var hpChange = _random.Next(-2, 1);
-            var apChange = _random.Next(-1, 1);
-            var lifetime = _random.Next(1, 3);
+            var hpChange = Random.Next(-2, 1);
+            var apChange = Random.Next(-1, 1);
+            var lifetime = Random.Next(1, 3);
 
             while (hpChange == 0 && apChange == 0) {
-                hpChange = _random.Next(-2, 1);
-                apChange = _random.Next(-1, 1);
+                hpChange = Random.Next(-2, 1);
+                apChange = Random.Next(-1, 1);
             }
             return new Buff(element, hpChange, apChange, lifetime);
         }
@@ -140,9 +180,9 @@ namespace HexMage.Simulator.PCG {
         public static List<AreaBuff> RandomAreaBuffs(AbilityElement element) {
             var result = new List<AreaBuff>();
 
-            int count = _random.Next(2);
+            int count = Random.Next(2);
             for (int i = 0; i < count; i++) {
-                result.Add(new AreaBuff(_random.Next(4), RandomBuff(element)));
+                result.Add(new AreaBuff(AxialCoord.Zero, Random.Next(4), RandomBuff(element)));
             }
 
             return result;

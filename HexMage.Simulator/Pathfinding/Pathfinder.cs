@@ -4,16 +4,30 @@ using System.Diagnostics;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
-    public class Pathfinder : IResettable {
-        private readonly List<AxialCoord> _diffs;
-        private readonly Map _map;
-        private readonly MobManager _mobManager;
+    public enum VertexState {
+        Unvisited,
+        Open,
+        Closed
+    }
 
-        public Pathfinder(Map map, MobManager mobManager) {
-            _map = map;
-            _mobManager = mobManager;
-            Paths = new HexMap<Path>(map.Size);
-            Paths.Initialize(() => new Path());
+    public struct Path {
+        public int Distance;
+        public AxialCoord? Source;
+        public bool Reachable;
+    }
+
+    public class Pathfinder : IResettable {
+        private readonly GameInstance _gameInstance;
+        private readonly List<AxialCoord> _diffs;
+        public readonly HexMap<HexMap<Path>> AllPaths;
+        private int Size => _gameInstance.Size;
+
+        private Dictionary<CoordPair, List<AxialCoord>> _precomputedPaths =
+            new Dictionary<CoordPair, List<AxialCoord>>();
+
+        public Pathfinder(GameInstance gameInstance) {
+            _gameInstance = gameInstance;
+            AllPaths = new HexMap<HexMap<Path>>(_gameInstance.Size);
 
             _diffs = new List<AxialCoord> {
                 new AxialCoord(-1, 0),
@@ -25,64 +39,98 @@ namespace HexMage.Simulator {
             };
         }
 
-        public HexMap<Path> Paths { get; set; }
-
-        private int Size => _map.Size;
+        public Pathfinder(GameInstance gameInstance, List<AxialCoord> diffs, HexMap<HexMap<Path>> allPaths) {
+            _gameInstance = gameInstance;
+            _diffs = diffs;
+            AllPaths = allPaths;
+        }
 
         public void Reset() {
             // Right now we're not caching anything, so there's nothing to reset
         }
 
-        public IList<AxialCoord> PathToMob(Mob mob) {
-            var target = NearestEmpty(mob.Coord);
-            if (target.HasValue) {
-                return PathTo(target.Value);
-            } else {
+        public AxialCoord? FurthestPointToTarget(MobInstance mob, MobInstance target) {
+            List<AxialCoord> path = PrecomputedPathTo(mob.Coord, target.Coord);
+
+            if (path.Count == 0 && mob.Coord.Distance(target.Coord) == 1) {
                 return null;
             }
+
+            AxialCoord? furthestPoint = null;
+            foreach (var coord in path) {
+                int distance = Distance(mob.Coord, coord);
+                var mobAtCoord = _gameInstance.State.AtCoord(coord);
+
+                if (distance <= mob.Ap) {
+                    if (mobAtCoord == null) {
+                        furthestPoint = coord;
+                    }
+                } else {
+                    break;
+                }                
+            }
+
+            
+            return furthestPoint;
+
+//            int iterations = 0;
+
+//            AxialCoord coord = target.Coord;
+//            while (true) {
+//                if (iterations++ > 1000) {
+//#warning TODO - throw an exception instead
+//                    throw new InvalidOperationException("Pathfinding got stuck searching for a shorter path");
+//                    return null;
+//                }
+//                var closer = NearestEmpty(mob.Coord, coord);
+//                if (closer == null) return null;
+
+
+//                if (Distance(mob.Coord, closer.Value) <= mob.Ap) {
+//                    return closer;
+//                } else {
+//                    coord = closer.Value;
+//                }
+//            }
         }
 
-        public IList<AxialCoord> PathTo(AxialCoord target) {
+        public List<AxialCoord> PathTo(AxialCoord from, AxialCoord target) {
             var result = new List<AxialCoord>();
 
             // Return an empty path if the coord is invalid
             if (!IsValidCoord(target)) return result;
 
-            if (_mobManager.AtCoord(target) != null) {
-                //return result;
-                throw new InvalidOperationException(
-                    $"Searching for a path into a mob is not allowed, use {nameof(PathToMob)} instead");
-            }
-
             var current = target;
             result.Add(current);
 
-            var path = Paths[current];
+            var paths = AllPaths[from];
+            Debug.Assert(paths != null);
+            var path = paths[current];
 
-            if (path == null) return result;
+            if (!path.Reachable) return result;
 
             var iterations = 1000;
             while ((path.Distance > 0) && (--iterations > 0)) {
                 if (path.Source != null) {
                     result.Add(path.Source.Value);
-                    path = Paths[path.Source.Value];
+                    path = paths[path.Source.Value];
                 } else {
                     result.Clear();
                     break;
                 }
             }
 
-
             Debug.Assert(iterations > 0);
             return result;
         }
 
-        public AxialCoord? FurthestPointToTarget(Mob mob, Mob target) {
-            Utils.Log(LogSeverity.Debug, nameof(Pathfinder), $"Finding path from {mob.Coord} to {target.Coord}");
-            var path = PathToMob(target);
-
-            if (path != null) {
-                return FurthestPointOnPath(mob, path);
+        /// <summary>
+        /// Finds a path to a hex closest to the target coord.
+        /// </summary>
+        public List<AxialCoord> PathToMob(AxialCoord from, AxialCoord to) {
+            var target = NearestEmpty(from, to);
+            if (target.HasValue) {
+                return PathTo(from, target.Value);
             } else {
                 return null;
             }
@@ -90,119 +138,131 @@ namespace HexMage.Simulator {
 
 
         private bool IsWalkable(AxialCoord coord) {
-            return IsValidCoord(coord) && (_map[coord] == HexType.Empty) && (_mobManager.AtCoord(coord) == null);
+            return IsValidCoord(coord) && (_gameInstance.Map[coord] == HexType.Empty) &&
+                   (_gameInstance.State.AtCoord(coord) == null);
         }
 
-        public AxialCoord FurthestPointOnPath(Mob mob, IList<AxialCoord> path) {
-            if (path.Count == 0) {
-                string errmsg = $"Trying to move on an empty path from {mob.Coord}, which is invalid.";
-                Utils.Log(LogSeverity.Error, nameof(Pathfinder), errmsg);
-                throw new InvalidOperationException(errmsg);
+        public void PathfindDistanceAll() {
+            int done = 0;
+            int loops = 0;
+            long total = 0;
+            var sw = Stopwatch.StartNew();
+
+            foreach (var source in AllPaths.AllCoords) {
+                AllPaths[source] = new HexMap<Path>(_gameInstance.Size);
+                PathfindDistanceOnlyFrom(AllPaths[source], source);
+                done++;
+                if (done == 100) {
+                    loops++;
+                    done = 0;
+                    long elapsed = sw.ElapsedMilliseconds;
+                    total += elapsed;
+                    sw.Restart();
+                }
             }
 
-            var currentAp = mob.Ap;
-            for (var i = path.Count - 1; i >= 0; i--) {
-                if (currentAp == 0) return path[i];
+            _precomputedPaths.Clear();
+            foreach (var source in AllPaths.AllCoords) {
+                foreach (var destination in AllPaths.AllCoords) {
+                    var key = new CoordPair(source, destination);
 
-                currentAp--;
-            }
-
-            return path[0];
-        }
-
-#warning TODO - move this some place else, it doesn't belong into the pathfinder
-        [Obsolete]
-        public void MoveAsFarAsPossible(Mob mob, IList<AxialCoord> path) {
-            var i = path.Count - 1;
-
-            while ((mob.Ap > 0) && (i > 0)) {
-                _mobManager.MoveMob(mob, path[i]);
-                i--;
+                    // TODO - path returns a reversed path including the starting point
+                    var path = PathTo(source, destination);
+                    if (path.Count > 0) {
+                        path.RemoveAt(0);
+                    }
+                    path.Reverse();
+                    _precomputedPaths.Add(key, path);
+                }
             }
         }
 
-        public int Distance(AxialCoord c) {
-            return Paths[c].Distance;
+        public List<AxialCoord> PrecomputedPathTo(AxialCoord from, AxialCoord to) {
+            return _precomputedPaths[new CoordPair(from, to)];
         }
 
-        public void PathfindFromCurrentMob(TurnManager turnManager) {
-            if (turnManager.CurrentMob != null) PathfindFrom(turnManager.CurrentMob.Coord);
-        }
-
-        public void PathfindFrom(AxialCoord start) {
+        public void PathfindDistanceOnlyFrom(HexMap<Path> distanceMap, AxialCoord start) {
             var queue = new Queue<AxialCoord>();
+            var states = new HexMap<VertexState>(_gameInstance.Size);
 
-            foreach (var coord in _map.AllCoords) {
-                var path = Paths[coord];
-
-                path.Source = null;
-                path.Distance = int.MaxValue;
-                path.Reachable = false;
-                path.State = VertexState.Unvisited;
+            foreach (var coord in distanceMap.AllCoords) {
+                distanceMap[coord] = new Path() {Reachable = false, Distance = int.MaxValue};
+                states[coord] = VertexState.Unvisited;
             }
 
-            var startPath = Paths[start];
-
-            startPath.Distance = 0;
-            startPath.State = VertexState.Open;
-            startPath.Reachable = true;
+            states[start] = VertexState.Open;
+            var path = distanceMap[start];
+            path.Reachable = true;
+            path.Distance = 0;
+            distanceMap[start] = path;
 
             queue.Enqueue(start);
 
-            var iterations = 0;
+            int iterations = 0;
 
             while (queue.Count > 0) {
-                var current = queue.Dequeue();
-
                 iterations++;
-
-                if ((iterations > Size*Size*10) || (queue.Count > 1000))
+                if ((iterations > Size * Size * 10) || (queue.Count > 1000)) {
                     Utils.Log(LogSeverity.Error, nameof(Pathfinder), "Pathfinder stuck when calculating a path.");
+                }
 
-                var p = Paths[current];
-
-                if (p.State == VertexState.Closed) continue;
-
-                p.Reachable = true;
-                p.State = VertexState.Closed;
+                var current = queue.Dequeue();
+                if (states[current] == VertexState.Closed) continue;
+                states[current] = VertexState.Closed;
 
                 foreach (var diff in _diffs) {
                     var neighbour = current + diff;
 
-                    if (IsValidCoord(neighbour)) {
-                        // We can immediately skip the starting position to avoid further complicated checks
+                    if (IsValidCoord(neighbour) && _gameInstance.Map[neighbour] != HexType.Wall) {
+                        // We can immediately skip the starting position
                         if (neighbour == start) continue;
 
-                        var n = Paths[neighbour];
-
-                        // TODO - this is not right
-                        if (n == null) continue;
-
-                        if ((n.State != VertexState.Closed) && IsWalkable(neighbour)) {
-                            if ((n.State == VertexState.Unvisited) || (n.Distance > p.Distance + 1)) {
-                                n.Distance = p.Distance + 1;
-                                n.Source = current;
-                                n.Reachable = true;
+                        if (states[neighbour] != VertexState.Closed) {
+                            if (states[neighbour] == VertexState.Unvisited ||
+                                distanceMap[neighbour].Distance > distanceMap[current].Distance + 1) {
+                                distanceMap[neighbour] = new Path() {
+                                    Distance = distanceMap[current].Distance + 1,
+                                    Source = current,
+                                    Reachable = true
+                                };
                             }
 
-                            n.State = VertexState.Open;
+                            states[neighbour] = VertexState.Open;
                             queue.Enqueue(neighbour);
                         }
                     }
                 }
             }
-
-            UpdateMobPaths();
         }
 
-        private AxialCoord? NearestEmpty(AxialCoord coord) {
+
+        public int Distance(AxialCoord from, AxialCoord to) {
+            var current = AllPaths[from];
+            Debug.Assert(current != null);
+            return current[to].Distance;
+        }
+
+        public void PathfindFromCurrentMob(TurnManager turnManager, Pathfinder pathfinder) {
+            throw new NotImplementedException();
+            //if (turnManager.CurrentMob != null)
+            //{
+            //    PathfindFrom(pathfinder, MobInstances[turnManager.CurrentMob.Value].Coord);
+            //}
+            //else
+            //{
+            //    Utils.Log(LogSeverity.Warning, nameof(Pathfinder), "CurrentMob is NULL, pathfind current failed");
+            //}
+        }
+
+
+        private AxialCoord? NearestEmpty(AxialCoord from, AxialCoord to) {
             AxialCoord? result = null;
             foreach (var diff in _diffs) {
-                var neighbour = coord + diff;
+                var neighbour = to + diff;
                 if (IsWalkable(neighbour)) {
                     if (!result.HasValue) result = neighbour;
 
-                    if (Distance(neighbour) < Distance(result.Value)) {
+                    if (Distance(from, neighbour) < Distance(from, result.Value)) {
                         result = neighbour;
                     }
                 }
@@ -212,25 +272,27 @@ namespace HexMage.Simulator {
         }
 
         public bool IsValidCoord(AxialCoord c) {
-            return (c.ToCube().Sum() == 0) && (_map.CubeDistance(new CubeCoord(0, 0, 0), c) <= _map.Size);
+            int a = (c.X + c.Y);
+            int distance = ((c.X < 0 ? -c.X : c.X)
+                            + (a < 0 ? -a : a)
+                            + (c.Y < 0 ? -c.Y : c.Y)) / 2;
+
+            //int distance = (Math.Abs(c.X)
+            //                + Math.Abs(c.X + c.Y)
+            //                + Math.Abs(c.Y)) / 2;
+            return distance <= _gameInstance.Size;
+
+            //return _map.AxialDistance(c, new AxialCoord(0, 0)) <= _map.Size;
+            //return _map.CubeDistance(new CubeCoord(0, 0, 0), c) <= _map.Size;
         }
 
+        public Pathfinder DeepCopy(GameInstance gameInstanceCopy) {
+            var copy = new Pathfinder(gameInstanceCopy,
+                                      _diffs, AllPaths);
 
-        private void UpdateMobPaths() {
-            foreach (var mob in _mobManager.Mobs) {
-                var path = Paths[mob.Coord];
+            copy._precomputedPaths = _precomputedPaths;
 
-                foreach (var diff in _diffs) {
-                    var neighbour = mob.Coord + diff;
-
-                    if (IsValidCoord(neighbour) && Distance(neighbour) < path.Distance) {
-                        path.Distance = 1 + Distance(neighbour);
-                        path.Source = neighbour;
-                        path.State = VertexState.Closed;
-                        path.Reachable = true;
-                    }
-                }
-            }
+            return copy;
         }
     }
 }

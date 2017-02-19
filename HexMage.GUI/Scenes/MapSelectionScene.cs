@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using HexMage.GUI.Components;
 using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
+using HexMage.Simulator.Model;
 using HexMage.Simulator.PCG;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+using Newtonsoft.Json;
 
 namespace HexMage.GUI.Scenes {
     public class MapSelectionScene : GameScene {
@@ -64,7 +68,7 @@ namespace HexMage.GUI.Scenes {
                 Spacing = 5,
                 Position = new Vector2(300, 0)
             };
-            
+
             sizeSliderLayout.AddChild(new Label("Change map size:", _assetManager.Font));
             sizeSliderLayout.AddChild(sizeSlider);
 
@@ -75,7 +79,9 @@ namespace HexMage.GUI.Scenes {
             };
 
             Action positionUpdater =
-                () => mapPreview.Position = new Vector2(30 + 10*(_selectedSize ?? MinSize), 120 + 30*(_selectedSize ?? MinSize));
+                () =>
+                    mapPreview.Position =
+                        new Vector2(30 + 10*(_selectedSize ?? MinSize), 120 + 30*(_selectedSize ?? MinSize));
 
             positionUpdater();
 
@@ -85,8 +91,19 @@ namespace HexMage.GUI.Scenes {
 
             var menuBar = new HorizontalLayout();
 
-
             rootElement.AddChild(menuBar);
+
+            var loaderEntity = new Entity {
+                SortOrder = Camera2D.SortUI
+            };
+
+            loaderEntity.AddComponent(() => {
+                                          if (InputManager.Instance.IsKeyJustReleased(Keys.F11)) {
+                                              LoadWorldFromSave();
+                                          }
+                                      });
+
+            AddAndInitializeRootEntity(loaderEntity, _assetManager);
         }
 
         private void BtnGenerateMapOnOnClick(TextButton btn) {
@@ -116,6 +133,33 @@ namespace HexMage.GUI.Scenes {
             _currentMap = _mapGenerator.Generate(_selectedSize ?? DefaultMapSize, _currentSeed);
         }
 
-        public override void Cleanup() {}        
+        public override void Cleanup() {}
+
+        public void LoadWorldFromSave() {
+            using (var reader = new StreamReader(GameInstance.MapSaveFilename))
+            using (var mobReader = new StreamReader(GameInstance.MobsSaveFilename)) {
+                var mapRepr = JsonConvert.DeserializeObject<MapRepresentation>(reader.ReadToEnd());
+
+                var game = new GameInstance(mapRepr.Size);
+                mapRepr.UpdateMap(game.Map);
+
+                var mobManager = JsonConvert.DeserializeObject<MobManager>(mobReader.ReadToEnd());
+                game.MobManager = mobManager;
+
+                mobManager.InitializeState(game.State);
+
+                var arenaScene = new ArenaScene(_gameManager, game);
+
+                game.MobManager.Teams[TeamColor.Red] = new PlayerController(arenaScene, game);
+                game.MobManager.Teams[TeamColor.Blue] = new PlayerController(arenaScene, game);
+
+                game.PrepareEverything();
+
+#warning TODO - run montecarlo to see that it works
+                //new FlatMonteCarlo().Run(game);
+
+                LoadNewScene(arenaScene);
+            }
+        }
     }
 }

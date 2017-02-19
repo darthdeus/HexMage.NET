@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
@@ -11,12 +13,12 @@ using HexMage.Simulator;
 using HexMage.Simulator.Model;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Newtonsoft.Json;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Components {
     public class GameBoardController : Component, IGameEventSubscriber {
         private readonly GameEventHub _eventHub;
-        private readonly ReplayRecorder _replayRecorder;
         private readonly ArenaScene _arenaScene;
         private readonly GameInstance _gameInstance;
 
@@ -36,21 +38,40 @@ namespace HexMage.GUI.Components {
 
         public int? SelectedAbilityIndex;
 
-        public GameBoardController(GameInstance gameInstance, GameEventHub eventHub, ReplayRecorder replayRecorder,
-                                   ArenaScene arenaScene) {
+        public GameBoardController(GameInstance gameInstance, GameEventHub eventHub, ArenaScene arenaScene) {
             _gameInstance = gameInstance;
             _eventHub = eventHub;
-            _replayRecorder = replayRecorder;
             _arenaScene = arenaScene;
         }
 
-        public async Task<bool> EventAbilityUsed(Mob mob, Mob target, UsableAbility usableAbility) {
-            var ability = usableAbility.Ability;
+        public void EventAbilityUsed(int mobId, int targetId, Ability ability) {
+            SlowEventAbilityUsed(mobId, targetId, ability).Wait();
+        }
 
+        public void EventMobMoved(int mobId, AxialCoord pos) {
+            SlowEventMobMoved(mobId, pos).Wait();
+        }
+
+        public async Task SlowEventMobMoved(int mobId, AxialCoord pos) {
+            var mobEntity = _arenaScene.MobEntities[mobId];
+            Debug.Assert(mobEntity != null, "Trying to move a mob without an associated entity.");
+
+            var from = _gameInstance.State.MobInstances[mobId].Coord;
+            var path = _gameInstance.Pathfinder.PathTo(from, pos);
+            path.Reverse();
+            foreach (var coord in path) {
+                await mobEntity.MoveTo(from, coord);
+                from = coord;
+            }
+        }
+
+        public async Task SlowEventAbilityUsed(int mobId, int targetId, Ability ability) {
             Utils.Log(LogSeverity.Info, nameof(GameBoardController), "EventAbilityUsed");
 
-            BuildUsedAbilityPopover(mob, usableAbility.Ability)
-                .LogContinuation();
+            var mobInstance = _gameInstance.State.MobInstances[mobId];
+            var targetInstance = _gameInstance.State.MobInstances[targetId];
+
+            BuildUsedAbilityPopover(mobId, ability).LogContinuation();
 
             var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
 
@@ -63,8 +84,8 @@ namespace HexMage.GUI.Components {
 
             var projectile = new ProjectileEntity(
                 TimeSpan.FromMilliseconds(1500),
-                mob.Coord,
-                target.Coord) {
+                mobInstance.Coord,
+                targetInstance.Coord) {
                 Renderer = new AnimationRenderer(projectileAnimation),
                 SortOrder = Camera2D.SortProjectiles,
                 Transform = () => Camera2D.Instance.Transform
@@ -81,7 +102,7 @@ namespace HexMage.GUI.Components {
                 SortOrder = Camera2D.SortProjectiles
             };
 
-            explosion.AddComponent(new PositionAtMob(target));
+            explosion.AddComponent(new PositionAtMob(_gameInstance.MobManager, targetId, _gameInstance));
 
             var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(ability.Element);
 
@@ -99,26 +120,6 @@ namespace HexMage.GUI.Components {
             Entity.Scene.AddAndInitializeNextFrame(explosion);
 
             Entity.Scene.DestroyEntity(projectile);
-
-            return true;
-        }
-
-        public async Task<bool> EventMobMoved(Mob mob, AxialCoord pos) {
-            Debug.Assert(mob.Metadata != null, "Trying to move a mob without an associated entity.");
-            var entity = (MobEntity) mob.Metadata;
-
-            var path = _gameInstance.Pathfinder.PathTo(pos).Reverse().Skip(1);
-            AxialCoord source = mob.Coord;
-            foreach (var destination in path) {
-                await entity.MoveTo(source, destination);
-                source = destination;
-            }
-
-            return true;
-        }
-
-        public Task<bool> EventDefenseDesireAcquired(Mob mob, DefenseDesire defenseDesireResult) {
-            return Task.FromResult(true);
         }
 
         public override void Initialize(AssetManager assetManager) {
@@ -126,54 +127,16 @@ namespace HexMage.GUI.Components {
             _assetManager = assetManager;
 
             BuildPopovers();
-            CreateMobEntities(assetManager);
 
-            _eventHub.MainLoop(TimeSpan.FromMilliseconds(200))
-                     .ContinueWith(async t => {
-                                       Utils.Log(LogSeverity.Info, nameof(GameBoardController),
-                                                 "Finished waiting for main loop to exit");
-                                       t.LogTask();
-
-                                       await ShowMessage("Game complete");
-                                   });
-        }
-
-        private void CreateMobEntities(AssetManager assetManager) {
-            foreach (var mob in _gameInstance.MobManager.Mobs) {
-                var mobAnimationController = new MobAnimationController();
-
-                var mobEntity = new MobEntity(mob, _gameInstance) {
-                    Renderer = new MobRenderer(_gameInstance, mob, mobAnimationController),
-                    SortOrder = Camera2D.SortMobs,
-                    Transform = () => Camera2D.Instance.Transform
-                };
-                mob.Metadata = mobEntity;
-                mobEntity.AddComponent(mobAnimationController);
-                mobEntity.AddComponent(new MobStateUpdater(mob));
-
-                Entity.Scene.AddRootEntity(mobEntity);
-                mobEntity.InitializeEntity(assetManager);
-            }
-        }
-
-        public Task ShowMessage(string message, int displayForSeconds = 5) {
-            _messageBoxLabel.Text = message;
-            _displayMessageBoxUntil = DateTime.Now.Add(TimeSpan.FromSeconds(displayForSeconds));
-
-            return Task.Delay(TimeSpan.FromSeconds(displayForSeconds));
+            _eventHub.SlowMainLoop(TimeSpan.FromMilliseconds(500))
+                     .LogContinuation();
         }
 
         public override void Update(GameTime time) {
-            HandleKeyboardAbilitySelect();
-
             UnselectAbilityIfNeeded();
 
             var inputManager = InputManager.Instance;
             var mouseHex = Camera2D.Instance.MouseHex;
-
-            if (inputManager.IsKeyJustPressed(Keys.P)) {
-                _replayRecorder.DumpReplay(Console.Out);
-            }
 
             if (inputManager.IsKeyJustPressed(Keys.Pause)) {
                 if (_eventHub.IsPaused) {
@@ -185,46 +148,63 @@ namespace HexMage.GUI.Components {
             }
 
             var controller = _gameInstance.TurnManager.CurrentController as PlayerController;
-            if (controller != null) {
+            if (controller != null && inputManager.UserInputEnabled && _eventHub.State == GameEventState.TurnInProgress) {
+                HandleKeyboardAbilitySelect();
+
                 if (inputManager.JustRightClicked())
                     if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
                         _gameInstance.Map.Toogle(mouseHex);
 
-                        // TODO - podivat se na generickou implementaci pathfinderu
-                        // TODO - pathfindovani ze zdi najde cesty
-                        _gameInstance.Pathfinder.PathfindFromCurrentMob(_gameInstance.TurnManager);
+                        _gameInstance.Pathfinder.PathfindDistanceAll();
+                        _gameInstance.Pathfinder.PathfindFromCurrentMob(_gameInstance.TurnManager, _gameInstance.Pathfinder);
+                        _gameInstance.Map.PrecomputeCubeLinedraw();
                     }
 
                 if (inputManager.IsKeyJustPressed(Keys.Space)) {
-                    controller.PlayerEndedTurn();
+                    controller.PlayerEndedTurn(_eventHub);
+                    SelectedAbilityIndex = null;
                     ShowMessage("Starting new turn!");
                 }
 
-                HandleUserTurnInput(inputManager);
+                if (inputManager.JustLeftClickReleased()) {
+                    EnqueueClickEvent(HandleLeftClick);
+                }
             }
 
             UpdatePopovers(time, mouseHex);
         }
 
-        private void UnselectAbilityIfNeeded() {
-            var mob = _gameInstance.TurnManager.CurrentMob;
-            if (mob != null && SelectedAbilityIndex.HasValue) {
-                var selectedAbility = mob.Abilities[SelectedAbilityIndex.Value];
-
-                if (selectedAbility.Cost > mob.Ap) {
-                    SelectedAbilityIndex = null;
-                }
-            }
-        }
-
-        private void HandleUserTurnInput(InputManager inputManager) {
-            if (inputManager.JustLeftClickReleased()) EnqueueClickEvent(HandleLeftClick);
-            else if (inputManager.IsKeyJustReleased(Keys.R))
-                _gameInstance.TurnManager.CurrentController.RandomAction(_eventHub);
-        }
-
         private void HandleKeyboardAbilitySelect() {
             var inputManager = InputManager.Instance;
+
+            if (inputManager.IsKeyJustReleased(Keys.F10)) {
+                var repr = new MapRepresentation(_gameInstance.Map);
+
+                using (var writer = new StreamWriter(GameInstance.MapSaveFilename))
+                using (var mobWriter = new StreamWriter(GameInstance.MobsSaveFilename)) {
+                    writer.Write(JsonConvert.SerializeObject(repr));
+                    mobWriter.Write(JsonConvert.SerializeObject(_gameInstance.MobManager));
+                }
+            }
+
+            if (inputManager.IsKeyJustReleased(Keys.F11)) {
+                using (var reader = new StreamReader(GameInstance.MapSaveFilename))
+                using (var mobReader = new StreamReader(GameInstance.MobsSaveFilename)) {
+                    var mapRepr = JsonConvert.DeserializeObject<MapRepresentation>(reader.ReadToEnd());
+                    mapRepr.UpdateMap(_gameInstance.Map);
+
+                    var mobManager = JsonConvert.DeserializeObject<MobManager>(mobReader.ReadToEnd());
+                    Console.WriteLine(mobManager);
+                }
+            }
+
+            if (inputManager.IsKeyJustReleased(Keys.F12)) {
+                foreach (var mobId in _gameInstance.MobManager.Mobs) {
+                    var mobInfo = _gameInstance.MobManager.MobInfos[mobId];
+                    var mobInstance = _gameInstance.State.MobInstances[mobId];
+                    Console.WriteLine($"#{mobId} {mobInstance.Coord} {mobInfo}");
+                }
+            }
 
             if (inputManager.IsKeyJustReleased(Keys.D1)) SelectAbility(0);
             else if (inputManager.IsKeyJustReleased(Keys.D2)) SelectAbility(1);
@@ -232,40 +212,67 @@ namespace HexMage.GUI.Components {
             else if (inputManager.IsKeyJustReleased(Keys.D4)) SelectAbility(3);
             else if (inputManager.IsKeyJustReleased(Keys.D5)) SelectAbility(4);
             else if (inputManager.IsKeyJustReleased(Keys.D6)) SelectAbility(5);
+
+            if (inputManager.IsKeyJustReleased(Keys.F1)) {
+                ((GameBoardRenderer) Entity.Renderer).Mode = BoardRenderMode.Default;
+            } else if (inputManager.IsKeyJustReleased(Keys.F2)) {
+                ((GameBoardRenderer) Entity.Renderer).Mode = BoardRenderMode.HoverHeatmap;
+            } else if (inputManager.IsKeyJustReleased(Keys.F3)) {
+                ((GameBoardRenderer) Entity.Renderer).Mode = BoardRenderMode.GlobalHeatmap;
+            }
         }
 
         public void SelectAbility(int index) {
             var currentMob = _gameInstance.TurnManager.CurrentMob;
-            var ability = currentMob.Abilities[index];
+            if (currentMob == null) return;
+
+            var mobInfo = _gameInstance.MobManager.MobInfos[currentMob.Value];
+            if (index >= mobInfo.Abilities.Count) {
+                Utils.Log(LogSeverity.Info, nameof(GameBoardController),
+                          "Trying to select an ability index higher than the number of abilities.");
+                return;
+            }
+            var ability = mobInfo.Abilities[index];
 
             if (SelectedAbilityIndex.HasValue) {
                 if (SelectedAbilityIndex.Value == index) {
                     SelectedAbilityIndex = null;
-                } else if (_gameInstance.IsAbilityUsable(currentMob, ability)) {
+                } else if (_gameInstance.IsAbilityUsable(currentMob.Value, ability)) {
                     SelectedAbilityIndex = index;
                 }
-            } else if (_gameInstance.IsAbilityUsable(currentMob, ability)) {
-                    SelectedAbilityIndex = index;
+            } else if (_gameInstance.IsAbilityUsable(currentMob.Value, ability)) {
+                SelectedAbilityIndex = index;
             }
         }
 
-        private void AttackMob(Mob target) {
-            var usableAbilities = _gameInstance.UsableAbilities(
-                _gameInstance.TurnManager.CurrentMob,
-                target);
-
+        private void AttackMob(int targetId) {
             Debug.Assert(SelectedAbilityIndex != null,
                          "_gameInstance.TurnManager.SelectedAbilityIndex != null");
 
             var abilityIndex = SelectedAbilityIndex.Value;
-            var ability = _gameInstance.TurnManager.CurrentMob.Abilities[abilityIndex];
+            var mobId = _gameInstance.TurnManager.CurrentMob;
 
-            var usableAbility = usableAbilities.FirstOrDefault(ua => ua.Ability == ability);
-            if (usableAbility != null) {
-                _eventHub.BroadcastAbilityUsed(_gameInstance.TurnManager.CurrentMob, target, usableAbility)
-                         .LogContinuation();
+            Debug.Assert(mobId != null);
+            var abilityId = _gameInstance.MobManager.MobInfos[mobId.Value].Abilities[abilityIndex];
+
+            var visibilityPath =
+                _gameInstance.Map.AxialLinedraw(_gameInstance.State.MobInstances[mobId.Value].Coord,
+                                                _gameInstance.State.MobInstances[targetId].Coord);
+
+            bool isVisible = true;
+            foreach (var coord in visibilityPath) {
+                if (_gameInstance.Map[coord] == HexType.Wall) {
+                    isVisible = false;
+                }
+            }
+
+            if (isVisible) {
+                InputManager.Instance.UserInputEnabled = false;
+                _eventHub.SlowBroadcastAbilityUsed(mobId.Value, targetId, abilityId)
+                         .ContinueWith(t => { InputManager.Instance.UserInputEnabled = true; })
+                         .LogTask();
             } else {
-                ShowMessage("You can't use the selected ability on that target.");
+                ShowMessage("The target is not visible.");
             }
         }
 
@@ -276,19 +283,24 @@ namespace HexMage.GUI.Components {
             var currentMob = _gameInstance.TurnManager.CurrentMob;
 
             if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                var mob = _gameInstance.MobManager.AtCoord(mouseHex);
-                if (mob != null) {
-                    if (mob == currentMob) {
+                var targetId = _gameInstance.State.AtCoord(mouseHex);
+                if (targetId != null) {
+                    if (targetId == currentMob) {
                         ShowMessage("You can't target yourself.");
                     } else {
-                        if (mob.Hp == 0) {
+                        var mobInfo = _gameInstance.MobManager.MobInfos[currentMob.Value];
+                        var targetInstance = _gameInstance.State.MobInstances[targetId.Value];
+                        var targetInfo = _gameInstance.MobManager.MobInfos[targetId.Value];
+
+                        if (targetInstance.Hp == 0) {
                             ShowMessage("This mob is already dead.");
                         } else {
-                            if (mob.Team == currentMob.Team) {
+                            if (mobInfo.Team == targetInfo.Team) {
                                 ShowMessage("You can't target your team.");
                             } else if (SelectedAbilityIndex.HasValue) {
+                                // TODO - tohle by se melo kontrolovat mnohem driv
                                 if (abilitySelected) {
-                                    AttackMob(mob);
+                                    AttackMob(targetId.Value);
                                 } else {
                                     ShowMessage("You can't move here.");
                                 }
@@ -299,16 +311,20 @@ namespace HexMage.GUI.Components {
                     if (abilitySelected) {
                         ShowMessage("You can't cast spells on the ground.");
                     } else {
-                        if (_gameInstance.Map[mouseHex] == HexType.Empty) {
-                            var distance = currentMob.Coord.Distance(mouseHex);
+                        var mobInstance = _gameInstance.State.MobInstances[currentMob.Value];
 
-                            if (distance > currentMob.Ap) {
+                        if (_gameInstance.Map[mouseHex] == HexType.Empty) {
+                            var distance = _gameInstance.Pathfinder.Distance(mobInstance.Coord, mouseHex);
+
+                            if (distance == int.MaxValue) {
+                                ShowMessage("Target is unreachable");
+                            } else if (distance > mobInstance.Ap) {
                                 ShowMessage("You don't have enough AP.");
                             } else {
-                                _eventHub.BroadcastMobMoved(currentMob, mouseHex)
-                                         .ContinueWith((t, o) => t.LogContinuation(),
-                                                       TaskContinuationOptions.LongRunning,
-                                                       TaskScheduler.Default);
+                                InputManager.Instance.UserInputEnabled = false;
+                                _eventHub.SlowBroadcastMobMoved(currentMob.Value, mouseHex)
+                                         .ContinueWith(t => { InputManager.Instance.UserInputEnabled = true; })
+                                         .LogContinuation();
                             }
                         } else {
                             ShowMessage("You can't walk into a wall.");
@@ -319,24 +335,25 @@ namespace HexMage.GUI.Components {
         }
 
         private void UpdatePopovers(GameTime time, AxialCoord mouseHex) {
-            var camera = Camera2D.Instance;
-            var position = camera.MousePixelPos + _mouseHoverPopoverOffset;
-            var sin = (float) Math.Sin(time.TotalGameTime.TotalSeconds);
-            var offset = sin*sin*new Vector2(0, -5);
-
-            _emptyHexPopover.Position = position + offset;
-            _mobPopover.Position = position + offset;
+            _emptyHexPopover.Position = new Vector2(900, 800);
+            _mobPopover.Position = new Vector2(900, 800);
 
             _emptyHexPopover.Active = false;
             _mobPopover.Active = false;
 
             if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                var mob = _gameInstance.MobManager.AtCoord(mouseHex);
+                var mobId = _gameInstance.State.AtCoord(mouseHex);
 
-                if (mob == null) {
+                if (mobId == null) {
                     var map = _gameInstance.Map;
 
                     var labelText = new StringBuilder();
+
+                    // If there's no mob we can't calculate a distance from it
+                    if (_gameInstance.TurnManager.CurrentMob.HasValue) {
+                        var mobInstance = _gameInstance.State.MobInstances[_gameInstance.TurnManager.CurrentMob.Value];
+                        labelText.AppendLine($"Distance: {_gameInstance.Pathfinder.Distance(mobInstance.Coord, mouseHex)}");
+                    }
 
                     switch (map[mouseHex]) {
                         case HexType.Empty:
@@ -363,25 +380,29 @@ namespace HexMage.GUI.Components {
                 } else {
                     _mobPopover.Active = true;
                     var mobTextBuilder = new StringBuilder();
-                    mobTextBuilder.AppendLine($"HP {mob.Hp}/{mob.MaxHp}\nAP {mob.Ap}/{mob.MaxAp}");
-                    mobTextBuilder.AppendLine($"Iniciative: {mob.Iniciative}");
+                    var mobInstance = _gameInstance.State.MobInstances[mobId.Value];
+                    var mobInfo = _gameInstance.MobManager.MobInfos[mobId.Value];
+
+                    mobTextBuilder.AppendLine(
+                        $"HP {mobInstance.Hp}/{mobInfo.MaxHp}\nAP {mobInstance.Ap}/{mobInfo.MaxAp}");
+                    mobTextBuilder.AppendLine($"Iniciative: {mobInfo.Iniciative}");
                     mobTextBuilder.AppendLine();
 
                     mobTextBuilder.AppendLine("Buffs:");
-                    foreach (var buff in mob.Buffs)
+                    foreach (var buff in mobInstance.Buffs)
                         mobTextBuilder.AppendLine(
-                            $"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns {buff.MoveSpeedModifier}spd");
+                            $"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");
 
                     mobTextBuilder.AppendLine();
                     mobTextBuilder.AppendLine("Area buffs:");
 
-                    var areaBuffs = _gameInstance.Map.BuffsAt(mob.Coord);
-                    foreach (var buff in areaBuffs)
+                    foreach (var buff in _gameInstance.Map.BuffsAt(mobInstance.Coord)) {
                         mobTextBuilder.AppendLine(
-                            $"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns {buff.MoveSpeedModifier}spd");
+                            $"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");
+                    }
 
                     mobTextBuilder.AppendLine();
-                    mobTextBuilder.AppendLine($"Coord {mob.Coord}");
+                    mobTextBuilder.AppendLine($"Coord {mobInstance.Coord}");
 
                     _mobHealthLabel.Text = mobTextBuilder.ToString();
                 }
@@ -433,7 +454,7 @@ namespace HexMage.GUI.Components {
 
         private readonly TimeSpan _abilityPopoverDisplayTime = TimeSpan.FromSeconds(3);
 
-        private async Task BuildUsedAbilityPopover(Mob mob, Ability ability) {
+        private async Task BuildUsedAbilityPopover(int mobId, Ability ability) {
             var result = new VerticalLayout {
                 Renderer = new ColorRenderer(Color.LightGray),
                 Padding = _popoverPadding,
@@ -444,7 +465,11 @@ namespace HexMage.GUI.Components {
             var camera = Camera2D.Instance;
 
             result.AddComponent(
-                () => { result.Position = camera.HexToPixelWorld(mob.Coord) + _usedAbilityOffset; });
+                () => {
+                    result.Position =
+                        camera.HexToPixelWorld(_gameInstance.State.MobInstances[mobId].Coord) +
+                        _usedAbilityOffset;
+                });
 
             string labelText = $"{ability.Dmg}DMG cost {ability.Cost}";
             result.AddChild(new Label(labelText, _assetManager.Font));
@@ -454,6 +479,25 @@ namespace HexMage.GUI.Components {
             await Task.Delay(_abilityPopoverDisplayTime);
 
             Entity.Scene.DestroyEntity(result);
+        }
+
+        private void UnselectAbilityIfNeeded() {
+            var mobId = _gameInstance.TurnManager.CurrentMob;
+            if (mobId == null || !SelectedAbilityIndex.HasValue) return;
+
+            var mobInfo = _gameInstance.MobManager.MobInfos[mobId.Value];
+            var selectedAbility = mobInfo.Abilities[SelectedAbilityIndex.Value];
+
+            if (!_gameInstance.IsAbilityUsable(mobId.Value, selectedAbility)) {
+                SelectedAbilityIndex = null;
+            }
+        }
+
+        public Task ShowMessage(string message, int displayForSeconds = 5) {
+            _messageBoxLabel.Text = message;
+            _displayMessageBoxUntil = DateTime.Now.Add(TimeSpan.FromSeconds(displayForSeconds));
+
+            return Task.Delay(TimeSpan.FromSeconds(displayForSeconds));
         }
     }
 }

@@ -2,8 +2,10 @@
 using System.CodeDom;
 using System.Collections.Generic;
 using HexMage.Simulator.Model;
+using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
+    // TODO - rename
     public enum AbilityElement {
         Earth,
         Fire,
@@ -11,21 +13,24 @@ namespace HexMage.Simulator {
         Water
     }
 
-    public class Ability : IDeepCopyable<Ability> {
+#warning TODO - this should be a struct
+    public class Ability {
         public int Dmg { get; set; }
         public int Cost { get; set; }
         public int Range { get; set; }
         public int Cooldown { get; set; }
-        public int CurrentCooldown { get; set; }
         public AbilityElement Element { get; set; }
         public List<Buff> Buffs { get; set; }
         public List<AreaBuff> AreaBuffs { get; set; }
 
+        public Ability() {}
+
         public Ability(int dmg, int cost, int range, int cooldown, AbilityElement element)
-            : this(dmg, cost, range, cooldown, element, new List<Buff>(), new List<AreaBuff>()) {}
+            : this(dmg, cost, range, cooldown, element, new List<Buff>(), new List<AreaBuff>()) {
+        }
 
         public Ability(int dmg, int cost, int range, int cooldown, AbilityElement element, List<Buff> buffs,
-                       List<AreaBuff> areaBuffs) {
+            List<AreaBuff> areaBuffs) {
             Dmg = dmg;
             Cost = cost;
             Range = range;
@@ -33,40 +38,39 @@ namespace HexMage.Simulator {
             Element = element;
             Buffs = buffs;
             AreaBuffs = areaBuffs;
-            CurrentCooldown = 0;
         }
 
+#warning TODO - ulozit je do nejaky tabulky a jenom referencovat
+        [JsonIgnore]
         public Buff ElementalEffect {
             get {
                 switch (Element) {
                     case AbilityElement.Earth:
-                        return new Buff(AbilityElement.Earth, 0, 0, 1, 0.5f);
+                        return new Buff(AbilityElement.Earth, 0, 0, 1);
                     case AbilityElement.Fire:
                         return new Buff(AbilityElement.Fire, -1, 0, 2);
                     case AbilityElement.Air:
-                        return new Buff(AbilityElement.Air, 0, 0, 1, 2f);
+                        return new Buff(AbilityElement.Air, 0, 0, 1);
                     case AbilityElement.Water:
-                        return new Buff(AbilityElement.Water, 0, 0, 1, 1, new List<AbilityElement>() {
-                                            AbilityElement.Air
-                                        });
+                        return new Buff(AbilityElement.Water, 0, 0, 1);
                     default:
                         throw new InvalidOperationException("Invalid element type");
                 }
             }
-        }
+        }        
 
-        public Ability DeepCopy() {
-            var buffsCopy = new List<Buff>();
-            foreach (var buff in Buffs) {
-                buffsCopy.Add(buff.DeepCopy());
-            }
-            var areaBuffsCopy = new List<AreaBuff>();
-            foreach (var areaBuff in AreaBuffs) {
-                areaBuffsCopy.Add(areaBuff.DeepCopy());
-            }
+        //public Ability DeepCopy() {
+        //    var buffsCopy = new List<Buff>();
+        //    foreach (var buff in Buffs) {
+        //        buffsCopy.Add(buff);
+        //    }
+        //    var areaBuffsCopy = new List<AreaBuff>();
+        //    foreach (var areaBuff in AreaBuffs) {
+        //        areaBuffsCopy.Add(areaBuff);
+        //    }
 
-            var copy = new Ability(Dmg, Cost, Range, Cooldown, Element, buffsCopy, areaBuffsCopy);
-            return copy;
-        }
+        //    var copy = new Ability(Id, Dmg, Cost, Range, Cooldown, Element, buffsCopy, areaBuffsCopy);
+        //    return copy;
+        //}
     }
 }

@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 using HexMage.GUI.Components;
 using HexMage.GUI.Core;
@@ -16,26 +16,33 @@ namespace HexMage.GUI.Scenes {
         private readonly GameInstance _gameInstance;
         private readonly Entity _defenseModal;
         private readonly GameEventHub _gameEventHub;
-        private readonly ReplayRecorder _replayRecorder;
+        public readonly Dictionary<int, MobEntity> MobEntities = new Dictionary<int, MobEntity>();
+
+        private GameBoardController _gameBoardController;
+        private LogBox _logBox;
 
         public ArenaScene(GameManager gameManager, GameInstance gameInstance) : base(gameManager) {
             _gameInstance = gameInstance;
 
-            _replayRecorder = new ReplayRecorder();
-
             _defenseModal = new VerticalLayout {
-                SortOrder = Camera2D.SortUI,
+                SortOrder = Camera2D.SortUI + 1000,
                 Padding = new Vector4(20),
                 Renderer = new ColorRenderer(Color.LightGray),
                 Position = new Vector2(500, 250),
                 Active = false
             };
-            
+
             _gameEventHub = new GameEventHub(_gameInstance);
         }
 
         public override void Initialize() {
-            _gameInstance.TurnManager.StartNextTurn(_gameInstance.Pathfinder);
+            //_gameInstance.MobManager.Reset();
+            //_gameInstance.Map.PrecomputeCubeLinedraw();
+            //_gameInstance.Pathfinder.PathfindDistanceAll();
+
+            //// TODO - vyresit kdy presne volat presort (mozna nejaky unifikovany initialize?)
+            //_gameInstance.TurnManager.PresortTurnOrder();
+            //_gameInstance.TurnManager.StartNextTurn(_gameInstance.Pathfinder);
 
             Camera2D.Instance.Translate = new Vector3(600, 500, 0);
 
@@ -45,37 +52,30 @@ namespace HexMage.GUI.Scenes {
 
             AddAndInitializeRootEntity(_logBox, _assetManager);
 
-            var buttons = new Panel();
-
-            var btnYes = new TextButton("Yes", _assetManager.Font) {
-                Position = new Vector2(40, 10)
-            };
-            var btnNo = new TextButton("No", _assetManager.Font) {
-                Position = new Vector2(100, 10)
-            };
-
-            btnYes.OnClick += _ => FinalizeDefenseModal(DefenseDesire.Block);
-            btnNo.OnClick += _ => FinalizeDefenseModal(DefenseDesire.Pass);
-
-            buttons.AddChild(btnYes);
-            buttons.AddChild(btnNo);
-
-            _defenseModal.AddChild(new Label("Do you want to defend?", _assetManager.Font));
-            _defenseModal.AddChild(buttons);
-
-            AddAndInitializeRootEntity(_defenseModal, _assetManager);
-
             var gameBoardEntity = CreateRootEntity(Camera2D.SortBackground);
-            var gameBoardController = new GameBoardController(_gameInstance, _gameEventHub, _replayRecorder, this);
+            var gameBoardController = new GameBoardController(_gameInstance, _gameEventHub, this);
             _gameBoardController = gameBoardController;
             gameBoardEntity.AddComponent(gameBoardController);
-            gameBoardEntity.Renderer = new GameBoardRenderer(_gameInstance, gameBoardController, _camera);
+            gameBoardEntity.Renderer = new GameBoardRenderer(_gameInstance, gameBoardController, _gameEventHub, _camera);
             gameBoardEntity.CustomBatch = true;
 
             _gameEventHub.AddSubscriber(gameBoardController);
-            _gameEventHub.AddSubscriber(_replayRecorder);
 
             BuildUi();
+
+            foreach (var mobId in _gameInstance.MobManager.Mobs) {
+                var mobAnimationController = new MobAnimationController(_gameInstance);
+                var mobEntity = new MobEntity(mobId, _gameInstance) {
+                    SortOrder = Camera2D.SortUI,
+                    // TODO - fetch the animation controller via GetComponent<T>
+                    Renderer = new MobRenderer(_gameInstance, mobId, mobAnimationController),
+                    Transform = () => Camera2D.Instance.Transform
+                };
+                mobEntity.AddComponent(mobAnimationController);
+
+                AddAndInitializeRootEntity(mobEntity, _assetManager);
+                MobEntities[mobId] = mobEntity;
+            }
         }
 
         private enum ParticleEffectSettings {
@@ -86,7 +86,7 @@ namespace HexMage.GUI.Scenes {
         public override void Cleanup() {}
 
         private void BuildUi() {
-            Func<string> gameStateTextFunc = () => _gameInstance.IsFinished() ? "Game finished" : "Game in progress";
+            Func<string> gameStateTextFunc = () => _gameInstance.IsFinished ? "Game finished" : "Game in progress";
             var gameStateLabel = new Label(gameStateTextFunc, _assetManager.Font) {
                 SortOrder = Camera2D.SortUI,
                 Position = new Vector2(400, 50)
@@ -110,23 +110,25 @@ namespace HexMage.GUI.Scenes {
             };
             AddAndInitializeRootEntity(hoverLayout, _assetManager);
 
-            Func<Mob> currentMobFunc = () => _gameInstance.TurnManager.CurrentMob;
-            Func<Mob> hoverMobFunc = () => {
+#warning TODO - this shouldn't be a func, but rater pass it directly
+            Func<GameInstance> gameFunc = () => _gameInstance;
+            Func<int?> currentMobFunc = () => _gameInstance.TurnManager.CurrentMob;
+            Func<int?> hoverMobFunc = () => {
                 var mouseHex = Camera2D.Instance.MouseHex;
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                    return _gameInstance.MobManager.AtCoord(mouseHex);
+                    return _gameInstance.State.AtCoord(mouseHex);
                 } else {
                     return null;
                 }
             };
 
-            for (int i = 0; i < Mob.NumberOfAbilities; i++) {
-                currentLayout.AddChild(AbilityDetail(currentMobFunc, i, ParticleEffectSettings.HighlightParticles));
-                hoverLayout.AddChild(AbilityDetail(hoverMobFunc, i, ParticleEffectSettings.NoParticles));
+            for (int i = 0; i < MobInfo.NumberOfAbilities; i++) {
+                currentLayout.AddChild(AbilityDetail(gameFunc, currentMobFunc, i, ParticleEffectSettings.HighlightParticles));
+                hoverLayout.AddChild(AbilityDetail(gameFunc, hoverMobFunc, i, ParticleEffectSettings.NoParticles));
             }
         }
 
-        private Entity AbilityDetail(Func<Mob> mobFunc, int abilityIndex, ParticleEffectSettings particleEffectSettings) {
+        private Entity AbilityDetail(Func<GameInstance> gameFunc, Func<int?> mobFunc, int abilityIndex, ParticleEffectSettings particleEffectSettings) {
             var abilityDetailWrapper = new Entity {
                 SizeFunc = () => new Vector2(120, 80)
             };
@@ -185,7 +187,8 @@ namespace HexMage.GUI.Scenes {
                     var mob = mobFunc();
                     if (_gameBoardController.SelectedAbilityIndex.HasValue && mob != null) {
                         int index = _gameBoardController.SelectedAbilityIndex.Value;
-                        return ElementColor(mob.Abilities[index].Element);
+                        var ability = _gameInstance.MobManager.AbilityForId(_gameInstance.MobManager.MobInfos[mob.Value].Abilities[index]);
+                        return ElementColor(ability.Element);
                     } else {
                         return Color.White;
                     }
@@ -197,7 +200,8 @@ namespace HexMage.GUI.Scenes {
                 abilityDetailWrapper.AddChild(particles);
             }
 
-            var abilityUpdater = new AbilityUpdater(mobFunc,
+            var abilityUpdater = new AbilityUpdater(gameFunc,
+                                                    mobFunc,
                                                     abilityIndex,
                                                     dmgLabel,
                                                     rangeLabel,
@@ -207,31 +211,12 @@ namespace HexMage.GUI.Scenes {
             abilityDetail.AddComponent(abilityUpdater);
 
             abilityUpdater.OnClick += index => {
-                Console.WriteLine($"ABILITY EVENT, time {DateTime.Now.Millisecond}");
-
                 _gameBoardController.SelectAbility(index);
             };
 
             return abilityDetailWrapper;
         }
 
-        private void FinalizeDefenseModal(DefenseDesire desire) {
-            Debug.Assert(_defenseDesireSource != null, "Defense desire modal wasn't properly initialized");
-            _defenseDesireSource.SetResult(desire);
-            _defenseDesireSource = null;
-            _defenseModal.Active = false;
-        }
-
-        private TaskCompletionSource<DefenseDesire> _defenseDesireSource;
-        private GameBoardController _gameBoardController;
-        private LogBox _logBox;
-
-        public Task<DefenseDesire> RequestDesireToDefend(Mob mob, Ability ability) {
-            _defenseModal.Active = true;
-            _defenseDesireSource = new TaskCompletionSource<DefenseDesire>();
-
-            return _defenseDesireSource.Task;
-        }
 
         private Color ElementColor(AbilityElement element) {
             switch (element) {

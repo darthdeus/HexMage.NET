@@ -1,18 +1,19 @@
-﻿using HexMage.Simulator.Model;
+﻿namespace HexMage.Simulator.Model {
+    public struct AreaBuff {
+        public AxialCoord Coord;
+        public int Radius;
+        public Buff Effect;
 
-namespace HexMage.Simulator {
-    public class AreaBuff : IDeepCopyable<AreaBuff> {
-        public int Radius { get; set; }
-
-        public Buff Effect { get; set; }
-
-        public AreaBuff(int radius, Buff effect) {
+        public AreaBuff(AxialCoord coord, int radius, Buff effect) {
+            Coord = coord;
             Radius = radius;
             Effect = effect;
         }
 
-        public AreaBuff DeepCopy() {
-            return new AreaBuff(Radius, Effect.DeepCopy());
+        public void DecreaseLifetime() {
+            var copy = Effect;
+            copy.Lifetime--;
+            Effect = copy;
         }
 
         public override string ToString() {

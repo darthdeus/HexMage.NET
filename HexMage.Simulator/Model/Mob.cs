@@ -1,79 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using HexMage.Simulator;
-using HexMage.Simulator.Model;
+using Newtonsoft.Json;
 
 namespace HexMage.Simulator.Model {
-    public class Mob : IResettable {
+    public struct MobInfo {
         public static readonly int NumberOfAbilities = 6;
 
-        private static int _lastId = 0;
-        public int Id { get; private set; }
-
-        public int Hp { get; set; }
-        public int Ap { get; set; }
         public int MaxHp { get; set; }
         public int MaxAp { get; set; }
-        public int DefenseCost { get; set; }
         public int Iniciative { get; set; }
 
-        public List<Ability> Abilities { get; set; }
+        public List<int> Abilities { get; set; }
         public TeamColor Team { get; set; }
-        public AxialCoord Coord { get; set; }
-        public AxialCoord OrigCoord { get; set; }
-        public static int AbilityCount => 6;
-        public object Metadata { get; set; }
-        public List<Buff> Buffs { get; set; } = new List<Buff>();
+        public AxialCoord OrigCoord;
 
-        public Mob(TeamColor team, int maxHp, int maxAp, int defenseCost, int iniciative, List<Ability> abilities) {
+        public static int AbilityCount => 6;
+
+        public MobInfo(TeamColor team, int maxHp, int maxAp, int iniciative, List<int> abilities) {
             Team = team;
             MaxHp = maxHp;
             MaxAp = maxAp;
-            DefenseCost = defenseCost;
             Iniciative = iniciative;
             Abilities = abilities;
-            Hp = maxHp;
-            Ap = maxAp;
-            Coord = new AxialCoord(0, 0);
-            OrigCoord = Coord;
-            Id = _lastId++;
+            OrigCoord = AxialCoord.Zero;
+        }
+    }
+
+    public struct MobInstance {
+        public static readonly int InvalidId = -1;
+        public int Id;
+        public AxialCoord Coord;
+        public int Hp;
+        public int Ap;
+        public List<Buff> Buffs { get; set; }
+
+        public MobInstance(int id) : this() {
+            Id = id;
+            Buffs = new List<Buff>();
+        }
+
+        public MobInstance DeepCopy() {
+            var copy = new MobInstance(Id) {
+                Coord = Coord,
+                Hp = Hp,
+                Ap = Ap
+            };
+
+            var buffs = new List<Buff>();
+
+            foreach (var buff in Buffs) {
+                buffs.Add(buff);
+            }
+
+            copy.Buffs = buffs;
+
+            return copy;
         }
 
         public override string ToString() {
-            return $"{Hp}/{MaxHp} {Ap}/{MaxAp}";
-        }
-
-        public void Reset() {
-            Buffs.Clear();
-            Coord = OrigCoord;
-            Hp = MaxHp;
-            Ap = MaxAp;
-            Metadata = null;
-        }
-
-        public float SpeedModifier => Buffs.Select(b => b.MoveSpeedModifier)
-                                           .Aggregate(1.0f, (a, m) => a*(1/m));
-
-        public int ModifiedDistance(int distance) {
-            return (int) Math.Round(distance*SpeedModifier);
-        }
-
-        public Mob DeepCopy() {
-            var abilitiesCopy = new List<Ability>();
-            foreach (var ability in Abilities) {
-                abilitiesCopy.Add(ability.DeepCopy());
-            }
-
-            var copy = new Mob(Team, MaxHp, MaxAp, DefenseCost, Iniciative, abilitiesCopy);
-            copy.Coord = Coord;
-            copy.Metadata = null;
-
-            foreach (var buff in Buffs) {
-                copy.Buffs.Add(buff.DeepCopy());
-            }
-
-            return copy;
+            return $"{Hp}HP {Ap}AP {Coord}";
         }
     }
 }
