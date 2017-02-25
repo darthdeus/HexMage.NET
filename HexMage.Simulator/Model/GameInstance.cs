@@ -50,6 +50,16 @@ namespace HexMage.Simulator {
             }
         }
 
+        public IMobController VictoryController {
+            get {
+                if (VictoryTeam.HasValue) {
+                    return MobManager.Teams[VictoryTeam.Value];
+                } else {
+                    return null;
+                }
+            }
+        }
+
         public GameInstance(Map map, MobManager mobManager) {
             Map = map;
             MobManager = mobManager;

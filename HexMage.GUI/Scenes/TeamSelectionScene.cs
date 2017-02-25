@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Reflection;
 using System.Text;
 using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
@@ -38,26 +35,10 @@ namespace HexMage.GUI.Scenes {
                 new AiRandomController(_gameInstance),
                 new MctsController(_gameInstance)
             };
-
-            LoadAiControllers(@"..\..\..\..\..\HexMage.AI\bin\Debug\HexMage.AI.dll", _gameInstance, _controllerList);
         }
 
         private const int MinTeamSize = 1;
         private const int MaxTeamSize = 7;
-
-        public void LoadAiControllers(string file, GameInstance gameInstance, List<IMobController> controllers) {
-            if (File.Exists(file)) {
-                Assembly dll = Assembly.LoadFrom(file);
-                Type[] types = dll.GetExportedTypes();
-
-                foreach (var type in types) {
-                    if (type != null && type.GetInterface(nameof(HexMage.Simulator.IMobController)) != null) {
-                        IMobController controller = (IMobController) Activator.CreateInstance(type, gameInstance);
-                        controllers.Add(controller);
-                    }
-                }
-            }
-        }
 
         public override void Initialize() {
             var left = new VerticalLayout {
@@ -189,10 +170,7 @@ namespace HexMage.GUI.Scenes {
             }
 
             _mobManager.InitializeState(_gameInstance.State);
-
             _gameInstance.State.SlowUpdateIsFinished(_mobManager);
-            //_gameInstance.State.RedAlive = t1size;
-            //_gameInstance.State.BlueAlive = t2size;
         }
 
         public Entity BuildMobPreview(Func<int> mobFunc) {

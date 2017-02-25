@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using HexMage.Simulator;
+using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.PCG;
 
@@ -162,7 +163,25 @@ namespace HexMage.Benchmarks {
 
     internal class Program {
         private static void Main(string[] args) {
-            for (int i = 0; i < 10; i++) {
+            Console.WriteLine("Choose:");
+            Console.WriteLine();
+            Console.WriteLine("\t1) Benchmark");
+            Console.WriteLine("\t2) Team evaluation");
+
+            var key = Console.ReadKey();
+            if (key.Key == ConsoleKey.D2) {
+                var data = JsonLoader.Load(@"c:\dev\simple.json");
+                Console.WriteLine(data);
+                //new GameInstanceEvaluator().Evaluate();
+            } else {
+                RunBenchmarks();
+            }
+            
+        }
+
+        private static void RunBenchmarks() {
+            for (int i = 0; i < 10; i++)
+            {
                 new Tester().Run();
             }
         }
