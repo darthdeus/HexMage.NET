@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator.AI
 {
@@ -23,6 +24,8 @@ namespace HexMage.Simulator.AI
                 new MctsFactory(20)
             };
 
+            var result = new EvaluationResult();
+
             foreach (var factory1 in factories) {
                 foreach (var factory2 in factories) {
                     var game = _gameInstance.DeepCopy();
@@ -30,6 +33,9 @@ namespace HexMage.Simulator.AI
 
                     var ai1 = factory1.Build(game);
                     var ai2 = factory2.Build(game);
+
+                    game.MobManager.Teams[TeamColor.Red] = ai1;
+                    game.MobManager.Teams[TeamColor.Blue] = ai2;
 
                     int iterations = 500;
 
@@ -43,14 +49,21 @@ namespace HexMage.Simulator.AI
                         Debug.Assert(game.VictoryController != null);
 
                         Console.WriteLine($"Won {game.VictoryTeam.Value} - {game.VictoryController}");
+                        if (game.VictoryTeam == TeamColor.Red) {
+                            result.RedWins++;
+                        } else {
+                            result.BlueWins++;
+                        }
                     } else {
+                        result.Draws++;
                         Console.WriteLine("DRAW");
                     }
+
+                    result.Total++;
                 }
             }
 
-            // TODO - figure out a format for the evaluation result
-            return new EvaluationResult();
+            return result;
         }
     }
 
@@ -79,6 +92,13 @@ namespace HexMage.Simulator.AI
     }
 
     public struct EvaluationResult {
-        
+        public int RedWins;
+        public int BlueWins;
+        public int Draws;
+        public int Total;
+
+        public override string ToString() {
+            return $"{RedWins}/{BlueWins} (draws: {Draws}), total: {Total}";
+        }
     }
 }

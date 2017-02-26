@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using HexMage.Simulator;
@@ -90,10 +91,10 @@ namespace HexMage.Benchmarks {
                     gameInstance.DeepCopy();
                     copyStopwatch.Stop();
 
-                    if (iterations%dumpIterations == 0) {
-                        double secondsPerThousand = (double) copyStopwatch.ElapsedTicks/Stopwatch.Frequency;
+                    if (iterations % dumpIterations == 0) {
+                        double secondsPerThousand = (double) copyStopwatch.ElapsedTicks / Stopwatch.Frequency;
                         double msPerCopy = secondsPerThousand;
-                        Console.WriteLine($"Copy {msPerCopy:0.00}ms, 1M in: {secondsPerThousand*1000}s");
+                        Console.WriteLine($"Copy {msPerCopy:0.00}ms, 1M in: {secondsPerThousand * 1000}s");
                         copyStopwatch.Reset();
                     }
                 }
@@ -118,7 +119,7 @@ namespace HexMage.Benchmarks {
                 int dumpIterations = 1;
 
                 int totalIterations = 500000;
-                double ratio = 1000000/totalIterations;
+                double ratio = 1000000 / totalIterations;
 
                 while (iterations < totalIterations) {
                     iterations++;
@@ -140,15 +141,15 @@ namespace HexMage.Benchmarks {
                 roundsPerThousand += rounds.Result;
 #endif
 
-                    if (iterations%dumpIterations == 0) {
+                    if (iterations % dumpIterations == 0) {
                         double perThousandMs = Math.Round(stopwatch.Elapsed.TotalMilliseconds, 2);
 
                         double estimateSecondsPerMil =
-                            Math.Round(totalStopwatch.Elapsed.TotalSeconds/iterations*totalIterations, 2);
-                        double perGame = Math.Round(perThousandMs/dumpIterations*1000, 2);
+                            Math.Round(totalStopwatch.Elapsed.TotalSeconds / iterations * totalIterations, 2);
+                        double perGame = Math.Round(perThousandMs / dumpIterations * 1000, 2);
 
                         Console.WriteLine(
-                            $"Starting a new game {iterations:00000}, {roundsPerThousand/dumpIterations} average rounds, {perThousandMs:00.00}ms\trunning average per 1M: {estimateSecondsPerMil*ratio:00.00}s, per game: {perGame:00.00}us");
+                            $"Starting a new game {iterations:00000}, {roundsPerThousand / dumpIterations} average rounds, {perThousandMs:00.00}ms\trunning average per 1M: {estimateSecondsPerMil * ratio:00.00}s, per game: {perGame:00.00}us");
                         roundsPerThousand = 0;
                         stopwatch.Reset();
                     }
@@ -170,18 +171,44 @@ namespace HexMage.Benchmarks {
 
             var key = Console.ReadKey();
             if (key.Key == ConsoleKey.D2) {
-                var data = JsonLoader.Load(@"c:\dev\simple.json");
-                Console.WriteLine(data);
-                //new GameInstanceEvaluator().Evaluate();
+                RunEvaluator();
             } else {
                 RunBenchmarks();
             }
-            
+        }
+
+        private static void RunEvaluator() {
+            string content = File.ReadAllText(@"c:\dev\simple.json");
+            var setup = JsonLoader.Load(content);
+
+            var game = new GameInstance(5);
+            var mobIds = new List<int>();
+
+            foreach (var mob in setup.red) {
+                var ids = mob.abilities.Select(ab => game.AddAbilityWithInfo(ab.ToAbility()));
+                mobIds.Add(game.AddMobWithInfo(mob.ToMobInfo(TeamColor.Red, ids)));
+            }
+
+            foreach (var mob in setup.blue) {
+                var ids = mob.abilities.Select(ab => game.AddAbilityWithInfo(ab.ToAbility()));
+                mobIds.Add(game.AddMobWithInfo(mob.ToMobInfo(TeamColor.Blue, ids)));
+            }
+
+            game.State.SetMobPosition(mobIds[0], new AxialCoord(2, 3));
+            game.State.SetMobPosition(mobIds[1], new AxialCoord(3, 2));
+
+            game.State.SetMobPosition(mobIds[2], new AxialCoord(-2, -3));
+            game.State.SetMobPosition(mobIds[3], new AxialCoord(-3, -2));
+
+            game.PrepareEverything();
+
+            var result = new GameInstanceEvaluator(game).Evaluate();
+
+            Console.WriteLine(result);
         }
 
         private static void RunBenchmarks() {
-            for (int i = 0; i < 10; i++)
-            {
+            for (int i = 0; i < 10; i++) {
                 new Tester().Run();
             }
         }

@@ -19,6 +19,10 @@ namespace HexMage.Simulator {
         private MobManager MobManager => _gameInstance.MobManager;
         private GameState State => _gameInstance.State;
 
+        public TurnManager(GameInstance gameInstance) {
+            _gameInstance = gameInstance;
+        }
+
         public IMobController CurrentController
             => CurrentMob != null ? MobManager.Teams[MobManager.MobInfos[CurrentMob.Value].Team] : null;
 
@@ -34,10 +38,9 @@ namespace HexMage.Simulator {
             }
         }
 
-        public TurnManager(GameInstance gameInstance) {
-            _gameInstance = gameInstance;
-        }
-
+        /// <summary>
+        /// Prepare turn order for the initial mob configuration
+        /// </summary>
         public void PresortTurnOrder() {
             _presortedOrder = MobManager.Mobs.ToList();
             _presortedOrder.Sort((a, b) => {
@@ -96,6 +99,16 @@ namespace HexMage.Simulator {
 
         public TurnManager DeepCopy(GameInstance gameInstanceCopy) {
             var copy = new TurnManager(gameInstanceCopy);
+
+            // TODO - this is certainly the wrong place to do it, but at some point the game instance needs to be initialized
+            if (_presortedOrder == null) {
+                Utils.Log(LogSeverity.Warning, nameof(TurnManager), "Initiated DeepCopy on an uninitialized GameInstance");
+                PresortTurnOrder();
+            }
+
+            if (_turnOrder == null) {
+                CopyTurnOrderFromPresort();
+            }
 
             copy._presortedOrder = _presortedOrder.ToList();
             copy._turnOrder = _turnOrder.ToList();

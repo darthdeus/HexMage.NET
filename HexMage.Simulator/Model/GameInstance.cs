@@ -22,6 +22,39 @@ namespace HexMage.Simulator {
 
         public bool IsFinished => State.IsFinished;
 
+        public GameInstance(Map map, MobManager mobManager) {
+            Map = map;
+            MobManager = mobManager;
+
+            Size = map.Size;
+            Pathfinder = new Pathfinder(this);
+            TurnManager = new TurnManager(this);
+            State = new GameState();
+            State.MobPositions = new HexMap<int?>(Size);
+        }
+
+        public GameInstance(int size) : this(new Map(size)) {}
+        public GameInstance(Map map) : this(map, new MobManager()) {}
+
+        private GameInstance(int size, Map map, MobManager mobManager, Pathfinder pathfinder) {
+            Size = size;
+            MobManager = mobManager;
+            Map = map;
+            Pathfinder = pathfinder;
+            TurnManager = new TurnManager(this);
+            State = new GameState();
+            State.MobPositions = new HexMap<int?>(Size);
+        }
+
+        public void PrepareEverything() {
+            State.Reset(MobManager);
+            Map.PrecomputeCubeLinedraw();
+            Pathfinder.PathfindDistanceAll();
+            TurnManager.PresortTurnOrder();
+            TurnManager.StartNextTurn(Pathfinder, State);
+            State.SlowUpdateIsFinished(MobManager);
+        }
+
         public TeamColor? CurrentTeam {
             get {
                 var currentMob = TurnManager.CurrentMob;
@@ -58,39 +91,6 @@ namespace HexMage.Simulator {
                     return null;
                 }
             }
-        }
-
-        public GameInstance(Map map, MobManager mobManager) {
-            Map = map;
-            MobManager = mobManager;
-
-            Size = map.Size;
-            Pathfinder = new Pathfinder(this);
-            TurnManager = new TurnManager(this);
-            State = new GameState();
-            State.MobPositions = new HexMap<int?>(Size);
-        }
-
-        public GameInstance(int size) : this(new Map(size)) {}
-        public GameInstance(Map map) : this(map, new MobManager()) {}
-
-        private GameInstance(int size, Map map, MobManager mobManager, Pathfinder pathfinder) {
-            Size = size;
-            MobManager = mobManager;
-            Map = map;
-            Pathfinder = pathfinder;
-            TurnManager = new TurnManager(this);
-            State = new GameState();
-            State.MobPositions = new HexMap<int?>(Size);
-        }
-
-        public void PrepareEverything() {
-            State.Reset(MobManager);
-            Map.PrecomputeCubeLinedraw();
-            Pathfinder.PathfindDistanceAll();
-            TurnManager.PresortTurnOrder();
-            TurnManager.StartNextTurn(Pathfinder, State);
-            State.SlowUpdateIsFinished(MobManager);
         }
 
         public bool IsAbilityUsable(int mobId, int abilityId) {

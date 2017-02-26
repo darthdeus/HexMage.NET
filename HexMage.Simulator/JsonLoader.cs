@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HexMage.Simulator.Model;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator
@@ -12,23 +13,35 @@ namespace HexMage.Simulator
         public int ap;
         public int range;
         public int cooldown;
+
+        public Ability ToAbility() {
+            return new Ability(dmg, ap, range, cooldown, AbilityElement.Fire);
+        }
     }
 
     public class JsonMob {
         public int hp;
         public int ap;
         public List<JsonAbility> abilities;
+
+        public MobInfo ToMobInfo(TeamColor color, IEnumerable<int> abilityIds) {
+            return new MobInfo(color, hp, ap, 0, abilityIds.ToList());
+        }
     }
 
     public class Team {
-        public string color;
         public List<JsonMob> mobs;
+    }
+
+    public class Setup {
+        public List<JsonMob> red;
+        public List<JsonMob> blue;
     }
 
     public class JsonLoader
     {
-        public static List<JsonMob> Load(string filename) {
-            return JsonConvert.DeserializeObject<List<JsonMob>>(filename);
+        public static Setup Load(string content) {
+            return JsonConvert.DeserializeObject<Setup>(content);
         }
     }
 }
