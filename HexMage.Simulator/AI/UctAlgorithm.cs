@@ -20,6 +20,7 @@ namespace HexMage.Simulator {
                 Backup(v, delta);
             }
 
+#if DOTGRAPH
             var builder = new StringBuilder();
 
             builder.AppendLine("digraph G {");
@@ -29,6 +30,7 @@ namespace HexMage.Simulator {
             string str = builder.ToString();
 
             File.WriteAllText("c:\\dev\\graph.dot", str);
+#endif
 
             UctNode result = root.Children[0];
 

@@ -19,12 +19,15 @@ namespace HexMage.Simulator
             UctAlgorithm.FNoCopy(_gameInstance, action);
         }
 
-        
         public Task SlowPlayTurn(GameEventHub eventHub) {
             FastPlayTurn(eventHub);
             return Task.CompletedTask;
         }
 
         public string Name => nameof(AiRandomController);
+
+        public override string ToString() {
+            return "AI_Rule";
+        }
     }
 }

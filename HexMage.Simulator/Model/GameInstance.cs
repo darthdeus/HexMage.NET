@@ -93,6 +93,20 @@ namespace HexMage.Simulator {
             }
         }
 
+        public IMobController LoserController {
+            get {
+                if (VictoryTeam.HasValue) {
+                    if (VictoryTeam.Value == TeamColor.Red) {
+                        return MobManager.Teams[TeamColor.Blue];
+                    } else {
+                        return MobManager.Teams[TeamColor.Red];
+                    }
+                } else {
+                    return null;
+                }
+            }
+        }
+
         public bool IsAbilityUsable(int mobId, int abilityId) {
             var ability = MobManager.AbilityForId(abilityId);
             var mob = State.MobInstances[mobId];

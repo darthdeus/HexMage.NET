@@ -14,6 +14,16 @@ namespace HexMage.Simulator
         public int range;
         public int cooldown;
 
+        public JsonAbility() {
+        }
+
+        public JsonAbility(int dmg, int ap, int range, int cooldown) {
+            this.dmg = dmg;
+            this.ap = ap;
+            this.range = range;
+            this.cooldown = cooldown;
+        }
+
         public Ability ToAbility() {
             return new Ability(dmg, ap, range, cooldown, AbilityElement.Fire);
         }
@@ -42,6 +52,10 @@ namespace HexMage.Simulator
     {
         public static Setup Load(string content) {
             return JsonConvert.DeserializeObject<Setup>(content);
+        }
+
+        public static Team LoadTeam(string content) {
+            return JsonConvert.DeserializeObject<Team>(content);
         }
     }
 }

@@ -7,10 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using HexMage.Simulator.Model;
 
-namespace HexMage.Simulator.AI
-{
-    public class GameInstanceEvaluator
-    {
+namespace HexMage.Simulator.AI {
+    public class GameInstanceEvaluator {
         private readonly GameInstance _gameInstance;
 
         public GameInstanceEvaluator(GameInstance gameInstance) {
@@ -37,7 +35,8 @@ namespace HexMage.Simulator.AI
                     game.MobManager.Teams[TeamColor.Red] = ai1;
                     game.MobManager.Teams[TeamColor.Blue] = ai2;
 
-                    int iterations = 500;
+                    const int maxIterations = 500;
+                    int iterations = maxIterations;
 
                     while (!game.IsFinished && iterations-- > 0) {
                         game.TurnManager.CurrentController.FastPlayTurn(hub);
@@ -48,7 +47,8 @@ namespace HexMage.Simulator.AI
                         Debug.Assert(game.VictoryTeam.HasValue);
                         Debug.Assert(game.VictoryController != null);
 
-                        Console.WriteLine($"Won {game.VictoryTeam.Value} - {game.VictoryController}");
+                        //Console.WriteLine($"Won {game.VictoryTeam.Value} - {game.VictoryController} vs {game.LoserController} in {500 - iterations}");
+                        Console.Write($"{game.VictoryController}:{game.LoserController}({maxIterations - iterations}), ");
                         if (game.VictoryTeam == TeamColor.Red) {
                             result.RedWins++;
                         } else {
@@ -56,12 +56,14 @@ namespace HexMage.Simulator.AI
                         }
                     } else {
                         result.Draws++;
-                        Console.WriteLine("DRAW");
+                        Console.Write("DRAW\t");
                     }
 
                     result.Total++;
                 }
             }
+
+            Console.WriteLine();
 
             return result;
         }
@@ -96,6 +98,8 @@ namespace HexMage.Simulator.AI
         public int BlueWins;
         public int Draws;
         public int Total;
+
+        public double WinPercentage => ((double) RedWins) / (double) Total;
 
         public override string ToString() {
             return $"{RedWins}/{BlueWins} (draws: {Draws}), total: {Total}";

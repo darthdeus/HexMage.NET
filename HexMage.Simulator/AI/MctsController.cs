@@ -15,8 +15,10 @@ namespace HexMage.Simulator {
 
             float endRatio = (float) UctAlgorithm.ActionCounts[UctActionType.EndTurn] /
                              UctAlgorithm.ActionCounts[UctActionType.AbilityUse];
-            Console.WriteLine(
-                $"action: {node.Action}, total: {UctAlgorithm.actions} [end ratio: {endRatio}]\t{UctAlgorithm.ActionCountString()}");
+
+            // TODO: temporarily disabled logging
+            //Console.WriteLine($"action: {node.Action}, total: {UctAlgorithm.actions} [end ratio: {endRatio}]\t{UctAlgorithm.ActionCountString()}");
+
             switch (node.Action.Type) {
                 case UctActionType.AbilityUse:
                     _gameInstance.FastUse(node.Action.AbilityId, node.Action.MobId, node.Action.TargetId);
@@ -37,5 +39,9 @@ namespace HexMage.Simulator {
         }
 
         public string Name => "MctsController";
+
+        public override string ToString() {
+            return "MCTS";
+        }
     }
 }
