@@ -18,8 +18,8 @@ namespace HexMage.Simulator.AI {
         public EvaluationResult Evaluate() {
             var factories = new IAiFactory[] {
                 new RuleBasedFactory(),
-                new MctsFactory(8),
-                new MctsFactory(20)
+                new MctsFactory(10),
+                new MctsFactory(1)
             };
 
             var result = new EvaluationResult();
@@ -48,7 +48,7 @@ namespace HexMage.Simulator.AI {
                         Debug.Assert(game.VictoryController != null);
 
                         //Console.WriteLine($"Won {game.VictoryTeam.Value} - {game.VictoryController} vs {game.LoserController} in {500 - iterations}");
-                        Console.Write($"{game.VictoryController}:{game.LoserController}({maxIterations - iterations}), ");
+                        Console.Write($"{game.VictoryController}:{game.LoserController}...{maxIterations - iterations}, ");
                         if (game.VictoryTeam == TeamColor.Red) {
                             result.RedWins++;
                         } else {
@@ -84,8 +84,7 @@ namespace HexMage.Simulator.AI {
         }
 
         public IMobController Build(GameInstance gameInstance) {
-            // TODO - actually set the time property of MCTS
-            return new MctsController(gameInstance);
+            return new MctsController(gameInstance, _time);
         }
     }
 

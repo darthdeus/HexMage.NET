@@ -12,7 +12,7 @@ namespace HexMage.Simulator {
         public UctNode UctSearch(GameInstance initialState) {
             var root = new UctNode(0, 0, UctAction.NullAction(), initialState);
 
-            int iterations = 10000;
+            int iterations = _thinkTime * 1000;
 
             while (iterations-- > 0) {
                 UctNode v = TreePolicy(root);
@@ -110,6 +110,7 @@ namespace HexMage.Simulator {
         }
 
         public static Dictionary<UctActionType, int> ActionCounts = new Dictionary<UctActionType, int>();
+        private int _thinkTime;
 
         public static string ActionCountString() {
             return
@@ -121,6 +122,10 @@ namespace HexMage.Simulator {
             ActionCounts.Add(UctActionType.EndTurn, 0);
             ActionCounts.Add(UctActionType.AbilityUse, 0);
             ActionCounts.Add(UctActionType.Move, 0);
+        }
+
+        public UctAlgorithm(int thinkTime) {
+            _thinkTime = thinkTime;
         }
 
         public static GameInstance FNoCopy(GameInstance state, UctAction action) {

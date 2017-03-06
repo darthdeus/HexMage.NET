@@ -164,7 +164,7 @@ namespace HexMage.Benchmarks {
     }
 
     internal class Program {
-        private static Random rand = new Random();
+        private static Random rand = new Random(22);
 
         private static void Main(string[] args) {
             Console.WriteLine("Choose:");
@@ -174,6 +174,9 @@ namespace HexMage.Benchmarks {
             Console.WriteLine("\t3) Generate new team");
 
             var key = Console.ReadKey();
+
+            Console.WriteLine();
+
             if (key.Key == ConsoleKey.D2) {
                 RunEvaluator();
             } else if (key.Key == ConsoleKey.D3) {
@@ -189,21 +192,21 @@ namespace HexMage.Benchmarks {
 
             var opponent = RandomTeam(2, 2);
 
+            var map = new Map(5);
             var stopwatch = new Stopwatch();
             for (int i = 0; i < 100; i++) {
                 stopwatch.Start();
                 var setup = new Setup() {red = team.mobs, blue = opponent.mobs};
 
-                var result = EvaluateSetup(setup);
+                var result = EvaluateSetup(setup, map);
 
-                Console.WriteLine($"STATS: {result.WinPercentage}");
-                Console.WriteLine(JsonConvert.SerializeObject(opponent));
-                Console.WriteLine();
+                Console.WriteLine($"Win: {result.WinPercentage*100}%");
 
-                if (result.WinPercentage < 0.3) {
+                double delta = 0.075;
+                if (result.WinPercentage < 0.5 - delta) {
                     Console.WriteLine("WEAKENING");
                     Weaken(opponent);
-                } else if (result.WinPercentage > 0.7) {
+                } else if (result.WinPercentage > 0.5 + delta) {
                     Console.WriteLine("STRENGHTENING");
                     Strenghten(opponent);
                 } else {
@@ -211,7 +214,12 @@ namespace HexMage.Benchmarks {
                 }
 
                 stopwatch.Stop();
+
                 Console.WriteLine($"\ttook: {stopwatch.Elapsed.Milliseconds}ms");
+                Console.WriteLine();
+                Console.WriteLine(JsonConvert.SerializeObject(opponent));
+                Console.WriteLine();
+                Console.WriteLine();
             }
         }
 
@@ -281,13 +289,13 @@ namespace HexMage.Benchmarks {
                 var abilities = new List<JsonAbility>();
 
                 for (int j = 0; j < spellsPerMob; j++) {
-                    abilities.Add(new JsonAbility(rand.Next(8), rand.Next(8), rand.Next(5), rand.Next(2)));
+                    abilities.Add(new JsonAbility(rand.Next(3, 8), rand.Next(2,6), rand.Next(3,5), rand.Next(2)));
                 }
 
                 team.mobs.Add(new JsonMob {
                     abilities = abilities,
-                    hp = rand.Next(10),
-                    ap = rand.Next(10)
+                    hp = rand.Next(4,10),
+                    ap = rand.Next(4,10)
                 });
             }
 
@@ -295,16 +303,16 @@ namespace HexMage.Benchmarks {
         }
 
         private static void RunEvaluator() {
-            string content = File.ReadAllText(@"c:\dev\simple.json");
+            string content = File.ReadAllText(@"simple.json");
             var setup = JsonLoader.Load(content);
 
-            var result = EvaluateSetup(setup);
+            var result = EvaluateSetup(setup, new Map(5));
 
             Console.WriteLine(result);
         }
 
-        private static EvaluationResult EvaluateSetup(Setup setup) {
-            var game = new GameInstance(5);
+        private static EvaluationResult EvaluateSetup(Setup setup, Map map) {
+            var game = new GameInstance(new Map(5));
             var mobIds = new List<int>();
 
             foreach (var mob in setup.red) {

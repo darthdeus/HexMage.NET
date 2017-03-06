@@ -4,13 +4,15 @@ using System.Threading.Tasks;
 namespace HexMage.Simulator {
     public class MctsController : IMobController {
         private readonly GameInstance _gameInstance;
+        private readonly int _thinkTime;
 
-        public MctsController(GameInstance gameInstance) {
+        public MctsController(GameInstance gameInstance, int thinkTime = 10) {
             _gameInstance = gameInstance;
+            _thinkTime = thinkTime;
         }
 
         public void FastPlayTurn(GameEventHub eventHub) {
-            var uct = new UctAlgorithm();
+            var uct = new UctAlgorithm(_thinkTime);
             var node = uct.UctSearch(_gameInstance);
 
             float endRatio = (float) UctAlgorithm.ActionCounts[UctActionType.EndTurn] /
@@ -41,7 +43,7 @@ namespace HexMage.Simulator {
         public string Name => "MctsController";
 
         public override string ToString() {
-            return "MCTS";
+            return $"MCTS[{_thinkTime}]";
         }
     }
 }
