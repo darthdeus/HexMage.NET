@@ -164,7 +164,8 @@ namespace HexMage.Benchmarks {
     }
 
     internal class Program {
-        private static Random rand = new Random(22);
+        private static Random rand = new Random();
+        //private static Random rand = new Random(22);
 
         private static void Main(string[] args) {
             Console.WriteLine("Choose:");
@@ -186,6 +187,16 @@ namespace HexMage.Benchmarks {
             }
         }
 
+        class GenerationTeam {
+            public Team Team;
+            public double Rating;
+
+            public GenerationTeam(Team team, double rating) {
+                Team = team;
+                Rating = rating;
+            }
+        }
+
         private static void RunGenerator() {
             string content = File.ReadAllText("team-1.json");
             var team = JsonLoader.LoadTeam(content);
@@ -194,36 +205,74 @@ namespace HexMage.Benchmarks {
 
             var map = new Map(5);
             var stopwatch = new Stopwatch();
-            for (int i = 0; i < 100; i++) {
-                stopwatch.Start();
-                var setup = new Setup() {red = team.mobs, blue = opponent.mobs};
 
-                var result = EvaluateSetup(setup, map);
+            var generation = new List<GenerationTeam>();
 
-                Console.WriteLine($"Win: {result.WinPercentage*100}%");
+            const int teamsPerGeneration = 100;
+            for (int i = 0; i < teamsPerGeneration; i++) {
+                generation.Add(new GenerationTeam(RandomTeam(2, 2), 0.0));
+            }
 
-                double delta = 0.075;
-                if (result.WinPercentage < 0.5 - delta) {
-                    Console.WriteLine("WEAKENING");
-                    Weaken(opponent);
-                } else if (result.WinPercentage > 0.5 + delta) {
-                    Console.WriteLine("STRENGHTENING");
-                    Strenghten(opponent);
-                } else {
-                    break;
+            const int numGenerations = 100;
+            for (int i = 0; i < numGenerations; i++) {
+                var genWatch = new Stopwatch();
+                genWatch.Start();
+
+                foreach (var genTeam in generation) {
+                    var teamWatch = new Stopwatch();
+                    teamWatch.Start();
+                    var setup = new Setup() {red = team.mobs, blue = genTeam.Team.mobs};
+                    EvaluationResult result = EvaluateSetup(setup, map);
+
+                    genTeam.Rating = result.WinPercentage;
+                    Console.WriteLine(genTeam.Rating);
+
+                    Mutate(genTeam.Team, result.WinPercentage - 0.5);
+                    Console.WriteLine($"Total:\t\t{teamWatch.ElapsedMilliseconds}ms\nPer turn:\t{result.MillisecondsPerTurn}ms\nPer iteration:\t{result.MillisecondsPerIteration}ms");
+                    Console.WriteLine();
+                    Console.WriteLine();
                 }
 
-                stopwatch.Stop();
-
-                Console.WriteLine($"\ttook: {stopwatch.Elapsed.Milliseconds}ms");
                 Console.WriteLine();
-                Console.WriteLine(JsonConvert.SerializeObject(opponent));
+                Console.WriteLine($"Generation done in {genWatch.ElapsedMilliseconds}ms");
+                Console.WriteLine();
+                Console.WriteLine();
                 Console.WriteLine();
                 Console.WriteLine();
             }
+
+
+            //for (int i = 0; i < 100; i++) {
+            //    stopwatch.Start();
+            //    var setup = new Setup() {red = team.mobs, blue = opponent.mobs};
+
+            //    var result = EvaluateSetup(setup, map);
+
+            //    Console.WriteLine($"Win: {result.WinPercentage * 100}%");
+
+            //    double delta = 0.075;
+            //    if (result.WinPercentage < 0.5 - delta) {
+            //        Console.WriteLine("WEAKENING");
+            //        Mutate(opponent, -1);
+            //    } else if (result.WinPercentage > 0.5 + delta) {
+            //        Console.WriteLine("STRENGHTENING");
+            //        Mutate(opponent, +1);
+            //        //Strenghten(opponent);
+            //    } else {
+            //        break;
+            //    }
+
+            //    stopwatch.Stop();
+
+            //    Console.WriteLine($"\ttook: {stopwatch.Elapsed.Milliseconds}ms");
+            //    Console.WriteLine();
+            //    Console.WriteLine(JsonConvert.SerializeObject(opponent));
+            //    Console.WriteLine();
+            //    Console.WriteLine();
+            //}
         }
 
-        public static void Weaken(Team team) {
+        public static void Mutate(Team team, double scale) {
             var mobIndex = rand.Next(team.mobs.Count);
             var mob = team.mobs[mobIndex];
             var abilities = mob.abilities;
@@ -232,27 +281,27 @@ namespace HexMage.Benchmarks {
 
             switch (rand.Next(6)) {
                 case 0:
-                    ability.dmg = Math.Max(ability.dmg - 1, 1);
+                    ability.dmg = (int) Math.Max(1, ability.dmg + 2*scale);
                     break;
                 case 1:
-                    ability.ap++;
+                    ability.ap = (int) Math.Max(1, ability.ap + 3 * scale);
                     break;
                 case 2:
-                    ability.range = Math.Max(ability.range - 1, 1);
+                    ability.range = (int)Math.Max(1, ability.range - 3 * scale);
                     break;
                 case 3:
-                    ability.cooldown++;
+                    ability.cooldown = (int) Math.Max(0, ability.cooldown + 1 * scale);
                     break;
                 case 4:
-                    mob.hp = Math.Max(mob.hp - 1, 1);
+                    mob.hp = (int)Math.Max(mob.hp + 5 * scale, 1);
                     break;
                 case 5:
-                    mob.ap = Math.Max(mob.ap - 1, 1);
+                    mob.ap = (int)Math.Max(mob.ap + 5 * scale, 1);
                     break;
             }
         }
 
-        public static void Strenghten(Team team) {            
+        public static void Strenghten(Team team) {
             var mobIndex = rand.Next(team.mobs.Count);
             var mob = team.mobs[mobIndex];
             var abilities = mob.abilities;
@@ -289,13 +338,13 @@ namespace HexMage.Benchmarks {
                 var abilities = new List<JsonAbility>();
 
                 for (int j = 0; j < spellsPerMob; j++) {
-                    abilities.Add(new JsonAbility(rand.Next(3, 8), rand.Next(2,6), rand.Next(3,5), rand.Next(2)));
+                    abilities.Add(new JsonAbility(rand.Next(3, 8), rand.Next(2, 6), rand.Next(3, 5), rand.Next(2)));
                 }
 
                 team.mobs.Add(new JsonMob {
                     abilities = abilities,
-                    hp = rand.Next(4,10),
-                    ap = rand.Next(4,10)
+                    hp = rand.Next(30, 100),
+                    ap = rand.Next(10, 20)
                 });
             }
 

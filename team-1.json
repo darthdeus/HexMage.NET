@@ -1,16 +1,16 @@
 {
   "mobs": [
     {
-      "hp": 10,
-      "ap": 5,
+      "hp": 30,
+      "ap": 10,
       "abilities": [
         { "dmg": 6, "ap": 5, "range": 4, "cooldown": 0 },
         { "dmg": 5, "ap": 5, "range": 4, "cooldown": 0 }
       ]
     },
     {
-      "hp": 5,
-      "ap": 5,
+      "hp": 50,
+      "ap": 13,
       "abilities": [
         { "dmg": 6, "ap": 5, "range": 4, "cooldown": 0 },
         { "dmg": 5, "ap": 5, "range": 4, "cooldown": 0 }

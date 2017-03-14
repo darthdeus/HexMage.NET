@@ -42,7 +42,6 @@ namespace HexMage.Simulator {
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-
         private ConsoleColor LogLevelColor(LogSeverity logLevel) {
             switch (logLevel) {
                 case LogSeverity.Debug:

@@ -18,11 +18,14 @@ namespace HexMage.Simulator.AI {
         public EvaluationResult Evaluate() {
             var factories = new IAiFactory[] {
                 new RuleBasedFactory(),
-                new MctsFactory(10),
+                //new MctsFactory(10),
                 new MctsFactory(1)
             };
 
             var result = new EvaluationResult();
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
 
             foreach (var factory1 in factories) {
                 foreach (var factory2 in factories) {
@@ -35,13 +38,15 @@ namespace HexMage.Simulator.AI {
                     game.MobManager.Teams[TeamColor.Red] = ai1;
                     game.MobManager.Teams[TeamColor.Blue] = ai2;
 
-                    const int maxIterations = 500;
+                    const int maxIterations = 100;
                     int iterations = maxIterations;
 
                     while (!game.IsFinished && iterations-- > 0) {
                         game.TurnManager.CurrentController.FastPlayTurn(hub);
                         game.TurnManager.NextMobOrNewTurn(game.Pathfinder, game.State);
                     }
+
+                    result.TotalIterations += maxIterations - iterations;
 
                     if (game.IsFinished) {
                         Debug.Assert(game.VictoryTeam.HasValue);
@@ -59,9 +64,13 @@ namespace HexMage.Simulator.AI {
                         Console.Write("DRAW\t");
                     }
 
-                    result.Total++;
+                    result.TotalTurns++;
                 }
             }
+
+            stopwatch.Stop();
+
+            result.TotalElapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
             Console.WriteLine();
 
@@ -96,12 +105,16 @@ namespace HexMage.Simulator.AI {
         public int RedWins;
         public int BlueWins;
         public int Draws;
-        public int Total;
+        public int TotalTurns;
+        public long TotalElapsedMilliseconds;
+        public int TotalIterations;
 
-        public double WinPercentage => ((double) RedWins) / (double) Total;
+        public double MillisecondsPerIteration => (double) TotalElapsedMilliseconds / (double) TotalIterations;
+        public double MillisecondsPerTurn => (double) TotalElapsedMilliseconds / (double) TotalTurns;
+        public double WinPercentage => ((double) RedWins) / (double) TotalTurns;
 
         public override string ToString() {
-            return $"{RedWins}/{BlueWins} (draws: {Draws}), total: {Total}";
+            return $"{RedWins}/{BlueWins} (draws: {Draws}), total: {TotalTurns}";
         }
     }
 }
