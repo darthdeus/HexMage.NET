@@ -1,4 +1,5 @@
-﻿#define FAST
+﻿//#define COPY_BENCH
+#define FAST
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -73,8 +74,7 @@ namespace HexMage.Benchmarks {
             gameInstance.State.Reset(gameInstance.MobManager);
             turnManager.PresortTurnOrder();
 
-            goto SKIP_COPY_BENCH;
-
+#if COPY_BENCH
             {
                 Console.WriteLine("---- STATE COPY BENCHMARK ----");
 
@@ -106,7 +106,7 @@ namespace HexMage.Benchmarks {
             Console.WriteLine("Press any key to continue.");
             Console.ReadKey();
 
-            SKIP_COPY_BENCH:
+#endif
 
             Console.WriteLine("Precomputing cubes");
             gameInstance.Map.PrecomputeCubeLinedraw();

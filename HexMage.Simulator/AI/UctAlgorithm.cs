@@ -106,11 +106,11 @@ namespace HexMage.Simulator {
         }
 
         public static GameInstance F(GameInstance state, UctAction action) {
-            return FNoCopy(state.DeepCopy(), action);
+            return FNoCopy(state.CopyStateOnly(), action);
         }
 
-        public static Dictionary<UctActionType, int> ActionCounts = new Dictionary<UctActionType, int>();
-        private int _thinkTime;
+        public static readonly Dictionary<UctActionType, int> ActionCounts = new Dictionary<UctActionType, int>();
+        private readonly int _thinkTime;
 
         public static string ActionCountString() {
             return
@@ -169,7 +169,7 @@ namespace HexMage.Simulator {
 
             Debug.Assert(game.CurrentTeam.HasValue, "game.CurrentTeam.HasValue");
 
-            var copy = game.DeepCopy();
+            var copy = game.CopyStateOnly();
             int iterations = 100;
 
             while (!copy.IsFinished && iterations-- > 0) {

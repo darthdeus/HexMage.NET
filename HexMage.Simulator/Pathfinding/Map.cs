@@ -101,18 +101,18 @@ namespace HexMage.Simulator {
         }
 
         public Map DeepCopy() {
-            var hexesCopy = new HexMap<HexType>(Size);
+            //var hexesCopy = new HexMap<HexType>(Size);
             var buffsCopy = new List<AreaBuff>();
 
-            foreach (var coord in AllCoords) {
-                hexesCopy[coord] = _hexes[coord];
-            }
+            //foreach (var coord in AllCoords) {
+            //    hexesCopy[coord] = _hexes[coord];
+            //}
 
             foreach (var buff in AreaBuffs) {
                 buffsCopy.Add(buff);
             }
 
-            return new Map(Size, hexesCopy, buffsCopy) {
+            return new Map(Size, _hexes, buffsCopy) {
                 Guid = Guid
             };
         }

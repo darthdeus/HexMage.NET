@@ -169,6 +169,16 @@ namespace HexMage.Simulator {
             State.ChangeMobAp(mobId, -ability.Cost);
         }
 
+        public GameInstance CopyStateOnly() {
+            var game = new GameInstance(Map, MobManager);
+            game.TurnManager = TurnManager.DeepCopy(game);
+            game.Pathfinder = Pathfinder.ShallowCopy(game);
+            game.State = State.DeepCopy();
+
+            return game;
+        }
+
+
         public GameInstance DeepCopy() {
 #warning TODO - tohle prepsat poradne!
             var mapCopy = Map.DeepCopy();
@@ -176,7 +186,7 @@ namespace HexMage.Simulator {
             // TODO - should the MobManager be copied here?                                                           
             var game = new GameInstance(mapCopy, MobManager);
             game.TurnManager = TurnManager.DeepCopy(game);
-            game.Pathfinder = Pathfinder.DeepCopy(game);
+            game.Pathfinder = Pathfinder.ShallowCopy(game);
             game.State = State.DeepCopy();
 
             return game;

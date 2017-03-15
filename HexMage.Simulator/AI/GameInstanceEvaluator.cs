@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator.AI {
@@ -29,7 +24,7 @@ namespace HexMage.Simulator.AI {
 
             foreach (var factory1 in factories) {
                 foreach (var factory2 in factories) {
-                    var game = _gameInstance.DeepCopy();
+                    var game = _gameInstance.CopyStateOnly();
                     var hub = new GameEventHub(game);
 
                     var ai1 = factory1.Build(game);

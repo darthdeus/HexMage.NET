@@ -286,7 +286,7 @@ namespace HexMage.Simulator {
             //return _map.CubeDistance(new CubeCoord(0, 0, 0), c) <= _map.Size;
         }
 
-        public Pathfinder DeepCopy(GameInstance gameInstanceCopy) {
+        public Pathfinder ShallowCopy(GameInstance gameInstanceCopy) {
             var copy = new Pathfinder(gameInstanceCopy,
                                       _diffs, AllPaths);
 
