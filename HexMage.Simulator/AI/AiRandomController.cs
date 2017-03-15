@@ -3,8 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using HexMage.Simulator.Model;
 
-namespace HexMage.Simulator
-{
+namespace HexMage.Simulator {
     public class AiRandomController : IMobController {
         private readonly GameInstance _gameInstance;
 
@@ -19,9 +18,28 @@ namespace HexMage.Simulator
             UctAlgorithm.FNoCopy(_gameInstance, action);
         }
 
-        public Task SlowPlayTurn(GameEventHub eventHub) {
-            FastPlayTurn(eventHub);
-            return Task.CompletedTask;
+        public async Task SlowPlayTurn(GameEventHub eventHub) {
+            var action = UctAlgorithm.DefaultPolicyAction(_gameInstance);
+
+            switch (action.Type) {
+                case UctActionType.AbilityUse:
+                    await eventHub.SlowBroadcastAbilityUsed(action.MobId, action.TargetId, action.AbilityId);
+                    break;
+
+                case UctActionType.EndTurn:
+                    // TODO - nastavit nejakej stav?                    
+                    break;
+
+                case UctActionType.Move:
+                    await eventHub.SlowBroadcastMobMoved(action.MobId, action.Coord);
+                    break;
+
+                case UctActionType.Null:
+                    break;
+            }
+
+            UctAlgorithm.FNoCopy(_gameInstance, action);
+            //FastPlayTurn(eventHub);
         }
 
         public string Name => nameof(AiRandomController);
