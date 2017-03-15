@@ -396,9 +396,11 @@ namespace HexMage.GUI.Components {
                     mobTextBuilder.AppendLine();
 
                     mobTextBuilder.AppendLine("Buffs:");
-                    foreach (var buff in mobInstance.Buffs)
-                        mobTextBuilder.AppendLine(
-                            $"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");
+                    if (!mobInstance.Buff.IsZero) {
+                        var buff = mobInstance.Buff;
+                        mobTextBuilder.AppendLine($"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");
+                    }
+                        
 
                     mobTextBuilder.AppendLine();
                     mobTextBuilder.AppendLine("Area buffs:");

@@ -155,7 +155,7 @@ namespace HexMage.GUI.Scenes {
             for (int i = 0; i < t1size; i++) {
                 var mobInfo = Generator.RandomMob(_mobManager, t1, _gameInstance.State);
                 var mobId = _gameInstance.AddMobWithInfo(mobInfo);
-               Generator.RandomPlaceMob(_gameInstance.MobManager, mobId, _map, _gameInstance.State);
+                Generator.RandomPlaceMob(_gameInstance.MobManager, mobId, _map, _gameInstance.State);
 
                 _t1Preview.AddChild(BuildMobPreview(() => mobId));
             }
@@ -185,12 +185,12 @@ namespace HexMage.GUI.Scenes {
                 foreach (var abilityId in mobInfo.Abilities) {
                     var ability = _gameInstance.MobManager.AbilityForId(abilityId);
                     builder.AppendLine("-----");
-                    builder.AppendLine(
-                        $"{ability.Element}, DMG {ability.Dmg}, Range {ability.Range}");
-                    builder.AppendLine("Buffs:");
-                    foreach (var buff in ability.Buffs) {
-                        builder.AppendLine(
-                            $"{buff.Element}, Hp {buff.HpChange}, Ap {buff.ApChange}");
+                    builder.AppendLine($"{ability.Element}, DMG {ability.Dmg}, Range {ability.Range}");
+
+                    if (!ability.Buff.IsZero) {
+                        var buff = ability.Buff;
+                        builder.AppendLine("Buffs:");
+                        builder.AppendLine($"{buff.Element}, Hp {buff.HpChange}, Ap {buff.ApChange}");
                     }
                 }
 
