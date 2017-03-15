@@ -162,8 +162,8 @@ namespace HexMage.Benchmarks {
     }
 
     internal class Program {
-        private static Random rand = new Random();
-        //private static Random rand = new Random(22);
+        //private static Random rand = new Random();
+        private static Random rand = new Random(22);
 
         private static void Main(string[] args) {
             Console.WriteLine("Choose:");

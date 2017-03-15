@@ -151,14 +151,22 @@ namespace HexMage.Simulator {
             var targetInstance = State.MobInstances[targetId];
             var targetInfo = MobManager.MobInfos[targetId];
 
-            targetInstance.Buffs.Add(ability.ElementalEffect);
-            foreach (var abilityBuff in ability.Buffs) {
-                // TODO - handle lifetimes
-                targetInstance.Buffs.Add(abilityBuff);
+            // TODO - combine with existing buffs
+            if (ability.Buff.IsZero) {
+                targetInstance.Buff = ability.ElementalEffect;
+            } else {
+                targetInstance.Buff = ability.Buff;
             }
 
-            foreach (var areaBuff in ability.AreaBuffs) {
-                var copy = areaBuff;
+            //targetInstance.Buffs.Add(ability.ElementalEffect);
+            //foreach (var abilityBuff in ability.Buffs) {
+            //    // TODO - handle lifetimes
+            //    targetInstance.Buffs.Add(abilityBuff);
+            //}
+
+
+            if (!ability.AreaBuff.IsZero) {
+                var copy = ability.AreaBuff;
                 copy.Coord = targetInstance.Coord;
                 Map.AreaBuffs.Add(copy);
             }
@@ -168,7 +176,7 @@ namespace HexMage.Simulator {
         }
 
         public GameInstance CopyStateOnly() {
-            var game = new GameInstance(Map, MobManager);
+            var game = new GameInstance(Map.Size, Map, MobManager, null);
             game.TurnManager = TurnManager.DeepCopy(game);
             game.Pathfinder = Pathfinder.ShallowCopy(game);
             game.State = State.DeepCopy();

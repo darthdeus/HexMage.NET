@@ -12,6 +12,12 @@
             Lifetime = lifetime;
         }
 
+        public static Buff ZeroBuff() {
+            return new Buff(AbilityElement.Fire, 0, 0, 0);
+        }
+
+        public bool IsZero => Lifetime == 0;
+
         public override string ToString() {
             return
                 $"{nameof(Element)}: {Element}, {nameof(HpChange)}: {HpChange}, {nameof(ApChange)}: {ApChange}, {nameof(Lifetime)}: {Lifetime}";

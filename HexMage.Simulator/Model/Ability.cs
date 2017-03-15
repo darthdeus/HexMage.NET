@@ -20,24 +20,24 @@ namespace HexMage.Simulator {
         public int Range { get; set; }
         public int Cooldown { get; set; }
         public AbilityElement Element { get; set; }
-        public List<Buff> Buffs { get; set; }
-        public List<AreaBuff> AreaBuffs { get; set; }
+        public Buff Buff { get; set; }
+        public AreaBuff AreaBuff { get; set; }
 
         public Ability() {}
 
         public Ability(int dmg, int cost, int range, int cooldown, AbilityElement element)
-            : this(dmg, cost, range, cooldown, element, new List<Buff>(), new List<AreaBuff>()) {
+            : this(dmg, cost, range, cooldown, element, Buff.ZeroBuff(), AreaBuff.ZeroBuff()) {
         }
 
-        public Ability(int dmg, int cost, int range, int cooldown, AbilityElement element, List<Buff> buffs,
-            List<AreaBuff> areaBuffs) {
+        public Ability(int dmg, int cost, int range, int cooldown, AbilityElement element, Buff buff,
+            AreaBuff areaBuff) {
             Dmg = dmg;
             Cost = cost;
             Range = range;
             Cooldown = cooldown;
             Element = element;
-            Buffs = buffs;
-            AreaBuffs = areaBuffs;
+            Buff = buff;
+            AreaBuff = areaBuff;
         }
 
 #warning TODO - ulozit je do nejaky tabulky a jenom referencovat

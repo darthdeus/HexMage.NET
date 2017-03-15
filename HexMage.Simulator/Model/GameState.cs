@@ -11,6 +11,9 @@ namespace HexMage.Simulator {
         public int? CurrentMobIndex;
         public int TurnNumber;
 
+        // This is optimized specifically for the smaller data sets on which
+        // the evolution is being performed.
+        // TODO - pole lepsi?
         [JsonIgnore] public Dictionary<int, AxialCoord> MobPositions = new Dictionary<int, AxialCoord>();
         public int RedAlive = 0;
         public int BlueAlive = 0;
@@ -89,17 +92,13 @@ namespace HexMage.Simulator {
                 var mobInstance = MobInstances[mobId];
                 if (mobInstance.Hp <= 0) continue;
 
-                var buffs = mobInstance.Buffs;
-                for (int i = 0; i < buffs.Count; i++) {
-                    var buff = buffs[i];
+                if (!mobInstance.Buff.IsZero) {
+                    ChangeMobHp(gameInstance, mobId, mobInstance.Buff.HpChange);
+                    ChangeMobAp(mobId, mobInstance.Buff.ApChange);
+                    mobInstance.Buff.Lifetime--;
 
-                    ChangeMobHp(gameInstance, mobId, buff.HpChange);
-                    ChangeMobAp(mobId, buff.ApChange);
-                    buff.Lifetime--;
-                    buffs[i] = buff;
+                    Debug.Assert(mobInstance.Buff.Lifetime >= 0, "mobInstance.Buff.Lifetime >= 0");
                 }
-
-                buffs.RemoveAll(x => x.Lifetime == 0);
             }
 
             for (int i = 0; i < map.AreaBuffs.Count; i++) {

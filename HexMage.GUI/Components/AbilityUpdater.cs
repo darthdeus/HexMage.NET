@@ -77,13 +77,14 @@ namespace HexMage.GUI.Components {
 
                 var buffTextBuilder = new StringBuilder();
 
-                foreach (var buff in _ability.Buffs) {
+                if (!_ability.Buff.IsZero) {
+                    var buff = _ability.Buff;
                     buffTextBuilder.AppendLine($"Buff {buff.HpChange}/{buff.ApChange}\nover {buff.Lifetime} turns");
                 }
 
-                foreach (var areaBuff in _ability.AreaBuffs) {
-                    buffTextBuilder.AppendLine(
-                        $"Area buff {areaBuff.Effect.HpChange}/{areaBuff.Effect.ApChange}\nover {areaBuff.Effect.Lifetime}, radius {areaBuff.Radius}");
+                if (!_ability.AreaBuff.IsZero) {
+                    var areaBuff = _ability.AreaBuff;
+                    buffTextBuilder.AppendLine($"Area buff {areaBuff.Effect.HpChange}/{areaBuff.Effect.ApChange}\nover {areaBuff.Effect.Lifetime}, radius {areaBuff.Radius}");
                 }
 
                 _buffsLabel.Text = buffTextBuilder.ToString();

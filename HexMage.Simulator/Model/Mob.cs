@@ -32,11 +32,10 @@ namespace HexMage.Simulator.Model {
         public AxialCoord Coord;
         public int Hp;
         public int Ap;
-        public List<Buff> Buffs { get; set; }
+        public Buff Buff;        
 
         public MobInstance(int id) : this() {
             Id = id;
-            Buffs = new List<Buff>();
         }
 
         public MobInstance DeepCopy() {
@@ -46,13 +45,7 @@ namespace HexMage.Simulator.Model {
                 Ap = Ap
             };
 
-            var buffs = new List<Buff>();
-
-            foreach (var buff in Buffs) {
-                buffs.Add(buff);
-            }
-
-            copy.Buffs = buffs;
+            copy.Buff = Buff;
 
             return copy;
         }
