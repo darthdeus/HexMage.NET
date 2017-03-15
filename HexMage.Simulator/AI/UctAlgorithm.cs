@@ -326,18 +326,19 @@ namespace HexMage.Simulator {
                         }
                     }
                 }
-                //if (allowMove) {
-                //    int count = 4;
-                //    foreach (var coord in state.Map.AllCoords) {
-                //        if (coord == mobInstance.Coord) continue;
 
-                //        if (state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
-                //            if (state.State.AtCoord(coord) == null && count-- > 0) {
-                //                result.Add(UctAction.MoveAction(mobId, coord));
-                //            }
-                //        }
-                //    }
-                //}
+                if (allowMove) {
+                    int count = 4;
+                    foreach (var coord in state.Map.AllCoords) {
+                        if (coord == mobInstance.Coord) continue;
+
+                        if (state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
+                            if (state.State.AtCoord(coord) == null && count-- > 0) {
+                                result.Add(UctAction.MoveAction(mobId, coord));
+                            }
+                        }
+                    }
+                }
             } else {
                 throw new InvalidOperationException();
                 Utils.Log(LogSeverity.Warning, nameof(UctNode),
