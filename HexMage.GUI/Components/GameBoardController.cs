@@ -23,7 +23,7 @@ namespace HexMage.GUI.Components {
         private readonly GameInstance _gameInstance;
 
         private readonly Vector2 _mouseHoverPopoverOffset = new Vector2(
-            0.5f*AssetManager.TileSize, -0.5f*AssetManager.TileSize);
+            0.5f * AssetManager.TileSize, -0.5f * AssetManager.TileSize);
 
         private readonly Vector2 _usedAbilityOffset = new Vector2(80, -20);
         private AssetManager _assetManager;
@@ -80,7 +80,7 @@ namespace HexMage.GUI.Components {
                                                     AssetManager.TileSize,
                                                     4);
 
-            projectileAnimation.Origin = new Vector2(AssetManager.TileSize/2, AssetManager.TileSize/2);
+            projectileAnimation.Origin = new Vector2(AssetManager.TileSize / 2, AssetManager.TileSize / 2);
 
             var projectile = new ProjectileEntity(
                 TimeSpan.FromMilliseconds(1500),
@@ -156,7 +156,8 @@ namespace HexMage.GUI.Components {
                         _gameInstance.Map.Toogle(mouseHex);
 
                         _gameInstance.Pathfinder.PathfindDistanceAll();
-                        _gameInstance.Pathfinder.PathfindFromCurrentMob(_gameInstance.TurnManager, _gameInstance.Pathfinder);
+                        _gameInstance.Pathfinder.PathfindFromCurrentMob(_gameInstance.TurnManager,
+                                                                        _gameInstance.Pathfinder);
                         _gameInstance.Map.PrecomputeCubeLinedraw();
                     }
 
@@ -267,10 +268,15 @@ namespace HexMage.GUI.Components {
             }
 
             if (isVisible) {
-                InputManager.Instance.UserInputEnabled = false;
-                _eventHub.SlowBroadcastAbilityUsed(mobId.Value, targetId, abilityId)
-                         .ContinueWith(t => { InputManager.Instance.UserInputEnabled = true; })
-                         .LogTask();
+                bool withinRange = (visibilityPath.Count - 1) <= _gameInstance.MobManager.Abilities[abilityId].Range;
+                if (withinRange) {
+                    InputManager.Instance.UserInputEnabled = false;
+                    _eventHub.SlowBroadcastAbilityUsed(mobId.Value, targetId, abilityId)
+                             .ContinueWith(t => { InputManager.Instance.UserInputEnabled = true; })
+                             .LogTask();
+                } else {
+                    ShowMessage("Target is outside the range of the currently selected ability.");
+                }
             } else {
                 ShowMessage("The target is not visible.");
             }
@@ -352,7 +358,8 @@ namespace HexMage.GUI.Components {
                     // If there's no mob we can't calculate a distance from it
                     if (_gameInstance.TurnManager.CurrentMob.HasValue) {
                         var mobInstance = _gameInstance.State.MobInstances[_gameInstance.TurnManager.CurrentMob.Value];
-                        labelText.AppendLine($"Distance: {_gameInstance.Pathfinder.Distance(mobInstance.Coord, mouseHex)}");
+                        labelText.AppendLine(
+                            $"Distance: {_gameInstance.Pathfinder.Distance(mobInstance.Coord, mouseHex)}");
                     }
 
                     switch (map[mouseHex]) {

@@ -223,7 +223,7 @@ namespace HexMage.GUI.Renderers {
                     if (abilityIndex.HasValue) {
                         var cubepath = _gameInstance.Map.AxialLinedraw(mobInstance.Coord, mouseHex);
 
-                        int distance = 1;
+                        int distance = 0;
                         bool walled = false;
                         foreach (var cubeCoord in cubepath) {
                             if (!_gameInstance.Pathfinder.IsValidCoord(cubeCoord)) {

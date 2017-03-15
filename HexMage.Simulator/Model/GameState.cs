@@ -11,7 +11,7 @@ namespace HexMage.Simulator {
         public int? CurrentMobIndex;
         public int TurnNumber;
 
-        [JsonIgnore] public HexMap<int?> MobPositions;
+        [JsonIgnore] public Dictionary<int, AxialCoord> MobPositions = new Dictionary<int, AxialCoord>();
         public int RedAlive = 0;
         public int BlueAlive = 0;
 
@@ -68,15 +68,20 @@ namespace HexMage.Simulator {
 
         public void SetMobPosition(int mobId, AxialCoord coord) {
             var instance = MobInstances[mobId];
-            MobPositions[instance.Coord] = null;
-            MobPositions[coord] = mobId;
+            MobPositions[mobId] = coord;                        
 
             MobInstances[mobId].Coord = coord;
             //mobinfo[mobId].OrigCoord = coord;
         }
 
         public int? AtCoord(AxialCoord c) {
-            return MobPositions[c];
+            foreach (var mobPosition in MobPositions) {
+                if (mobPosition.Value == c) {
+                    return mobPosition.Key;
+                }
+            }
+
+            return null;
         }
 
         public void ApplyDots(Map map, GameInstance gameInstance) {
@@ -157,9 +162,9 @@ namespace HexMage.Simulator {
                 gameStateCopy.Cooldowns.Add(Cooldowns[i]);
             }
 
-            gameStateCopy.MobPositions = new HexMap<int?>(MobPositions.Size);
-            foreach (var coord in MobPositions.AllCoords) {
-                gameStateCopy.MobPositions[coord] = MobPositions[coord];
+            gameStateCopy.MobPositions = new Dictionary<int, AxialCoord>();
+            foreach (var mobPosition in MobPositions) {
+                gameStateCopy.MobPositions[mobPosition.Key] = mobPosition.Value;
             }
 
             gameStateCopy.MobInstances = new MobInstance[MobInstances.Length];
@@ -177,9 +182,7 @@ namespace HexMage.Simulator {
             RedAlive = 0;
             BlueAlive = 0;
 
-            foreach (var coord in MobPositions.AllCoords) {
-                MobPositions[coord] = null;
-            }
+            MobPositions.Clear();
         }
 
         public void Reset(MobManager mobManager) {

@@ -30,7 +30,6 @@ namespace HexMage.Simulator {
             Pathfinder = new Pathfinder(this);
             TurnManager = new TurnManager(this);
             State = new GameState();
-            State.MobPositions = new HexMap<int?>(Size);
         }
 
         public GameInstance(int size) : this(new Map(size)) {}
@@ -43,7 +42,6 @@ namespace HexMage.Simulator {
             Pathfinder = pathfinder;
             TurnManager = new TurnManager(this);
             State = new GameState();
-            State.MobPositions = new HexMap<int?>(Size);
         }
 
         public void PrepareEverything() {
