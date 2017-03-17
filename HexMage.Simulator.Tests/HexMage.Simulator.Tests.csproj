@@ -51,6 +51,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AbilityBuffTest.cs" />
+    <Compile Include="StateTest.cs" />
     <Compile Include="TestHelpers.cs" />
     <Compile Include="TurnOrderTest.cs" />
     <Compile Include="UctTest.cs" />

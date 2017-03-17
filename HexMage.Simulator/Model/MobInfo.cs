@@ -17,12 +17,12 @@ namespace HexMage.Simulator.Model {
         // TODO - this is no longer needed
         public static int AbilityCount => 6;
 
-        public MobInfo(TeamColor team, int maxHp, int maxAp, int iniciative, List<int> abilities) {
+        public MobInfo(TeamColor team, int maxHp, int maxAp, int iniciative, IEnumerable<int> abilities) {
             Team = team;
             MaxHp = maxHp;
             MaxAp = maxAp;
             Iniciative = iniciative;
-            Abilities = abilities;
+            Abilities = abilities.ToList();
             OrigCoord = AxialCoord.Zero;
         }
 

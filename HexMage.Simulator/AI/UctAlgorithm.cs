@@ -249,13 +249,24 @@ namespace HexMage.Simulator {
 
                 // TODO - mela by to byt viditelna vzdalenost
                 if (possibleTargetInfo.Team != mobInfo.Team) {
-                    if (abilityId.HasValue &&
-                        pathfinder.Distance(mobInstance.Coord, possibleTargetInstance.Coord) <= ability.Range) {
-                        spellTarget = possibleTarget;
-                        break;
+                    moveTarget = possibleTarget;
+
+                    var from = mobInstance.Coord;
+                    var to = possibleTargetInstance.Coord;
+
+                    if (abilityId.HasValue && state.Map.AxialDistance(from, to) <= ability.Range) {
+                        if (state.Map.IsVisible(from, to)) {
+                            spellTarget = possibleTarget;
+                            break;
+                        }
                     }
 
-                    moveTarget = possibleTarget;
+                    // TODO - tohle uz neni potreba?
+                    //if (abilityId.HasValue &&
+                    //    pathfinder.Distance(mobInstance.Coord, possibleTargetInstance.Coord) <= ability.Range) {
+                    //    spellTarget = possibleTarget;
+                    //    break;
+                    //}
                 }
             }
 

@@ -106,6 +106,10 @@ namespace HexMage.Simulator {
             }
         }
 
+        public void SlowUpdateIsFinished() {
+            State.SlowUpdateIsFinished(MobManager);
+        }
+
         public bool IsAbilityUsable(int mobId, int abilityId) {
             var ability = MobManager.AbilityForId(abilityId);
             var mob = State.MobInstances[mobId];

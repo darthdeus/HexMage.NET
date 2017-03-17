@@ -18,6 +18,8 @@ namespace HexMage.Simulator {
         private readonly Dictionary<CoordPair, List<AxialCoord>> _visibilityLines =
             new Dictionary<CoordPair, List<AxialCoord>>();
 
+        private readonly Dictionary<CoordPair, bool> _visibility = new Dictionary<CoordPair, bool>();
+
         public Map(int size, HexMap<HexType> hexes, List<AreaBuff> buffs) {
             Size = size;
             _hexes = hexes;
@@ -51,15 +53,15 @@ namespace HexMage.Simulator {
         public int AxialDistance(AxialCoord a, AxialCoord b) {
             return (Math.Abs(a.X - b.X)
                     + Math.Abs(a.X + a.Y - b.X - b.Y)
-                    + Math.Abs(a.Y - b.Y))/2;
+                    + Math.Abs(a.Y - b.Y)) / 2;
         }
 
         public int CubeDistance(CubeCoord a, CubeCoord b) {
-            return (Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y) + Math.Abs(a.Z - b.Z))/2;
+            return (Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y) + Math.Abs(a.Z - b.Z)) / 2;
         }
 
         public float Lerp(float a, float b, float t) {
-            return a + (b - a)*t;
+            return a + (b - a) * t;
         }
 
         public int LerpRound(float a, float b, float t, float offset = 0) {
@@ -72,12 +74,20 @@ namespace HexMage.Simulator {
                                  LerpRound(a.Z, b.Z, t, -0.000002f));
         }
 
+        public bool IsVisible(AxialCoord from, AxialCoord to) {
+            return _visibility[new CoordPair(from, to)];
+        }
 
         public void PrecomputeCubeLinedraw() {
             foreach (var a in AllCoords) {
                 foreach (var b in AllCoords) {
                     var result = ComputeCubeLinedraw(a, b);
-                    _visibilityLines[new CoordPair(a, b)] = result.Select(x => x.ToAxial()).ToList();
+                    var line = result.Select(x => x.ToAxial()).ToList();
+
+                    var key = new CoordPair(a, b);
+
+                    _visibilityLines[key] = line;
+                    _visibility[key] = line.All(coord => this[coord] == HexType.Empty);
                 }
             }
         }
@@ -95,7 +105,7 @@ namespace HexMage.Simulator {
 
             var N = CubeDistance(a, b);
             for (int i = 0; i < N + 1; i++) {
-                result.Add(CubeLerp(a, b, ((float) i)/N));
+                result.Add(CubeLerp(a, b, ((float) i) / N));
             }
 
             return result;
@@ -109,6 +119,7 @@ namespace HexMage.Simulator {
             //    hexesCopy[coord] = _hexes[coord];
             //}
 
+            // TODO - nemelo by se kopirovat i visiblityLines a visibility?!?!?!?!??!?!
             foreach (var buff in AreaBuffs) {
                 buffsCopy.Add(buff);
             }
