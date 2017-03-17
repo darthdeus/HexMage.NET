@@ -70,7 +70,7 @@ namespace HexMage.Simulator {
 
         public void SetMobPosition(int mobId, AxialCoord coord) {
             var instance = MobInstances[mobId];
-            MobPositions[mobId] = coord;                        
+            MobPositions[mobId] = coord;
 
             MobInstances[mobId].Coord = coord;
             //mobinfo[mobId].OrigCoord = coord;
@@ -92,10 +92,12 @@ namespace HexMage.Simulator {
                 if (mobInstance.Hp <= 0) continue;
 
                 if (!mobInstance.Buff.IsZero) {
+                    mobInstance.Buff.Lifetime--;
+                    MobInstances[mobId] = mobInstance;
+
                     ChangeMobHp(gameInstance, mobId, mobInstance.Buff.HpChange);
                     ChangeMobAp(mobId, mobInstance.Buff.ApChange);
-                    mobInstance.Buff.Lifetime--;
-
+                    
                     Debug.Assert(mobInstance.Buff.Lifetime >= 0, "mobInstance.Buff.Lifetime >= 0");
                 }
             }

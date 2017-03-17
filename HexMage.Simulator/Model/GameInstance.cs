@@ -159,6 +159,7 @@ namespace HexMage.Simulator {
                 targetInstance.Buff = ability.Buff;
             }
 
+            State.MobInstances[targetId] = targetInstance;
             //targetInstance.Buffs.Add(ability.ElementalEffect);
             //foreach (var abilityBuff in ability.Buffs) {
             //    // TODO - handle lifetimes

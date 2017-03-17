@@ -23,6 +23,9 @@ namespace HexMage.Simulator.Tests {
 
             game.FastUse(abilityId, m1, m2);
 
+            var fireDebuff = game.State.MobInstances[m2].Buff;
+            Assert.AreEqual(2, fireDebuff.Lifetime);
+
             Assert.AreEqual(9, game.State.MobInstances[m1].Ap);
             // No damage has been done yet
             Assert.AreEqual(10, game.State.MobInstances[m2].Hp);
@@ -38,9 +41,11 @@ namespace HexMage.Simulator.Tests {
             Assert.AreEqual(2, game.TurnManager.TurnNumber);
             Assert.AreEqual(m1, game.TurnManager.CurrentMob);
 
-            Assert.AreEqual(9, game.State.MobInstances[m2].Hp);
+            var targetAfter = game.State.MobInstances[m2];
+            Assert.AreEqual(9, targetAfter.Hp);
+            Assert.AreEqual(10, targetAfter.Ap);
+            Assert.AreEqual(1, targetAfter.Buff.Lifetime);
             Assert.AreEqual(10, game.State.MobInstances[m1].Ap);
-            Assert.AreEqual(10, game.State.MobInstances[m2].Ap);
 
             game.NextMobOrNewTurn();
             game.NextMobOrNewTurn();
@@ -49,7 +54,9 @@ namespace HexMage.Simulator.Tests {
             Assert.AreEqual(m1, game.TurnManager.CurrentMob);
 
             Assert.AreEqual(8, game.State.MobInstances[m2].Hp);
-            Assert.IsTrue(game.State.MobInstances[m2].Buff.IsZero);
+
+            var buffAfter = game.State.MobInstances[m2].Buff;
+            Assert.IsTrue(buffAfter.IsZero);
         }
     }
 }
