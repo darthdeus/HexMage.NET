@@ -6,12 +6,6 @@ using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
     // TODO - rename
-    public enum AbilityElement {
-        Earth,
-        Fire,
-        Air,
-        Water
-    }
 
 #warning TODO - this should be a struct
     public class Ability {
@@ -26,11 +20,10 @@ namespace HexMage.Simulator {
         public Ability() {}
 
         public Ability(int dmg, int cost, int range, int cooldown, AbilityElement element)
-            : this(dmg, cost, range, cooldown, element, Buff.ZeroBuff(), AreaBuff.ZeroBuff()) {
-        }
+            : this(dmg, cost, range, cooldown, element, Buff.ZeroBuff(), AreaBuff.ZeroBuff()) {}
 
         public Ability(int dmg, int cost, int range, int cooldown, AbilityElement element, Buff buff,
-            AreaBuff areaBuff) {
+                       AreaBuff areaBuff) {
             Dmg = dmg;
             Cost = cost;
             Range = range;
@@ -57,20 +50,39 @@ namespace HexMage.Simulator {
                         throw new InvalidOperationException("Invalid element type");
                 }
             }
-        }        
+        }
 
-        //public Ability DeepCopy() {
-        //    var buffsCopy = new List<Buff>();
-        //    foreach (var buff in Buffs) {
-        //        buffsCopy.Add(buff);
-        //    }
-        //    var areaBuffsCopy = new List<AreaBuff>();
-        //    foreach (var areaBuff in AreaBuffs) {
-        //        areaBuffsCopy.Add(areaBuff);
-        //    }
+        protected bool Equals(Ability other) {
+            return Dmg == other.Dmg && Cost == other.Cost && Range == other.Range && Cooldown == other.Cooldown &&
+                   Element == other.Element && Buff.Equals(other.Buff) && AreaBuff.Equals(other.AreaBuff);
+        }
 
-        //    var copy = new Ability(Id, Dmg, Cost, Range, Cooldown, Element, buffsCopy, areaBuffsCopy);
-        //    return copy;
-        //}
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Ability) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = Dmg;
+                hashCode = (hashCode * 397) ^ Cost;
+                hashCode = (hashCode * 397) ^ Range;
+                hashCode = (hashCode * 397) ^ Cooldown;
+                hashCode = (hashCode * 397) ^ (int) Element;
+                hashCode = (hashCode * 397) ^ Buff.GetHashCode();
+                hashCode = (hashCode * 397) ^ AreaBuff.GetHashCode();
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(Ability left, Ability right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(Ability left, Ability right) {
+            return !Equals(left, right);
+        }
     }
 }

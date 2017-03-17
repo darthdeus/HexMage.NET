@@ -9,7 +9,6 @@ namespace HexMage.Simulator {
         public MobInstance[] MobInstances = new MobInstance[0];
         public readonly List<int> Cooldowns = new List<int>();
         public int? CurrentMobIndex;
-        public int TurnNumber;
 
         // This is optimized specifically for the smaller data sets on which
         // the evolution is being performed.
@@ -154,7 +153,6 @@ namespace HexMage.Simulator {
                 RedAlive = RedAlive,
                 BlueAlive = BlueAlive,
                 CurrentMobIndex = CurrentMobIndex,
-                TurnNumber = TurnNumber 
             };
 
             for (int i = 0; i < Cooldowns.Count; i++) {

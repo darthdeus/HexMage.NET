@@ -13,7 +13,8 @@ namespace HexMage.Simulator {
         public readonly List<MobInfo> MobInfos = new List<MobInfo>();
 
         [JsonIgnore]
-        public readonly Dictionary<TeamColor, IMobController> Teams = new Dictionary<TeamColor, IMobController>();
+        public readonly Dictionary<TeamColor, IMobController> Teams =
+            new Dictionary<TeamColor, IMobController>();
 
         public Ability AbilityForId(int id) {
             return Abilities[id];

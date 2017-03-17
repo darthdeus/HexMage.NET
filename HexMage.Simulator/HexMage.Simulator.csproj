@@ -55,10 +55,12 @@
     <Compile Include="Config.cs" />
     <Compile Include="AI\FlatMonteCarlo.cs" />
     <Compile Include="JsonLoader.cs" />
+    <Compile Include="Model\AbilityElement.cs" />
     <Compile Include="Model\GameEventHub.cs" />
     <Compile Include="Model\GameState.cs" />
     <Compile Include="IDeepCopyable.cs" />
     <Compile Include="IGameEventSubscriber.cs" />
+    <Compile Include="Model\MobInstance.cs" />
     <Compile Include="Serialization\MapItem.cs" />
     <Compile Include="Serialization\MapRepresentation.cs" />
     <Compile Include="Model\AreaBuff.cs" />
@@ -75,7 +77,7 @@
     <Compile Include="Utils\Color.cs" />
     <Compile Include="Model\Ability.cs" />
     <Compile Include="Model\HexType.cs" />
-    <Compile Include="Model\Mob.cs" />
+    <Compile Include="Model\MobInfo.cs" />
     <Compile Include="Utils\AxialCoord.cs" />
     <Compile Include="Utils\PixelCoord.cs" />
     <Compile Include="Utils\CubeCoord.cs" />

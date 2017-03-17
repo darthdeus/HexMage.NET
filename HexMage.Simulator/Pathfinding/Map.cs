@@ -8,6 +8,7 @@ namespace HexMage.Simulator {
     public class Map : IDeepCopyable<Map>, IResettable {
         private readonly HexMap<HexType> _hexes;
         public int Size { get; set; }
+        // TODO - remove Guid, it's no longer needed
         public Guid Guid = Guid.NewGuid();
 
         public List<AreaBuff> AreaBuffs = new List<AreaBuff>();

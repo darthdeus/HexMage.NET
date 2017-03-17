@@ -4,12 +4,14 @@ using System.Diagnostics;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
+    // TODO - extract this
     public enum VertexState {
         Unvisited,
         Open,
         Closed
     }
 
+    // TODO - extract this
     public struct Path {
         public int Distance;
         public AxialCoord? Source;
