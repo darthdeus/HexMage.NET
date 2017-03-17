@@ -1,4 +1,6 @@
-﻿namespace HexMage.Simulator.Model {
+﻿using System;
+
+namespace HexMage.Simulator.Model {
     public struct Buff {
         public readonly AbilityElement Element;
         public readonly int HpChange;
@@ -16,6 +18,18 @@
             return new Buff(AbilityElement.Fire, 0, 0, 0);
         }
 
+        public static Buff Combine(Buff a, Buff b) {
+            if (a.IsZero) return b;
+            if (b.IsZero) return a;
+            
+            if (a.Element == b.Element) {
+                return new Buff(a.Element, a.HpChange + b.HpChange, a.ApChange + b.ApChange,
+                    Math.Max(a.Lifetime, b.Lifetime));
+            } else {
+                return b;
+            }
+        }
+
         public bool IsZero => Lifetime == 0;
 
         public override string ToString() {
@@ -24,7 +38,8 @@
         }
 
         public bool Equals(Buff other) {
-            return Element == other.Element && HpChange == other.HpChange && ApChange == other.ApChange && Lifetime == other.Lifetime;
+            return Element == other.Element && HpChange == other.HpChange && ApChange == other.ApChange &&
+                   Lifetime == other.Lifetime;
         }
 
         public override bool Equals(object obj) {
