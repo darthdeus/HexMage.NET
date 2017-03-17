@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using HexMage.Simulator.Model;
 
@@ -143,6 +144,8 @@ namespace HexMage.Simulator {
                     state.FastUse(action.AbilityId, action.MobId, action.TargetId);
                     break;
                 case UctActionType.Move:
+                    // TODO - gameinstance co se jmenuje state?
+                    Debug.Assert(state.State.AtCoord(action.Coord) == null, "Trying to move into a mob.");
                     state.FastMove(action.MobId, action.Coord);
                     break;
                 default:
@@ -310,6 +313,8 @@ namespace HexMage.Simulator {
                     // Skip abilities which are on cooldown
                     if (state.State.Cooldowns[abilityId] > 0) continue;
 
+                    //Console.WriteLine($"Allowed {abilityId} not on cooldown");
+
                     if (abilityInfo.Cost <= mobInstance.Ap) {
                         foreach (var targetId in state.MobManager.Mobs) {
                             var targetInfo = state.MobManager.MobInfos[targetId];
@@ -328,16 +333,29 @@ namespace HexMage.Simulator {
                 }
 
                 if (allowMove) {
-                    int count = 4;
+                    // TODO - proper move action concatenation
+                    var moveActions = new List<UctAction>();
+
+                    // TODO - properly define max actions
+                    int count = 200;
                     foreach (var coord in state.Map.AllCoords) {
                         if (coord == mobInstance.Coord) continue;
 
                         if (state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
                             if (state.State.AtCoord(coord) == null && count-- > 0) {
-                                result.Add(UctAction.MoveAction(mobId, coord));
+                                moveActions.Add(UctAction.MoveAction(mobId, coord));
+                                //result.Add(UctAction.MoveAction(mobId, coord));
                             }
                         }
                     }
+
+                    if (count == 0) {
+                        Console.WriteLine("More than 100 possible move actions.");
+                    }
+
+                    Shuffle(moveActions);
+
+                    result.AddRange(moveActions.Take(20));
                 }
             } else {
                 throw new InvalidOperationException();
@@ -350,6 +368,21 @@ namespace HexMage.Simulator {
             }
 
             return result;
+        }
+
+        // TODO - replace with a global RNG
+        private static Random rng = new Random();
+
+        public static void Shuffle<T>(IList<T> list) {
+            // TODO - rewrite this to be better
+            int n = list.Count;
+            while (n > 1) {
+                n--;
+                int k = rng.Next(n + 1);
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
         }
     }
 }

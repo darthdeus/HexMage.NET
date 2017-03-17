@@ -17,7 +17,7 @@ namespace HexMage.GUI.Scenes {
         private IMobController _leftController;
         private IMobController _rightController;
         private readonly ArenaScene _arenaScene;
-        private List<IMobController> _controllerList;
+        private readonly List<IMobController> _controllerList;
         private readonly MobManager _mobManager = new MobManager();
         private VerticalLayout _teamPreviewLayout;
         private HorizontalLayout _t1Preview;

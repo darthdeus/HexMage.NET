@@ -49,6 +49,30 @@ namespace HexMage.Simulator {
             return totalTurns;
         }
 
+        public async Task SlowPlayAction(GameInstance instance, UctAction action) {
+            // TODDO - instance vs _gameInstance?
+            Debug.Assert(instance == _gameInstance, "instance == _gameInstance");
+
+            switch (action.Type) {
+                case UctActionType.AbilityUse:
+                    await SlowBroadcastAbilityUsed(action.MobId, action.TargetId, action.AbilityId);
+                    break;
+
+                case UctActionType.EndTurn:
+                    // TODO - nastavit nejakej stav?                    
+                    break;
+
+                case UctActionType.Move:
+                    // TODO - assert jenom na jednom miste?
+                    Debug.Assert(instance.State.AtCoord(action.Coord) == null, "Trying to move into a mob.");
+                    await SlowBroadcastMobMoved(action.MobId, action.Coord);
+                    break;
+
+                case UctActionType.Null:
+                    break;
+            }
+        }
+
         public int FastMainLoop(TimeSpan turnDelay) {
             var turnManager = _gameInstance.TurnManager;
             turnManager.StartNextTurn(_gameInstance.Pathfinder, _gameInstance.State);

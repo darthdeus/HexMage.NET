@@ -21,23 +21,15 @@ namespace HexMage.Simulator {
             // TODO: temporarily disabled logging
             //Console.WriteLine($"action: {node.Action}, total: {UctAlgorithm.actions} [end ratio: {endRatio}]\t{UctAlgorithm.ActionCountString()}");
 
-            switch (node.Action.Type) {
-                case UctActionType.AbilityUse:
-                    _gameInstance.FastUse(node.Action.AbilityId, node.Action.MobId, node.Action.TargetId);
-                    break;
-                case UctActionType.Move:
-                    _gameInstance.FastMove(node.Action.MobId, node.Action.Coord);
-                    break;
-                default:
-                    // TODO - check out if there is a need to explicitly end the turn
-                    // intentionally doing nothing
-                    break;
-            }
+            // TODO - hrat vic akci za kolo
+            UctAlgorithm.FNoCopy(_gameInstance, node.Action);
         }
 
-        public Task SlowPlayTurn(GameEventHub eventHub) {
-            FastPlayTurn(eventHub);
-            return Task.CompletedTask;
+        public async Task SlowPlayTurn(GameEventHub eventHub) {
+            var node = new UctAlgorithm(_thinkTime).UctSearch(_gameInstance);
+            var action = node.Action;
+
+            await eventHub.SlowPlayAction(_gameInstance, action);
         }
 
         public string Name => "MctsController";
