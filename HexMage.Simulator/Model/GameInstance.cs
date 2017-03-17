@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
     public class GameInstance : IDeepCopyable<GameInstance>, IResettable {
+        // TODO - fuj hardcoded cesty
         public static string MapSaveFilename = @"C:\dev\HexMage\HexMage\HexMage.GUI\map.json";
         public static string MobsSaveFilename = @"C:\dev\HexMage\HexMage\HexMage.GUI\mobs.json";
 
