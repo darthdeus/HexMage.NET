@@ -1,3 +1,4 @@
+#define DOTGRAPH
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,6 +10,7 @@ using HexMage.Simulator.Model;
 namespace HexMage.Simulator {
     public class UctAlgorithm {
         public static int actions = 0;
+        public static int searchCount = 0;
 
         public UctNode UctSearch(GameInstance initialState) {
             var root = new UctNode(0, 0, UctAction.NullAction(), initialState.DeepCopy());
@@ -30,8 +32,10 @@ namespace HexMage.Simulator {
 
             string str = builder.ToString();
 
-            File.WriteAllText("c:\\dev\\graph.dot", str);
+            File.WriteAllText($"c:\\dev\\graphs\\graph{searchCount}.dot", str);
 #endif
+            searchCount++;
+
 
             UctNode result = root.Children[0];
 
@@ -348,7 +352,7 @@ namespace HexMage.Simulator {
                     var moveActions = new List<UctAction>();
 
                     // TODO - properly define max actions
-                    int count = 200;
+                    int count = 2;
                     foreach (var coord in state.Map.AllCoords) {
                         if (coord == mobInstance.Coord) continue;
 
@@ -361,7 +365,7 @@ namespace HexMage.Simulator {
                     }
 
                     if (count == 0) {
-                        Console.WriteLine("More than 100 possible move actions.");
+                        //Console.WriteLine("More than 100 possible move actions.");
                     }
 
                     Shuffle(moveActions);

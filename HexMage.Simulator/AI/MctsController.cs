@@ -12,25 +12,33 @@ namespace HexMage.Simulator {
         }
 
         public void FastPlayTurn(GameEventHub eventHub) {
-            var uct = new UctAlgorithm(_thinkTime);
-            var node = uct.UctSearch(_gameInstance);
+            UctAction action;
 
-            float endRatio = (float) UctAlgorithm.ActionCounts[UctActionType.EndTurn] /
-                             UctAlgorithm.ActionCounts[UctActionType.AbilityUse];
+            do {
+                var uct = new UctAlgorithm(_thinkTime);
+                var node = uct.UctSearch(_gameInstance);
+                action = node.Action;
 
-            // TODO: temporarily disabled logging
-            //Console.WriteLine($"action: {node.Action}, total: {UctAlgorithm.actions} [end ratio: {endRatio}]\t{UctAlgorithm.ActionCountString()}");
+                // TODO - pokud nemam AP, tak MCTS stejne pocita dlouho, co muze udelat
 
-            // TODO - hrat vic akci za kolo
-            UctAlgorithm.FNoCopy(_gameInstance, node.Action);
+                float endRatio = (float) UctAlgorithm.ActionCounts[UctActionType.EndTurn] /
+                                 UctAlgorithm.ActionCounts[UctActionType.AbilityUse];
+
+                // TODO: temporarily disabled logging
+                //Console.WriteLine($"action: {node.Action}, total: {UctAlgorithm.actions} [end ratio: {endRatio}]\t{UctAlgorithm.ActionCountString()}");
+                
+                UctAlgorithm.FNoCopy(_gameInstance, action);
+            } while (action.Type != UctActionType.EndTurn);
         }
 
         public async Task SlowPlayTurn(GameEventHub eventHub) {
-            // TODO - ujistit se, ze continuation bezi na spravnym threadu?
-            var node = await Task.Run(() => new UctAlgorithm(_thinkTime).UctSearch(_gameInstance));
-            var action = node.Action;
+            UctAction action;
+            do {
+                var node = await Task.Run(() => new UctAlgorithm(_thinkTime).UctSearch(_gameInstance));
+                action = node.Action;
 
-            await eventHub.SlowPlayAction(_gameInstance, action);
+                await eventHub.SlowPlayAction(_gameInstance, action);
+            } while (action.Type != UctActionType.EndTurn);
         }
 
         public string Name => "MctsController";

@@ -112,10 +112,10 @@ namespace HexMage.Simulator.PCG {
             };
 
             var abilities = new List<int>();
-            var maxHp = Random.Next(30, 52);
+            var maxHp = Random.Next(30, 82);
             // TODO - fix me later, only used for debugging
-            maxHp = 1;
-            var maxAp = Random.Next(7, 12);
+            //maxHp = 1;
+            var maxAp = Random.Next(17, 30);
 
             for (int i = 0; i < 1; i++) {
                 var element = elements[Random.Next(0, 4)];
