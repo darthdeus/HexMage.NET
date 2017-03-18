@@ -15,12 +15,12 @@ namespace HexMage.Simulator.Tests {
 
             game.PrepareEverything();
 
-            game.SlowUpdateIsFinished();
+            game.State.SlowUpdateIsFinished(game.MobManager);
             Assert.IsFalse(game.IsFinished);
 
             game.FastUse(a1, m1, m2);
 
-            game.SlowUpdateIsFinished();
+            game.State.SlowUpdateIsFinished(game.MobManager);
             Assert.IsTrue(game.IsFinished);
         }
 
