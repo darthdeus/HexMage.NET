@@ -32,6 +32,11 @@ namespace HexMage.Simulator {
 
             string str = builder.ToString();
 
+            string dirname = @"c:\dev\graphs";
+            if (!Directory.Exists(dirname)) {
+                Directory.CreateDirectory(dirname);
+            }
+
             File.WriteAllText($"c:\\dev\\graphs\\graph{searchCount}.dot", str);
 #endif
             searchCount++;
@@ -95,6 +100,7 @@ namespace HexMage.Simulator {
         public UctNode Expand(UctNode node) {
             try {
                 var type = node.Action.Type;
+
                 node.PrecomputePossibleActions(type != UctActionType.Move, true || type != UctActionType.EndTurn);
 
                 var action = node.PossibleActions[node.Children.Count];
@@ -104,7 +110,8 @@ namespace HexMage.Simulator {
                 node.Children.Add(child);
 
                 return child;
-            } catch (ArgumentOutOfRangeException e) {
+            }
+            catch (ArgumentOutOfRangeException e) {
                 Debugger.Break();
                 throw;
             }
@@ -306,13 +313,12 @@ namespace HexMage.Simulator {
                 Console.WriteLine("Move failed!");
 
                 Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
-                          $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
+                    $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
                 return UctAction.EndTurnAction();
             }
         }
 
-        public static List<UctAction> PossibleActions(GameInstance state, bool allowMove = true,
-                                                      bool allowEndTurn = true) {
+        public static List<UctAction> PossibleActions(GameInstance state, bool allowMove, bool allowEndTurn) {
             var result = new List<UctAction>();
 
             var currentMob = state.TurnManager.CurrentMob;
@@ -375,7 +381,7 @@ namespace HexMage.Simulator {
             } else {
                 throw new InvalidOperationException();
                 Utils.Log(LogSeverity.Warning, nameof(UctNode),
-                          "Final state reached while trying to compute possible actions.");
+                    "Final state reached while trying to compute possible actions.");
             }
 
             if (allowEndTurn) {
