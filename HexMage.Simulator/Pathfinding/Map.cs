@@ -15,10 +15,8 @@ namespace HexMage.Simulator {
 
         public List<AxialCoord> AllCoords => _hexes.AllCoords;
 
-        private readonly Dictionary<CoordPair, List<AxialCoord>> _visibilityLines =
-            new Dictionary<CoordPair, List<AxialCoord>>();
-
-        private readonly Dictionary<CoordPair, bool> _visibility = new Dictionary<CoordPair, bool>();
+        private Dictionary<CoordPair, List<AxialCoord>> _visibilityLines = new Dictionary<CoordPair, List<AxialCoord>>();
+        private Dictionary<CoordPair, bool> _visibility = new Dictionary<CoordPair, bool>();
 
         public Map(int size, HexMap<HexType> hexes, List<AreaBuff> buffs) {
             Size = size;
@@ -119,14 +117,17 @@ namespace HexMage.Simulator {
             //    hexesCopy[coord] = _hexes[coord];
             //}
 
-            // TODO - nemelo by se kopirovat i visiblityLines a visibility?!?!?!?!??!?!
             foreach (var buff in AreaBuffs) {
                 buffsCopy.Add(buff);
             }
 
-            return new Map(Size, _hexes, buffsCopy) {
+            var map = new Map(Size, _hexes, buffsCopy) {
                 Guid = Guid
             };
+
+            map._visibility = _visibility;
+            map._visibilityLines = _visibilityLines;
+            return map;
         }
 
         public void Reset() {

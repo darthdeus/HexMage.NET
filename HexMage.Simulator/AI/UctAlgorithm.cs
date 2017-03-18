@@ -11,7 +11,7 @@ namespace HexMage.Simulator {
         public static int actions = 0;
 
         public UctNode UctSearch(GameInstance initialState) {
-            var root = new UctNode(0, 0, UctAction.NullAction(), initialState);
+            var root = new UctNode(0, 0, UctAction.NullAction(), initialState.DeepCopy());
 
             int iterations = _thinkTime * 1000;
 

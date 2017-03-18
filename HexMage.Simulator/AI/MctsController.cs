@@ -26,7 +26,8 @@ namespace HexMage.Simulator {
         }
 
         public async Task SlowPlayTurn(GameEventHub eventHub) {
-            var node = new UctAlgorithm(_thinkTime).UctSearch(_gameInstance);
+            // TODO - ujistit se, ze continuation bezi na spravnym threadu?
+            var node = await Task.Run(() => new UctAlgorithm(_thinkTime).UctSearch(_gameInstance));
             var action = node.Action;
 
             await eventHub.SlowPlayAction(_gameInstance, action);
