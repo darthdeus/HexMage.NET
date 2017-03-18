@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace HexMage.Simulator {
@@ -12,33 +13,38 @@ namespace HexMage.Simulator {
         }
 
         public void FastPlayTurn(GameEventHub eventHub) {
-            UctAction action;
+            var uct = new UctAlgorithm(_thinkTime);
+            var nodes = uct.UctSearch(_gameInstance);
 
-            do {
-                var uct = new UctAlgorithm(_thinkTime);
-                var node = uct.UctSearch(_gameInstance);
-                action = node.Action;
+            foreach (var node in nodes) {
+                Debug.Assert(node.Action.Type != UctActionType.EndTurn, "node.Action.Type != UctActionType.EndTurn");
 
-                // TODO - pokud nemam AP, tak MCTS stejne pocita dlouho, co muze udelat
+                UctAlgorithm.FNoCopy(_gameInstance, node.Action);
+            }
 
-                float endRatio = (float) UctAlgorithm.ActionCounts[UctActionType.EndTurn] /
-                                 UctAlgorithm.ActionCounts[UctActionType.AbilityUse];
+            float endRatio = (float) UctAlgorithm.ActionCounts[UctActionType.EndTurn] /
+                             UctAlgorithm.ActionCounts[UctActionType.AbilityUse];
 
-                // TODO: temporarily disabled logging
-                //Console.WriteLine($"action: {node.Action}, total: {UctAlgorithm.actions} [end ratio: {endRatio}]\t{UctAlgorithm.ActionCountString()}");
-                
-                UctAlgorithm.FNoCopy(_gameInstance, action);
-            } while (action.Type != UctActionType.EndTurn);
+            // TODO: temporarily disabled logging
+            //Console.WriteLine($"action: {node.Action}, total: {UctAlgorithm.actions} [end ratio: {endRatio}]\t{UctAlgorithm.ActionCountString()}");
         }
 
         public async Task SlowPlayTurn(GameEventHub eventHub) {
-            UctAction action;
-            do {
-                var node = await Task.Run(() => new UctAlgorithm(_thinkTime).UctSearch(_gameInstance));
-                action = node.Action;
+            var nodes = await Task.Run(() => new UctAlgorithm(_thinkTime).UctSearch(_gameInstance));
 
-                await eventHub.SlowPlayAction(_gameInstance, action);
-            } while (action.Type != UctActionType.EndTurn);
+            foreach (var node in nodes) {
+                Debug.Assert(node.Action.Type != UctActionType.EndTurn, "node.Action.Type != UctActionType.EndTurn");
+
+                await eventHub.SlowPlayAction(_gameInstance, node.Action);
+            }
+
+            //UctAction action;
+            //do {
+            //    var node = await Task.Run(() => new UctAlgorithm(_thinkTime).UctSearch(_gameInstance));
+            //    action = node.Action;
+
+            //    await eventHub.SlowPlayAction(_gameInstance, action);
+            //} while (action.Type != UctActionType.EndTurn);
         }
 
         public string Name => "MctsController";

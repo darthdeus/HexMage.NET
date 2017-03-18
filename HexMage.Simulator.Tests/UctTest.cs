@@ -106,7 +106,7 @@ namespace HexMage.Simulator.Tests {
             Assert.AreEqual(m1, game.TurnManager.CurrentMob.Value);
 
             var firstNode = new UctNode(0, 0, UctAction.NullAction(), game);
-            firstNode.PrecomputePossibleActions();
+            firstNode.PrecomputePossibleActions(true, true);
 
             Assert.AreEqual(7, firstNode.PossibleActions.Count);
 
@@ -123,7 +123,7 @@ namespace HexMage.Simulator.Tests {
             Assert.AreEqual(m2, game.TurnManager.CurrentMob.Value);
 
             var secondNode = new UctNode(0, 0, UctAction.NullAction(), game);
-            secondNode.PrecomputePossibleActions();
+            secondNode.PrecomputePossibleActions(true, true);
 
             Assert.AreEqual(8, secondNode.PossibleActions.Count);
             var useAction = secondNode.PossibleActions.First(x => x.Type == UctActionType.AbilityUse);

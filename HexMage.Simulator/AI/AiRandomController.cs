@@ -12,17 +12,30 @@ namespace HexMage.Simulator {
         }
 
         public void FastPlayTurn(GameEventHub eventHub) {
-            var action = UctAlgorithm.DefaultPolicyAction(_gameInstance);
+            UctAction action;
+            do {
+                action = UctAlgorithm.DefaultPolicyAction(_gameInstance);
 
-            // TODO - is this what we want?
-            UctAlgorithm.FNoCopy(_gameInstance, action);
+                if (action.Type == UctActionType.EndTurn) {
+                    break;
+                }
+
+                UctAlgorithm.FNoCopy(_gameInstance, action);
+            } while (!_gameInstance.IsFinished);            
         }
 
         public async Task SlowPlayTurn(GameEventHub eventHub) {
-            var action = UctAlgorithm.DefaultPolicyAction(_gameInstance);
+            UctAction action;
 
-            await eventHub.SlowPlayAction(_gameInstance, action);
-            //FastPlayTurn(eventHub);
+            do {
+                action = UctAlgorithm.DefaultPolicyAction(_gameInstance);
+
+                if (action.Type == UctActionType.EndTurn) {
+                    break;
+                }
+
+                await eventHub.SlowPlayAction(_gameInstance, action);
+            } while (!_gameInstance.IsFinished);
         }
 
         public string Name => nameof(AiRandomController);

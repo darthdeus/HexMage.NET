@@ -12,7 +12,7 @@ namespace HexMage.Simulator {
         public static int actions = 0;
         public static int searchCount = 0;
 
-        public UctNode UctSearch(GameInstance initialState) {
+        public List<UctNode> UctSearch(GameInstance initialState) {
             var root = new UctNode(0, 0, UctAction.NullAction(), initialState.DeepCopy());
 
             int iterations = _thinkTime * 1000;
@@ -41,17 +41,38 @@ namespace HexMage.Simulator {
 #endif
             searchCount++;
 
+            //UctNode result = root.Children[0];
 
-            UctNode result = root.Children[0];
+            //foreach (var child in root.Children) {
+            //    if (child.Q > result.Q) {
+            //        result = child;
+            //    }
+            //}
 
-            foreach (var child in root.Children) {
-                if (child.Q > result.Q) {
-                    result = child;
+            //return result;
+
+            var result = new List<UctNode>();
+            UctNode current = root;
+
+            do {
+                if (current.Children.Count == 0) break;
+
+                UctNode max = current.Children[0];
+
+                foreach (var child in current.Children) {
+                    if (child.Q > max.Q) {
+                        max = child;
+                    }
                 }
-            }
+
+                if (max.Action.Type != UctActionType.EndTurn) {
+                    result.Add(max);
+                }
+
+                current = max;
+            } while (current.Action.Type != UctActionType.EndTurn);
 
             return result;
-            //return BestChild(root);
         }
 
         void PrintDot(StringBuilder builder, UctNode node) {
@@ -110,8 +131,7 @@ namespace HexMage.Simulator {
                 node.Children.Add(child);
 
                 return child;
-            }
-            catch (ArgumentOutOfRangeException e) {
+            } catch (ArgumentOutOfRangeException e) {
                 Debugger.Break();
                 throw;
             }
@@ -193,6 +213,8 @@ namespace HexMage.Simulator {
                 }
 
                 FNoCopy(copy, action);
+
+                // TODO - odebrat az se opravi
                 copy.State.SlowUpdateIsFinished(copy.MobManager);
             }
 
@@ -313,7 +335,7 @@ namespace HexMage.Simulator {
                 Console.WriteLine("Move failed!");
 
                 Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
-                    $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
+                          $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
                 return UctAction.EndTurnAction();
             }
         }
@@ -381,7 +403,7 @@ namespace HexMage.Simulator {
             } else {
                 throw new InvalidOperationException();
                 Utils.Log(LogSeverity.Warning, nameof(UctNode),
-                    "Final state reached while trying to compute possible actions.");
+                          "Final state reached while trying to compute possible actions.");
             }
 
             if (allowEndTurn) {
