@@ -161,7 +161,7 @@ namespace HexMage.GUI.Renderers {
 
             _spriteBatch.Begin(transformMatrix: _camera.Transform, samplerState: Camera2D.SamplerState);
             foreach (var coord in heatmap.Map.AllCoords) {
-                float percent = heatmap.Map[coord] / (float) heatmap.MaxValue;
+                float percent = heatmap.Map[coord] / (float) heatmap.MaxValue / 2 + 0.5f;
                 DrawAt(_assetManager[AssetManager.HexHoverSprite], coord, Color.Red * percent * percent);
             }
             _spriteBatch.End();
@@ -185,8 +185,7 @@ namespace HexMage.GUI.Renderers {
 
                     var mouseMob = _gameInstance.State.AtCoord(mouseHex);
                     if (mouseMob != null) {
-                        path =
-                            _gameInstance.Pathfinder.PathToMob(mobInstance.Coord,
+                        path = _gameInstance.Pathfinder.PathToMob(mobInstance.Coord,
                                                                _gameInstance.State.MobInstances[mouseMob.Value].Coord);
                     } else {
                         path = _gameInstance.Pathfinder.PathTo(mobInstance.Coord, mouseHex);
