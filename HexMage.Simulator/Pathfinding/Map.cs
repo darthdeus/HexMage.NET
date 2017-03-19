@@ -85,7 +85,16 @@ namespace HexMage.Simulator {
                     var key = new CoordPair(a, b);
 
                     _visibilityLines[key] = line;
-                    _visibility[key] = line.All(coord => this[coord] == HexType.Empty);
+
+                    bool targetVisible = true;
+                    foreach (var coord in line) {
+                        if (this[coord] != HexType.Empty) {
+                            targetVisible = false;
+                            break;
+                        }
+                    }
+
+                    _visibility[key] = targetVisible;
                 }
             }
         }

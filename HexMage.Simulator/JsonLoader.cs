@@ -46,6 +46,8 @@ namespace HexMage.Simulator
     public class Setup {
         public List<JsonMob> red;
         public List<JsonMob> blue;
+
+
     }
 
     public class JsonLoader

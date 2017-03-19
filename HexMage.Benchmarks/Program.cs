@@ -1,4 +1,5 @@
 ﻿//#define COPY_BENCH
+
 #define FAST
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using HexMage.Simulator;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
@@ -185,7 +187,7 @@ namespace HexMage.Benchmarks {
             }
         }
 
-        class GenerationTeam {
+        internal class GenerationTeam {
             public Team Team;
             public double Rating;
 
@@ -216,27 +218,30 @@ namespace HexMage.Benchmarks {
                 var genWatch = new Stopwatch();
                 genWatch.Start();
 
-                foreach (var genTeam in generation) {
-                    var teamWatch = new Stopwatch();
-                    teamWatch.Start();
-                    var setup = new Setup() {red = team.mobs, blue = genTeam.Team.mobs};
-                    EvaluationResult result = EvaluateSetup(setup, map);
+                const bool sequential = true;
+                if (sequential) {
+                    foreach (var genTeam in generation) {
+                        PopulationMember(team, genTeam, map, Console.Out);
+                    }
+                } else {
+                    var tasks = generation.Select(genTeam => {
+                        return Task.Factory.StartNew(() => {
+                            var writer = new StringWriter();
 
-                    genTeam.Rating = result.WinPercentage;
-                    Console.WriteLine(genTeam.Rating);
+                            PopulationMember(team, genTeam, map, writer);
 
-                    Mutate(genTeam.Team, result.WinPercentage - 0.5);
-                    Console.WriteLine($"Total:\t\t{teamWatch.ElapsedMilliseconds}ms\nPer turn:\t{result.MillisecondsPerTurn}ms\nPer iteration:\t{result.MillisecondsPerIteration}ms");
-                    Console.WriteLine();
-                    Console.WriteLine();
+                            Console.Write(writer.ToString());
+                        });
+                    });
+
+                    Task.WaitAll(tasks.ToArray());
                 }
 
-                Console.WriteLine();
+                Console.WriteLine("****************************************************");
+                Console.WriteLine("****************************************************");
                 Console.WriteLine($"Generation done in {genWatch.ElapsedMilliseconds}ms");
-                Console.WriteLine();
-                Console.WriteLine();
-                Console.WriteLine();
-                Console.WriteLine();
+                Console.WriteLine("****************************************************");
+                Console.WriteLine("****************************************************");
             }
 
 
@@ -270,6 +275,23 @@ namespace HexMage.Benchmarks {
             //}
         }
 
+        public static void PopulationMember(Team team, GenerationTeam genTeam, Map map, TextWriter writer) {
+            var teamWatch = new Stopwatch();
+            teamWatch.Start();
+            var setup = new Setup() {red = team.mobs, blue = genTeam.Team.mobs};
+            EvaluationResult result = EvaluateSetup(setup, map, writer);
+
+            genTeam.Rating = result.WinPercentage;
+            writer.WriteLine(genTeam.Rating);
+
+            Mutate(genTeam.Team, result.WinPercentage - 0.5);
+
+            writer.WriteLine(
+                $"Total:\t\t{teamWatch.ElapsedMilliseconds}ms\nPer turn:\t{result.MillisecondsPerTurn}ms\nPer iteration:\t{result.MillisecondsPerIteration}ms");
+            writer.WriteLine();
+            writer.WriteLine();
+        }
+
         public static void Mutate(Team team, double scale) {
             var mobIndex = rand.Next(team.mobs.Count);
             var mob = team.mobs[mobIndex];
@@ -279,22 +301,22 @@ namespace HexMage.Benchmarks {
 
             switch (rand.Next(6)) {
                 case 0:
-                    ability.dmg = (int) Math.Max(1, ability.dmg + 2*scale);
+                    ability.dmg = (int) Math.Max(1, ability.dmg + 2 * scale);
                     break;
                 case 1:
                     ability.ap = (int) Math.Max(1, ability.ap + 3 * scale);
                     break;
                 case 2:
-                    ability.range = (int)Math.Max(1, ability.range - 3 * scale);
+                    ability.range = (int) Math.Max(1, ability.range - 3 * scale);
                     break;
                 case 3:
                     ability.cooldown = (int) Math.Max(0, ability.cooldown + 1 * scale);
                     break;
                 case 4:
-                    mob.hp = (int)Math.Max(mob.hp + 5 * scale, 1);
+                    mob.hp = (int) Math.Max(mob.hp + 5 * scale, 1);
                     break;
                 case 5:
-                    mob.ap = (int)Math.Max(mob.ap + 5 * scale, 1);
+                    mob.ap = (int) Math.Max(mob.ap + 5 * scale, 1);
                     break;
             }
         }
@@ -353,12 +375,12 @@ namespace HexMage.Benchmarks {
             string content = File.ReadAllText(@"simple.json");
             var setup = JsonLoader.Load(content);
 
-            var result = EvaluateSetup(setup, new Map(5));
+            var result = EvaluateSetup(setup, new Map(5), Console.Out);
 
             Console.WriteLine(result);
         }
 
-        private static EvaluationResult EvaluateSetup(Setup setup, Map map) {
+        private static EvaluationResult EvaluateSetup(Setup setup, Map map, TextWriter writer) {
             var game = new GameInstance(new Map(5));
             var mobIds = new List<int>();
 
@@ -380,7 +402,8 @@ namespace HexMage.Benchmarks {
 
             game.PrepareEverything();
 
-            var result = new GameInstanceEvaluator(game).Evaluate();
+            var result = new GameInstanceEvaluator(game, writer).Evaluate();
+
             return result;
         }
 

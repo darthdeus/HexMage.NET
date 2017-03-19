@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator.AI {
     public class GameInstanceEvaluator {
         private readonly GameInstance _gameInstance;
+        private readonly TextWriter _writer;
 
-        public GameInstanceEvaluator(GameInstance gameInstance) {
+        public GameInstanceEvaluator(GameInstance gameInstance, TextWriter writer) {
             _gameInstance = gameInstance;
+            _writer = writer;
         }
 
         public EvaluationResult Evaluate() {
@@ -48,7 +51,7 @@ namespace HexMage.Simulator.AI {
                         Debug.Assert(game.VictoryController != null);
 
                         //Console.WriteLine($"Won {game.VictoryTeam.Value} - {game.VictoryController} vs {game.LoserController} in {500 - iterations}");
-                        Console.Write($"{game.VictoryController}:{game.LoserController}...{maxIterations - iterations}, ");
+                        _writer.Write($"{game.VictoryController}:{game.LoserController}...{maxIterations - iterations}, ");
                         if (game.VictoryTeam == TeamColor.Red) {
                             result.RedWins++;
                         } else {
@@ -56,7 +59,7 @@ namespace HexMage.Simulator.AI {
                         }
                     } else {
                         result.Draws++;
-                        Console.Write("DRAW\t");
+                        _writer.Write("DRAW\t");
                     }
 
                     result.TotalTurns++;
@@ -67,7 +70,7 @@ namespace HexMage.Simulator.AI {
 
             result.TotalElapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
-            Console.WriteLine();
+            _writer.WriteLine();
 
             return result;
         }
