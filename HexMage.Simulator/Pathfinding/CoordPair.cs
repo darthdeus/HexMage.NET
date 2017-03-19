@@ -1,34 +1,15 @@
-﻿namespace HexMage.Simulator {
-    public struct CoordPair {
-        private AxialCoord _a;
-        private AxialCoord _b;
+﻿using System;
+using System.Diagnostics;
 
-        public CoordPair(AxialCoord a, AxialCoord b) {
-            _a = a;
-            _b = b;
-        }
+namespace HexMage.Simulator {
+    public static class CoordPair {
+        public static int Build(AxialCoord a, AxialCoord b) {
+            Debug.Assert(a.X < 100);
+            Debug.Assert(a.Y < 100);
+            Debug.Assert(b.X < 100);
+            Debug.Assert(b.Y < 100);            
 
-        public bool Equals(CoordPair other) {
-            return _a.Equals(other._a) && _b.Equals(other._b);
-        }
-
-        public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            return obj is CoordPair && Equals((CoordPair) obj);
-        }
-
-        public override int GetHashCode() {
-            unchecked {
-                return (_a.GetHashCode() * 397) ^ _b.GetHashCode();
-            }
-        }
-
-        public static bool operator ==(CoordPair left, CoordPair right) {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(CoordPair left, CoordPair right) {
-            return !left.Equals(right);
+            return a.X * 1000000 + a.Y * 10000 + b.X * 100 + b.Y;
         }
     }
 }

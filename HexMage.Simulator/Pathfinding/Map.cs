@@ -15,8 +15,8 @@ namespace HexMage.Simulator {
 
         public List<AxialCoord> AllCoords => _hexes.AllCoords;
 
-        private Dictionary<CoordPair, List<AxialCoord>> _visibilityLines = new Dictionary<CoordPair, List<AxialCoord>>();
-        private Dictionary<CoordPair, bool> _visibility = new Dictionary<CoordPair, bool>();
+        private Dictionary<int, List<AxialCoord>> _visibilityLines = new Dictionary<int, List<AxialCoord>>();
+        private Dictionary<int, bool> _visibility = new Dictionary<int, bool>();
 
         public Map(int size, HexMap<HexType> hexes, List<AreaBuff> buffs) {
             Size = size;
@@ -73,7 +73,7 @@ namespace HexMage.Simulator {
         }
 
         public bool IsVisible(AxialCoord from, AxialCoord to) {
-            return _visibility[new CoordPair(from, to)];
+            return _visibility[CoordPair.Build(from, to)];
         }
 
         public void PrecomputeCubeLinedraw() {
@@ -82,7 +82,7 @@ namespace HexMage.Simulator {
                     var result = ComputeCubeLinedraw(a, b);
                     var line = result.Select(x => x.ToAxial()).ToList();
 
-                    var key = new CoordPair(a, b);
+                    var key = CoordPair.Build(a, b);
 
                     _visibilityLines[key] = line;
 
@@ -100,7 +100,7 @@ namespace HexMage.Simulator {
         }
 
         public List<AxialCoord> AxialLinedraw(AxialCoord a, AxialCoord b) {
-            return _visibilityLines[new CoordPair(a, b)];
+            return _visibilityLines[CoordPair.Build(a, b)];
         }
 
         private List<CubeCoord> ComputeCubeLinedraw(CubeCoord a, CubeCoord b) {

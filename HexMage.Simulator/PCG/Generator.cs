@@ -4,6 +4,7 @@ using System.Linq;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator.PCG {
+    // TODO - remove map seeds altogether
     public struct MapSeed {
         private readonly Guid _guid;
 

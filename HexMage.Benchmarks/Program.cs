@@ -165,7 +165,7 @@ namespace HexMage.Benchmarks {
 
     internal class Program {
         //private static Random rand = new Random();
-        private static Random rand = new Random(22);
+        //private static Random rand = new Random(22);
 
         private static void Main(string[] args) {
             Console.WriteLine("Choose:");
@@ -293,6 +293,8 @@ namespace HexMage.Benchmarks {
         }
 
         public static void Mutate(Team team, double scale) {
+            var rand = Generator.Random;
+
             var mobIndex = rand.Next(team.mobs.Count);
             var mob = team.mobs[mobIndex];
             var abilities = mob.abilities;
@@ -322,6 +324,8 @@ namespace HexMage.Benchmarks {
         }
 
         public static void Strenghten(Team team) {
+            var rand = Generator.Random;
+
             var mobIndex = rand.Next(team.mobs.Count);
             var mob = team.mobs[mobIndex];
             var abilities = mob.abilities;
@@ -351,6 +355,8 @@ namespace HexMage.Benchmarks {
         }
 
         private static Team RandomTeam(int mobs, int spellsPerMob) {
+            var rand = Generator.Random;
+
             var team = new Team();
             team.mobs = new List<JsonMob>();
 

@@ -47,7 +47,6 @@ namespace HexMage.GUI.Renderers {
                     }
                 }
 
-
                 DrawHoverPath();
             } else {
                 var hexTooFar = _assetManager[AssetManager.HexPathSprite];
@@ -186,7 +185,7 @@ namespace HexMage.GUI.Renderers {
                     var mouseMob = _gameInstance.State.AtCoord(mouseHex);
                     if (mouseMob != null) {
                         path = _gameInstance.Pathfinder.PathToMob(mobInstance.Coord,
-                                                               _gameInstance.State.MobInstances[mouseMob.Value].Coord);
+                                                                  _gameInstance.State.MobInstances[mouseMob.Value].Coord);
                     } else {
                         path = _gameInstance.Pathfinder.PathTo(mobInstance.Coord, mouseHex);
                     }

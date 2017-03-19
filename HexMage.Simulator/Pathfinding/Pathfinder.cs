@@ -24,8 +24,8 @@ namespace HexMage.Simulator {
         public readonly HexMap<HexMap<Path>> AllPaths;
         private int Size => _gameInstance.Size;
 
-        private Dictionary<CoordPair, List<AxialCoord>> _precomputedPaths =
-            new Dictionary<CoordPair, List<AxialCoord>>();
+        private Dictionary<int, List<AxialCoord>> _precomputedPaths =
+            new Dictionary<int, List<AxialCoord>>();
 
         public Pathfinder(GameInstance gameInstance) {
             _gameInstance = gameInstance;
@@ -166,7 +166,7 @@ namespace HexMage.Simulator {
             _precomputedPaths.Clear();
             foreach (var source in AllPaths.AllCoords) {
                 foreach (var destination in AllPaths.AllCoords) {
-                    var key = new CoordPair(source, destination);
+                    var key = CoordPair.Build(source, destination);
 
                     // TODO - path returns a reversed path including the starting point
                     var path = PathTo(source, destination);
@@ -180,7 +180,7 @@ namespace HexMage.Simulator {
         }
 
         public List<AxialCoord> PrecomputedPathTo(AxialCoord from, AxialCoord to) {
-            return _precomputedPaths[new CoordPair(from, to)];
+            return _precomputedPaths[CoordPair.Build(from, to)];
         }
 
         public void PathfindDistanceOnlyFrom(HexMap<Path> distanceMap, AxialCoord start) {

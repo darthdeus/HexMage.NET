@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
+using HexMage.Simulator.PCG;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -26,7 +27,6 @@ namespace HexMage.GUI.Components {
         public float AgeSpeed { get; set; }
         public readonly List<Particle> Particles = new List<Particle>();
 
-        private Random _rnd;
         private float _millisecondTimeout;
         private float _elapsedSinceLastEmit = 0;
         private readonly Func<Random, Vector2> _offsetFunc;
@@ -49,8 +49,6 @@ namespace HexMage.GUI.Components {
             ParticleSprite = particleSprite;
             AgeSpeed = ageSpeed;
             Renderer = new ParticleSystemRenderer(this);
-
-            _rnd = new Random();
         }
 
         protected override void Update(GameTime time) {
@@ -74,9 +72,9 @@ namespace HexMage.GUI.Components {
         }
 
         private void EmitParticle() {
-            var offset = _offsetFunc.Invoke(_rnd);
+            var offset = _offsetFunc.Invoke(Generator.Random);
 
-            var velocity = Direction*Speed + _velocityFunc.Invoke(_rnd);
+            var velocity = Direction*Speed + _velocityFunc.Invoke(Generator.Random);
             var particle = new Particle(velocity) {
                 Position = offset*10
             };
