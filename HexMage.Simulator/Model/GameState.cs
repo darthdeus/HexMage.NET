@@ -6,6 +6,11 @@ using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
     public class GameState {
+        public struct MobPosition {
+            public int MobId;
+            public AxialCoord Coord;
+        }
+
         public MobInstance[] MobInstances = new MobInstance[0];
         public readonly List<int> Cooldowns = new List<int>();
         public int? CurrentMobIndex;
@@ -13,7 +18,7 @@ namespace HexMage.Simulator {
         // This is optimized specifically for the smaller data sets on which
         // the evolution is being performed.
         // TODO - pole lepsi?
-        [JsonIgnore] public Dictionary<int, AxialCoord> MobPositions = new Dictionary<int, AxialCoord>();
+        //[JsonIgnore] public Dictionary<int, AxialCoord> MobPositions = new Dictionary<int, AxialCoord>();
         public int RedAlive = 0;
         public int BlueAlive = 0;
 
@@ -69,19 +74,17 @@ namespace HexMage.Simulator {
         }
 
         public void SetMobPosition(int mobId, AxialCoord coord) {
-            var instance = MobInstances[mobId];
-            MobPositions[mobId] = coord;
-
             MobInstances[mobId].Coord = coord;
-            //mobinfo[mobId].OrigCoord = coord;
         }
 
         public int? AtCoord(AxialCoord c) {
-            foreach (var mobPosition in MobPositions) {
-                if (mobPosition.Value == c) {
-                    return mobPosition.Key;
+            for (int i = 0; i < MobInstances.Length; i++) {
+                if (MobInstances[i].Coord == c) {
+                    return i;
                 }
             }
+
+            return null;
 
             return null;
         }
@@ -161,11 +164,6 @@ namespace HexMage.Simulator {
                 gameStateCopy.Cooldowns.Add(Cooldowns[i]);
             }
 
-            gameStateCopy.MobPositions = new Dictionary<int, AxialCoord>();
-            foreach (var mobPosition in MobPositions) {
-                gameStateCopy.MobPositions[mobPosition.Key] = mobPosition.Value;
-            }
-
             gameStateCopy.MobInstances = new MobInstance[MobInstances.Length];
             for (int i = 0; i < MobInstances.Length; i++) {
                 gameStateCopy.MobInstances[i] = MobInstances[i].DeepCopy();
@@ -180,8 +178,6 @@ namespace HexMage.Simulator {
             CurrentMobIndex = null;
             RedAlive = 0;
             BlueAlive = 0;
-
-            MobPositions.Clear();
         }
 
         public void Reset(MobManager mobManager) {

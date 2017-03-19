@@ -25,7 +25,7 @@ namespace HexMage.GUI.Renderers {
         public BoardRenderMode Mode { get; set; }
 
         public GameBoardRenderer(GameInstance gameInstance, GameBoardController gameBoardController,
-            GameEventHub eventHub, Camera2D camera) {
+                                 GameEventHub eventHub, Camera2D camera) {
             _gameInstance = gameInstance;
             _gameBoardController = gameBoardController;
             _eventHub = eventHub;
@@ -43,7 +43,7 @@ namespace HexMage.GUI.Renderers {
                     if (Mode == BoardRenderMode.HoverHeatmap) {
                         DrawHoverHeatmap(currentMob.Value);
                     } else if (Mode == BoardRenderMode.GlobalHeatmap) {
-                        DrawGlobalHeatmap(currentMob.Value);
+                        DrawGlobalHeatmap();
                     }
                 }
 
@@ -144,8 +144,8 @@ namespace HexMage.GUI.Renderers {
 
                     _spriteBatch.Begin(transformMatrix: _camera.Transform, samplerState: Camera2D.SamplerState);
                     foreach (var coord in heatmap.AllCoords) {
-                        float percent = heatmap[coord]/(float) maxDmg;
-                        DrawAt(_assetManager[AssetManager.HexHoverSprite], coord, Color.Red*percent*percent);
+                        float percent = heatmap[coord] / (float) maxDmg;
+                        DrawAt(_assetManager[AssetManager.HexHoverSprite], coord, Color.Red * percent * percent);
                     }
                     _spriteBatch.End();
                 }
@@ -153,43 +153,16 @@ namespace HexMage.GUI.Renderers {
         }
 
 
-        private void DrawGlobalHeatmap(int currentMob) {
+        private void DrawGlobalHeatmap() {
             var mobManager = _gameInstance.MobManager;
             var state = _gameInstance.State;
 
-            var heatmap = new HexMap<int>(_gameInstance.Size);
-            int maxDmg = 0;
-
-            foreach (var mobId in mobManager.Mobs) {
-                var playerTeam = mobManager.MobInfos[currentMob].Team;
-                var mobInfo = mobManager.MobInfos[mobId];
-                var mobInstance = state.MobInstances[mobId];
-
-                if (playerTeam != mobInfo.Team) {
-                    foreach (var coord in heatmap.AllCoords) {
-                        int maxAbilityDmg = 0;
-                        foreach (var abilityId in mobInfo.Abilities) {
-                            var abilityInfo = mobManager.AbilityForId(abilityId);
-
-#warning TODO - resit cooldowny
-                            if (coord.Distance(mobInstance.Coord) <= abilityInfo.Range &&
-                                abilityInfo.Cost <= mobInstance.Ap) {
-                                if (abilityInfo.Dmg > maxAbilityDmg) {
-                                    maxAbilityDmg = abilityInfo.Dmg;
-                                }
-                            }
-                        }
-
-                        heatmap[coord] += maxAbilityDmg;
-                        if (heatmap[coord] > maxDmg) maxDmg = heatmap[coord];
-                    }
-                }
-            }
+            var heatmap = _gameInstance.BuildHeatmap();
 
             _spriteBatch.Begin(transformMatrix: _camera.Transform, samplerState: Camera2D.SamplerState);
-            foreach (var coord in heatmap.AllCoords) {
-                float percent = heatmap[coord]/(float) maxDmg;
-                DrawAt(_assetManager[AssetManager.HexHoverSprite], coord, Color.Red*percent*percent);
+            foreach (var coord in heatmap.Map.AllCoords) {
+                float percent = heatmap.Map[coord] / (float) heatmap.MaxValue;
+                DrawAt(_assetManager[AssetManager.HexHoverSprite], coord, Color.Red * percent * percent);
             }
             _spriteBatch.End();
         }
@@ -213,7 +186,8 @@ namespace HexMage.GUI.Renderers {
                     var mouseMob = _gameInstance.State.AtCoord(mouseHex);
                     if (mouseMob != null) {
                         path =
-                            _gameInstance.Pathfinder.PathToMob(mobInstance.Coord, _gameInstance.State.MobInstances[mouseMob.Value].Coord);
+                            _gameInstance.Pathfinder.PathToMob(mobInstance.Coord,
+                                                               _gameInstance.State.MobInstances[mouseMob.Value].Coord);
                     } else {
                         path = _gameInstance.Pathfinder.PathTo(mobInstance.Coord, mouseHex);
                     }
@@ -228,7 +202,7 @@ namespace HexMage.GUI.Renderers {
                         foreach (var cubeCoord in cubepath) {
                             if (!_gameInstance.Pathfinder.IsValidCoord(cubeCoord)) {
                                 Utils.Log(LogSeverity.Warning, nameof(GameBoardRenderer),
-                                    $"Computed invalid cube visibility path of {cubeCoord}.");
+                                          $"Computed invalid cube visibility path of {cubeCoord}.");
                                 continue;
                             }
                             if (_gameInstance.Map[cubeCoord] == HexType.Wall) {

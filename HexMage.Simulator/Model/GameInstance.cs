@@ -106,6 +106,69 @@ namespace HexMage.Simulator {
             }
         }
 
+        public class Heatmap {
+            // TODO - make these properties
+            public HexMap<int> Map;
+            public int Size;
+            public int MaxValue;
+
+            public Heatmap(int size) {
+                Size = size;
+                Map = new HexMap<int>(size);
+                MaxValue = 0;
+            }
+        }
+
+        public Heatmap BuildHeatmap() {
+            var heatmap = new Heatmap(Size);
+            if (CurrentTeam.HasValue) {
+                int maxDmg = 0;
+                var playerTeam = CurrentTeam.Value;
+
+                foreach (var coord in heatmap.Map.AllCoords) {
+                    foreach (var mobId in MobManager.Mobs) {
+                        var mobInfo = MobManager.MobInfos[mobId];
+                        var mobInstance = State.MobInstances[mobId];
+
+                        if (playerTeam == mobInfo.Team) continue;
+
+                        int maxAbilityDmg = 0;
+                        foreach (var abilityId in mobInfo.Abilities) {
+                            var abilityInfo = MobManager.AbilityForId(abilityId);
+
+                            bool withinRange = Map.AxialDistance(coord, mobInstance.Coord) <= abilityInfo.Range;
+                            bool onCooldown = State.Cooldowns[abilityId] > 0;
+                            bool hasEnoughAp = abilityInfo.Cost <= mobInstance.Ap;
+
+                            bool isAbilityUsable = withinRange && !onCooldown && hasEnoughAp;
+
+                            if (isAbilityUsable && abilityInfo.Dmg > maxAbilityDmg) {
+                                maxAbilityDmg = abilityInfo.Dmg;
+                            }
+//#warning TODO - resit cooldowny
+//                            if (coord.Distance(mobInstance.Coord) <= abilityInfo.Range &&
+//                                abilityInfo.Cost <= mobInstance.Ap) {
+//                                if (abilityInfo.Dmg > maxAbilityDmg) {
+//                                    maxAbilityDmg = abilityInfo.Dmg;
+//                                }
+//                            }
+                        }
+
+                        heatmap.Map[coord] += maxAbilityDmg;
+
+                        if (heatmap.Map[coord] > maxDmg) {
+                            maxDmg = heatmap.Map[coord];
+                        }
+                    }
+                }
+
+                heatmap.MaxValue = maxDmg;
+            }
+
+
+            return heatmap;
+        }
+
         public bool IsAbilityUsable(int mobId, int abilityId) {
             var ability = MobManager.AbilityForId(abilityId);
             var mob = State.MobInstances[mobId];

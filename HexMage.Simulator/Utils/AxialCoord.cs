@@ -69,12 +69,7 @@ namespace HexMage.Simulator {
         public override string ToString() {
             return $"[{X},{Y}]";
         }
-
-        public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            return obj is AxialCoord && Equals((AxialCoord) obj);
-        }
-
+        
         public override int GetHashCode() {
             unchecked {
                 return (X*397) ^ Y;
