@@ -1,4 +1,5 @@
 //#define DOTGRAPH
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -376,29 +377,52 @@ namespace HexMage.Simulator {
                 }
 
                 if (allowMove) {
+                    var heatmap = state.BuildHeatmap();
+                    var usedValues = new HashSet<int>();
+
                     // TODO - proper move action concatenation
                     var moveActions = new List<UctAction>();
 
-                    // TODO - properly define max actions
-                    int count = 2;
-                    foreach (var coord in state.Map.AllCoords) {
-                        if (coord == mobInstance.Coord) continue;
-
-                        if (state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
-                            if (state.State.AtCoord(coord) == null && count-- > 0) {
-                                moveActions.Add(UctAction.MoveAction(mobId, coord));
-                                //result.Add(UctAction.MoveAction(mobId, coord));
-                            }
+                    foreach (var coord in heatmap.Map.AllCoords) {
+                        if (state.State.AtCoord(coord).HasValue) {
+                            continue;
                         }
+
+                        bool canMoveTo = state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap;
+
+                        if (!canMoveTo) continue;
+
+                        // TODO - tohle je asi overkill, ale nemame lepsi zpusob jak iterovat
+                        int value = heatmap.Map[coord];
+
+                        if (usedValues.Contains(value)) continue;
+
+                        usedValues.Add(value);
+                        moveActions.Add(UctAction.MoveAction(mobId, coord));
                     }
 
-                    if (count == 0) {
-                        //Console.WriteLine("More than 100 possible move actions.");
-                    }
+                    result.AddRange(moveActions);
 
-                    Shuffle(moveActions);
+                    //// TODO - properly define max actions
+                    //int count = 2;
+                    //foreach (var coord in state.Map.AllCoords) {
+                    //    if (coord == mobInstance.Coord) continue;
 
-                    result.AddRange(moveActions.Take(20));
+                    //    if (state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
+                    //        if (state.State.AtCoord(coord) == null && count-- > 0) {
+                    //            moveActions.Add(UctAction.MoveAction(mobId, coord));
+                    //            //result.Add(UctAction.MoveAction(mobId, coord));
+                    //        }
+                    //    }
+                    //}
+
+                    //if (count == 0) {
+                    //    //Console.WriteLine("More than 100 possible move actions.");
+                    //}
+
+                    //Shuffle(moveActions);
+
+                    //result.AddRange(moveActions.Take(20));
                 }
             } else {
                 throw new InvalidOperationException();
