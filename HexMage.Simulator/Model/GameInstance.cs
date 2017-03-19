@@ -136,11 +136,12 @@ namespace HexMage.Simulator {
                         foreach (var abilityId in mobInfo.Abilities) {
                             var abilityInfo = MobManager.AbilityForId(abilityId);
 
-                            bool withinRange = Map.AxialDistance(coord, mobInstance.Coord) <= abilityInfo.Range;
+                            bool isVisible = Map.IsVisible(mobInstance.Coord, coord);
+                            bool withinRange = Map.AxialDistance(mobInstance.Coord, coord) <= abilityInfo.Range;
                             bool onCooldown = State.Cooldowns[abilityId] > 0;
                             bool hasEnoughAp = abilityInfo.Cost <= mobInstance.Ap;
 
-                            bool isAbilityUsable = withinRange && !onCooldown && hasEnoughAp;
+                            bool isAbilityUsable = isVisible && withinRange && !onCooldown && hasEnoughAp;
 
                             if (isAbilityUsable && abilityInfo.Dmg > maxAbilityDmg) {
                                 maxAbilityDmg = abilityInfo.Dmg;
