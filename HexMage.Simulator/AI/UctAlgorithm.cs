@@ -10,14 +10,29 @@ using HexMage.Simulator.Model;
 using HexMage.Simulator.PCG;
 
 namespace HexMage.Simulator {
+    public class UctSearchResult {
+        public List<UctNode> Actions { get; }
+        public double MillisecondsPerIteration { get; }
+
+        public UctSearchResult(List<UctNode> actions, double millisecondsPerIteration) {
+            Actions = actions;
+            MillisecondsPerIteration = millisecondsPerIteration;
+        }
+    }
+
     public class UctAlgorithm {
         public static int actions = 0;
         public static int searchCount = 0;
 
-        public List<UctNode> UctSearch(GameInstance initialState) {
+
+        public UctSearchResult UctSearch(GameInstance initialState) {
             var root = new UctNode(0, 0, UctAction.NullAction(), initialState.DeepCopy());
 
-            int iterations = _thinkTime * 1000;
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            int totalIterations = _thinkTime * 1000;
+            int iterations = totalIterations;
 
             while (iterations-- > 0) {
                 UctNode v = TreePolicy(root);
@@ -25,6 +40,7 @@ namespace HexMage.Simulator {
                 Backup(v, delta);
             }
 
+            stopwatch.Stop();
 #if DOTGRAPH
             PrintDotgraph(root);            
 #endif
@@ -32,7 +48,8 @@ namespace HexMage.Simulator {
 
             //Console.WriteLine($"Total Q: {root.Children.Sum(c => c.Q)}, N: {root.Children.Sum(c => c.N)}");
 
-            return SelectBestActions(root);
+            var actions = SelectBestActions(root);
+            return new UctSearchResult(actions, (double) stopwatch.ElapsedMilliseconds / (double) totalIterations);
         }
 
         public UctNode TreePolicy(UctNode node) {
@@ -56,10 +73,6 @@ namespace HexMage.Simulator {
                     best = child;
                 }
             }
-
-            //if (node.Action.Type == UctActionType.EndTurn && best.Action.Type == UctActionType.EndTurn) {
-            //    throw new InvalidOperationException();
-            //}
 
             return best;
         }
@@ -326,52 +339,7 @@ namespace HexMage.Simulator {
                 }
 
                 if (allowMove) {
-                    var heatmap = state.BuildHeatmap();
-                    var usedValues = new HashSet<int>();
-
-                    // TODO - proper move action concatenation
-                    var moveActions = new List<UctAction>();
-
-                    foreach (var coord in heatmap.Map.AllCoords) {
-                        if (state.State.AtCoord(coord).HasValue) {
-                            continue;
-                        }
-
-                        bool canMoveTo = state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap;
-
-                        if (!canMoveTo) continue;
-
-                        // TODO - tohle je asi overkill, ale nemame lepsi zpusob jak iterovat
-                        int value = heatmap.Map[coord];
-
-                        if (usedValues.Contains(value)) continue;
-
-                        usedValues.Add(value);
-                        moveActions.Add(UctAction.MoveAction(mobId, coord));
-                    }
-
-                    result.AddRange(moveActions);
-
-                    //// TODO - properly define max actions
-                    //int count = 2;
-                    //foreach (var coord in state.Map.AllCoords) {
-                    //    if (coord == mobInstance.Coord) continue;
-
-                    //    if (state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
-                    //        if (state.State.AtCoord(coord) == null && count-- > 0) {
-                    //            moveActions.Add(UctAction.MoveAction(mobId, coord));
-                    //            //result.Add(UctAction.MoveAction(mobId, coord));
-                    //        }
-                    //    }
-                    //}
-
-                    //if (count == 0) {
-                    //    //Console.WriteLine("More than 100 possible move actions.");
-                    //}
-
-                    //Shuffle(moveActions);
-
-                    //result.AddRange(moveActions.Take(20));
+                    GenerateMoveActions(state, mobInstance, mobId, result);
                 }
             } else {
                 throw new InvalidOperationException();
@@ -384,6 +352,58 @@ namespace HexMage.Simulator {
             }
 
             return result;
+        }
+
+        private static void GenerateMoveActions(GameInstance state, MobInstance mobInstance, int mobId,
+                                                List<UctAction> result) {
+            const bool useHeatmap = false;
+            var moveActions = new List<UctAction>();
+
+            if (useHeatmap) {
+                var heatmap = state.BuildHeatmap();
+                var usedValues = new HashSet<int>();
+
+                foreach (var coord in heatmap.Map.AllCoords) {
+                    if (state.State.AtCoord(coord).HasValue) {
+                        continue;
+                    }
+
+                    bool canMoveTo = state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap;
+
+                    if (!canMoveTo) continue;
+
+                    // TODO - tohle je asi overkill, ale nemame lepsi zpusob jak iterovat
+                    int value = heatmap.Map[coord];
+
+                    if (usedValues.Contains(value)) continue;
+
+                    usedValues.Add(value);
+                    moveActions.Add(UctAction.MoveAction(mobId, coord));
+                }
+
+                result.AddRange(moveActions);
+            } else {
+                //// TODO - properly define max actions
+                int count = 2;
+                foreach (var coord in state.Map.AllCoords) {
+                    if (coord == mobInstance.Coord) continue;
+
+                    if (state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
+                        if (state.State.AtCoord(coord) == null && count-- > 0) {
+                            moveActions.Add(UctAction.MoveAction(mobId, coord));
+                            //result.Add(UctAction.MoveAction(mobId, coord));
+                        }
+                    }
+                }
+
+                if (count == 0) {
+                    //Console.WriteLine("More than 100 possible move actions.");
+                }
+
+                Shuffle(moveActions);
+
+                result.AddRange(moveActions.Take(20));
+            }
         }
 
         public static void Shuffle<T>(IList<T> list) {

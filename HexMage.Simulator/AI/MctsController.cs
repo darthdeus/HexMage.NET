@@ -17,7 +17,7 @@ namespace HexMage.Simulator {
             var uct = new UctAlgorithm(_thinkTime);
             var nodes = uct.UctSearch(_gameInstance);
 
-            foreach (var node in nodes) {
+            foreach (var node in nodes.Actions) {
                 Debug.Assert(node.Action.Type != UctActionType.EndTurn, "node.Action.Type != UctActionType.EndTurn");
 
                 UctAlgorithm.FNoCopy(_gameInstance, node.Action);
@@ -26,10 +26,12 @@ namespace HexMage.Simulator {
             float endRatio = (float) UctAlgorithm.ActionCounts[UctActionType.EndTurn] /
                              UctAlgorithm.ActionCounts[UctActionType.AbilityUse];
 
+            Console.WriteLine($"*** MCTS SPEED: {nodes.MillisecondsPerIteration}ms/iter***");
+
             if (EnableLogging) {
-                foreach (var node in nodes) {
+                foreach (var node in nodes.Actions) {
                     Console.WriteLine($"action: {node.Action}");
-                }
+                }                
 
                 Console.WriteLine(
                     $"total: {UctAlgorithm.actions} [end ratio: {endRatio}]\t{UctAlgorithm.ActionCountString()}");
@@ -39,7 +41,7 @@ namespace HexMage.Simulator {
         public async Task SlowPlayTurn(GameEventHub eventHub) {
             var nodes = await Task.Run(() => new UctAlgorithm(_thinkTime).UctSearch(_gameInstance));
 
-            foreach (var node in nodes) {
+            foreach (var node in nodes.Actions) {
                 Debug.Assert(node.Action.Type != UctActionType.EndTurn, "node.Action.Type != UctActionType.EndTurn");
 
                 await eventHub.SlowPlayAction(_gameInstance, node.Action);
