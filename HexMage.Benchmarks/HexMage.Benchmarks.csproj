@@ -47,8 +47,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Evolution.cs" />
+    <Compile Include="GenerationTeam.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Benchmarks.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

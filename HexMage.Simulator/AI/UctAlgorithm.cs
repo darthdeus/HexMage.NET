@@ -1,4 +1,4 @@
-#define DOTGRAPH
+//#define DOTGRAPH
 
 using System;
 using System.Collections.Generic;
@@ -26,68 +26,13 @@ namespace HexMage.Simulator {
             }
 
 #if DOTGRAPH
-            var builder = new StringBuilder();
-
-            builder.AppendLine("digraph G {");
-            int budget = 2;
-            PrintDot(builder, root, budget);
-            builder.AppendLine("}");
-
-            string str = builder.ToString();
-
-            string dirname = @"c:\dev\graphs";
-            if (!Directory.Exists(dirname)) {
-                Directory.CreateDirectory(dirname);
-            }
-
-            File.WriteAllText($"c:\\dev\\graphs\\graph{searchCount}.dot", str);
+            PrintDotgraph(root);            
 #endif
             searchCount++;
 
-            //UctNode result = root.Children[0];
+            //Console.WriteLine($"Total Q: {root.Children.Sum(c => c.Q)}, N: {root.Children.Sum(c => c.N)}");
 
-            //foreach (var child in root.Children) {
-            //    if (child.Q > result.Q) {
-            //        result = child;
-            //    }
-            //}
-
-            //return result;
-
-            var result = new List<UctNode>();
-            UctNode current = root;
-
-            do {
-                if (current.Children.Count == 0) break;
-
-                UctNode max = current.Children[0];
-
-                foreach (var child in current.Children) {
-                    if (child.Q > max.Q) {
-                        max = child;
-                    }
-                }
-
-                if (max.Action.Type != UctActionType.EndTurn) {
-                    result.Add(max);
-                }
-
-                current = max;
-            } while (current.Action.Type != UctActionType.EndTurn);
-
-            return result;
-        }
-
-        void PrintDot(StringBuilder builder, UctNode node, int budget) {
-            if (budget == 0) return;
-
-            foreach (var child in node.Children) {
-                builder.AppendLine($"\"{node}\" -> \"{child}\"");
-            }
-
-            foreach (var child in node.Children) {
-                PrintDot(builder, child, budget - 1);
-            }
+            return SelectBestActions(root);
         }
 
         public UctNode TreePolicy(UctNode node) {
@@ -450,6 +395,72 @@ namespace HexMage.Simulator {
                 T value = list[k];
                 list[k] = list[n];
                 list[n] = value;
+            }
+        }
+
+
+        private List<UctNode> SelectBestActions(UctNode root) {
+            //UctNode result = root.Children[0];
+
+            //foreach (var child in root.Children) {
+            //    if (child.Q > result.Q) {
+            //        result = child;
+            //    }
+            //}
+
+            //return result;
+
+            var result = new List<UctNode>();
+            UctNode current = root;
+
+            do {
+                if (current.Children.Count == 0) break;
+
+                UctNode max = current.Children[0];
+
+                foreach (var child in current.Children) {
+                    if (child.Q > max.Q) {
+                        max = child;
+                    }
+                }
+
+                if (max.Action.Type != UctActionType.EndTurn) {
+                    result.Add(max);
+                }
+
+                current = max;
+            } while (current.Action.Type != UctActionType.EndTurn);
+
+            return result;
+        }
+
+        private void PrintDotgraph(UctNode root) {
+            var builder = new StringBuilder();
+
+            builder.AppendLine("digraph G {");
+            int budget = 2;
+            PrintDotNode(builder, root, budget);
+            builder.AppendLine("}");
+
+            string str = builder.ToString();
+
+            string dirname = @"c:\dev\graphs";
+            if (!Directory.Exists(dirname)) {
+                Directory.CreateDirectory(dirname);
+            }
+
+            File.WriteAllText($"c:\\dev\\graphs\\graph{searchCount}.dot", str);
+        }
+
+        private void PrintDotNode(StringBuilder builder, UctNode node, int budget) {
+            if (budget == 0) return;
+
+            foreach (var child in node.Children) {
+                builder.AppendLine($"\"{node}\" -> \"{child}\"");
+            }
+
+            foreach (var child in node.Children) {
+                PrintDotNode(builder, child, budget - 1);
             }
         }
     }

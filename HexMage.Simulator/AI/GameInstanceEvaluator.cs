@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator.AI {
@@ -51,7 +53,8 @@ namespace HexMage.Simulator.AI {
                         Debug.Assert(game.VictoryController != null);
 
                         //Console.WriteLine($"Won {game.VictoryTeam.Value} - {game.VictoryController} vs {game.LoserController} in {500 - iterations}");
-                        _writer.Write($"{game.VictoryController}:{game.LoserController}...{maxIterations - iterations}, ");
+                        _writer.Write(
+                            $"{game.VictoryController}:{game.LoserController}...{maxIterations - iterations}, ");
                         if (game.VictoryTeam == TeamColor.Red) {
                             result.RedWins++;
                         } else {
@@ -73,6 +76,45 @@ namespace HexMage.Simulator.AI {
             _writer.WriteLine();
 
             return result;
+        }
+
+        private static void PreparePositions(GameInstance game, List<int> mobIds, int x, int y) {
+            game.State.SetMobPosition(mobIds[0], new AxialCoord(x, y));
+            game.State.SetMobPosition(mobIds[1], new AxialCoord(y, x));
+
+            game.State.SetMobPosition(mobIds[2], new AxialCoord(-x, -y));
+            game.State.SetMobPosition(mobIds[3], new AxialCoord(-y, -x));
+
+            game.PrepareEverything();
+        }
+
+        public static List<EvaluationResult> EvaluateSetup(Setup setup, TextWriter writer) {
+            const int mapSize = 10;
+
+            var game = new GameInstance(new Map(mapSize));
+            var mobIds = new List<int>();
+
+            foreach (var mob in setup.red) {
+                var ids = mob.abilities.Select(ab => game.AddAbilityWithInfo(ab.ToAbility()));
+                mobIds.Add(game.AddMobWithInfo(mob.ToMobInfo(TeamColor.Red, ids)));
+            }
+
+            foreach (var mob in setup.blue) {
+                var ids = mob.abilities.Select(ab => game.AddAbilityWithInfo(ab.ToAbility()));
+                mobIds.Add(game.AddMobWithInfo(mob.ToMobInfo(TeamColor.Blue, ids)));
+            }
+
+            var results = new List<EvaluationResult>();
+
+            for (int i = 0; i < mapSize; i += 3) {
+                PreparePositions(game, mobIds, i, mapSize - i);
+
+                var result = new GameInstanceEvaluator(game, writer).Evaluate();
+
+                results.Add(result);
+            }
+
+            return results;
         }
     }
 

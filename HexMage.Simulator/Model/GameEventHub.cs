@@ -82,7 +82,6 @@ namespace HexMage.Simulator {
 
             while (!_gameInstance.IsFinished) {
                 totalTurns++;
-                Console.WriteLine("Loop iter");
 
                 turnManager.CurrentController.FastPlayTurn(this);
                 turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder, _gameInstance.State);

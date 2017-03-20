@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace HexMage.Simulator {
     public class MctsController : IMobController {
+        public static bool EnableLogging = true;
         private readonly GameInstance _gameInstance;
         private readonly int _thinkTime;
 
@@ -25,11 +26,14 @@ namespace HexMage.Simulator {
             float endRatio = (float) UctAlgorithm.ActionCounts[UctActionType.EndTurn] /
                              UctAlgorithm.ActionCounts[UctActionType.AbilityUse];
 
-            foreach (var node in nodes) {
-                Console.WriteLine($"action: {node.Action}");
+            if (EnableLogging) {
+                foreach (var node in nodes) {
+                    Console.WriteLine($"action: {node.Action}");
+                }
+
+                Console.WriteLine(
+                    $"total: {UctAlgorithm.actions} [end ratio: {endRatio}]\t{UctAlgorithm.ActionCountString()}");
             }
-            // TODO: temporarily disabled logging
-            Console.WriteLine($"total: {UctAlgorithm.actions} [end ratio: {endRatio}]\t{UctAlgorithm.ActionCountString()}");
         }
 
         public async Task SlowPlayTurn(GameEventHub eventHub) {
