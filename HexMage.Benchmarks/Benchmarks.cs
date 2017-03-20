@@ -49,7 +49,6 @@ namespace HexMage.Benchmarks {
 
             mobManager.Teams[t1] = new MctsController(gameInstance);
             mobManager.Teams[t2] = new MctsController(gameInstance);
-            //mobManager.Teams[t2] = new AiRandomController(gameInstance);
 
             for (int i = 0; i < 5; i++) {
                 pathfinder.PathfindDistanceAll();

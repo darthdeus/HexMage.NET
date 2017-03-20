@@ -15,7 +15,7 @@ namespace HexMage.Simulator {
         public HexMap(int size) {
             Debug.Assert(size > 0);
             Size = size;
-            _data = new T[Size*2 + 1, Size*2 + 1];
+            _data = new T[Size * 2 + 1, Size * 2 + 1];
         }
 
         public T this[AxialCoord c] {
@@ -26,9 +26,10 @@ namespace HexMage.Simulator {
         public T this[int x, int y] {
             get { return this[new AxialCoord(x, y)]; }
             set { this[new AxialCoord(x, y)] = value; }
-        }        
+        }
 
-        private static Dictionary<int, List<AxialCoord>> _allCoordDictionary = new Dictionary<int, List<AxialCoord>>();
+        private static readonly Dictionary<int, List<AxialCoord>> _allCoordDictionary =
+            new Dictionary<int, List<AxialCoord>>();
 
         private List<AxialCoord> CalculateAllCoords(int size) {
             var result = new List<AxialCoord>();
@@ -50,9 +51,12 @@ namespace HexMage.Simulator {
 
         public List<AxialCoord> AllCoords {
             get {
-                if (!_allCoordDictionary.ContainsKey(Size)) {
-                    _allCoordDictionary[Size] = CalculateAllCoords(Size);
+                lock (_allCoordDictionary) {
+                    if (!_allCoordDictionary.ContainsKey(Size)) {
+                        _allCoordDictionary[Size] = CalculateAllCoords(Size);
+                    }
                 }
+
                 return _allCoordDictionary[Size];
             }
         }

@@ -18,7 +18,7 @@ namespace HexMage.Simulator.AI {
         public EvaluationResult Evaluate() {
             var factories = new IAiFactory[] {
                 new RuleBasedFactory(),
-                new MctsFactory(1),
+                //new MctsFactory(1),
                 //new MctsFactory(10)
             };
 
@@ -48,7 +48,8 @@ namespace HexMage.Simulator.AI {
 
                     result.TotalIterations += maxIterations - iterations;
 
-                    if (game.IsFinished) {
+                    // TODO !!!!!!!!!!!!!!!! muze nastat remiza
+                    if (game.IsFinished && game.VictoryTeam.HasValue) {
                         Debug.Assert(game.VictoryTeam.HasValue);
                         Debug.Assert(game.VictoryController != null);                        
 
@@ -87,7 +88,7 @@ namespace HexMage.Simulator.AI {
         }
 
         public static List<EvaluationResult> EvaluateSetup(Setup setup, TextWriter writer) {
-            const int mapSize = 10;
+            const int mapSize = 4;
 
             var game = new GameInstance(new Map(mapSize));
             var mobIds = new List<int>();
@@ -112,7 +113,7 @@ namespace HexMage.Simulator.AI {
                 results.Add(result);
             }
 
-            Console.WriteLine($"\n***MCTS avg: {ExponentialMovingAverage.Instance.CurrentValue}ms/iter\n\n");
+            writer.WriteLine($"\n***MCTS avg: {ExponentialMovingAverage.Instance.CurrentValue}ms/iter\n\n");
 
             return results;
         }

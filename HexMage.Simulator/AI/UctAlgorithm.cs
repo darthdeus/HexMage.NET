@@ -15,7 +15,6 @@ namespace HexMage.Simulator {
         public static int actions = 0;
         public static int searchCount = 0;
 
-
         public UctSearchResult UctSearch(GameInstance initialState) {
             var root = new UctNode(0, 0, UctAction.NullAction(), initialState.DeepCopy());
 

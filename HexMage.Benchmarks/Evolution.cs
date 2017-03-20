@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using HexMage.Simulator;
 using HexMage.Simulator.AI;
@@ -11,18 +13,22 @@ using HexMage.Simulator.PCG;
 
 namespace HexMage.Benchmarks {
     public class Evolution {
+        public class GenomeTask {
+            public GenerationTeam GenTeam;
+        }
+
         public void Run() {
             string content = File.ReadAllText("team-1.json");
             var team = JsonLoader.LoadTeam(content);
 
             var generation = new List<GenerationTeam>();
 
-            const int teamsPerGeneration = 100;
+            const int numGenerations = 100;
+            const int teamsPerGeneration = 200;
             for (int i = 0; i < teamsPerGeneration; i++) {
                 generation.Add(new GenerationTeam(RandomTeam(2, 2), 0.0));
             }
 
-            const int numGenerations = 100;
             for (int i = 0; i < numGenerations; i++) {
                 var genWatch = new Stopwatch();
                 genWatch.Start();
@@ -30,20 +36,44 @@ namespace HexMage.Benchmarks {
                 const bool sequential = true;
                 if (sequential) {
                     foreach (var genTeam in generation) {
-                        PopulationMember(team, genTeam, Console.Out);
+                        var writer = new StringWriter();
+                        PopulationMember(team, genTeam, writer);
+                        //Console.Write(writer.ToString());
                     }
                 } else {
-                    var tasks = generation.Select(genTeam => {
-                        return Task.Factory.StartNew(() => {
-                            var writer = new StringWriter();
+                    var queue = new ConcurrentQueue<GenomeTask>();
+                    var threads = new List<Thread>();
 
-                            PopulationMember(team, genTeam, writer);
+                    // TODO - nestartovat thready na kazdou generaci
+                    // TODO - moznost threadpool jednoduse zabit
+                    long done = 0;
 
-                            Console.Write(writer.ToString());
+                    for (int j = 0; j < 12; j++) {
+                        var thread = new Thread(() => {
+                            while (Interlocked.Read(ref done) < generation.Count) {
+                                GenomeTask task;
+                                if (queue.TryDequeue(out task)) {
+                                    var writer = new StringWriter();
+
+                                    PopulationMember(team, task.GenTeam, writer);
+
+                                    Interlocked.Increment(ref done);
+
+                                    //Console.Write(writer.ToString());
+                                }
+                            }
                         });
-                    });
+                        threads.Add(thread);
+                        thread.Start();
+                    }
 
-                    Task.WaitAll(tasks.ToArray());
+                    foreach (var genTeam in generation) {
+                        queue.Enqueue(new GenomeTask() {GenTeam = genTeam});
+                    }
+
+                    while (Interlocked.Read(ref done) < generation.Count) {
+                        Thread.Yield();
+                    }
                 }
 
                 Console.WriteLine("****************************************************");
@@ -52,36 +82,6 @@ namespace HexMage.Benchmarks {
                 Console.WriteLine("****************************************************");
                 Console.WriteLine("****************************************************");
             }
-
-
-            //for (int i = 0; i < 100; i++) {
-            //    stopwatch.Start();
-            //    var setup = new Setup() {red = team.mobs, blue = opponent.mobs};
-
-            //    var result = EvaluateSetup(setup, map);
-
-            //    Console.WriteLine($"Win: {result.WinPercentage * 100}%");
-
-            //    double delta = 0.075;
-            //    if (result.WinPercentage < 0.5 - delta) {
-            //        Console.WriteLine("WEAKENING");
-            //        Mutate(opponent, -1);
-            //    } else if (result.WinPercentage > 0.5 + delta) {
-            //        Console.WriteLine("STRENGHTENING");
-            //        Mutate(opponent, +1);
-            //        //Strenghten(opponent);
-            //    } else {
-            //        break;
-            //    }
-
-            //    stopwatch.Stop();
-
-            //    Console.WriteLine($"\ttook: {stopwatch.Elapsed.Milliseconds}ms");
-            //    Console.WriteLine();
-            //    Console.WriteLine(JsonConvert.SerializeObject(opponent));
-            //    Console.WriteLine();
-            //    Console.WriteLine();
-            //}
         }
 
         public static void PopulationMember(Team team, GenerationTeam genTeam, TextWriter writer) {

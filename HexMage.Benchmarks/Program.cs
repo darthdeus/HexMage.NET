@@ -34,7 +34,6 @@ namespace HexMage.Benchmarks {
             }
         }
 
-
         private static void RunEvaluator() {
             string content = File.ReadAllText(@"simple.json");
             var setup = JsonLoader.Load(content);
