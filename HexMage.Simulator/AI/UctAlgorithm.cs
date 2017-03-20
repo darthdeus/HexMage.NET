@@ -1,4 +1,4 @@
-//#define DOTGRAPH
+#define DOTGRAPH
 
 using System;
 using System.Collections.Generic;
@@ -29,7 +29,8 @@ namespace HexMage.Simulator {
             var builder = new StringBuilder();
 
             builder.AppendLine("digraph G {");
-            PrintDot(builder, root);
+            int budget = 2;
+            PrintDot(builder, root, budget);
             builder.AppendLine("}");
 
             string str = builder.ToString();
@@ -77,13 +78,15 @@ namespace HexMage.Simulator {
             return result;
         }
 
-        void PrintDot(StringBuilder builder, UctNode node) {
+        void PrintDot(StringBuilder builder, UctNode node, int budget) {
+            if (budget == 0) return;
+
             foreach (var child in node.Children) {
                 builder.AppendLine($"\"{node}\" -> \"{child}\"");
             }
 
             foreach (var child in node.Children) {
-                PrintDot(builder, child);
+                PrintDot(builder, child, budget - 1);
             }
         }
 

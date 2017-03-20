@@ -39,9 +39,9 @@ namespace HexMage.Simulator {
                 case UctActionType.EndTurn:
                     return $"End";
                 case UctActionType.AbilityUse:
-                    return $"ABILITY[{AbilityId}]: {MobId} -> {TargetId}";
+                    return $"A[{AbilityId}]:{TargetId}";
                 case UctActionType.Move:
-                    return $"MOVE[{MobId}] -> {Coord}";
+                    return $"M[{MobId}]:{Coord}";
                 default:
                     throw new InvalidOperationException($"Invalid value of ${Type}");
             }

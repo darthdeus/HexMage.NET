@@ -7,7 +7,6 @@ namespace HexMage.Simulator {
         private static int _id = 0;
         public int Id;
 
-
         public float Q { get; set; }
         public int N { get; set; }
         public UctAction Action { get; set; }
@@ -46,7 +45,8 @@ namespace HexMage.Simulator {
 
             string terminal = IsTerminal ? $"[T]" : "";
             var value = Math.Round(UcbValue(), 2);
-            return $"[{team}]{terminal}{Q}/{N}/{value}\\n{Action}";
+            //return $"[{team}]{terminal}{Q}/{N}/{value}\\n{Action}";
+            return $"[{team}]{terminal}\\n{Q}/{N}\\n{Action}";
         }
 
         private string ShortTeam(TeamColor team) {

@@ -25,8 +25,11 @@ namespace HexMage.Simulator {
             float endRatio = (float) UctAlgorithm.ActionCounts[UctActionType.EndTurn] /
                              UctAlgorithm.ActionCounts[UctActionType.AbilityUse];
 
+            foreach (var node in nodes) {
+                Console.WriteLine($"action: {node.Action}");
+            }
             // TODO: temporarily disabled logging
-            //Console.WriteLine($"action: {node.Action}, total: {UctAlgorithm.actions} [end ratio: {endRatio}]\t{UctAlgorithm.ActionCountString()}");
+            Console.WriteLine($"total: {UctAlgorithm.actions} [end ratio: {endRatio}]\t{UctAlgorithm.ActionCountString()}");
         }
 
         public async Task SlowPlayTurn(GameEventHub eventHub) {
