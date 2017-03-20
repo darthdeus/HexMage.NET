@@ -19,7 +19,7 @@ namespace HexMage.Simulator.AI {
             var factories = new IAiFactory[] {
                 new RuleBasedFactory(),
                 new MctsFactory(1),
-                new MctsFactory(10)
+                //new MctsFactory(10)
             };
 
             var result = new EvaluationResult();
@@ -104,13 +104,15 @@ namespace HexMage.Simulator.AI {
 
             var results = new List<EvaluationResult>();
 
-            for (int i = 0; i < mapSize; i += 3) {
+            for (int i = 0; i < mapSize; i += 20) {
                 PreparePositions(game, mobIds, i, mapSize - i);
 
                 var result = new GameInstanceEvaluator(game, writer).Evaluate();
 
                 results.Add(result);
             }
+
+            Console.WriteLine($"\n***MCTS avg: {ExponentialMovingAverage.Instance.CurrentValue}ms/iter\n\n");
 
             return results;
         }

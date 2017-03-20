@@ -12,8 +12,6 @@ using HexMage.Simulator.PCG;
 namespace HexMage.Benchmarks {
     public class Evolution {
         public void Run() {
-            MctsController.EnableLogging = false;
-
             string content = File.ReadAllText("team-1.json");
             var team = JsonLoader.LoadTeam(content);
 

@@ -11,7 +11,7 @@ using HexMage.Simulator.PCG;
 namespace HexMage.Benchmarks {
     public class Benchmarks {
         public void Run() {
-            var size = 7;
+            var size = 5;
 
             var s = Stopwatch.StartNew();
             CoordRadiusCache.Instance.PrecomputeUpto(50);

@@ -6,20 +6,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.PCG;
 
 namespace HexMage.Simulator {
-    public class UctSearchResult {
-        public List<UctNode> Actions { get; }
-        public double MillisecondsPerIteration { get; }
-
-        public UctSearchResult(List<UctNode> actions, double millisecondsPerIteration) {
-            Actions = actions;
-            MillisecondsPerIteration = millisecondsPerIteration;
-        }
-    }
-
     public class UctAlgorithm {
         public static int actions = 0;
         public static int searchCount = 0;
@@ -419,7 +410,7 @@ namespace HexMage.Simulator {
         }
 
 
-        private List<UctNode> SelectBestActions(UctNode root) {
+        private List<UctAction> SelectBestActions(UctNode root) {
             //UctNode result = root.Children[0];
 
             //foreach (var child in root.Children) {
@@ -430,7 +421,7 @@ namespace HexMage.Simulator {
 
             //return result;
 
-            var result = new List<UctNode>();
+            var result = new List<UctAction>();
             UctNode current = root;
 
             do {
@@ -445,7 +436,7 @@ namespace HexMage.Simulator {
                 }
 
                 if (max.Action.Type != UctActionType.EndTurn) {
-                    result.Add(max);
+                    result.Add(max.Action);
                 }
 
                 current = max;

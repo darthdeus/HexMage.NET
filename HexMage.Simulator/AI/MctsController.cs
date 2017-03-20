@@ -15,22 +15,24 @@ namespace HexMage.Simulator {
 
         public void FastPlayTurn(GameEventHub eventHub) {
             var uct = new UctAlgorithm(_thinkTime);
-            var nodes = uct.UctSearch(_gameInstance);
+            var result = uct.UctSearch(_gameInstance);
 
-            foreach (var node in nodes.Actions) {
-                Debug.Assert(node.Action.Type != UctActionType.EndTurn, "node.Action.Type != UctActionType.EndTurn");
+            foreach (var action in result.Actions) {
+                Debug.Assert(action.Type != UctActionType.EndTurn, "node.Action.Type != UctActionType.EndTurn");
 
-                UctAlgorithm.FNoCopy(_gameInstance, node.Action);
+                UctAlgorithm.FNoCopy(_gameInstance, action);
             }
 
             float endRatio = (float) UctAlgorithm.ActionCounts[UctActionType.EndTurn] /
                              UctAlgorithm.ActionCounts[UctActionType.AbilityUse];
 
-            Console.WriteLine($"*** MCTS SPEED: {nodes.MillisecondsPerIteration}ms/iter***");
+            ExponentialMovingAverage.Instance.Average(result.MillisecondsPerIteration);
 
             if (EnableLogging) {
-                foreach (var node in nodes.Actions) {
-                    Console.WriteLine($"action: {node.Action}");
+                Console.WriteLine($"*** MCTS SPEED: {result.MillisecondsPerIteration}ms/iter***");
+
+                foreach (var action in result.Actions) {
+                    Console.WriteLine($"action: {action}");
                 }                
 
                 Console.WriteLine(
@@ -39,12 +41,12 @@ namespace HexMage.Simulator {
         }
 
         public async Task SlowPlayTurn(GameEventHub eventHub) {
-            var nodes = await Task.Run(() => new UctAlgorithm(_thinkTime).UctSearch(_gameInstance));
+            var result = await Task.Run(() => new UctAlgorithm(_thinkTime).UctSearch(_gameInstance));
 
-            foreach (var node in nodes.Actions) {
-                Debug.Assert(node.Action.Type != UctActionType.EndTurn, "node.Action.Type != UctActionType.EndTurn");
+            foreach (var action in result.Actions) {
+                Debug.Assert(action.Type != UctActionType.EndTurn, "node.Action.Type != UctActionType.EndTurn");
 
-                await eventHub.SlowPlayAction(_gameInstance, node.Action);
+                await eventHub.SlowPlayAction(_gameInstance, action);
             }
 
             //UctAction action;
