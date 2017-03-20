@@ -49,6 +49,7 @@ namespace HexMage.Simulator {
             return result;
         }
 
+        // TODO - tohle by melo byt mnohem lepe udelana globalni cache (nebo thread local?)
         public List<AxialCoord> AllCoords {
             get {
                 lock (_allCoordDictionary) {

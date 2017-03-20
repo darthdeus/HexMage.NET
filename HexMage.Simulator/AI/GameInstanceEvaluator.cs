@@ -18,8 +18,8 @@ namespace HexMage.Simulator.AI {
         public EvaluationResult Evaluate() {
             var factories = new IAiFactory[] {
                 new RuleBasedFactory(),
-                //new MctsFactory(1),
-                //new MctsFactory(10)
+                new MctsFactory(1),
+                new MctsFactory(10)
             };
 
             var result = new EvaluationResult();

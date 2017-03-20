@@ -17,6 +17,8 @@ namespace HexMage.Benchmarks {
             public GenerationTeam GenTeam;
         }
 
+        private long done = 0;
+
         public void Run() {
             string content = File.ReadAllText("team-1.json");
             var team = JsonLoader.LoadTeam(content);
@@ -24,48 +26,29 @@ namespace HexMage.Benchmarks {
             var generation = new List<GenerationTeam>();
 
             const int numGenerations = 100;
-            const int teamsPerGeneration = 200;
+            const int teamsPerGeneration = 100;
             for (int i = 0; i < teamsPerGeneration; i++) {
                 generation.Add(new GenerationTeam(RandomTeam(2, 2), 0.0));
+            }
+
+            var queue = new ConcurrentQueue<GenomeTask>();
+
+            const bool sequential = true;
+
+            if (!sequential) {
+                StartThreadpool(team, queue);
             }
 
             for (int i = 0; i < numGenerations; i++) {
                 var genWatch = new Stopwatch();
                 genWatch.Start();
 
-                const bool sequential = true;
                 if (sequential) {
                     foreach (var genTeam in generation) {
-                        var writer = new StringWriter();
-                        PopulationMember(team, genTeam, writer);
-                        //Console.Write(writer.ToString());
+                        PopulationMember(team, genTeam, Console.Out);
                     }
                 } else {
-                    var queue = new ConcurrentQueue<GenomeTask>();
-                    var threads = new List<Thread>();
-
-                    // TODO - nestartovat thready na kazdou generaci
-                    // TODO - moznost threadpool jednoduse zabit
-                    long done = 0;
-
-                    for (int j = 0; j < 12; j++) {
-                        var thread = new Thread(() => {
-                            while (Interlocked.Read(ref done) < generation.Count) {
-                                GenomeTask task;
-                                if (queue.TryDequeue(out task)) {
-                                    var writer = new StringWriter();
-
-                                    PopulationMember(team, task.GenTeam, writer);
-
-                                    Interlocked.Increment(ref done);
-
-                                    //Console.Write(writer.ToString());
-                                }
-                            }
-                        });
-                        threads.Add(thread);
-                        thread.Start();
-                    }
+                    done = 0;
 
                     foreach (var genTeam in generation) {
                         queue.Enqueue(new GenomeTask() {GenTeam = genTeam});
@@ -167,6 +150,32 @@ namespace HexMage.Benchmarks {
             }
 
             return team;
+        }
+
+        private void StartThreadpool(Team team, ConcurrentQueue<GenomeTask> queue) {
+            var threads = new List<Thread>();
+
+            // TODO - moznost threadpool jednoduse zabit
+            // TODO - pocet threadu podle HW cpu
+            for (int j = 0; j < 12; j++) {
+                var thread = new Thread(() => {
+                    //while (Interlocked.Read(ref done) < generation.Count)
+                    while (true) {
+                        GenomeTask task;
+                        if (queue.TryDequeue(out task)) {
+                            var writer = new StringWriter();
+
+                            PopulationMember(team, task.GenTeam, writer);
+
+                            Interlocked.Increment(ref done);
+
+                            Console.Write(writer.ToString());
+                        }
+                    }
+                });
+                threads.Add(thread);
+                thread.Start();
+            }
         }
     }
 }

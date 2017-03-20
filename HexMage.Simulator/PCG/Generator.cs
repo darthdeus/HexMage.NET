@@ -157,13 +157,13 @@ namespace HexMage.Simulator.PCG {
         }
 
         public static Buff RandomBuff(AbilityElement element) {
-            var hpChange = Random.Next(-2, 1);
-            var apChange = Random.Next(-1, 1);
+            var hpChange = Random.Next(-5, 1);
+            var apChange = Random.Next(-2, 1);
             var lifetime = Random.Next(1, 3);
 
             while (hpChange == 0 && apChange == 0) {
-                hpChange = Random.Next(-2, 1);
-                apChange = Random.Next(-1, 1);
+                hpChange = Random.Next(-5, 1);
+                apChange = Random.Next(-2, 1);
             }
             return new Buff(element, hpChange, apChange, lifetime);
         }

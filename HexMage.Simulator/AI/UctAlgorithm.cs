@@ -246,13 +246,6 @@ namespace HexMage.Simulator {
                             break;
                         }
                     }
-
-                    // TODO - tohle uz neni potreba?
-                    //if (abilityId.HasValue &&
-                    //    pathfinder.Distance(mobInstance.Coord, possibleTargetInstance.Coord) <= ability.Range) {
-                    //    spellTarget = possibleTarget;
-                    //    break;
-                    //}
                 }
             }
 
@@ -309,8 +302,6 @@ namespace HexMage.Simulator {
                     // Skip abilities which are on cooldown
                     if (state.State.Cooldowns[abilityId] > 0) continue;
 
-                    //Console.WriteLine($"Allowed {abilityId} not on cooldown");
-
                     if (abilityInfo.Cost <= mobInstance.Ap) {
                         foreach (var targetId in state.MobManager.Mobs) {
                             var targetInfo = state.MobManager.MobInfos[targetId];
@@ -346,7 +337,7 @@ namespace HexMage.Simulator {
 
         private static void GenerateMoveActions(GameInstance state, MobInstance mobInstance, int mobId,
                                                 List<UctAction> result) {
-            const bool useHeatmap = false;
+            const bool useHeatmap = true;
             var moveActions = new List<UctAction>();
 
             if (useHeatmap) {
