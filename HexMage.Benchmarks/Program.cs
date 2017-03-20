@@ -22,6 +22,7 @@ namespace HexMage.Benchmarks {
             Console.WriteLine();
 
             if (key.Key == ConsoleKey.D2) {
+                MctsController.EnableLogging = false;
                 RunEvaluator();
             } else if (key.Key == ConsoleKey.D3) {
                 new Evolution().Run();

@@ -57,7 +57,7 @@ namespace HexMage.Simulator {
         public string Name => "MctsController";
 
         public override string ToString() {
-            return $"MCTS[{_thinkTime}]";
+            return $"MCTS#{_thinkTime}";
         }
     }
 }

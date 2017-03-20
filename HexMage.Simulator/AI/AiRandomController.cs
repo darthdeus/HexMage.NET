@@ -41,7 +41,7 @@ namespace HexMage.Simulator {
         public string Name => nameof(AiRandomController);
 
         public override string ToString() {
-            return "AI_Rule";
+            return "AI";
         }
     }
 }

@@ -18,8 +18,8 @@ namespace HexMage.Simulator.AI {
         public EvaluationResult Evaluate() {
             var factories = new IAiFactory[] {
                 new RuleBasedFactory(),
-                //new MctsFactory(10),
-                new MctsFactory(1)
+                new MctsFactory(1),
+                new MctsFactory(10)
             };
 
             var result = new EvaluationResult();
@@ -50,19 +50,18 @@ namespace HexMage.Simulator.AI {
 
                     if (game.IsFinished) {
                         Debug.Assert(game.VictoryTeam.HasValue);
-                        Debug.Assert(game.VictoryController != null);
+                        Debug.Assert(game.VictoryController != null);                        
 
                         //Console.WriteLine($"Won {game.VictoryTeam.Value} - {game.VictoryController} vs {game.LoserController} in {500 - iterations}");
-                        _writer.Write(
-                            $"{game.VictoryController}:{game.LoserController}...{maxIterations - iterations}, ");
+                        _writer.Write($"{game.VictoryController}:{game.LoserController}: {maxIterations - iterations}({game.VictoryTeam.ToString()[0]}), ");
                         if (game.VictoryTeam == TeamColor.Red) {
                             result.RedWins++;
                         } else {
                             result.BlueWins++;
                         }
                     } else {
-                        result.Draws++;
-                        _writer.Write("DRAW\t");
+                        result.Timeouts++;
+                        _writer.Write("Timeout\t");
                     }
 
                     result.TotalTurns++;
@@ -144,7 +143,7 @@ namespace HexMage.Simulator.AI {
     public struct EvaluationResult {
         public int RedWins;
         public int BlueWins;
-        public int Draws;
+        public int Timeouts;
         public int TotalTurns;
         public long TotalElapsedMilliseconds;
         public int TotalIterations;
@@ -154,7 +153,7 @@ namespace HexMage.Simulator.AI {
         public double WinPercentage => ((double) RedWins) / (double) TotalTurns;
 
         public override string ToString() {
-            return $"{RedWins}/{BlueWins} (draws: {Draws}), total: {TotalTurns}";
+            return $"{RedWins}/{BlueWins} (draws: {Timeouts}), total: {TotalTurns}";
         }
     }
 }

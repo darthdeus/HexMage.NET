@@ -11,29 +11,6 @@ using HexMage.Simulator.PCG;
 
 namespace HexMage.Benchmarks {
     public class Evolution {
-        private static Team RandomTeam(int mobs, int spellsPerMob) {
-            var rand = Generator.Random;
-
-            var team = new Team();
-            team.mobs = new List<JsonMob>();
-
-            for (int i = 0; i < mobs; i++) {
-                var abilities = new List<JsonAbility>();
-
-                for (int j = 0; j < spellsPerMob; j++) {
-                    abilities.Add(new JsonAbility(rand.Next(3, 8), rand.Next(2, 6), rand.Next(3, 5), rand.Next(2)));
-                }
-
-                team.mobs.Add(new JsonMob {
-                    abilities = abilities,
-                    hp = rand.Next(30, 100),
-                    ap = rand.Next(10, 20)
-                });
-            }
-
-            return team;
-        }
-
         public void Run() {
             MctsController.EnableLogging = false;
 
@@ -120,7 +97,7 @@ namespace HexMage.Benchmarks {
             foreach (var res in results) {
                 result.BlueWins += res.BlueWins;
                 result.RedWins += res.RedWins;
-                result.Draws += res.Draws;
+                result.Timeouts += res.Timeouts;
                 result.TotalTurns += res.TotalTurns;
                 result.TotalIterations += res.TotalIterations;
                 result.TotalElapsedMilliseconds += res.TotalElapsedMilliseconds;
@@ -171,6 +148,27 @@ namespace HexMage.Benchmarks {
             }
         }
 
+        private static Team RandomTeam(int mobs, int spellsPerMob) {
+            var rand = Generator.Random;
 
+            var team = new Team();
+            team.mobs = new List<JsonMob>();
+
+            for (int i = 0; i < mobs; i++) {
+                var abilities = new List<JsonAbility>();
+
+                for (int j = 0; j < spellsPerMob; j++) {
+                    abilities.Add(new JsonAbility(rand.Next(3, 8), rand.Next(2, 6), rand.Next(3, 5), rand.Next(2)));
+                }
+
+                team.mobs.Add(new JsonMob {
+                    abilities = abilities,
+                    hp = rand.Next(30, 100),
+                    ap = rand.Next(10, 20)
+                });
+            }
+
+            return team;
+        }
     }
 }
