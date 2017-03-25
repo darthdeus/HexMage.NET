@@ -13,11 +13,19 @@ namespace HexMage.Benchmarks {
             Console.WriteLine("\t2) Team evaluation");
             Console.WriteLine("\t3) Generate new team");
 
+
             MctsController.EnableLogging = false;
-            new Evolution().Run();
+
+            const bool evaluateAis = false;
+
+            if (evaluateAis) {
+                new AiEvaluator().Run();
+            } else {
+                new Evolution().Run();
+            }
+
             return;
-
-
+                        
             var key = Console.ReadKey();
 
             Console.WriteLine();

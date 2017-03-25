@@ -135,7 +135,7 @@ namespace HexMage.Benchmarks {
             }
         }
 
-        private static Team RandomTeam(int mobs, int spellsPerMob) {
+        public static Team RandomTeam(int mobs, int spellsPerMob) {
             var rand = Generator.Random;
 
             var team = new Team();

@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AiEvaluator.cs" />
     <Compile Include="Evolution.cs" />
     <Compile Include="GenerationTeam.cs" />
     <Compile Include="Program.cs" />
