@@ -297,6 +297,7 @@ namespace HexMage.Simulator {
         public static List<UctAction> PossibleActions(GameInstance state, bool allowMove, bool allowEndTurn) {
             var result = new List<UctAction>();
 
+            bool foundAbilityUse = false;
             var currentMob = state.TurnManager.CurrentMob;
             if (currentMob.HasValue) {
                 var mobId = currentMob.Value;
@@ -321,13 +322,15 @@ namespace HexMage.Simulator {
                             bool targetAlive = targetInstance.Hp > 0;
 
                             if (isEnemy && withinRange && targetAlive) {
+                                foundAbilityUse = true;
                                 result.Add(UctAction.AbilityUseAction(abilityId, mobId, targetId));
                             }
                         }
                     }
                 }
 
-                if (allowMove) {
+                // We disable movement if there is a possibility to cast abilities.
+                if (allowMove && !foundAbilityUse) {
                     GenerateMoveActions(state, mobInstance, mobId, result);
                 }
             } else {
@@ -336,8 +339,14 @@ namespace HexMage.Simulator {
                           "Final state reached while trying to compute possible actions.");
             }
 
+            const bool endTurnAsLastResort = true;
+
             if (allowEndTurn) {
-                result.Add(UctAction.EndTurnAction());
+                // We would skip end turn if there are not enough actions.
+                // TODO - generate more move actions if we don't have enough?
+                if (!endTurnAsLastResort || result.Count <= 1) {
+                    result.Add(UctAction.EndTurnAction());
+                }
             }
 
             return result;
@@ -378,6 +387,7 @@ namespace HexMage.Simulator {
 
                         foreach (var coord in enemyDistances.AllCoords) {
                             if (!state.Map.IsVisible(coord, enemyInstance.Coord)) continue;
+                            if (state.State.AtCoord(coord).HasValue) continue;
 
                             int remainingAp = mobInstance.Ap - state.Pathfinder.Distance(mobInstance.Coord, coord);
 
