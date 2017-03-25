@@ -84,7 +84,8 @@ namespace HexMage.Simulator {
                 node.Children.Add(child);
 
                 return child;
-            } catch (ArgumentOutOfRangeException e) {
+            }
+            catch (ArgumentOutOfRangeException e) {
                 Debugger.Break();
                 throw;
             }
@@ -281,7 +282,7 @@ namespace HexMage.Simulator {
                 Console.WriteLine("Move failed!");
 
                 Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
-                          $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
+                    $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
                 return UctAction.EndTurnAction();
             }
         }
@@ -325,7 +326,7 @@ namespace HexMage.Simulator {
             } else {
                 throw new InvalidOperationException();
                 Utils.Log(LogSeverity.Warning, nameof(UctNode),
-                          "Final state reached while trying to compute possible actions.");
+                    "Final state reached while trying to compute possible actions.");
             }
 
             if (allowEndTurn) {
@@ -336,31 +337,70 @@ namespace HexMage.Simulator {
         }
 
         private static void GenerateMoveActions(GameInstance state, MobInstance mobInstance, int mobId,
-                                                List<UctAction> result) {
+            List<UctAction> result) {
             const bool useHeatmap = true;
             var moveActions = new List<UctAction>();
+            var mobInfo = state.MobManager.MobInfos[mobId];
 
             if (useHeatmap) {
                 var heatmap = state.BuildHeatmap();
                 var usedValues = new HashSet<int>();
 
-                foreach (var coord in heatmap.Map.AllCoords) {
-                    if (state.State.AtCoord(coord).HasValue) {
-                        continue;
+                const bool moveToRange = true;
+                const bool heatmapBasedMove = false;
+
+                if (moveToRange) {
+                    var enemyDistances = new HexMap<int>(state.Size);
+
+                    //Ability bestAbility = state.MobManager.Abilities[mobInfo.Abilities[0]];
+                    //foreach (var abilityId in mobInfo.Abilities) {
+                    //    var ability = state.MobManager.Abilities[abilityId];
+
+                    //    if (ability.Range > bestAbility.Range) {
+
+                    //    }
+                    //    maxRange = Math.Max(maxRange, ability.Range);
+                    //}
+
+                    foreach (var coord in enemyDistances.AllCoords) {
+                        foreach (var enemyInstance in state.State.MobInstances) {
+                            if (!state.Map.IsVisible(coord, enemyInstance.Coord)) continue;
+
+                            int remainingAp = mobInstance.Ap - state.Pathfinder.Distance(mobInstance.Coord, coord);
+
+                            foreach (var abilityId in mobInfo.Abilities) {
+                                var ability = state.MobManager.Abilities[abilityId];
+                                bool withinRange = ability.Range >= coord.Distance(enemyInstance.Coord);
+                                bool enoughAp = remainingAp >= ability.Cost;
+
+                                if (withinRange && enoughAp) {
+                                    moveActions.Add(UctAction.MoveAction(mobId, coord));
+                                }
+                            }
+                        }
                     }
-
-                    bool canMoveTo = state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap;
-
-                    if (!canMoveTo) continue;
-
-                    // TODO - tohle je asi overkill, ale nemame lepsi zpusob jak iterovat
-                    int value = heatmap.Map[coord];
-
-                    if (usedValues.Contains(value)) continue;
-
-                    usedValues.Add(value);
-                    moveActions.Add(UctAction.MoveAction(mobId, coord));
                 }
+
+                if (heatmapBasedMove) {
+                    foreach (var coord in heatmap.Map.AllCoords) {
+                        if (state.State.AtCoord(coord).HasValue) {
+                            continue;
+                        }
+
+                        bool canMoveTo = state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap;
+
+                        if (!canMoveTo) continue;
+
+                        // TODO - tohle je asi overkill, ale nemame lepsi zpusob jak iterovat
+                        int value = heatmap.Map[coord];
+
+                        if (usedValues.Contains(value)) continue;
+
+                        usedValues.Add(value);
+                        moveActions.Add(UctAction.MoveAction(mobId, coord));
+                    }
+                }
+
 
                 result.AddRange(moveActions);
             } else {

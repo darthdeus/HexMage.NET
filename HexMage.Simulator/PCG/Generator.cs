@@ -30,7 +30,7 @@ namespace HexMage.Simulator.PCG {
 
             var map = new Map(mapSize);
 
-            for (int i = 0, total = 0; i < 20 && total < 1000; i++, total++) {
+            for (int i = 0, total = 0; i < 30 && total < 1000; i++, total++) {
                 var coord = map.AllCoords[random.Next(map.AllCoords.Count)];
                 if (map[coord] == HexType.Empty) {
                     map[coord] = HexType.Wall;
@@ -44,7 +44,7 @@ namespace HexMage.Simulator.PCG {
     }
 
     public static class Generator {
-        public static Random Random = new Random();
+        public static Random Random = new Random(12345);
 
         //public static GameInstance RandomGame(int size, MapSeed seed, int teamSize, Func<GameInstance, IMobController> controllerFunc) {
         //    var map = new MapGenerator().Generate(size, seed);

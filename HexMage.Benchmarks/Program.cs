@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using HexMage.Simulator;
 using HexMage.Simulator.AI;
-using HexMage.Simulator.Model;
 using HexMage.Simulator.PCG;
-using Newtonsoft.Json;
 
 namespace HexMage.Benchmarks {
     internal class Program {
