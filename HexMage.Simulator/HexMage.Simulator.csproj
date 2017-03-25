@@ -54,6 +54,7 @@
     <Compile Include="AI\UctActionType.cs" />
     <Compile Include="AI\UctNode.cs" />
     <Compile Include="AI\UctSearchResult.cs" />
+    <Compile Include="AI\XmlTreePrinter.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="AI\FlatMonteCarlo.cs" />
     <Compile Include="JsonLoader.cs" />

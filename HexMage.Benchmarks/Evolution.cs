@@ -46,6 +46,12 @@ namespace HexMage.Benchmarks {
                 if (sequential) {
                     foreach (var genTeam in generation) {
                         PopulationMember(team, genTeam, Console.Out);
+
+                        Console.WriteLine("\n\nWin stats:");
+                        foreach (var pair in GameInstanceEvaluator.GlobalControllerStatistics) {
+                            Console.WriteLine($"{pair.Key}: {pair.Value}");
+                        }
+                        Console.WriteLine("\n\n");
                     }
                 } else {
                     done = 0;
@@ -61,7 +67,7 @@ namespace HexMage.Benchmarks {
 
                 Console.WriteLine("****************************************************");
                 Console.WriteLine("****************************************************");
-                Console.WriteLine($"Generation done in {genWatch.ElapsedMilliseconds}ms");
+                Console.WriteLine($"Generation {i}. done in {genWatch.ElapsedMilliseconds}ms");
                 Console.WriteLine("****************************************************");
                 Console.WriteLine("****************************************************");
             }

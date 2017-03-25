@@ -1,3 +1,4 @@
+//#define XML
 //#define DOTGRAPH
 
 using System;
@@ -31,6 +32,13 @@ namespace HexMage.Simulator {
             }
 
             stopwatch.Stop();
+
+#if XML
+            string filename = @"c:\dev\graphs\xml\iter-" + searchCount + ".xml";
+            using (var writer = new StreamWriter(filename)) {
+                new XmlTreePrinter(root).Print(writer);
+            };
+#endif
 #if DOTGRAPH
             PrintDotgraph(root);            
 #endif
@@ -84,8 +92,7 @@ namespace HexMage.Simulator {
                 node.Children.Add(child);
 
                 return child;
-            }
-            catch (ArgumentOutOfRangeException e) {
+            } catch (ArgumentOutOfRangeException e) {
                 Debugger.Break();
                 throw;
             }
@@ -282,7 +289,7 @@ namespace HexMage.Simulator {
                 Console.WriteLine("Move failed!");
 
                 Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
-                    $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
+                          $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
                 return UctAction.EndTurnAction();
             }
         }
@@ -326,7 +333,7 @@ namespace HexMage.Simulator {
             } else {
                 throw new InvalidOperationException();
                 Utils.Log(LogSeverity.Warning, nameof(UctNode),
-                    "Final state reached while trying to compute possible actions.");
+                          "Final state reached while trying to compute possible actions.");
             }
 
             if (allowEndTurn) {
@@ -337,7 +344,7 @@ namespace HexMage.Simulator {
         }
 
         private static void GenerateMoveActions(GameInstance state, MobInstance mobInstance, int mobId,
-            List<UctAction> result) {
+                                                List<UctAction> result) {
             const bool useHeatmap = true;
             var moveActions = new List<UctAction>();
             var mobInfo = state.MobManager.MobInfos[mobId];
@@ -362,8 +369,12 @@ namespace HexMage.Simulator {
                     //    maxRange = Math.Max(maxRange, ability.Range);
                     //}
 
-                    foreach (var coord in enemyDistances.AllCoords) {
-                        foreach (var enemyInstance in state.State.MobInstances) {
+
+                    // TODO - brat nejblizsi policko
+                    foreach (var enemyInstance in state.State.MobInstances) {
+                        var possibleMoves = new List<AxialCoord>();
+
+                        foreach (var coord in enemyDistances.AllCoords) {
                             if (!state.Map.IsVisible(coord, enemyInstance.Coord)) continue;
 
                             int remainingAp = mobInstance.Ap - state.Pathfinder.Distance(mobInstance.Coord, coord);
@@ -374,9 +385,25 @@ namespace HexMage.Simulator {
                                 bool enoughAp = remainingAp >= ability.Cost;
 
                                 if (withinRange && enoughAp) {
-                                    moveActions.Add(UctAction.MoveAction(mobId, coord));
+                                    possibleMoves.Add(coord);
                                 }
                             }
+                        }
+
+                        if (possibleMoves.Count > 0) {
+                            AxialCoord myCoord = mobInstance.Coord;
+                            AxialCoord closestCoord = possibleMoves[0];
+                            int distance = state.Pathfinder.Distance(myCoord, closestCoord);
+
+                            foreach (var possibleMove in possibleMoves) {
+                                int newDistance = state.Pathfinder.Distance(myCoord, possibleMove);
+                                if (newDistance < distance) {
+                                    distance = newDistance;
+                                    closestCoord = possibleMove;
+                                }
+                            }
+
+                            moveActions.Add(UctAction.MoveAction(mobId, closestCoord));
                         }
                     }
                 }

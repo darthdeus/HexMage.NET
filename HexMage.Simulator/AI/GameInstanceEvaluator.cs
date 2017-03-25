@@ -9,6 +9,7 @@ namespace HexMage.Simulator.AI {
     public class GameInstanceEvaluator {
         private readonly GameInstance _gameInstance;
         private readonly TextWriter _writer;
+        public static readonly Dictionary<string, int> GlobalControllerStatistics = new Dictionary<string, int>();
 
         public GameInstanceEvaluator(GameInstance gameInstance, TextWriter writer) {
             _gameInstance = gameInstance;
@@ -18,8 +19,8 @@ namespace HexMage.Simulator.AI {
         public EvaluationResult Evaluate() {
             var factories = new IAiFactory[] {
                 new RuleBasedFactory(),
-                new MctsFactory(1),
-                new MctsFactory(10)
+                //new MctsFactory(1),
+                //new MctsFactory(10)
             };
 
             var result = new EvaluationResult();
@@ -58,6 +59,14 @@ namespace HexMage.Simulator.AI {
                             result.RedWins++;
                         } else {
                             result.BlueWins++;
+                        }
+
+                        var victoryControllerName = game.VictoryController.ToString();
+
+                        if (GlobalControllerStatistics.ContainsKey(victoryControllerName)) {
+                            GlobalControllerStatistics[victoryControllerName]++;
+                        } else {
+                            GlobalControllerStatistics[victoryControllerName] = 1;
                         }
                     } else {
                         result.Timeouts++;

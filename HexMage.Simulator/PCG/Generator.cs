@@ -30,7 +30,9 @@ namespace HexMage.Simulator.PCG {
 
             var map = new Map(mapSize);
 
-            for (int i = 0, total = 0; i < 30 && total < 1000; i++, total++) {
+            // TODO - neni jich uz moc?
+            int wallCount = mapSize > 6 ? 50 : 30;
+            for (int i = 0, total = 0; i < wallCount && total < 1000; i++, total++) {
                 var coord = map.AllCoords[random.Next(map.AllCoords.Count)];
                 if (map[coord] == HexType.Empty) {
                     map[coord] = HexType.Wall;
@@ -127,7 +129,10 @@ namespace HexMage.Simulator.PCG {
                 var dmg = Random.Next(1, 10);
                 var cost = Random.Next(3, 7);
                 var range = Random.Next(3, 10);
-                var cooldown = Random.Next(0, 3);
+
+                // TODO - re-enable cooldowns?
+                //var cooldown = Random.Next(0, 3);
+                var cooldown = 0;
 
                 int score = 0;
                 score += dmg;
