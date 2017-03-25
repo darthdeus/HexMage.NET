@@ -25,8 +25,8 @@ namespace HexMage.Benchmarks {
 
             var generation = new List<GenerationTeam>();
 
-            const int numGenerations = 100;
-            const int teamsPerGeneration = 100;
+            const int numGenerations = 1;
+            const int teamsPerGeneration = 10;
             for (int i = 0; i < teamsPerGeneration; i++) {
                 generation.Add(new GenerationTeam(RandomTeam(2, 2), 0.0));
             }

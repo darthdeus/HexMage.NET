@@ -372,7 +372,9 @@ namespace HexMage.Simulator {
 
                     // TODO - brat nejblizsi policko
                     foreach (var enemyInstance in state.State.MobInstances) {
-                        var possibleMoves = new List<AxialCoord>();
+                        AxialCoord myCoord = mobInstance.Coord;
+                        AxialCoord? closestCoord = null;
+                        int? distance = null;
 
                         foreach (var coord in enemyDistances.AllCoords) {
                             if (!state.Map.IsVisible(coord, enemyInstance.Coord)) continue;
@@ -385,25 +387,21 @@ namespace HexMage.Simulator {
                                 bool enoughAp = remainingAp >= ability.Cost;
 
                                 if (withinRange && enoughAp) {
-                                    possibleMoves.Add(coord);
+                                    int myDistance = state.Pathfinder.Distance(myCoord, coord);
+
+                                    if (!closestCoord.HasValue) {
+                                        closestCoord = coord;
+                                        distance = myDistance;
+                                    } else if (distance.Value > myDistance) {
+                                        closestCoord = coord;
+                                        distance = myDistance;
+                                    }
                                 }
                             }
                         }
 
-                        if (possibleMoves.Count > 0) {
-                            AxialCoord myCoord = mobInstance.Coord;
-                            AxialCoord closestCoord = possibleMoves[0];
-                            int distance = state.Pathfinder.Distance(myCoord, closestCoord);
-
-                            foreach (var possibleMove in possibleMoves) {
-                                int newDistance = state.Pathfinder.Distance(myCoord, possibleMove);
-                                if (newDistance < distance) {
-                                    distance = newDistance;
-                                    closestCoord = possibleMove;
-                                }
-                            }
-
-                            moveActions.Add(UctAction.MoveAction(mobId, closestCoord));
+                        if (closestCoord.HasValue) {
+                            moveActions.Add(UctAction.MoveAction(mobId, closestCoord.Value));
                         }
                     }
                 }

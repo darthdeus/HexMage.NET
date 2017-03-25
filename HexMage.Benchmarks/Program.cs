@@ -13,6 +13,11 @@ namespace HexMage.Benchmarks {
             Console.WriteLine("\t2) Team evaluation");
             Console.WriteLine("\t3) Generate new team");
 
+            MctsController.EnableLogging = false;
+            new Evolution().Run();
+            return;
+
+
             var key = Console.ReadKey();
 
             Console.WriteLine();
@@ -41,6 +46,5 @@ namespace HexMage.Benchmarks {
             }
             Console.WriteLine("*************************\n\n");
         }
-
     }
 }
