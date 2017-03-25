@@ -52,6 +52,9 @@ namespace HexMage.Benchmarks {
                             Console.WriteLine($"{pair.Key}: {pair.Value}");
                         }
                         Console.WriteLine("\n\n");
+
+                        // TODO - PRIO1 PRYC S TIM
+                        break;
                     }
                 } else {
                     done = 0;

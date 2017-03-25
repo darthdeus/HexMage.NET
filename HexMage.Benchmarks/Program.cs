@@ -13,7 +13,7 @@ namespace HexMage.Benchmarks {
             Console.WriteLine("\t2) Team evaluation");
             Console.WriteLine("\t3) Generate new team");
 
-
+            Generator.Random = new Random(3);
             MctsController.EnableLogging = false;
 
             const bool evaluateAis = false;
