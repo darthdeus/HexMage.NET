@@ -288,7 +288,7 @@ namespace HexMage.Simulator {
             } else {
                 Console.WriteLine("Move failed!");
 
-                Utils.Log(LogSeverity.Debug, nameof(AiRandomController),
+                Utils.Log(LogSeverity.Debug, nameof(AiRuleBasedController),
                           $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
                 return UctAction.EndTurnAction();
             }

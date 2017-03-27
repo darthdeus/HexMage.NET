@@ -5,6 +5,7 @@ using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
+using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.PCG;
 using Microsoft.Xna.Framework;
@@ -31,7 +32,7 @@ namespace HexMage.GUI.Scenes {
 
             _controllerList = new List<IMobController> {
                 new PlayerController(_arenaScene, _gameInstance),
-                new AiRandomController(_gameInstance),
+                new AiRuleBasedController(_gameInstance),
                 new MctsController(_gameInstance)
             };
         }

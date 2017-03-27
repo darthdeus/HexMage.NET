@@ -20,7 +20,8 @@ namespace HexMage.Simulator.AI {
             var factories = new IAiFactory[] {
                 new RuleBasedFactory(),
                 new MctsFactory(1),
-                new MctsFactory(10)
+                //new MctsFactory(10),
+                new RandomFactory(),
             };
 
             var result = new EvaluationResult();
@@ -125,46 +126,6 @@ namespace HexMage.Simulator.AI {
             writer.WriteLine($"\n***MCTS avg: {ExponentialMovingAverage.Instance.CurrentValue}ms/iter\n\n");
 
             return results;
-        }
-    }
-
-    public class RuleBasedFactory : IAiFactory {
-        public IMobController Build(GameInstance gameInstance) {
-            // TODO - rename to RuleBasedController
-            return new AiRandomController(gameInstance);
-        }
-    }
-
-    public class MctsFactory : IAiFactory {
-        private readonly int _time;
-
-        public MctsFactory(int time) {
-            _time = time;
-        }
-
-        public IMobController Build(GameInstance gameInstance) {
-            return new MctsController(gameInstance, _time);
-        }
-    }
-
-    public interface IAiFactory {
-        IMobController Build(GameInstance gameInstance);
-    }
-
-    public struct EvaluationResult {
-        public int RedWins;
-        public int BlueWins;
-        public int Timeouts;
-        public int TotalTurns;
-        public long TotalElapsedMilliseconds;
-        public int TotalIterations;
-
-        public double MillisecondsPerIteration => (double) TotalElapsedMilliseconds / (double) TotalIterations;
-        public double MillisecondsPerTurn => (double) TotalElapsedMilliseconds / (double) TotalTurns;
-        public double WinPercentage => ((double) RedWins) / (double) TotalTurns;
-
-        public override string ToString() {
-            return $"{RedWins}/{BlueWins} (draws: {Timeouts}), total: {TotalTurns}";
         }
     }
 }

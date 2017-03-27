@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using HexMage.GUI.Scenes;
 using HexMage.Simulator;
+using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 
 namespace HexMage.GUI.Core {
@@ -12,11 +13,11 @@ namespace HexMage.GUI.Core {
         public PlayerController(ArenaScene arenaScene, GameInstance gameInstance) {
             _arenaScene = arenaScene;
             _gameInstance = gameInstance;
-            _aiRandomController = new AiRandomController(_gameInstance);
+            _aiRuleBasedController = new AiRuleBasedController(_gameInstance);
         }
 
         private TaskCompletionSource<bool> _tcs;
-        private readonly AiRandomController _aiRandomController;
+        private readonly AiRuleBasedController _aiRuleBasedController;
 
         public bool TurnActive { get; private set; }
 

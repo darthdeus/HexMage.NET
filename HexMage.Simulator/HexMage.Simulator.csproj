@@ -47,9 +47,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AI\AiRandomController.cs" />
+    <Compile Include="AI\AiRuleBasedController.cs" />
+    <Compile Include="AI\EvaluationResult.cs" />
     <Compile Include="AI\ExponentialMovingAverage.cs" />
+    <Compile Include="AI\IAiFactory.cs" />
     <Compile Include="AI\MctsController.cs" />
     <Compile Include="AI\GameInstanceEvaluator.cs" />
+    <Compile Include="AI\MctsFactory.cs" />
+    <Compile Include="AI\RuleBasedFactory.cs" />
     <Compile Include="AI\UctAction.cs" />
     <Compile Include="AI\UctActionType.cs" />
     <Compile Include="AI\UctNode.cs" />

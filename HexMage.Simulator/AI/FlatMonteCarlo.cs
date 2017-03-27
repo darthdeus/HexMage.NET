@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
@@ -84,8 +85,8 @@ namespace HexMage.Simulator {
 
             foreach (var state in possibleStates) {
                 var hub = new GameEventHub(state);
-                state.MobManager.Teams[TeamColor.Red] = new AiRandomController(state);
-                state.MobManager.Teams[TeamColor.Blue] = new AiRandomController(state);
+                state.MobManager.Teams[TeamColor.Red] = new AiRuleBasedController(state);
+                state.MobManager.Teams[TeamColor.Blue] = new AiRuleBasedController(state);
 
                 var rounds = hub.FastMainLoop(TimeSpan.Zero);
                 Console.WriteLine($"Took {rounds} rounds");
