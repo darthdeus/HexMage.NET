@@ -9,6 +9,7 @@ using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.PCG;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Scenes {
@@ -33,7 +34,7 @@ namespace HexMage.GUI.Scenes {
             _controllerList = new List<IMobController> {
                 new PlayerController(_arenaScene, _gameInstance),
                 new AiRuleBasedController(_gameInstance),
-                new MctsController(_gameInstance, 100)
+                new MctsController(_gameInstance)
             };
         }
 
@@ -94,15 +95,62 @@ namespace HexMage.GUI.Scenes {
                 Position = new Vector2(250, 20)
             };
 
-            btnStart.OnClick += _ => {
-                if (_leftController != null && _rightController != null) {
-                    _gameInstance.PrepareEverything();
-                    LoadNewScene(_arenaScene);
-                } else {
-                    Utils.Log(LogSeverity.Warning, nameof(TeamSelectionScene),
-                              "Failed to start a game, no controllers selected.");
+            btnStart.OnClick += _ => { DoContinue(); };
+
+            var hotkeyManager = new Entity() {SortOrder = Camera2D.SortUI};
+
+            bool first = true;
+            hotkeyManager.AddComponent(() => {
+                bool handPickedTeam = false;
+                if (InputManager.Instance.IsKeyJustPressed(Keys.A)) {
+                    if (first) {
+                        _leftController = new AiRuleBasedController(_gameInstance);
+                    } else {
+                        _rightController = new AiRuleBasedController(_gameInstance);
+                    }
+                    handPickedTeam = true;
+                } else if (InputManager.Instance.IsKeyJustPressed(Keys.S)) {
+                    if (first) {
+                        _leftController = new AiRandomController(_gameInstance);
+                    } else {
+                        _rightController = new AiRandomController(_gameInstance);
+                    }
+                    handPickedTeam = true;
+                } else if (InputManager.Instance.IsKeyJustPressed(Keys.D)) {
+                    if (first) {
+                        _leftController = new MctsController(_gameInstance);
+                    } else {
+                        _rightController = new MctsController(_gameInstance);
+                    }
+                    handPickedTeam = true;
+                } else if (InputManager.Instance.IsKeyJustPressed(Keys.F)) {
+                    if (first) {
+                        _leftController = new PlayerController(_arenaScene, _gameInstance);
+                    } else {
+                        _rightController = new PlayerController(_arenaScene, _gameInstance);
+                    }
+                    handPickedTeam = true;
                 }
-            };
+
+                if (handPickedTeam) {
+                    RegenerateTeams(t1Slider.Value, t2Slider.Value);
+                    first = !first;
+                }
+
+                if (InputManager.Instance.IsKeyJustPressed(Keys.D1)) {
+                    RegenerateTeams(1, 1);
+                } else if (InputManager.Instance.IsKeyJustPressed(Keys.D2)) {
+                    RegenerateTeams(2, 2);
+                } else if (InputManager.Instance.IsKeyJustPressed(Keys.D3)) {
+                    RegenerateTeams(3, 3);
+                }
+
+                if (InputManager.Instance.IsKeyJustPressed(Keys.Space)) {
+                    DoContinue();
+                }
+            });
+
+            AddAndInitializeRootEntity(hotkeyManager, _assetManager);
 
             var btnRegenerate = new TextButton("Regenerate teams", _assetManager.Font) {
                 SortOrder = Camera2D.SortUI,
@@ -130,6 +178,16 @@ namespace HexMage.GUI.Scenes {
             _teamPreviewLayout.AddChild(_t2Preview);
 
             AddAndInitializeRootEntity(_teamPreviewLayout, _assetManager);
+        }
+
+        private void DoContinue() {
+            if (_leftController != null && _rightController != null) {
+                _gameInstance.PrepareEverything();
+                LoadNewScene(_arenaScene);
+            } else {
+                Utils.Log(LogSeverity.Warning, nameof(TeamSelectionScene),
+                          "Failed to start a game, no controllers selected.");
+            }
         }
 
         private void RegenerateTeams(int t1size, int t2size) {

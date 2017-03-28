@@ -55,7 +55,7 @@ namespace HexMage.GUI.Scenes {
 
             middleColumn.Position = new Vector2(400, 40);
             var btnStartGame = new TextButton("Start game using current map", _assetManager.Font);
-            btnStartGame.OnClick += _ => { LoadNewScene(new TeamSelectionScene(_gameManager, _currentMap.DeepCopy())); };
+            btnStartGame.OnClick += _ => { DoContinue(); };
             middleColumn.AddChild(btnStartGame);
 
             var sizeSlider = new Slider(MinSize, MaxSize, new Point(100, 20));
@@ -81,7 +81,7 @@ namespace HexMage.GUI.Scenes {
             Action positionUpdater =
                 () =>
                     mapPreview.Position =
-                        new Vector2(30 + 10*(_selectedSize ?? MinSize), 120 + 30*(_selectedSize ?? MinSize));
+                        new Vector2(30 + 10 * (_selectedSize ?? MinSize), 120 + 30 * (_selectedSize ?? MinSize));
 
             positionUpdater();
 
@@ -98,12 +98,20 @@ namespace HexMage.GUI.Scenes {
             };
 
             loaderEntity.AddComponent(() => {
-                                          if (InputManager.Instance.IsKeyJustReleased(Keys.F11)) {
-                                              LoadWorldFromSave();
-                                          }
-                                      });
+                if (InputManager.Instance.IsKeyJustReleased(Keys.F11)) {
+                    LoadWorldFromSave();
+                }
+
+                if (InputManager.Instance.IsKeyJustPressed(Keys.Space)) {
+                    DoContinue();
+                }
+            });
 
             AddAndInitializeRootEntity(loaderEntity, _assetManager);
+        }
+
+        private void DoContinue() {
+            LoadNewScene(new TeamSelectionScene(_gameManager, _currentMap.DeepCopy()));
         }
 
         private void BtnGenerateMapOnOnClick(TextButton btn) {
