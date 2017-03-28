@@ -86,21 +86,19 @@ namespace HexMage.Simulator.PCG {
             int iterations = 10000;
 
             while (--iterations > 0) {
-                var x = Random.Next(-size, size);
-                var y = Random.Next(-size, size);
+                // +1 since .Next is inclusive of the lower bound
+                var x = Random.Next(-size+1, size);
+                var y = Random.Next(-size+1, size);
 
-                var zero = new AxialCoord(0, 0);
                 var coord = new AxialCoord(x, y);
 
-                if (isCoordAvailable(coord) && coord.Distance(zero) < size) {
-                    if (state.AtCoord(coord) == null || state.AtCoord(coord).Value == mob) {
-                        var infoCopy = mobManager.MobInfos[mob];
-                        infoCopy.OrigCoord = coord;
-                        mobManager.MobInfos[mob] = infoCopy;
-                        break;
-                    } else {
-                        throw new InvalidOperationException($"There already is a mob at {coord}");
-                    }
+                bool isWall = map[coord] == HexType.Wall;
+                bool isTaken = mobManager.MobInfos.Any(info => info.OrigCoord == coord);
+
+                if (!isWall && !isTaken) {
+                    var infoCopy = mobManager.MobInfos[mob];
+                    infoCopy.OrigCoord = coord;
+                    mobManager.MobInfos[mob] = infoCopy;
                 }
             }
 
@@ -140,12 +138,12 @@ namespace HexMage.Simulator.PCG {
 
 
                 var ability = new Ability(dmg,
-                                          cost,
-                                          range,
-                                          cooldown,
-                                          element,
-                                          buff,
-                                          areaBuff);
+                    cost,
+                    range,
+                    cooldown,
+                    element,
+                    buff,
+                    areaBuff);
 
                 // TODO - use GameInstance.AddAbilityWithInfo instead
                 int id = mobManager.Abilities.Count;
