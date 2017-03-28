@@ -187,7 +187,7 @@ namespace HexMage.GUI.Scenes {
                 LoadNewScene(_arenaScene);
             } else {
                 Utils.Log(LogSeverity.Warning, nameof(TeamSelectionScene),
-                          "Failed to start a game, no controllers selected.");
+                    "Failed to start a game, no controllers selected.");
             }
         }
 
@@ -213,19 +213,38 @@ namespace HexMage.GUI.Scenes {
 
             for (int i = 0; i < t1size; i++) {
                 var mobInfo = Generator.RandomMob(_mobManager, t1, _gameInstance.State);
-                var mobId = _gameInstance.AddMobWithInfo(mobInfo);
-                Generator.RandomPlaceMob(_gameInstance.MobManager, mobId, _map, _gameInstance.State);
 
-                _t1Preview.AddChild(BuildMobPreview(() => mobId));
+                var m1 = _gameInstance.AddMobWithInfo(mobInfo);
+                var m2 = _gameInstance.AddMobWithInfo(mobInfo);
+
+                // Change team of m2
+                var mi2 = _gameInstance.MobManager.MobInfos[m2];
+                mi2.Team = t2;
+                _gameInstance.MobManager.MobInfos[m2] = mi2;
+
+                Generator.RandomPlaceMob(_gameInstance.MobManager, m1, _map, _gameInstance.State);
+                Generator.RandomPlaceMob(_gameInstance.MobManager, m2, _map, _gameInstance.State);
+
+                _t1Preview.AddChild(BuildMobPreview(() => m1));
+                _t1Preview.AddChild(BuildMobPreview(() => m2));
             }
 
-            for (int i = 0; i < t2size; i++) {
-                var mobInfo = Generator.RandomMob(_mobManager, t2, _gameInstance.State);
-                var mobId = _gameInstance.AddMobWithInfo(mobInfo);
-                Generator.RandomPlaceMob(_gameInstance.MobManager, mobId, _map, _gameInstance.State);
 
-                _t2Preview.AddChild(BuildMobPreview(() => mobId));
-            }
+            //for (int i = 0; i < t1size; i++) {
+            //    var mobInfo = Generator.RandomMob(_mobManager, t1, _gameInstance.State);
+            //    var mobId = _gameInstance.AddMobWithInfo(mobInfo);
+            //    Generator.RandomPlaceMob(_gameInstance.MobManager, mobId, _map, _gameInstance.State);
+
+            //    _t1Preview.AddChild(BuildMobPreview(() => mobId));
+            //}
+
+            //for (int i = 0; i < t2size; i++) {
+            //    var mobInfo = Generator.RandomMob(_mobManager, t2, _gameInstance.State);
+            //    var mobId = _gameInstance.AddMobWithInfo(mobInfo);
+            //    Generator.RandomPlaceMob(_gameInstance.MobManager, mobId, _map, _gameInstance.State);
+
+            //    _t2Preview.AddChild(BuildMobPreview(() => mobId));
+            //}
 
             _mobManager.InitializeState(_gameInstance.State);
             _gameInstance.State.SlowUpdateIsFinished(_mobManager);
@@ -265,6 +284,7 @@ namespace HexMage.GUI.Scenes {
             return wrapper;
         }
 
-        public override void Cleanup() {}
+        public override void Cleanup() {
+        }
     }
 }
