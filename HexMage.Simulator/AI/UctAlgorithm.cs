@@ -1,4 +1,4 @@
-#define XML
+//#define XML
 //#define DOTGRAPH
 
 using System;

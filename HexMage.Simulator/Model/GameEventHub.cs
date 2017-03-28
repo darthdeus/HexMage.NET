@@ -41,6 +41,7 @@ namespace HexMage.Simulator {
 
                 await turnManager.CurrentController.SlowPlayTurn(this);
 
+                // TODO - try to use this to find some more race conditions :)
                 // Delay used to find random race conditions
                 //await Task.Delay(TimeSpan.FromMilliseconds(1000));
                 turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder, state);

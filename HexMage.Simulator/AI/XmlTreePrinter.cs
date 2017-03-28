@@ -13,18 +13,21 @@ namespace HexMage.Simulator.AI {
         }
 
         public void Print(TextWriter writer) {
-            var rootElement = PrintNode(_root);
+            const int budget = 4;
+            var rootElement = PrintNode(_root, budget);
             _doc.AppendChild(rootElement);
 
             writer.Write(_doc.OuterXml);
         }
 
-        private XmlElement PrintNode(UctNode node) {
+        private XmlElement PrintNode(UctNode node, int budget) {
             var element = _doc.CreateElement("action");
 
-            foreach (var child in node.Children) {
-                var xmlElement = PrintNode(child);
-                element.AppendChild(xmlElement);
+            if (budget > 0) {
+                foreach (var child in node.Children) {
+                    var xmlElement = PrintNode(child, budget - 1);
+                    element.AppendChild(xmlElement);
+                }
             }
 
             element.SetAttribute("Q", node.Q.ToString());
