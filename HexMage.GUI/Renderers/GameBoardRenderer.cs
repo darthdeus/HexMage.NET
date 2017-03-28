@@ -155,7 +155,7 @@ namespace HexMage.GUI.Renderers {
             DrawHeatmap(heatmap);
         }
 
-        private void DrawHeatmap(GameInstance.Heatmap heatmap) {
+        private void DrawHeatmap(Heatmap heatmap) {
             _spriteBatch.Begin(transformMatrix: _camera.Transform, samplerState: Camera2D.SamplerState);
             foreach (var coord in heatmap.Map.AllCoords) {
                 if (heatmap.Map[coord] == 0) continue;
