@@ -225,6 +225,8 @@ namespace HexMage.GUI.Components {
                 ((GameBoardRenderer) Entity.Renderer).Mode = BoardRenderMode.HoverHeatmap;
             } else if (inputManager.IsKeyJustReleased(Keys.F3)) {
                 ((GameBoardRenderer) Entity.Renderer).Mode = BoardRenderMode.GlobalHeatmap;
+            } else if (inputManager.IsKeyJustReleased(Keys.F4)) {
+                ((GameBoardRenderer) Entity.Renderer).Mode = BoardRenderMode.VisibilityMap;
             }
         }
 

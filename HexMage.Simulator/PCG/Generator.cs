@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using HexMage.Simulator.Model;
 
@@ -90,6 +91,11 @@ namespace HexMage.Simulator.PCG {
                 var x = Random.Next(-size+1, size);
                 var y = Random.Next(-size+1, size);
 
+                if (Math.Abs(x) + Math.Abs(y) >= size) continue;
+
+                Debug.Assert(Math.Abs(x) < size);
+                Debug.Assert(Math.Abs(y) < size);
+
                 var coord = new AxialCoord(x, y);
 
                 bool isWall = map[coord] == HexType.Wall;
@@ -98,7 +104,9 @@ namespace HexMage.Simulator.PCG {
                 if (!isWall && !isTaken) {
                     var infoCopy = mobManager.MobInfos[mob];
                     infoCopy.OrigCoord = coord;
+                    //Console.WriteLine($"Placed at {coord}");
                     mobManager.MobInfos[mob] = infoCopy;
+                    break;
                 }
             }
 

@@ -144,6 +144,10 @@ namespace HexMage.GUI.Scenes {
                     RegenerateTeams(2, 2);
                 } else if (InputManager.Instance.IsKeyJustPressed(Keys.D3)) {
                     RegenerateTeams(3, 3);
+                } else if (InputManager.Instance.IsKeyJustPressed(Keys.D4)) {
+                    RegenerateTeams(4, 4);
+                } else if (InputManager.Instance.IsKeyJustPressed(Keys.D5)) {
+                    RegenerateTeams(5, 5);
                 }
 
                 if (InputManager.Instance.IsKeyJustPressed(Keys.Space)) {
@@ -226,7 +230,7 @@ namespace HexMage.GUI.Scenes {
                 Generator.RandomPlaceMob(_gameInstance.MobManager, m2, _map, _gameInstance.State);
 
                 _t1Preview.AddChild(BuildMobPreview(() => m1));
-                _t1Preview.AddChild(BuildMobPreview(() => m2));
+                _t2Preview.AddChild(BuildMobPreview(() => m2));
             }
 
 

@@ -33,8 +33,11 @@ namespace HexMage.Simulator {
             State = new GameState();
         }
 
-        public GameInstance(int size) : this(new Map(size)) {}
-        public GameInstance(Map map) : this(map, new MobManager()) {}
+        public GameInstance(int size) : this(new Map(size)) {
+        }
+
+        public GameInstance(Map map) : this(map, new MobManager()) {
+        }
 
         private GameInstance(int size, Map map, MobManager mobManager, Pathfinder pathfinder) {
             Size = size;
@@ -121,56 +124,56 @@ namespace HexMage.Simulator {
             }
         }
 
-        public Heatmap BuildHeatmap() {
+        public Heatmap BuildHeatmap(int? chosenMob = null) {
             var heatmap = new Heatmap(Size);
-            if (CurrentTeam.HasValue) {
-                int maxDmg = 0;
-                int minDmg = int.MaxValue;
-                var playerTeam = CurrentTeam.Value;
 
-                foreach (var coord in heatmap.Map.AllCoords) {
-                    foreach (var mobId in MobManager.Mobs) {
-                        var mobInfo = MobManager.MobInfos[mobId];
-                        var mobInstance = State.MobInstances[mobId];
+            int maxDmg = 0;
+            int minDmg = int.MaxValue;
 
-                        bool isVisible = Map.IsVisible(mobInstance.Coord, coord);
-                        if (!isVisible) continue;
+            if (!CurrentTeam.HasValue) return heatmap;
 
-                        if (playerTeam == mobInfo.Team) continue;
+            TeamColor playerTeam = CurrentTeam.Value; 
 
-                        int maxAbilityDmg = 0;
-                        foreach (var abilityId in mobInfo.Abilities) {
-                            var abilityInfo = MobManager.AbilityForId(abilityId);
+            foreach (var coord in heatmap.Map.AllCoords) {
+                foreach (var mobId in MobManager.Mobs) {
+                    var enemyInfo = MobManager.MobInfos[mobId];
+                    var enemyInstance = State.MobInstances[mobId];
 
-                            bool withinRange = Map.AxialDistance(mobInstance.Coord, coord) <= abilityInfo.Range;
-                            bool onCooldown = State.Cooldowns[abilityId] > 0;
-                            bool hasEnoughAp = abilityInfo.Cost <= mobInstance.Ap;
+                    // TODO - fuj
+                    if (chosenMob.HasValue && chosenMob.Value != mobId) continue;
 
-                            bool isAbilityUsable = withinRange && !onCooldown && hasEnoughAp;
+                    bool isFriendly = playerTeam == enemyInfo.Team;          
+                    bool isVisible = Map.IsVisible(enemyInstance.Coord, coord);
 
-                            if (isAbilityUsable && abilityInfo.Dmg > maxAbilityDmg) {
-                                maxAbilityDmg = abilityInfo.Dmg;
-                            }
-//#warning TODO - resit cooldowny
-//                            if (coord.Distance(mobInstance.Coord) <= abilityInfo.Range &&
-//                                abilityInfo.Cost <= mobInstance.Ap) {
-//                                if (abilityInfo.Dmg > maxAbilityDmg) {
-//                                    maxAbilityDmg = abilityInfo.Dmg;
-//                                }
-//                            }
+                    if (!isVisible) continue;
+                    // We skip friendly mobs only when not focusing on a particular mob
+                    if (!chosenMob.HasValue && isFriendly) continue;
+
+                    int maxAbilityDmg = 0;
+                    foreach (var abilityId in enemyInfo.Abilities) {
+                        var abilityInfo = MobManager.AbilityForId(abilityId);
+
+                        bool withinRange = Map.AxialDistance(enemyInstance.Coord, coord) <= abilityInfo.Range;
+                        bool onCooldown = State.Cooldowns[abilityId] > 0;
+                        bool hasEnoughAp = abilityInfo.Cost <= enemyInstance.Ap;
+
+                        bool isAbilityUsable = withinRange && !onCooldown && hasEnoughAp;
+
+                        if (isAbilityUsable && abilityInfo.Dmg > maxAbilityDmg) {
+                            maxAbilityDmg = abilityInfo.Dmg;
                         }
-
-                        heatmap.Map[coord] += maxAbilityDmg;
-
-                        int coordValue = heatmap.Map[coord];
-                        if (coordValue < minDmg) minDmg = coordValue;
-                        if (coordValue > maxDmg) maxDmg = coordValue;
                     }
-                }
 
-                heatmap.MinValue = minDmg;
-                heatmap.MaxValue = maxDmg;
+                    heatmap.Map[coord] += maxAbilityDmg;
+
+                    int coordValue = heatmap.Map[coord];
+                    if (coordValue < minDmg) minDmg = coordValue;
+                    if (coordValue > maxDmg) maxDmg = coordValue;
+                }
             }
+
+            heatmap.MinValue = minDmg;
+            heatmap.MaxValue = maxDmg;
 
             return heatmap;
         }
@@ -325,9 +328,9 @@ namespace HexMage.Simulator {
         /// TODO - fix stuff below
         public int AddMobWithInfo(MobInfo mobInfo) {
             Debug.Assert(State.MobInstances.Length == MobManager.MobInfos.Count,
-                         "State.MobInstances.Length == MobManager.MobInfos.Count");
+                "State.MobInstances.Length == MobManager.MobInfos.Count");
             Debug.Assert(State.MobInstances.Length == MobManager.Mobs.Count,
-                         "State.MobInstances.Length == MobManager.Mobs.Count");
+                "State.MobInstances.Length == MobManager.Mobs.Count");
 
             var id = MobManager.Mobs.Count;
 

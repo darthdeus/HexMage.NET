@@ -237,7 +237,6 @@ namespace HexMage.Simulator {
             }
         }
 
-
         public int Distance(AxialCoord from, AxialCoord to) {
             var current = AllPaths[from];
             Debug.Assert(current != null);

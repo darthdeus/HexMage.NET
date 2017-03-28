@@ -12,7 +12,8 @@ namespace HexMage.GUI.Renderers {
     public enum BoardRenderMode {
         Default,
         HoverHeatmap,
-        GlobalHeatmap
+        GlobalHeatmap,
+        VisibilityMap
     }
 
     public class GameBoardRenderer : IRenderer {
@@ -25,7 +26,7 @@ namespace HexMage.GUI.Renderers {
         public BoardRenderMode Mode { get; set; }
 
         public GameBoardRenderer(GameInstance gameInstance, GameBoardController gameBoardController,
-                                 GameEventHub eventHub, Camera2D camera) {
+            GameEventHub eventHub, Camera2D camera) {
             _gameInstance = gameInstance;
             _gameBoardController = gameBoardController;
             _eventHub = eventHub;
@@ -44,10 +45,14 @@ namespace HexMage.GUI.Renderers {
                         DrawHoverHeatmap(currentMob.Value);
                     } else if (Mode == BoardRenderMode.GlobalHeatmap) {
                         DrawGlobalHeatmap();
+                    } else if (Mode == BoardRenderMode.VisibilityMap) {
+                        DrawVisibilityMap(currentMob.Value);
                     }
                 }
 
-                DrawHoverPath();
+                if (Mode != BoardRenderMode.VisibilityMap) {
+                    DrawHoverPath();
+                }
             } else {
                 var hexTooFar = _assetManager[AssetManager.HexPathSprite];
                 var mouseHex = Camera2D.Instance.MouseHex;
@@ -61,6 +66,25 @@ namespace HexMage.GUI.Renderers {
             batch.Begin();
             batch.DrawString(assetManager.Font, $"State: {_eventHub.State}", new Vector2(800, 30), Color.Black);
             batch.End();
+        }
+
+        private void DrawVisibilityMap(int currentMob) {
+            var from = _gameInstance.State.MobInstances[currentMob].Coord;
+
+            var mouseHex = Camera2D.Instance.MouseHex;
+            if (_gameInstance.State.AtCoord(mouseHex).HasValue) {
+                from = mouseHex;
+            }
+
+            _spriteBatch.Begin(transformMatrix: _camera.Transform, samplerState: Camera2D.SamplerState);
+            foreach (var to in _gameInstance.Map.AllCoords) {
+                if (_gameInstance.Map.IsVisible(from, to)) {
+                    // TODO - extrahovat hover sprite
+                    DrawAt(_assetManager[AssetManager.HexHoverSprite], to, Color.Red * 0.5f);
+                }
+            }
+
+            _spriteBatch.End();
         }
 
         private void DrawBackground() {
@@ -111,55 +135,31 @@ namespace HexMage.GUI.Renderers {
 
         private void DrawHoverHeatmap(int currentMob) {
             if (_gameInstance.Pathfinder.IsValidCoord(_camera.MouseHex)) {
-                var mobManager = _gameInstance.MobManager;
                 var state = _gameInstance.State;
                 var mouseMob = state.AtCoord(_camera.MouseHex);
 
                 if (mouseMob.HasValue) {
-                    var heatmap = new HexMap<int>(_gameInstance.Size);
-                    var mobInfo = mobManager.MobInfos[mouseMob.Value];
-                    var mobInstance = state.MobInstances[mouseMob.Value];
+                    var heatmap = _gameInstance.BuildHeatmap(mouseMob);
 
-                    int maxDmg = 0;
-
-                    foreach (var coord in heatmap.AllCoords) {
-                        int maxAbilityDmg = 0;
-
-                        foreach (var abilityId in mobInfo.Abilities) {
-                            var abilityInfo = mobManager.AbilityForId(abilityId);
-
-                            if (coord.Distance(mobInstance.Coord) <= abilityInfo.Range &&
-                                abilityInfo.Cost <= mobInstance.Ap) {
-                                if (abilityInfo.Dmg > maxAbilityDmg) {
-                                    maxAbilityDmg = abilityInfo.Dmg;
-                                }
-                            }
-                        }
-
-                        heatmap[coord] += maxAbilityDmg;
-
-                        if (heatmap[coord] > maxDmg) maxDmg = heatmap[coord];
-                    }
-
-                    _spriteBatch.Begin(transformMatrix: _camera.Transform, samplerState: Camera2D.SamplerState);
-                    foreach (var coord in heatmap.AllCoords) {
-                        float percent = heatmap[coord] / (float) maxDmg;
-                        DrawAt(_assetManager[AssetManager.HexHoverSprite], coord, Color.Red * percent * percent);
-                    }
-                    _spriteBatch.End();
+                    DrawHeatmap(heatmap);
                 }
             }
         }
 
-
         private void DrawGlobalHeatmap() {
-            var mobManager = _gameInstance.MobManager;
             var state = _gameInstance.State;
 
-            var heatmap = _gameInstance.BuildHeatmap();
+            var mouseMob = state.AtCoord(_camera.MouseHex);
+            var heatmap = _gameInstance.BuildHeatmap(mouseMob);
 
+            DrawHeatmap(heatmap);
+        }
+
+        private void DrawHeatmap(GameInstance.Heatmap heatmap) {
             _spriteBatch.Begin(transformMatrix: _camera.Transform, samplerState: Camera2D.SamplerState);
             foreach (var coord in heatmap.Map.AllCoords) {
+                if (heatmap.Map[coord] == 0) continue;
+
                 float percent = heatmap.Map[coord] / (float) heatmap.MaxValue / 2 + 0.5f;
                 DrawAt(_assetManager[AssetManager.HexHoverSprite], coord, Color.Red * percent * percent);
             }
@@ -173,10 +173,20 @@ namespace HexMage.GUI.Renderers {
             var hexTooFar = _assetManager[AssetManager.HexPathSprite];
 
             var mouseHex = _camera.MouseHex;
-            if (_gameInstance.TurnManager.CurrentMob.HasValue) {
-                var currentMob = _gameInstance.TurnManager.CurrentMob;
+
+            var currentMob = _gameInstance.TurnManager.CurrentMob;
+
+            if (currentMob.HasValue) {
                 var mobInfo = _gameInstance.MobManager.MobInfos[currentMob.Value];
                 var mobInstance = _gameInstance.State.MobInstances[currentMob.Value];
+
+                // TODO - tohle smazat, az se prestanou placovat mobove mimo mapu
+                if (mouseHex.Distance(AxialCoord.Zero) >= _gameInstance.Size) {
+                    // TODO - pouzit util log
+                    //Console.WriteLine("Hovering outside of the map, not drawing path");
+                    _spriteBatch.End();
+                    return;
+                }
 
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex) &&
                     _gameInstance.Pathfinder.Distance(mobInstance.Coord, mouseHex) != int.MaxValue) {
@@ -185,7 +195,7 @@ namespace HexMage.GUI.Renderers {
                     var mouseMob = _gameInstance.State.AtCoord(mouseHex);
                     if (mouseMob != null) {
                         path = _gameInstance.Pathfinder.PathToMob(mobInstance.Coord,
-                                                                  _gameInstance.State.MobInstances[mouseMob.Value].Coord);
+                            _gameInstance.State.MobInstances[mouseMob.Value].Coord);
                     } else {
                         path = _gameInstance.Pathfinder.PathTo(mobInstance.Coord, mouseHex);
                     }
@@ -200,7 +210,7 @@ namespace HexMage.GUI.Renderers {
                         foreach (var cubeCoord in cubepath) {
                             if (!_gameInstance.Pathfinder.IsValidCoord(cubeCoord)) {
                                 Utils.Log(LogSeverity.Warning, nameof(GameBoardRenderer),
-                                          $"Computed invalid cube visibility path of {cubeCoord}.");
+                                    $"Computed invalid cube visibility path of {cubeCoord}.");
                                 continue;
                             }
                             if (_gameInstance.Map[cubeCoord] == HexType.Wall) {
