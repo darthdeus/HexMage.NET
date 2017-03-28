@@ -138,6 +138,11 @@ namespace HexMage.GUI.Components {
             var inputManager = InputManager.Instance;
             var mouseHex = Camera2D.Instance.MouseHex;
 
+            if (inputManager.IsKeyJustPressed(Keys.R) && Keyboard.GetState().IsKeyDown(Keys.LeftControl)) {
+                SceneManager.RollbackToFirst = true;
+                return;
+            }
+
             if (inputManager.IsKeyJustPressed(Keys.Pause)) {
                 if (_eventHub.IsPaused) {
                     ShowMessage("Game resumed.");
@@ -398,9 +403,10 @@ namespace HexMage.GUI.Components {
                     mobTextBuilder.AppendLine("Buffs:");
                     if (!mobInstance.Buff.IsZero) {
                         var buff = mobInstance.Buff;
-                        mobTextBuilder.AppendLine($"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");
+                        mobTextBuilder.AppendLine(
+                            $"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");
                     }
-                        
+
 
                     mobTextBuilder.AppendLine();
                     mobTextBuilder.AppendLine("Area buffs:");

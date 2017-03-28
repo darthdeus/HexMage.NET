@@ -32,9 +32,10 @@ namespace HexMage.GUI.Scenes {
             _arenaScene = new ArenaScene(_gameManager, _gameInstance);
 
             _controllerList = new List<IMobController> {
-                new PlayerController(_arenaScene, _gameInstance),
                 new AiRuleBasedController(_gameInstance),
-                new MctsController(_gameInstance)
+                new AiRandomController(_gameInstance),
+                new MctsController(_gameInstance),
+                new PlayerController(_arenaScene, _gameInstance)
             };
         }
 

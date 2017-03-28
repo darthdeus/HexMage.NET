@@ -4,6 +4,8 @@ using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.Scenes {
     class SceneManager {
+        public static bool RollbackToFirst = false;
+
         private readonly Stack<GameScene> _scenes = new Stack<GameScene>();
 
         public SceneManager(GameScene initialScene) {
@@ -40,6 +42,15 @@ namespace HexMage.GUI.Scenes {
 
                 case SceneUpdateResult.Continue:
                     break;
+            }
+
+            if (RollbackToFirst) {
+                while (_scenes.Count > 1) {
+                    currentScene.Cleanup();
+                    _scenes.Pop();
+                }
+
+                RollbackToFirst = false;
             }
         }
 
