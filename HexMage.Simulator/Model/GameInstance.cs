@@ -33,11 +33,9 @@ namespace HexMage.Simulator {
             State = new GameState();
         }
 
-        public GameInstance(int size) : this(new Map(size)) {
-        }
+        public GameInstance(int size) : this(new Map(size)) {}
 
-        public GameInstance(Map map) : this(map, new MobManager()) {
-        }
+        public GameInstance(Map map) : this(map, new MobManager()) {}
 
         private GameInstance(int size, Map map, MobManager mobManager, Pathfinder pathfinder) {
             Size = size;
@@ -109,21 +107,6 @@ namespace HexMage.Simulator {
             }
         }
 
-        public class Heatmap {
-            // TODO - make these properties
-            public HexMap<int> Map;
-            public int Size;
-            public int MaxValue;
-            public int MinValue;
-
-            public Heatmap(int size) {
-                Size = size;
-                Map = new HexMap<int>(size);
-                MaxValue = 0;
-                MinValue = int.MaxValue;
-            }
-        }
-
         public Heatmap BuildHeatmap(int? chosenMob = null) {
             var heatmap = new Heatmap(Size);
 
@@ -132,7 +115,7 @@ namespace HexMage.Simulator {
 
             if (!CurrentTeam.HasValue) return heatmap;
 
-            TeamColor playerTeam = CurrentTeam.Value; 
+            TeamColor playerTeam = CurrentTeam.Value;
 
             foreach (var coord in heatmap.Map.AllCoords) {
                 foreach (var mobId in MobManager.Mobs) {
@@ -142,7 +125,7 @@ namespace HexMage.Simulator {
                     // TODO - fuj
                     if (chosenMob.HasValue && chosenMob.Value != mobId) continue;
 
-                    bool isFriendly = playerTeam == enemyInfo.Team;          
+                    bool isFriendly = playerTeam == enemyInfo.Team;
                     bool isVisible = Map.IsVisible(enemyInstance.Coord, coord);
 
                     if (!isVisible) continue;
@@ -325,12 +308,27 @@ namespace HexMage.Simulator {
             return result;
         }
 
+        public float PercentageHp(TeamColor team) {
+            int totalMaxHp = 0;
+            int totalCurrentHp = 0;
+
+            foreach (var mobId in MobManager.Mobs) {
+                var mobInfo = MobManager.MobInfos[mobId];
+                var mobInstance = State.MobInstances[mobId];
+
+                totalMaxHp += mobInfo.MaxHp;
+                totalCurrentHp += mobInstance.Hp;
+            }
+
+            return (float) totalCurrentHp / (float) totalMaxHp;
+        }
+
         /// TODO - fix stuff below
         public int AddMobWithInfo(MobInfo mobInfo) {
             Debug.Assert(State.MobInstances.Length == MobManager.MobInfos.Count,
-                "State.MobInstances.Length == MobManager.MobInfos.Count");
+                         "State.MobInstances.Length == MobManager.MobInfos.Count");
             Debug.Assert(State.MobInstances.Length == MobManager.Mobs.Count,
-                "State.MobInstances.Length == MobManager.Mobs.Count");
+                         "State.MobInstances.Length == MobManager.Mobs.Count");
 
             var id = MobManager.Mobs.Count;
 

@@ -59,7 +59,7 @@ namespace HexMage.Simulator {
                 }
 
                 Console.WriteLine(
-                    $"total: {UctAlgorithm.actions} [end ratio: {endRatio}]\t{UctAlgorithm.ActionCountString()}");
+                    $"total: {UctAlgorithm.Actions} [end ratio: {endRatio}]\t{UctAlgorithm.ActionCountString()}");
             }
         }
 

@@ -13,8 +13,11 @@ using HexMage.Simulator.PCG;
 
 namespace HexMage.Simulator {
     public class UctAlgorithm {
-        public static int actions = 0;
-        public static int searchCount = 0;
+        // TODO - extrahovat do args nebo configuraku
+        public const bool UseHpPercentageScaling = true;
+
+        public static int Actions = 0;
+        public static int SearchCount = 0;
 
         public static int ExpandCount = 0;
         public static int BestChildCount = 0;
@@ -37,7 +40,7 @@ namespace HexMage.Simulator {
             stopwatch.Stop();
 
             PrintTreeRepresentation(root);
-            searchCount++;
+            SearchCount++;
 
             //Console.WriteLine($"Total Q: {root.Children.Sum(c => c.Q)}, N: {root.Children.Sum(c => c.N)}");
 
@@ -91,8 +94,7 @@ namespace HexMage.Simulator {
                 node.Children.Add(child);
 
                 return child;
-            }
-            catch (ArgumentOutOfRangeException e) {
+            } catch (ArgumentOutOfRangeException e) {
                 Debugger.Break();
                 throw;
             }
@@ -123,7 +125,7 @@ namespace HexMage.Simulator {
         }
 
         public static GameInstance FNoCopy(GameInstance state, UctAction action) {
-            actions++;
+            Actions++;
             ActionCounts[action.Type]++;
 
             switch (action.Type) {
@@ -151,18 +153,9 @@ namespace HexMage.Simulator {
 
         public static float DefaultPolicy(GameInstance game, TeamColor startingTeam) {
             if (game.IsFinished) {
-                if (game.VictoryTeam.HasValue) {
-                    if (startingTeam == game.VictoryTeam.Value) {
-                        return 1;
-                    } else {
-                        return -1;
-                    }
-                } else {
-                    return 0;
-                }
+                Debug.Assert(game.VictoryTeam.HasValue, "game.VictoryTeam.HasValue");
+                return CalculateDeltaReward(game, startingTeam, game.VictoryTeam);
             }
-
-            var rnd = Generator.Random;
 
             Debug.Assert(game.CurrentTeam.HasValue, "game.CurrentTeam.HasValue");
 
@@ -187,15 +180,28 @@ namespace HexMage.Simulator {
 
             TeamColor? victoryTeam = copy.VictoryTeam;
 
-            if (victoryTeam == null) {
+            return CalculateDeltaReward(game, startingTeam, victoryTeam);
+        }
+
+        public static float CalculateDeltaReward(GameInstance game, TeamColor startingTeam, TeamColor? victoryTeam) {
+            // TODO - tohle duplikuje to dole
+            if (victoryTeam.HasValue) {
+                if (startingTeam == victoryTeam.Value) {
+                    if (UseHpPercentageScaling) {
+                        return 1 * game.PercentageHp(startingTeam);
+                    } else {
+                        return 1;
+                    }
+                } else {
+                    if (UseHpPercentageScaling) {
+                        return -1 * (1 - game.PercentageHp(victoryTeam.Value));
+                    } else {
+                        return -1;
+                    }
+                }
+            } else {
                 // The game was a draw
                 return 0;
-            } else if (startingTeam == victoryTeam.Value) {
-                return 1;
-            } else if (startingTeam != victoryTeam.Value) {
-                return -1;
-            } else {
-                throw new InvalidOperationException("Invalid victory team result when running DefaultPolicy.");
             }
         }
 
@@ -293,7 +299,7 @@ namespace HexMage.Simulator {
                 Console.WriteLine("Move failed!");
 
                 Utils.Log(LogSeverity.Debug, nameof(AiRuleBasedController),
-                    $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
+                          $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
                 return UctAction.EndTurnAction();
             }
         }
@@ -345,7 +351,7 @@ namespace HexMage.Simulator {
             } else {
                 throw new InvalidOperationException();
                 Utils.Log(LogSeverity.Warning, nameof(UctNode),
-                    "Final state reached while trying to compute possible actions.");
+                          "Final state reached while trying to compute possible actions.");
             }
 
             const bool endTurnAsLastResort = true;
@@ -362,7 +368,7 @@ namespace HexMage.Simulator {
         }
 
         private static void GenerateDefensiveMoveActions(GameInstance state, MobInstance mobInstance, int mobId,
-            List<UctAction> result) {
+                                                         List<UctAction> result) {
             var heatmap = state.BuildHeatmap();
             var coords = new List<AxialCoord>();
 
@@ -394,7 +400,7 @@ namespace HexMage.Simulator {
         }
 
         private static void GenerateAggressiveMoveActions(GameInstance state, MobInstance mobInstance, int mobId,
-            List<UctAction> result) {
+                                                          List<UctAction> result) {
             var mobInfo = state.MobManager.MobInfos[mobId];
             var enemyDistances = new HexMap<int>(state.Size);
 
@@ -520,7 +526,7 @@ namespace HexMage.Simulator {
                 Directory.CreateDirectory(dirname);
             }
 
-            File.WriteAllText($"c:\\dev\\graphs\\graph{searchCount}.dot", str);
+            File.WriteAllText($"c:\\dev\\graphs\\graph{SearchCount}.dot", str);
         }
 
         private void PrintDotNode(StringBuilder builder, UctNode node, int budget) {

@@ -117,7 +117,7 @@ namespace HexMage.Benchmarks {
 
                     turnManager.StartNextTurn(pathfinder, gameInstance.State);
 
-                    Console.WriteLine($"Starting, actions: {UctAlgorithm.actions}");
+                    Console.WriteLine($"Starting, actions: {UctAlgorithm.Actions}");
                     stopwatch.Start();
 #if FAST
                     var rounds = hub.FastMainLoop(TimeSpan.Zero);

@@ -47,7 +47,7 @@ namespace HexMage.Benchmarks {
                     foreach (var genTeam in generation) {
                         PopulationMember(team, genTeam, Console.Out);
 
-                        Console.WriteLine("\n\nWin stats:");
+                        Console.WriteLine("Win stats:");
                         foreach (var pair in GameInstanceEvaluator.GlobalControllerStatistics) {
                             Console.WriteLine($"{pair.Key}: {pair.Value}");
                         }
