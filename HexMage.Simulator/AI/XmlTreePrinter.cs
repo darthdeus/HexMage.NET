@@ -13,7 +13,7 @@ namespace HexMage.Simulator.AI {
         }
 
         public void Print(TextWriter writer) {
-            const int budget = 4;
+            const int budget = 7;
             var rootElement = PrintNode(_root, budget);
             _doc.AppendChild(rootElement);
 

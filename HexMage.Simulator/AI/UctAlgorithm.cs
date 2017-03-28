@@ -22,7 +22,7 @@ namespace HexMage.Simulator {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            int totalIterations = _thinkTime * 1000;
+            int totalIterations = _thinkTime * 10000;
             int iterations = totalIterations;
 
             while (iterations-- > 0) {
@@ -33,15 +33,7 @@ namespace HexMage.Simulator {
 
             stopwatch.Stop();
 
-#if XML
-            string filename = @"c:\dev\graphs\xml\iter-" + searchCount + ".xml";
-            using (var writer = new StreamWriter(filename)) {
-                new XmlTreePrinter(root).Print(writer);
-            };
-#endif
-#if DOTGRAPH
-            PrintDotgraph(root);            
-#endif
+            PrintTreeRepresentation(root);
             searchCount++;
 
             //Console.WriteLine($"Total Q: {root.Children.Sum(c => c.Q)}, N: {root.Children.Sum(c => c.N)}");
@@ -49,6 +41,7 @@ namespace HexMage.Simulator {
             var actions = SelectBestActions(root);
             return new UctSearchResult(actions, (double) stopwatch.ElapsedMilliseconds / (double) totalIterations);
         }
+
 
         public UctNode TreePolicy(UctNode node) {
             while (!node.IsTerminal) {
@@ -93,7 +86,8 @@ namespace HexMage.Simulator {
                 node.Children.Add(child);
 
                 return child;
-            } catch (ArgumentOutOfRangeException e) {
+            }
+            catch (ArgumentOutOfRangeException e) {
                 Debugger.Break();
                 throw;
             }
@@ -206,7 +200,7 @@ namespace HexMage.Simulator {
                 node.Q += delta;
                 node = node.Parent;
 
-                delta *= 0.95f;
+                //delta *= 0.95f;
                 // 5. puntik, nema se delta prepnout kdyz ja jsem EndTurn, a ne muj rodic?
                 if (node != null && node.Action.Type == UctActionType.EndTurn) {
                     // 6. puntik, kdy se ma prepinat?
@@ -294,7 +288,7 @@ namespace HexMage.Simulator {
                 Console.WriteLine("Move failed!");
 
                 Utils.Log(LogSeverity.Debug, nameof(AiRuleBasedController),
-                          $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
+                    $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
                 return UctAction.EndTurnAction();
             }
         }
@@ -336,6 +330,7 @@ namespace HexMage.Simulator {
 
                 // We disable movement if there is a possibility to cast abilities.
                 if (allowMove && !foundAbilityUse) {
+                    //if (allowMove) {
                     GenerateAggressiveMoveActions(state, mobInstance, mobId, result);
                 }
 
@@ -345,7 +340,7 @@ namespace HexMage.Simulator {
             } else {
                 throw new InvalidOperationException();
                 Utils.Log(LogSeverity.Warning, nameof(UctNode),
-                          "Final state reached while trying to compute possible actions.");
+                    "Final state reached while trying to compute possible actions.");
             }
 
             const bool endTurnAsLastResort = true;
@@ -362,9 +357,8 @@ namespace HexMage.Simulator {
         }
 
         private static void GenerateDefensiveMoveActions(GameInstance state, MobInstance mobInstance, int mobId,
-                                                         List<UctAction> result) {
+            List<UctAction> result) {
             var heatmap = state.BuildHeatmap();
-            //var usedValues = new HashSet<int>();
             var coords = new List<AxialCoord>();
 
             foreach (var coord in heatmap.Map.AllCoords) {
@@ -375,7 +369,6 @@ namespace HexMage.Simulator {
                 bool canMoveTo = state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap;
 
                 if (!canMoveTo) continue;
-
 
                 // TODO - samplovat po sektorech
                 coords.Add(coord);
@@ -396,7 +389,7 @@ namespace HexMage.Simulator {
         }
 
         private static void GenerateAggressiveMoveActions(GameInstance state, MobInstance mobInstance, int mobId,
-                                                          List<UctAction> result) {
+            List<UctAction> result) {
             var mobInfo = state.MobManager.MobInfos[mobId];
             var enemyDistances = new HexMap<int>(state.Size);
 
@@ -511,7 +504,7 @@ namespace HexMage.Simulator {
             var builder = new StringBuilder();
 
             builder.AppendLine("digraph G {");
-            int budget = 2;
+            int budget = 4;
             PrintDotNode(builder, root, budget);
             builder.AppendLine("}");
 
@@ -535,6 +528,25 @@ namespace HexMage.Simulator {
             foreach (var child in node.Children) {
                 PrintDotNode(builder, child, budget - 1);
             }
+        }
+
+
+        private void PrintTreeRepresentation(UctNode root) {
+#if XML
+            var dirname = @"c:\dev\graphs\xml\";
+            if (!Directory.Exists(dirname)) {
+                Directory.CreateDirectory(dirname);
+            }
+
+            string filename = dirname + "iter-" + searchCount + ".xml";
+
+            using (var writer = new StreamWriter(filename)) {
+                new XmlTreePrinter(root).Print(writer);
+            }
+#endif
+#if DOTGRAPH
+            PrintDotgraph(root);            
+#endif
         }
     }
 }
