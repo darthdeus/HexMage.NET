@@ -62,6 +62,7 @@ namespace HexMage.Simulator {
                     // TODO - nastavit nejakej stav?                    
                     break;
 
+                case UctActionType.DefensiveMove:
                 case UctActionType.Move:
                     // TODO - assert jenom na jednom miste?
                     Debug.Assert(instance.State.AtCoord(action.Coord) == null, "Trying to move into a mob.");

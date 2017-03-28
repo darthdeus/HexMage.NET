@@ -3,6 +3,7 @@ namespace HexMage.Simulator {
         EndTurn,
         Null,
         AbilityUse,
-        Move
+        Move,
+        DefensiveMove
     }
 }

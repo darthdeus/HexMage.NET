@@ -28,7 +28,11 @@ namespace HexMage.Simulator {
 
         public void PrecomputePossibleActions(bool allowMove, bool allowEndTurn) {
             if (PossibleActions == null) {
-                PossibleActions = UctAlgorithm.PossibleActions(State, allowMove, allowEndTurn);
+                if (Action.Type == UctActionType.DefensiveMove) {
+                    PossibleActions = new List<UctAction> {UctAction.EndTurnAction()};
+                } else {
+                    PossibleActions = UctAlgorithm.PossibleActions(State, allowMove, allowEndTurn);
+                }
             }
         }
 

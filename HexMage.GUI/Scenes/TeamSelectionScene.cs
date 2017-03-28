@@ -33,7 +33,7 @@ namespace HexMage.GUI.Scenes {
             _controllerList = new List<IMobController> {
                 new PlayerController(_arenaScene, _gameInstance),
                 new AiRuleBasedController(_gameInstance),
-                new MctsController(_gameInstance)
+                new MctsController(_gameInstance, 100)
             };
         }
 
@@ -134,8 +134,7 @@ namespace HexMage.GUI.Scenes {
 
         private void RegenerateTeams(int t1size, int t2size) {
             if (_leftController == null || _rightController == null) {
-                Utils.Log(LogSeverity.Warning, nameof(TeamSelectionScene),
-                          "Generating teams while no controllers are selected.");
+                //Utils.Log(LogSeverity.Warning, nameof(TeamSelectionScene), "Generating teams while no controllers are selected.");
                 return;
             }
 

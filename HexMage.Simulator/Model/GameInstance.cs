@@ -111,11 +111,13 @@ namespace HexMage.Simulator {
             public HexMap<int> Map;
             public int Size;
             public int MaxValue;
+            public int MinValue;
 
             public Heatmap(int size) {
                 Size = size;
                 Map = new HexMap<int>(size);
                 MaxValue = 0;
+                MinValue = int.MaxValue;
             }
         }
 
@@ -123,6 +125,7 @@ namespace HexMage.Simulator {
             var heatmap = new Heatmap(Size);
             if (CurrentTeam.HasValue) {
                 int maxDmg = 0;
+                int minDmg = int.MaxValue;
                 var playerTeam = CurrentTeam.Value;
 
                 foreach (var coord in heatmap.Map.AllCoords) {
@@ -159,15 +162,15 @@ namespace HexMage.Simulator {
 
                         heatmap.Map[coord] += maxAbilityDmg;
 
-                        if (heatmap.Map[coord] > maxDmg) {
-                            maxDmg = heatmap.Map[coord];
-                        }
+                        int coordValue = heatmap.Map[coord];
+                        if (coordValue < minDmg) minDmg = coordValue;
+                        if (coordValue > maxDmg) maxDmg = coordValue;
                     }
                 }
 
+                heatmap.MinValue = minDmg;
                 heatmap.MaxValue = maxDmg;
             }
-
 
             return heatmap;
         }

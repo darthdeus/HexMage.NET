@@ -37,7 +37,7 @@ namespace HexMage.GUI.Components {
                 if (_moveProgress >= 1.0f) {
                     _moveProgress = 1.0f;
                     _animateMovement = false;
-                    Utils.Log(LogSeverity.Debug, nameof(MobEntity), "Move finished");
+                    //Utils.Log(LogSeverity.Debug, nameof(MobEntity), "Move finished");
                     _tcs.SetResult(true);
                     _tcs = null;
                 }
@@ -59,7 +59,7 @@ namespace HexMage.GUI.Components {
 
             _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             _moveProgress = 0.0f;
-            Utils.Log(LogSeverity.Info, nameof(MobEntity), $"Moving from {source} to {destination}");
+            //Utils.Log(LogSeverity.Info, nameof(MobEntity), $"Moving from {source} to {destination}");
             _destination = destination;
             _source = source;
             _animateMovement = true;

@@ -85,8 +85,6 @@ namespace HexMage.Simulator {
             }
 
             return null;
-
-            return null;
         }
 
         public void ApplyDots(Map map, GameInstance gameInstance) {

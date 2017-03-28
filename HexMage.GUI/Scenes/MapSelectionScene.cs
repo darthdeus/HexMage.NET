@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 
 namespace HexMage.GUI.Scenes {
     public class MapSelectionScene : GameScene {
-        private const int DefaultMapSize = 7;
+        private const int DefaultMapSize = 5;
         private const int MinSize = 4;
         private const int MaxSize = 12;
         private int? _selectedSize;

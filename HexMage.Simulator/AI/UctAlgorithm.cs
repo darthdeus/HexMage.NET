@@ -1,4 +1,4 @@
-//#define XML
+#define XML
 //#define DOTGRAPH
 
 using System;
@@ -83,7 +83,8 @@ namespace HexMage.Simulator {
             try {
                 var type = node.Action.Type;
 
-                node.PrecomputePossibleActions(type != UctActionType.Move, true || type != UctActionType.EndTurn);
+                var allowMove = type != UctActionType.Move && type != UctActionType.DefensiveMove;
+                node.PrecomputePossibleActions(allowMove, true || type != UctActionType.EndTurn);
 
                 var action = node.PossibleActions[node.Children.Count];
                 var child = new UctNode(0, 0, action, F(node.State, action));
@@ -107,7 +108,7 @@ namespace HexMage.Simulator {
 
         public static string ActionCountString() {
             return
-                $"EndTurn: {ActionCounts[UctActionType.EndTurn]}, Ability: {ActionCounts[UctActionType.AbilityUse]}, Move: {ActionCounts[UctActionType.Move]}, Null: {ActionCounts[UctActionType.Null]}";
+                $"EndTurn: {ActionCounts[UctActionType.EndTurn]}, Ability: {ActionCounts[UctActionType.AbilityUse]}, Move: {ActionCounts[UctActionType.Move]}, Null: {ActionCounts[UctActionType.Null]}, DefensiveMove: {ActionCounts[UctActionType.DefensiveMove]}";
         }
 
         static UctAlgorithm() {
@@ -115,6 +116,7 @@ namespace HexMage.Simulator {
             ActionCounts.Add(UctActionType.EndTurn, 0);
             ActionCounts.Add(UctActionType.AbilityUse, 0);
             ActionCounts.Add(UctActionType.Move, 0);
+            ActionCounts.Add(UctActionType.DefensiveMove, 0);
         }
 
         public UctAlgorithm(int thinkTime) {
@@ -135,6 +137,7 @@ namespace HexMage.Simulator {
                 case UctActionType.AbilityUse:
                     state.FastUse(action.AbilityId, action.MobId, action.TargetId);
                     break;
+                case UctActionType.DefensiveMove:
                 case UctActionType.Move:
                     // TODO - gameinstance co se jmenuje state?
                     Debug.Assert(state.State.AtCoord(action.Coord) == null, "Trying to move into a mob.");
@@ -202,6 +205,8 @@ namespace HexMage.Simulator {
                 node.N++;
                 node.Q += delta;
                 node = node.Parent;
+
+                delta *= 0.95f;
                 // 5. puntik, nema se delta prepnout kdyz ja jsem EndTurn, a ne muj rodic?
                 if (node != null && node.Action.Type == UctActionType.EndTurn) {
                     // 6. puntik, kdy se ma prepinat?
@@ -331,7 +336,11 @@ namespace HexMage.Simulator {
 
                 // We disable movement if there is a possibility to cast abilities.
                 if (allowMove && !foundAbilityUse) {
-                    GenerateMoveActions(state, mobInstance, mobId, result);
+                    GenerateAggressiveMoveActions(state, mobInstance, mobId, result);
+                }
+
+                if (allowMove) {
+                    GenerateDefensiveMoveActions(state, mobInstance, mobId, result);
                 }
             } else {
                 throw new InvalidOperationException();
@@ -352,114 +361,102 @@ namespace HexMage.Simulator {
             return result;
         }
 
-        private static void GenerateMoveActions(GameInstance state, MobInstance mobInstance, int mobId,
-                                                List<UctAction> result) {
-            const bool useHeatmap = true;
-            var moveActions = new List<UctAction>();
+        private static void GenerateDefensiveMoveActions(GameInstance state, MobInstance mobInstance, int mobId,
+                                                         List<UctAction> result) {
+            var heatmap = state.BuildHeatmap();
+            //var usedValues = new HashSet<int>();
+            var coords = new List<AxialCoord>();
+
+            foreach (var coord in heatmap.Map.AllCoords) {
+                if (heatmap.Map[coord] != heatmap.MinValue) continue;
+                if (state.Map[coord] == HexType.Wall) continue;
+                if (state.State.AtCoord(coord).HasValue) continue;
+
+                bool canMoveTo = state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap;
+
+                if (!canMoveTo) continue;
+
+
+                // TODO - samplovat po sektorech
+                coords.Add(coord);
+
+                // TODO - tohle je asi overkill, ale nemame lepsi zpusob jak iterovat
+                //int value = heatmap.Map[coord];
+
+                //if (usedValues.Contains(value)) continue;
+
+                //usedValues.Add(value);
+                //result.Add(UctAction.MoveAction(mobId, coord));
+            }
+
+            Shuffle(coords);
+            for (int i = 0; i < Math.Min(coords.Count, 3); i++) {
+                result.Add(UctAction.DefensiveMoveAction(mobId, coords[i]));
+            }
+        }
+
+        private static void GenerateAggressiveMoveActions(GameInstance state, MobInstance mobInstance, int mobId,
+                                                          List<UctAction> result) {
             var mobInfo = state.MobManager.MobInfos[mobId];
+            var enemyDistances = new HexMap<int>(state.Size);
 
-            if (useHeatmap) {
-                var heatmap = state.BuildHeatmap();
-                var usedValues = new HashSet<int>();
+            // TODO - preferovat blizsi policka pri vyberu akci?
+            foreach (var enemyInstance in state.State.MobInstances) {
+                AxialCoord myCoord = mobInstance.Coord;
+                AxialCoord? closestCoord = null;
+                int? distance = null;
 
-                const bool moveToRange = true;
-                const bool heatmapBasedMove = false;
+                foreach (var coord in enemyDistances.AllCoords) {
+                    if (state.Map[coord] == HexType.Wall) continue;
+                    if (!state.Map.IsVisible(coord, enemyInstance.Coord)) continue;
+                    if (state.State.AtCoord(coord).HasValue) continue;
 
-                if (moveToRange) {
-                    var enemyDistances = new HexMap<int>(state.Size);
+                    int remainingAp = mobInstance.Ap - state.Pathfinder.Distance(mobInstance.Coord, coord);
 
-                    //Ability bestAbility = state.MobManager.Abilities[mobInfo.Abilities[0]];
-                    //foreach (var abilityId in mobInfo.Abilities) {
-                    //    var ability = state.MobManager.Abilities[abilityId];
+                    foreach (var abilityId in mobInfo.Abilities) {
+                        var ability = state.MobManager.Abilities[abilityId];
+                        bool withinRange = ability.Range >= coord.Distance(enemyInstance.Coord);
+                        bool enoughAp = remainingAp >= ability.Cost;
 
-                    //    if (ability.Range > bestAbility.Range) {
+                        if (withinRange && enoughAp) {
+                            int myDistance = state.Pathfinder.Distance(myCoord, coord);
 
-                    //    }
-                    //    maxRange = Math.Max(maxRange, ability.Range);
-                    //}
-
-
-                    // TODO - brat nejblizsi policko
-                    foreach (var enemyInstance in state.State.MobInstances) {
-                        AxialCoord myCoord = mobInstance.Coord;
-                        AxialCoord? closestCoord = null;
-                        int? distance = null;
-
-                        foreach (var coord in enemyDistances.AllCoords) {
-                            if (!state.Map.IsVisible(coord, enemyInstance.Coord)) continue;
-                            if (state.State.AtCoord(coord).HasValue) continue;
-
-                            int remainingAp = mobInstance.Ap - state.Pathfinder.Distance(mobInstance.Coord, coord);
-
-                            foreach (var abilityId in mobInfo.Abilities) {
-                                var ability = state.MobManager.Abilities[abilityId];
-                                bool withinRange = ability.Range >= coord.Distance(enemyInstance.Coord);
-                                bool enoughAp = remainingAp >= ability.Cost;
-
-                                if (withinRange && enoughAp) {
-                                    int myDistance = state.Pathfinder.Distance(myCoord, coord);
-
-                                    if (!closestCoord.HasValue) {
-                                        closestCoord = coord;
-                                        distance = myDistance;
-                                    } else if (distance.Value > myDistance) {
-                                        closestCoord = coord;
-                                        distance = myDistance;
-                                    }
-                                }
+                            if (!closestCoord.HasValue) {
+                                closestCoord = coord;
+                                distance = myDistance;
+                            } else if (distance.Value > myDistance) {
+                                closestCoord = coord;
+                                distance = myDistance;
                             }
                         }
-
-                        if (closestCoord.HasValue) {
-                            moveActions.Add(UctAction.MoveAction(mobId, closestCoord.Value));
-                        }
                     }
                 }
 
-                if (heatmapBasedMove) {
-                    foreach (var coord in heatmap.Map.AllCoords) {
-                        if (state.State.AtCoord(coord).HasValue) {
-                            continue;
-                        }
-
-                        bool canMoveTo = state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap;
-
-                        if (!canMoveTo) continue;
-
-                        // TODO - tohle je asi overkill, ale nemame lepsi zpusob jak iterovat
-                        int value = heatmap.Map[coord];
-
-                        if (usedValues.Contains(value)) continue;
-
-                        usedValues.Add(value);
-                        moveActions.Add(UctAction.MoveAction(mobId, coord));
-                    }
+                if (closestCoord.HasValue) {
+                    result.Add(UctAction.MoveAction(mobId, closestCoord.Value));
                 }
-
-
-                result.AddRange(moveActions);
-            } else {
-                //// TODO - properly define max actions
-                int count = 2;
-                foreach (var coord in state.Map.AllCoords) {
-                    if (coord == mobInstance.Coord) continue;
-
-                    if (state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
-                        if (state.State.AtCoord(coord) == null && count-- > 0) {
-                            moveActions.Add(UctAction.MoveAction(mobId, coord));
-                            //result.Add(UctAction.MoveAction(mobId, coord));
-                        }
-                    }
-                }
-
-                if (count == 0) {
-                    //Console.WriteLine("More than 100 possible move actions.");
-                }
-
-                Shuffle(moveActions);
-
-                result.AddRange(moveActions.Take(20));
             }
+
+            //    //// TODO - properly define max actions
+            //    int count = 2;
+            //    foreach (var coord in state.Map.AllCoords) {
+            //        if (coord == mobInstance.Coord) continue;
+
+            //        if (state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
+            //            if (state.State.AtCoord(coord) == null && count-- > 0) {
+            //                moveActions.Add(UctAction.MoveAction(mobId, coord));
+            //                //result.Add(UctAction.MoveAction(mobId, coord));
+            //            }
+            //        }
+            //    }
+
+            //    if (count == 0) {
+            //        //Console.WriteLine("More than 100 possible move actions.");
+            //    }
+
+            //    Shuffle(moveActions);
+
+            //    result.AddRange(moveActions.Take(20));
         }
 
         public static void Shuffle<T>(IList<T> list) {

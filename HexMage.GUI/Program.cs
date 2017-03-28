@@ -9,6 +9,7 @@ namespace HexMage.GUI {
 
         [STAThread]
         static void Main() {
+            MctsController.EnableLogging = true;
             var cts = new CancellationTokenSource();
             CoordRadiusCache.Instance.PrecomputeUpto(50);
 

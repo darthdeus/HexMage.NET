@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using HexMage.Simulator.AI;
 
 namespace HexMage.Simulator {
     public class MctsController : IMobController {
@@ -23,21 +24,9 @@ namespace HexMage.Simulator {
                 UctAlgorithm.FNoCopy(_gameInstance, action);
             }
 
-            float endRatio = (float) UctAlgorithm.ActionCounts[UctActionType.EndTurn] /
-                             UctAlgorithm.ActionCounts[UctActionType.AbilityUse];
-
             ExponentialMovingAverage.Instance.Average(result.MillisecondsPerIteration);
 
-            if (EnableLogging) {
-                Console.WriteLine($"*** MCTS SPEED: {result.MillisecondsPerIteration}ms/iter***");
-
-                foreach (var action in result.Actions) {
-                    Console.WriteLine($"action: {action}");
-                }                
-
-                Console.WriteLine(
-                    $"total: {UctAlgorithm.actions} [end ratio: {endRatio}]\t{UctAlgorithm.ActionCountString()}");
-            }
+            LogActions(result);
         }
 
         public async Task SlowPlayTurn(GameEventHub eventHub) {
@@ -49,6 +38,7 @@ namespace HexMage.Simulator {
                 await eventHub.SlowPlayAction(_gameInstance, action);
             }
 
+            LogActions(result);
             //UctAction action;
             //do {
             //    var node = await Task.Run(() => new UctAlgorithm(_thinkTime).UctSearch(_gameInstance));
@@ -57,6 +47,22 @@ namespace HexMage.Simulator {
             //    await eventHub.SlowPlayAction(_gameInstance, action);
             //} while (action.Type != UctActionType.EndTurn);
         }
+
+        private void LogActions(UctSearchResult result) {
+            float endRatio = (float) UctAlgorithm.ActionCounts[UctActionType.EndTurn] /
+                             UctAlgorithm.ActionCounts[UctActionType.AbilityUse];
+            if (EnableLogging) {
+                Console.WriteLine($"*** MCTS SPEED: {result.MillisecondsPerIteration}ms/iter***");
+
+                foreach (var action in result.Actions) {
+                    Console.WriteLine($"action: {action}");
+                }
+
+                Console.WriteLine(
+                    $"total: {UctAlgorithm.actions} [end ratio: {endRatio}]\t{UctAlgorithm.ActionCountString()}");
+            }
+        }
+
 
         public string Name => "MctsController";
 

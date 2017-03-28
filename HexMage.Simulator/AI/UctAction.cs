@@ -32,6 +32,10 @@ namespace HexMage.Simulator {
             return new UctAction(UctActionType.Move, -1, mobId, -1, coord);
         }
 
+        public static UctAction DefensiveMoveAction(int mobId, AxialCoord coord) {
+            return new UctAction(UctActionType.DefensiveMove, -1, mobId, -1, coord);
+        }
+
         public override string ToString() {
             switch (Type) {
                 case UctActionType.Null:
@@ -42,6 +46,8 @@ namespace HexMage.Simulator {
                     return $"A[{AbilityId}]:{TargetId}";
                 case UctActionType.Move:
                     return $"M[{MobId}]:{Coord}";
+                case UctActionType.DefensiveMove:
+                    return $"D[{MobId}]:{Coord}";
                 default:
                     throw new InvalidOperationException($"Invalid value of ${Type}");
             }
