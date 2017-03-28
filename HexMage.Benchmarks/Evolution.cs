@@ -25,7 +25,7 @@ namespace HexMage.Benchmarks {
 
             var generation = new List<GenerationTeam>();
 
-            const int numGenerations = 10;
+            const int numGenerations = 1;
             const int teamsPerGeneration = 10;
             for (int i = 0; i < teamsPerGeneration; i++) {
                 generation.Add(new GenerationTeam(RandomTeam(2, 2), 0.0));
@@ -51,10 +51,12 @@ namespace HexMage.Benchmarks {
                         foreach (var pair in GameInstanceEvaluator.GlobalControllerStatistics) {
                             Console.WriteLine($"{pair.Key}: {pair.Value}");
                         }
+                        Console.WriteLine(
+                            $"Expand: {UctAlgorithm.ExpandCount}, BestChild: {UctAlgorithm.BestChildCount}, Ratio: {(float) UctAlgorithm.ExpandCount / (float) UctAlgorithm.BestChildCount}");
                         Console.WriteLine("\n\n");
 
-                        // TODO - PRIO1 PRYC S TIM
-                        break;
+                        //// TODO - PRIO1 PRYC S TIM
+                        //break;
                     }
                 } else {
                     done = 0;

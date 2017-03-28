@@ -7,6 +7,8 @@ using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator.AI {
     public class GameInstanceEvaluator {
+        public static bool CountGlobalStats = true;
+
         private readonly GameInstance _gameInstance;
         private readonly TextWriter _writer;
         public static readonly Dictionary<string, int> GlobalControllerStatistics = new Dictionary<string, int>();
@@ -53,9 +55,10 @@ namespace HexMage.Simulator.AI {
                     // TODO !!!!!!!!!!!!!!!! muze nastat remiza
                     if (game.IsFinished && game.VictoryTeam.HasValue) {
                         Debug.Assert(game.VictoryTeam.HasValue);
-                        Debug.Assert(game.VictoryController != null);                        
+                        Debug.Assert(game.VictoryController != null);
 
-                        _writer.Write($"{game.VictoryController}:{game.LoserController}: {maxIterations - iterations}({game.VictoryTeam.ToString()[0]}), ");
+                        _writer.Write(
+                            $"{game.VictoryController}:{game.LoserController}: {maxIterations - iterations}({game.VictoryTeam.ToString()[0]}), ");
                         if (game.VictoryTeam == TeamColor.Red) {
                             result.RedWins++;
                         } else {
@@ -64,10 +67,12 @@ namespace HexMage.Simulator.AI {
 
                         var victoryControllerName = game.VictoryController.ToString();
 
-                        if (GlobalControllerStatistics.ContainsKey(victoryControllerName)) {
-                            GlobalControllerStatistics[victoryControllerName]++;
-                        } else {
-                            GlobalControllerStatistics[victoryControllerName] = 1;
+                        if (CountGlobalStats) {
+                            if (GlobalControllerStatistics.ContainsKey(victoryControllerName)) {
+                                GlobalControllerStatistics[victoryControllerName]++;
+                            } else {
+                                GlobalControllerStatistics[victoryControllerName] = 1;
+                            }
                         }
                     } else {
                         result.Timeouts++;

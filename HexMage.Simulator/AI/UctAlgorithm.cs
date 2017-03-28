@@ -16,13 +16,16 @@ namespace HexMage.Simulator {
         public static int actions = 0;
         public static int searchCount = 0;
 
+        public static int ExpandCount = 0;
+        public static int BestChildCount = 0;
+
         public UctSearchResult UctSearch(GameInstance initialState) {
             var root = new UctNode(0, 0, UctAction.NullAction(), initialState.DeepCopy());
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            int totalIterations = _thinkTime * 10000;
+            int totalIterations = _thinkTime * 1000;
             int iterations = totalIterations;
 
             while (iterations-- > 0) {
@@ -46,8 +49,10 @@ namespace HexMage.Simulator {
         public UctNode TreePolicy(UctNode node) {
             while (!node.IsTerminal) {
                 if (!node.IsFullyExpanded) {
+                    ExpandCount++;
                     return Expand(node);
                 } else {
+                    BestChildCount++;
                     node = BestChild(node);
                 }
             }
