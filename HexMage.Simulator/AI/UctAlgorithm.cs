@@ -109,7 +109,12 @@ namespace HexMage.Simulator {
 
         public static string ActionCountString() {
             return
-                $"EndTurn: {ActionCounts[UctActionType.EndTurn]}, Ability: {ActionCounts[UctActionType.AbilityUse]}, Move: {ActionCounts[UctActionType.Move]}, Null: {ActionCounts[UctActionType.Null]}, DefensiveMove: {ActionCounts[UctActionType.DefensiveMove]}";
+                $"EndTurn: {ActionCounts[UctActionType.EndTurn]}, " +
+                $"Ability: {ActionCounts[UctActionType.AbilityUse]}, " +
+                $"Move: {ActionCounts[UctActionType.Move]}, " +
+                $"Null: {ActionCounts[UctActionType.Null]}, " +
+                $"DefensiveMove: {ActionCounts[UctActionType.DefensiveMove]}, " +
+                $"AttackMove: {ActionCounts[UctActionType.AttackMove]}";
         }
 
         static UctAlgorithm() {
@@ -118,6 +123,7 @@ namespace HexMage.Simulator {
             ActionCounts.Add(UctActionType.AbilityUse, 0);
             ActionCounts.Add(UctActionType.Move, 0);
             ActionCounts.Add(UctActionType.DefensiveMove, 0);
+            ActionCounts.Add(UctActionType.AttackMove, 0);
         }
 
         public UctAlgorithm(int thinkTime) {
@@ -136,6 +142,11 @@ namespace HexMage.Simulator {
                     state.NextMobOrNewTurn();
                     break;
                 case UctActionType.AbilityUse:
+                    state.FastUse(action.AbilityId, action.MobId, action.TargetId);
+                    break;
+                case UctActionType.AttackMove:
+                    Debug.Assert(state.State.AtCoord(action.Coord) == null, "Trying to move into a mob.");
+                    state.FastMove(action.MobId, action.Coord);
                     state.FastUse(action.AbilityId, action.MobId, action.TargetId);
                     break;
                 case UctActionType.DefensiveMove:

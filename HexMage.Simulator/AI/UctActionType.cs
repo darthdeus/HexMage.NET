@@ -4,6 +4,7 @@ namespace HexMage.Simulator {
         Null,
         AbilityUse,
         Move,
-        DefensiveMove
+        DefensiveMove,
+        AttackMove
     }
 }

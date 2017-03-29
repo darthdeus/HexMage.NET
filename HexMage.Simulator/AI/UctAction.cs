@@ -36,6 +36,10 @@ namespace HexMage.Simulator {
             return new UctAction(UctActionType.DefensiveMove, -1, mobId, -1, coord);
         }
 
+        public static UctAction AttackMoveAction(int mobId, AxialCoord coord, int abilityId, int targetId) {
+            return new UctAction(UctActionType.AttackMove, abilityId, mobId, targetId, coord);
+        }
+
         public override string ToString() {
             switch (Type) {
                 case UctActionType.Null:
@@ -46,6 +50,8 @@ namespace HexMage.Simulator {
                     return $"A[{AbilityId}]:{TargetId}";
                 case UctActionType.Move:
                     return $"M[{MobId}]:{Coord}";
+                case UctActionType.AttackMove:
+                    return $"AM[{MobId}->{Coord}]:{AbilityId}->{TargetId}";
                 case UctActionType.DefensiveMove:
                     return $"D[{MobId}]:{Coord}";
                 default:
