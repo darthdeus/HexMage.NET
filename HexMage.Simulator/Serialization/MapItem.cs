@@ -1,3 +1,5 @@
+using HexMage.Simulator.Model;
+
 namespace HexMage.Simulator {
     public class MapItem {
         public AxialCoord Coord { get; set; }

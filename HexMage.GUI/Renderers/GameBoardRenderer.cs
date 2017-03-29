@@ -38,6 +38,7 @@ namespace HexMage.GUI.Renderers {
             _assetManager = assetManager;
 
             DrawBackground();
+
             if (_gameInstance.TurnManager.CurrentController is PlayerController) {
                 var currentMob = _gameInstance.TurnManager.CurrentMob;
                 if (currentMob.HasValue) {
@@ -96,19 +97,14 @@ namespace HexMage.GUI.Renderers {
             var map = _gameInstance.Map;
 
             foreach (var coord in map.AllCoords) {
-                if (_gameInstance.Map[coord] == HexType.Empty) {
-                    DrawAt(hexGreen, coord);
-                } else {
-                    DrawAt(hexWall, coord);
-                }
+                var hexType = _gameInstance.Map[coord];
 
-                var pos = _camera.HexToPixel(coord);
-                //_spriteBatch.DrawString(_assetManager.Font, _gameInstance.Pathfinder.Distance(coord).ToString(), pos + new Vector2(15, 10),
-                //Color.Black);
+                if (hexType == HexType.Empty) DrawAt(hexGreen, coord);
+                if (hexType == HexType.Wall) DrawAt(hexWall, coord);
 
                 var hexBuffs = map.BuffsAt(coord);
 
-                if (hexBuffs.Count > 0) {
+                if (hexBuffs.Count > 0 && hexType != HexType.Wall) {
                     foreach (var buff in hexBuffs) {
                         DrawAt(_assetManager[AssetManager.HexHoverSprite], coord, ElementColor(buff.Element));
                     }
