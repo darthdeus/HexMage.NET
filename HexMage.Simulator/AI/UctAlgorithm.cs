@@ -239,8 +239,6 @@ namespace HexMage.Simulator {
             if (mobId == null)
                 throw new InvalidOperationException("Requesting mob action when there is no current mob.");
 
-            var pathfinder = state.Pathfinder;
-
             var mobInfo = state.MobManager.MobInfos[mobId.Value];
             var mobInstance = state.State.MobInstances[mobId.Value];
 
@@ -262,6 +260,8 @@ namespace HexMage.Simulator {
             foreach (var possibleTarget in state.MobManager.Mobs) {
                 var possibleTargetInstance = state.State.MobInstances[possibleTarget];
                 var possibleTargetInfo = state.MobManager.MobInfos[possibleTarget];
+
+                // TODO - porovnat, co kdyz dovolim utocit na dead cile
                 if (possibleTargetInstance.Hp <= 0) continue;
 
                 // TODO - mela by to byt viditelna vzdalenost
@@ -321,7 +321,6 @@ namespace HexMage.Simulator {
             // TODO - zmerit poradne, jestli tohle vubec pomaha, a kolik to ma byt
             var result = new List<UctAction>(10);
 
-            bool foundAbilityUse = false;
             var currentMob = state.TurnManager.CurrentMob;
             if (currentMob.HasValue) {
                 var mobId = currentMob.Value;
@@ -329,32 +328,7 @@ namespace HexMage.Simulator {
                 var mobInstance = state.State.MobInstances[mobId];
                 var mobInfo = state.MobManager.MobInfos[mobId];
 
-                foreach (var abilityId in mobInfo.Abilities) {
-                    var abilityInfo = state.MobManager.Abilities[abilityId];
-
-                    // Skip abilities which are on cooldown
-                    if (state.State.Cooldowns[abilityId] > 0) continue;
-
-                    if (abilityInfo.Cost <= mobInstance.Ap) {
-                        foreach (var targetId in state.MobManager.Mobs) {
-                            var targetInfo = state.MobManager.MobInfos[targetId];
-                            var targetInstance = state.State.MobInstances[targetId];
-                            int enemyDistance = state.Map.AxialDistance(mobInstance.Coord, targetInstance.Coord);
-                            //int enemyDistance = state.Pathfinder.Distance(mobInstance.Coord, targetInstance.Coord);
-
-                            // TODO - nahradit za isAbilityUsable
-                            bool isVisible = state.Map.IsVisible(mobInstance.Coord, targetInstance.Coord);
-                            bool isEnemy = targetInfo.Team != mobInfo.Team;
-                            bool withinRange = enemyDistance <= abilityInfo.Range;
-                            bool targetAlive = targetInstance.Hp > 0;                            
-
-                            if (isEnemy && withinRange && targetAlive && isVisible) {
-                                foundAbilityUse = true;
-                                result.Add(UctAction.AbilityUseAction(abilityId, mobId, targetId));
-                            }
-                        }
-                    }
-                }
+                bool foundAbilityUse = GenerateDirectAbilityUse(state, mobId, mobInfo, mobInstance, result);
 
                 // We disable movement if there is a possibility to cast abilities.
                 if (allowMove && !foundAbilityUse) {
@@ -382,6 +356,40 @@ namespace HexMage.Simulator {
             }
 
             return result;
+        }
+
+        private static bool GenerateDirectAbilityUse(GameInstance state, int mobId, MobInfo mobInfo,
+                                                     MobInstance mobInstance, List<UctAction> result) {
+            bool foundAbilityUse = false;
+
+            foreach (var abilityId in mobInfo.Abilities) {
+                var abilityInfo = state.MobManager.Abilities[abilityId];
+
+                // Skip abilities which are on cooldown
+                if (state.State.Cooldowns[abilityId] > 0) continue;
+
+                if (abilityInfo.Cost <= mobInstance.Ap) {
+                    foreach (var targetId in state.MobManager.Mobs) {
+                        var targetInfo = state.MobManager.MobInfos[targetId];
+                        var targetInstance = state.State.MobInstances[targetId];
+                        int enemyDistance = state.Map.AxialDistance(mobInstance.Coord, targetInstance.Coord);
+                        //int enemyDistance = state.Pathfinder.Distance(mobInstance.Coord, targetInstance.Coord);
+
+                        // TODO - nahradit za isAbilityUsable
+                        bool isVisible = state.Map.IsVisible(mobInstance.Coord, targetInstance.Coord);
+                        bool isEnemy = targetInfo.Team != mobInfo.Team;
+                        bool withinRange = enemyDistance <= abilityInfo.Range;
+                        bool targetAlive = targetInstance.Hp > 0;
+
+                        if (isEnemy && withinRange && targetAlive && isVisible) {
+                            foundAbilityUse = true;
+                            result.Add(UctAction.AbilityUseAction(abilityId, mobId, targetId));
+                        }
+                    }
+                }
+            }
+
+            return foundAbilityUse;
         }
 
         private static void GenerateDefensiveMoveActions(GameInstance state, MobInstance mobInstance, int mobId,

@@ -166,7 +166,7 @@ namespace HexMage.Simulator {
             var mob = State.MobInstances[mobId];
             return mob.Ap >= ability.Cost && State.Cooldowns[abilityId] == 0;
         }
-
+        
         public bool IsAbilityUsable(int mobId, int targetId, int abilityId) {
             var mob = State.MobInstances[mobId];
             var target = State.MobInstances[targetId];
