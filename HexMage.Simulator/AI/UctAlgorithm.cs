@@ -318,7 +318,8 @@ namespace HexMage.Simulator {
         }
 
         public static List<UctAction> PossibleActions(GameInstance state, bool allowMove, bool allowEndTurn) {
-            var result = new List<UctAction>();
+            // TODO - zmerit poradne, jestli tohle vubec pomaha, a kolik to ma byt
+            var result = new List<UctAction>(10);
 
             bool foundAbilityUse = false;
             var currentMob = state.TurnManager.CurrentMob;
@@ -338,13 +339,16 @@ namespace HexMage.Simulator {
                         foreach (var targetId in state.MobManager.Mobs) {
                             var targetInfo = state.MobManager.MobInfos[targetId];
                             var targetInstance = state.State.MobInstances[targetId];
-                            int enemyDistance = state.Pathfinder.Distance(mobInstance.Coord, targetInstance.Coord);
+                            int enemyDistance = state.Map.AxialDistance(mobInstance.Coord, targetInstance.Coord);
+                            //int enemyDistance = state.Pathfinder.Distance(mobInstance.Coord, targetInstance.Coord);
 
+                            // TODO - nahradit za isAbilityUsable
+                            bool isVisible = state.Map.IsVisible(mobInstance.Coord, targetInstance.Coord);
                             bool isEnemy = targetInfo.Team != mobInfo.Team;
                             bool withinRange = enemyDistance <= abilityInfo.Range;
-                            bool targetAlive = targetInstance.Hp > 0;
+                            bool targetAlive = targetInstance.Hp > 0;                            
 
-                            if (isEnemy && withinRange && targetAlive) {
+                            if (isEnemy && withinRange && targetAlive && isVisible) {
                                 foundAbilityUse = true;
                                 result.Add(UctAction.AbilityUseAction(abilityId, mobId, targetId));
                             }
@@ -420,6 +424,8 @@ namespace HexMage.Simulator {
             // TODO - preferovat blizsi policka pri vyberu akci?
             foreach (var enemyId in state.MobManager.Mobs) {
                 MobInstance enemyInstance = state.State.MobInstances[enemyId];
+                // TODO - zkontrolovat vsude, ze netargetuju dead opponenty :)
+                //if (enemyInstance.Hp <= 0) continue;
 
                 AxialCoord myCoord = mobInstance.Coord;
                 AxialCoord? closestCoord = null;

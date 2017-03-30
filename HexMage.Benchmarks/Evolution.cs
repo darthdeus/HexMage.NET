@@ -15,6 +15,7 @@ namespace HexMage.Benchmarks {
     public class Evolution {
         public class GenomeTask {
             public GenerationTeam GenTeam;
+            public bool IsPoison;
         }
 
         private long done = 0;
@@ -26,9 +27,9 @@ namespace HexMage.Benchmarks {
             var generation = new List<GenerationTeam>();
 
             const int numGenerations = 1;
-            const int teamsPerGeneration = 200;
+            const int teamsPerGeneration = 100;
             for (int i = 0; i < teamsPerGeneration; i++) {
-                generation.Add(new GenerationTeam(RandomTeam(2, 2), 0.0));
+                generation.Add(new GenerationTeam(RandomTeam(3, 2), 0.0));
             }
 
             var queue = new ConcurrentQueue<GenomeTask>();
@@ -36,7 +37,8 @@ namespace HexMage.Benchmarks {
             const bool sequential = false;
 
             if (!sequential) {
-                StartThreadpool(team, queue);
+                // TODO - pocet threadu podle HW cpu
+                StartThreadpool(12, team, queue);
             }
 
             for (int i = 0; i < numGenerations; i++) {
@@ -62,12 +64,12 @@ namespace HexMage.Benchmarks {
                     done = 0;
 
                     foreach (var genTeam in generation) {
-                        queue.Enqueue(new GenomeTask() {GenTeam = genTeam});
+                        queue.Enqueue(new GenomeTask() {GenTeam = genTeam, IsPoison = false});
                     }
 
                     while (Interlocked.Read(ref done) < generation.Count) {
                         Thread.Yield();
-                    }
+                    }                    
                 }
 
                 Console.WriteLine("****************************************************");
@@ -75,6 +77,8 @@ namespace HexMage.Benchmarks {
                 Console.WriteLine($"Generation {i}. done in {genWatch.ElapsedMilliseconds}ms");
                 Console.WriteLine("****************************************************");
                 Console.WriteLine("****************************************************");
+
+                queue.Enqueue(new GenomeTask() { IsPoison = true });
             }
         }
 
@@ -129,7 +133,9 @@ namespace HexMage.Benchmarks {
                     ability.range = (int) Math.Max(1, ability.range - 3 * scale);
                     break;
                 case 3:
-                    ability.cooldown = (int) Math.Max(0, ability.cooldown + 1 * scale);
+                    // TODO: cooldown mutations are disabled
+                    // (int) Math.Max(0, ability.cooldown + 1 * scale);
+                    ability.cooldown = 0;
                     break;
                 case 4:
                     mob.hp = (int) Math.Max(mob.hp + 5 * scale, 1);
@@ -150,39 +156,47 @@ namespace HexMage.Benchmarks {
                 var abilities = new List<JsonAbility>();
 
                 for (int j = 0; j < spellsPerMob; j++) {
-                    abilities.Add(new JsonAbility(rand.Next(3, 8), rand.Next(2, 6), rand.Next(3, 5), rand.Next(2)));
+                    abilities.Add(new JsonAbility(Generator.RandomDmg(),
+                                                  Generator.RandomCost(),
+                                                  Generator.RandomRange(),
+                                                  0));
+                                                  // rand.Next(2)));
                 }
 
                 team.mobs.Add(new JsonMob {
                     abilities = abilities,
-                    hp = rand.Next(30, 100),
-                    ap = rand.Next(10, 20)
+                    hp = Generator.RandomHp(),
+                    ap = Generator.RandomAp()
                 });
             }
 
             return team;
         }
 
-        private void StartThreadpool(Team team, ConcurrentQueue<GenomeTask> queue) {
+        private void StartThreadpool(int poolSize, Team team, ConcurrentQueue<GenomeTask> queue) {
             var threads = new List<Thread>();
 
             // TODO - moznost threadpool jednoduse zabit
-            // TODO - pocet threadu podle HW cpu
-            for (int j = 0; j < 12; j++) {
+            for (int j = 0; j < poolSize; j++) {
                 var thread = new Thread(() => {
                     //while (Interlocked.Read(ref done) < generation.Count)
                     while (true) {
                         GenomeTask task;
                         if (queue.TryDequeue(out task)) {
+                            if (task.IsPoison) {
+                                queue.Enqueue(task);
+                                break;
+                            }
+
                             var writer = new StringWriter();
 
                             PopulationMember(team, task.GenTeam, writer);
 
                             writer.WriteLine();
                             writer.WriteLine("Win stats:\n" +
-                                              $"Rule: {GameInstanceEvaluator.RuleBasedAiWins}\n" +
-                                              $"MCTS: {GameInstanceEvaluator.MctsWins}\n" +
-                                              $"RAND: {GameInstanceEvaluator.RandomAiWins}\n");
+                                             $"Rule: {GameInstanceEvaluator.RuleBasedAiWins}\n" +
+                                             $"MCTS: {GameInstanceEvaluator.MctsWins}\n" +
+                                             $"RAND: {GameInstanceEvaluator.RandomAiWins}\n");
 
                             Interlocked.Increment(ref done);
 

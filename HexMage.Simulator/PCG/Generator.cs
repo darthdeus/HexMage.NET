@@ -121,10 +121,6 @@ namespace HexMage.Simulator.PCG {
             };
 
             var abilities = new List<int>();
-            var maxHp = Random.Next(30, 82);
-            // TODO - fix me later, only used for debugging
-            //maxHp = 1;
-            var maxAp = Random.Next(13, 20);
 
             for (int i = 0; i < 1; i++) {
                 var element = elements[Random.Next(0, 4)];
@@ -132,22 +128,14 @@ namespace HexMage.Simulator.PCG {
 
                 var areaBuff = RandomAreaBuff(element);
 
-                var dmg = Random.Next(1, 10);
-                var cost = Random.Next(3, 7);
-                var range = Random.Next(3, 10);
-
                 // TODO - re-enable cooldowns?
                 //var cooldown = Random.Next(0, 3);
                 var cooldown = 0;
 
-                int score = 0;
-                score += dmg;
-                score += (dmg - cost) * 2;
 
-
-                var ability = new Ability(dmg,
-                    cost,
-                    range,
+                var ability = new Ability(RandomDmg(),
+                    RandomCost(),
+                    RandomRange(),
                     cooldown,
                     element,
                     buff,
@@ -164,17 +152,37 @@ namespace HexMage.Simulator.PCG {
             int iniciative = Random.Next(10);
 
 #warning TODO - generated mobs do not have their coords assigned
-            return new MobInfo(team, maxHp, maxAp, iniciative, abilities);
+            return new MobInfo(team, RandomHp(), RandomAp(), iniciative, abilities);
+        }
+
+        public static int RandomHp() {
+            return Random.Next(40, 100);
+        }
+
+        public static int RandomAp() {
+            return Random.Next(13, 20);
+        }
+
+        public static int RandomDmg() {
+            return Random.Next(5, 20);
+        }
+
+        public static int RandomCost() {
+            return Random.Next(3, 12);
+        }
+
+        public static int RandomRange() {
+            return Random.Next(3, 10);
         }
 
         public static Buff RandomBuff(AbilityElement element) {
-            var hpChange = Random.Next(-5, 1);
-            var apChange = Random.Next(-2, 1);
+            var hpChange = Random.Next(-5, 0);
+            var apChange = Random.Next(-2, 0);
             var lifetime = Random.Next(1, 3);
 
             while (hpChange == 0 && apChange == 0) {
-                hpChange = Random.Next(-5, 1);
-                apChange = Random.Next(-2, 1);
+                hpChange = Random.Next(-5, 0);
+                apChange = Random.Next(-2, 0);
             }
             return new Buff(element, hpChange, apChange, lifetime);
         }

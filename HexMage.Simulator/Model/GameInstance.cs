@@ -194,6 +194,7 @@ namespace HexMage.Simulator {
 
             var ability = MobManager.AbilityForId(abilityId);
 
+            Debug.Assert(ability.Cooldown == 0);
             State.Cooldowns[abilityId] = ability.Cooldown;
 
             TargetHit(abilityId, mobId, targetId);
