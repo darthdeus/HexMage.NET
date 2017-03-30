@@ -186,6 +186,19 @@ namespace HexMage.Simulator {
             return ability.Range >= distance && IsAbilityUsable(mobId, abilityId);
         }
 
+        public bool IsAbilityUsable(CachedMob mob, CachedMob target, int abilityId) {
+            var abilityInfo = MobManager.Abilities[abilityId];
+
+            if (abilityInfo.Cost > mob.MobInstance.Ap) return false;
+
+            bool isVisible = Map.IsVisible(mob.MobInstance.Coord, target.MobInstance.Coord);
+            bool isEnemy = mob.MobInfo.Team != target.MobInfo.Team;
+            bool withinRange = mob.MobInstance.Coord.Distance(target.MobInstance.Coord) <= abilityInfo.Range;
+            bool isTargetAlive = target.MobInstance.Hp > 0;
+
+            return isVisible && isEnemy && withinRange && isTargetAlive;
+        }
+
         public void FastUse(int abilityId, int mobId, int targetId) {
             var target = State.MobInstances[targetId];
             var targetInfo = MobManager.MobInfos[targetId];

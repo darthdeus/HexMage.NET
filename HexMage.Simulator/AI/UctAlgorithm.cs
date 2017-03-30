@@ -330,9 +330,10 @@ namespace HexMage.Simulator {
 
                 bool foundAbilityUse = GenerateDirectAbilityUse(state, mobId, mobInfo, mobInstance, result);
 
+                const bool alwaysAttackMove = false;
+
                 // We disable movement if there is a possibility to cast abilities.
-                if (allowMove && !foundAbilityUse) {
-                    //if (allowMove) {
+                if (allowMove && (alwaysAttackMove || !foundAbilityUse)) {
                     GenerateAttackMoveActions(state, mobInstance, mobId, result);
                 }
 
@@ -358,8 +359,11 @@ namespace HexMage.Simulator {
             return result;
         }
 
-        private static bool GenerateDirectAbilityUse(GameInstance state, int mobId, MobInfo mobInfo,
-                                                     MobInstance mobInstance, List<UctAction> result) {
+        private static bool GenerateDirectAbilityUse(GameInstance state,
+                                                     int mobId,
+                                                     MobInfo mobInfo,
+                                                     MobInstance mobInstance,
+                                                     List<UctAction> result) {
             bool foundAbilityUse = false;
 
             foreach (var abilityId in mobInfo.Abilities) {
@@ -373,7 +377,6 @@ namespace HexMage.Simulator {
                         var targetInfo = state.MobManager.MobInfos[targetId];
                         var targetInstance = state.State.MobInstances[targetId];
                         int enemyDistance = state.Map.AxialDistance(mobInstance.Coord, targetInstance.Coord);
-                        //int enemyDistance = state.Pathfinder.Distance(mobInstance.Coord, targetInstance.Coord);
 
                         // TODO - nahradit za isAbilityUsable
                         bool isVisible = state.Map.IsVisible(mobInstance.Coord, targetInstance.Coord);
