@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator.AI {
@@ -11,6 +12,11 @@ namespace HexMage.Simulator.AI {
 
         private readonly GameInstance _gameInstance;
         private readonly TextWriter _writer;
+
+        public static int MctsWins = 0;
+        public static int RandomAiWins = 0;
+        public static int RuleBasedAiWins = 0;
+
         public static readonly Dictionary<string, int> GlobalControllerStatistics = new Dictionary<string, int>();
 
         public GameInstanceEvaluator(GameInstance gameInstance, TextWriter writer) {
@@ -66,6 +72,16 @@ namespace HexMage.Simulator.AI {
                         }
 
                         var victoryControllerName = game.VictoryController.ToString();
+
+                        var victoryControllerType = game.VictoryController.GetType();
+
+                        if (victoryControllerType == typeof(MctsController)) {
+                            Interlocked.Increment(ref MctsWins);
+                        } else if (victoryControllerType == typeof(AiRandomController)) {
+                            Interlocked.Increment(ref RandomAiWins);
+                        } else if (victoryControllerType == typeof(AiRuleBasedController)) {
+                            Interlocked.Increment(ref RuleBasedAiWins);
+                        }
 
                         if (CountGlobalStats) {
                             if (GlobalControllerStatistics.ContainsKey(victoryControllerName)) {

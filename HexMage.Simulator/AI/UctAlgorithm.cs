@@ -186,6 +186,8 @@ namespace HexMage.Simulator {
             }
 
             if (iterations <= 0) {
+                Utils.Log(LogSeverity.Error, nameof(UctAlgorithm),
+                          "DefaultPolicy ran out of time (over 100 iterations for playout), computed results are likely wrong.");
                 return 0;
             }
 
@@ -353,7 +355,7 @@ namespace HexMage.Simulator {
                 // We disable movement if there is a possibility to cast abilities.
                 if (allowMove && !foundAbilityUse) {
                     //if (allowMove) {
-                    GenerateAggressiveMoveActions(state, mobInstance, mobId, result);
+                    GenerateAttackMoveActions(state, mobInstance, mobId, result);
                 }
 
                 if (allowMove) {
@@ -410,16 +412,20 @@ namespace HexMage.Simulator {
             }
         }
 
-        private static void GenerateAggressiveMoveActions(GameInstance state, MobInstance mobInstance, int mobId,
-                                                          List<UctAction> result) {
+        private static void GenerateAttackMoveActions(GameInstance state, MobInstance mobInstance, int mobId,
+                                                      List<UctAction> result) {
             var mobInfo = state.MobManager.MobInfos[mobId];
             var enemyDistances = new HexMap<int>(state.Size);
 
             // TODO - preferovat blizsi policka pri vyberu akci?
-            foreach (var enemyInstance in state.State.MobInstances) {
+            foreach (var enemyId in state.MobManager.Mobs) {
+                MobInstance enemyInstance = state.State.MobInstances[enemyId];
+
                 AxialCoord myCoord = mobInstance.Coord;
                 AxialCoord? closestCoord = null;
                 int? distance = null;
+                int? chosenAbilityId = null;
+                int? targetId = null;
 
                 foreach (var coord in enemyDistances.AllCoords) {
                     if (state.Map[coord] == HexType.Wall) continue;
@@ -436,6 +442,9 @@ namespace HexMage.Simulator {
                         if (withinRange && enoughAp) {
                             int myDistance = state.Pathfinder.Distance(myCoord, coord);
 
+                            chosenAbilityId = abilityId;
+                            targetId = enemyId;
+
                             if (!closestCoord.HasValue) {
                                 closestCoord = coord;
                                 distance = myDistance;
@@ -448,7 +457,15 @@ namespace HexMage.Simulator {
                 }
 
                 if (closestCoord.HasValue) {
-                    result.Add(UctAction.MoveAction(mobId, closestCoord.Value));
+                    const bool attackMoveEnabled = true;
+                    if (attackMoveEnabled) {
+                        result.Add(UctAction.AttackMoveAction(mobId,
+                                                              closestCoord.Value,
+                                                              chosenAbilityId.Value,
+                                                              targetId.Value));
+                    } else {
+                        result.Add(UctAction.MoveAction(mobId, closestCoord.Value));
+                    }
                 }
             }
 

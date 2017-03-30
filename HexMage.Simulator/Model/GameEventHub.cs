@@ -63,6 +63,11 @@ namespace HexMage.Simulator {
                     // TODO - nastavit nejakej stav?                    
                     break;
 
+                case UctActionType.AttackMove:
+                    await SlowBroadcastMobMoved(action.MobId, action.Coord);
+                    await SlowBroadcastAbilityUsed(action.MobId, action.TargetId, action.AbilityId);
+                    break;
+
                 case UctActionType.DefensiveMove:
                 case UctActionType.Move:
                     // TODO - assert jenom na jednom miste?

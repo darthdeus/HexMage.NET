@@ -26,14 +26,14 @@ namespace HexMage.Benchmarks {
             var generation = new List<GenerationTeam>();
 
             const int numGenerations = 1;
-            const int teamsPerGeneration = 10;
+            const int teamsPerGeneration = 200;
             for (int i = 0; i < teamsPerGeneration; i++) {
                 generation.Add(new GenerationTeam(RandomTeam(2, 2), 0.0));
             }
 
             var queue = new ConcurrentQueue<GenomeTask>();
 
-            const bool sequential = true;
+            const bool sequential = false;
 
             if (!sequential) {
                 StartThreadpool(team, queue);
@@ -177,6 +177,12 @@ namespace HexMage.Benchmarks {
                             var writer = new StringWriter();
 
                             PopulationMember(team, task.GenTeam, writer);
+
+                            writer.WriteLine();
+                            writer.WriteLine("Win stats:\n" +
+                                              $"Rule: {GameInstanceEvaluator.RuleBasedAiWins}\n" +
+                                              $"MCTS: {GameInstanceEvaluator.MctsWins}\n" +
+                                              $"RAND: {GameInstanceEvaluator.RandomAiWins}\n");
 
                             Interlocked.Increment(ref done);
 
