@@ -34,7 +34,7 @@ namespace HexMage.Benchmarks {
 
             var queue = new ConcurrentQueue<GenomeTask>();
 
-            const bool sequential = false;
+            const bool sequential = true;
 
             if (!sequential) {
                 // TODO - pocet threadu podle HW cpu

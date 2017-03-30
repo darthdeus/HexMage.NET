@@ -3,5 +3,5 @@
 build:
 	xbuild /p:Configuration=Release
 
-run: build
+run:
 	mono ./bin/Release/HexMage.Benchmarks.exe

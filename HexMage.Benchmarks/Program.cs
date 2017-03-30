@@ -25,7 +25,7 @@ namespace HexMage.Benchmarks {
             }
 
             return;
-                        
+
             var key = Console.ReadKey();
 
             Console.WriteLine();
