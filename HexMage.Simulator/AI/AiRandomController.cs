@@ -11,7 +11,7 @@ namespace HexMage.Simulator.AI {
 
         public void FastPlayTurn(GameEventHub eventHub) {
             do {
-                var possibleActions = UctAlgorithm.PossibleActions(_gameInstance, true, true);
+                var possibleActions = ActionGenerator.PossibleActions(_gameInstance, true, true);
                 var chosenAction = possibleActions[Generator.Random.Next(possibleActions.Count)];
 
                 if (chosenAction.Type == UctActionType.EndTurn)
@@ -23,7 +23,7 @@ namespace HexMage.Simulator.AI {
 
         public async Task SlowPlayTurn(GameEventHub eventHub) {
             do {
-                var possibleActions = UctAlgorithm.PossibleActions(_gameInstance, true, true);
+                var possibleActions = ActionGenerator.PossibleActions(_gameInstance, true, true);
                 var chosenAction = possibleActions[Generator.Random.Next(possibleActions.Count)];
 
                 if (chosenAction.Type == UctActionType.EndTurn)

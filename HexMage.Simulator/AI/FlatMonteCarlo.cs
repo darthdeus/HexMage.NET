@@ -6,7 +6,7 @@ using HexMage.Simulator.Model;
 namespace HexMage.Simulator {
     public class FlatMonteCarlo {
         public UctAction Run(GameInstance initialState) {
-            var actions = UctAlgorithm.PossibleActions(initialState, true, true);
+            var actions = ActionGenerator.PossibleActions(initialState, true, true);
 
             float max = float.MinValue;
             UctAction bestAction = UctAction.EndTurnAction();

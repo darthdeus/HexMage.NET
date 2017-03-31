@@ -232,49 +232,6 @@ namespace HexMage.Simulator {
             }
         }
 
-        public static List<UctAction> PossibleActions(GameInstance state, bool allowMove, bool allowEndTurn) {
-            // TODO - zmerit poradne, jestli tohle vubec pomaha, a kolik to ma byt
-            var result = new List<UctAction>(10);
-
-            var currentMob = state.TurnManager.CurrentMob;
-            if (currentMob.HasValue) {
-                var mobId = currentMob.Value;
-
-                var mobInstance = state.State.MobInstances[mobId];
-                var mobInfo = state.MobManager.MobInfos[mobId];
-
-                bool foundAbilityUse = ActionGenerator.GenerateDirectAbilityUse(state, mobId, mobInfo, mobInstance, result);
-
-                const bool alwaysAttackMove = false;
-
-                // We disable movement if there is a possibility to cast abilities.
-                if (allowMove && (alwaysAttackMove || !foundAbilityUse)) {
-                    ActionGenerator.GenerateAttackMoveActions(state, mobInstance, mobId, result);
-                }
-
-                if (allowMove) {
-                    ActionGenerator.GenerateDefensiveMoveActions(state, mobInstance, mobId, result);
-                }
-            } else {
-                throw new InvalidOperationException();
-                Utils.Log(LogSeverity.Warning, nameof(UctNode),
-                          "Final state reached while trying to compute possible actions.");
-            }
-
-            const bool endTurnAsLastResort = true;
-
-            if (allowEndTurn) {
-                // We would skip end turn if there are not enough actions.
-                // TODO - generate more move actions if we don't have enough?
-                if (!endTurnAsLastResort || result.Count <= 1) {
-                    result.Add(UctAction.EndTurnAction());
-                }
-            }
-
-            return result;
-        }
-
-
         private List<UctAction> SelectBestActions(UctNode root) {
             //UctNode result = root.Children[0];
 
