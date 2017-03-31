@@ -32,7 +32,7 @@ namespace HexMage.Simulator
     public class JsonMob {
         public int hp;
         public int ap;
-        public List<JsonAbility> abilities;
+        public List<JsonAbility> abilities = new List<JsonAbility>();
 
         public MobInfo ToMobInfo(TeamColor color, IEnumerable<int> abilityIds) {
             return new MobInfo(color, hp, ap, 0, abilityIds.ToList());
@@ -40,14 +40,12 @@ namespace HexMage.Simulator
     }
 
     public class Team {
-        public List<JsonMob> mobs;
+        public List<JsonMob> mobs = new List<JsonMob>();
     }
 
     public class Setup {
-        public List<JsonMob> red;
-        public List<JsonMob> blue;
-
-
+        public List<JsonMob> red = new List<JsonMob>();
+        public List<JsonMob> blue = new List<JsonMob>();
     }
 
     public class JsonLoader

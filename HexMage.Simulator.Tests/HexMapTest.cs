@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace HexMage.Simulator.Tests
 {
     [TestClass]
-    public class MatrixTest
+    public class HexMapTest
     {
         [TestMethod]
         public void TestSubscriptOperator()

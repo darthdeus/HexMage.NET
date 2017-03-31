@@ -132,7 +132,6 @@ namespace HexMage.Simulator.PCG {
                 //var cooldown = Random.Next(0, 3);
                 var cooldown = 0;
 
-
                 var ability = new Ability(RandomDmg(),
                     RandomCost(),
                     RandomRange(),
@@ -156,23 +155,23 @@ namespace HexMage.Simulator.PCG {
         }
 
         public static int RandomHp() {
-            return Random.Next(40, 100);
+            return Random.Next(40, Constants.HpMax);
         }
 
         public static int RandomAp() {
-            return Random.Next(13, 20);
+            return Random.Next(13, Constants.ApMax);
         }
 
         public static int RandomDmg() {
-            return Random.Next(5, 20);
+            return Random.Next(5, Constants.DmgMax);
         }
 
         public static int RandomCost() {
-            return Random.Next(3, 12);
+            return Random.Next(3, Constants.CostMax);
         }
 
         public static int RandomRange() {
-            return Random.Next(3, 10);
+            return Random.Next(3, Constants.RangeMax);
         }
 
         public static Buff RandomBuff(AbilityElement element) {

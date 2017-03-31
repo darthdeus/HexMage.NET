@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HexMage.Simulator;
@@ -56,9 +55,6 @@ namespace HexMage.Benchmarks {
                         Console.WriteLine(
                             $"Expand: {UctAlgorithm.ExpandCount}, BestChild: {UctAlgorithm.BestChildCount}, Ratio: {(float) UctAlgorithm.ExpandCount / (float) UctAlgorithm.BestChildCount}");
                         Console.WriteLine("\n\n");
-
-                        //// TODO - PRIO1 PRYC S TIM
-                        //break;
                     }
                 } else {
                     done = 0;
@@ -69,7 +65,7 @@ namespace HexMage.Benchmarks {
 
                     while (Interlocked.Read(ref done) < generation.Count) {
                         Thread.Yield();
-                    }                    
+                    }
                 }
 
                 Console.WriteLine("****************************************************");
@@ -78,7 +74,7 @@ namespace HexMage.Benchmarks {
                 Console.WriteLine("****************************************************");
                 Console.WriteLine("****************************************************");
 
-                queue.Enqueue(new GenomeTask() { IsPoison = true });
+                queue.Enqueue(new GenomeTask() {IsPoison = true});
             }
         }
 
@@ -160,7 +156,7 @@ namespace HexMage.Benchmarks {
                                                   Generator.RandomCost(),
                                                   Generator.RandomRange(),
                                                   0));
-                                                  // rand.Next(2)));
+                    // rand.Next(2)));
                 }
 
                 team.mobs.Add(new JsonMob {

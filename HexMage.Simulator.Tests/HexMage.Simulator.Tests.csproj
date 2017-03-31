@@ -51,14 +51,19 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AbilityBuffTest.cs" />
+    <Compile Include="DNATest.cs" />
     <Compile Include="StateTest.cs" />
     <Compile Include="TestHelpers.cs" />
     <Compile Include="TurnOrderTest.cs" />
     <Compile Include="UctTest.cs" />
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="HexMapTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\HexMage.Benchmarks\HexMage.Benchmarks.csproj">
+      <Project>{85118626-8106-414F-8EF3-D906C92EAA5B}</Project>
+      <Name>HexMage.Benchmarks</Name>
+    </ProjectReference>
     <ProjectReference Include="..\HexMage.Simulator\HexMage.Simulator.csproj">
       <Project>{597fff01-9f07-4f0d-9dba-ced5ca9b76e9}</Project>
       <Name>HexMage.Simulator</Name>
