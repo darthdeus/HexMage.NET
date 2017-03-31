@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace HexMage.Benchmarks {
+namespace HexMage.Simulator {
     public class DNA {
         public List<float> Data = new List<float>();
         public int AbilityCount;

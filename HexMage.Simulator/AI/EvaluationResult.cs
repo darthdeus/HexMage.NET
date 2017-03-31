@@ -16,5 +16,13 @@
         public override string ToString() {
             return $"{RedWins}/{BlueWins} (draws: {Timeouts}), total: {TotalTurns}";
         }
+
+        public string ToFitnessString(DNA dna) {
+            string fstr = HpFitness.ToString("0.00");
+            string wstr = WinPercentage.ToString("0.0");
+
+            return $"F:{fstr}\tW:{wstr}\t{dna.ToDNAString()}";
+
+        }
     }
 }

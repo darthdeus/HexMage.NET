@@ -48,7 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AiEvaluator.cs" />
-    <Compile Include="DNA.cs" />
     <Compile Include="Evolution.cs" />
     <Compile Include="GenerationTeam.cs" />
     <Compile Include="GenomeLoader.cs" />

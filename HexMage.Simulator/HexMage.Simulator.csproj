@@ -65,6 +65,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="AI\FlatMonteCarlo.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="DNA.cs" />
     <Compile Include="JsonLoader.cs" />
     <Compile Include="Mathf.cs" />
     <Compile Include="Model\AbilityElement.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="IGameEventSubscriber.cs" />
     <Compile Include="Model\Heatmap.cs" />
     <Compile Include="Model\MobInstance.cs" />
+    <Compile Include="Probability.cs" />
     <Compile Include="Serialization\MapItem.cs" />
     <Compile Include="Serialization\MapRepresentation.cs" />
     <Compile Include="Model\AreaBuff.cs" />
