@@ -74,7 +74,7 @@ namespace HexMage.Simulator.Tests {
 
             Assert.AreEqual(TeamColor.Blue, game.CurrentTeam);
 
-            var bestAction = UctAlgorithm.DefaultPolicyAction(game);
+            var bestAction = ActionGenerator.DefaultPolicyAction(game);
             Console.WriteLine($"Best: {bestAction}");
 
             var node = uct.UctSearch(game);

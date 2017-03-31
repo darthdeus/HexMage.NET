@@ -140,7 +140,7 @@ namespace HexMage.Simulator {
                         bool onCooldown = State.Cooldowns[abilityId] > 0;
                         bool hasEnoughAp = abilityInfo.Cost <= enemyInstance.Ap;
 
-                        bool isAbilityUsable = withinRange && !onCooldown && hasEnoughAp;
+                        bool isAbilityUsable = withinRange && !onCooldown && hasEnoughAp;                        
 
                         if (isAbilityUsable && abilityInfo.Dmg > maxAbilityDmg) {
                             maxAbilityDmg = abilityInfo.Dmg;
@@ -163,8 +163,12 @@ namespace HexMage.Simulator {
 
         public bool IsAbilityUsableNoTarget(int mobId, int abilityId) {
             var ability = MobManager.AbilityForId(abilityId);
-            var mob = State.MobInstances[mobId];
-            return mob.Ap >= ability.Cost && State.Cooldowns[abilityId] == 0;
+            var mobInstance = State.MobInstances[mobId];
+
+            bool enoughAp = mobInstance.Ap >= ability.Cost;
+            bool noCooldown = State.Cooldowns[abilityId] == 0;
+
+            return enoughAp && noCooldown;
         }
 
         //public bool IsAbilityUsable(int mobId, int targetId, int abilityId) {
@@ -199,6 +203,10 @@ namespace HexMage.Simulator {
             bool isEnemy = mob.MobInfo.Team != target.MobInfo.Team;
 
             return isVisible && isTargetAlive && isEnemy;
+        }
+
+        public bool IsAbilityUsableAtCoord(CachedMob mob, AxialCoord coord, int abilityId) {
+            throw new NotImplementedException();
         }
 
         public bool IsAbilityUsableApRangeCheck(CachedMob mob, CachedMob target, int abilityId) {

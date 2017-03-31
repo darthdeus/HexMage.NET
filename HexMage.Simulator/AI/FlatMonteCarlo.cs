@@ -78,7 +78,7 @@ namespace HexMage.Simulator {
                 }
 
                 var moveForwardCopy = initialState.DeepCopy();
-                var moveAction = UctAlgorithm.FastMoveTowardsEnemy(moveForwardCopy, mobId, moveTarget);
+                var moveAction = ActionGenerator.FastMoveTowardsEnemy(moveForwardCopy, mobId, moveTarget);
                 UctAlgorithm.FNoCopy(moveForwardCopy, moveAction);
 
                 possibleStates.Add(moveForwardCopy);

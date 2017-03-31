@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AI\ActionGenerator.cs" />
     <Compile Include="AI\AiRandomController.cs" />
     <Compile Include="AI\AiRuleBasedController.cs" />
     <Compile Include="AI\EvaluationResult.cs" />
