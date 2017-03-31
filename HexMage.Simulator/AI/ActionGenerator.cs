@@ -111,14 +111,6 @@ namespace HexMage.Simulator {
 
                 // TODO - samplovat po sektorech
                 coords.Add(coord);
-
-                // TODO - tohle je asi overkill, ale nemame lepsi zpusob jak iterovat
-                //int value = heatmap.Map[coord];
-
-                //if (usedValues.Contains(value)) continue;
-
-                //usedValues.Add(value);
-                //result.Add(UctAction.MoveAction(mobId, coord));
             }
 
             Shuffle(coords);
@@ -127,16 +119,19 @@ namespace HexMage.Simulator {
             }
         }
 
-        public static void GenerateAttackMoveActions(GameInstance state, MobInstance mobInstance, int mobId,
-                                                     List<UctAction> result) {
-            var mobInfo = state.MobManager.MobInfos[mobId];
+        public static void GenerateAttackMoveActions(GameInstance state, CachedMob mob, List<UctAction> result) {
+            var mobInfo = mob.MobInfo;
+            var mobInstance = mob.MobInstance;
+
             var enemyDistances = new HexMap<int>(state.Size);
 
             // TODO - preferovat blizsi policka pri vyberu akci?
             foreach (var enemyId in state.MobManager.Mobs) {
+                var enemy = state.CachedMob(enemyId);
+
+                if (!state.IsTargetable(mob, enemy, checkVisibility: false)) continue;
+
                 MobInstance enemyInstance = state.State.MobInstances[enemyId];
-                // TODO - zkontrolovat vsude, ze netargetuju dead opponenty :)
-                //if (enemyInstance.Hp <= 0) continue;
 
                 AxialCoord myCoord = mobInstance.Coord;
                 AxialCoord? closestCoord = null;
@@ -145,30 +140,25 @@ namespace HexMage.Simulator {
                 int? targetId = null;
 
                 foreach (var coord in enemyDistances.AllCoords) {
-                    if (state.Map[coord] == HexType.Wall) continue;
                     if (!state.Map.IsVisible(coord, enemyInstance.Coord)) continue;
-                    if (state.State.AtCoord(coord).HasValue) continue;
 
-                    int remainingAp = mobInstance.Ap - state.Pathfinder.Distance(mobInstance.Coord, coord);
+                    int remainingAp, possibleDistance;
+                    if (!state.CanMoveTo(mob, coord, out remainingAp, out possibleDistance)) continue;
 
                     foreach (var abilityId in mobInfo.Abilities) {
-                        var ability = state.MobManager.Abilities[abilityId];
-                        bool withinRange = ability.Range >= coord.Distance(enemyInstance.Coord);
-                        bool enoughAp = remainingAp >= ability.Cost;
+                        if (!state.IsAbilityUsableFrom(mob, coord, enemy, abilityId)) continue;
 
-                        if (withinRange && enoughAp) {
-                            int myDistance = state.Pathfinder.Distance(myCoord, coord);
+                        int myDistance = state.Pathfinder.Distance(myCoord, coord);
 
-                            chosenAbilityId = abilityId;
-                            targetId = enemyId;
+                        chosenAbilityId = abilityId;
+                        targetId = enemyId;
 
-                            if (!closestCoord.HasValue) {
-                                closestCoord = coord;
-                                distance = myDistance;
-                            } else if (distance.Value > myDistance) {
-                                closestCoord = coord;
-                                distance = myDistance;
-                            }
+                        if (!closestCoord.HasValue) {
+                            closestCoord = coord;
+                            distance = myDistance;
+                        } else if (distance.Value > myDistance) {
+                            closestCoord = coord;
+                            distance = myDistance;
                         }
                     }
                 }
@@ -176,17 +166,41 @@ namespace HexMage.Simulator {
                 if (closestCoord.HasValue) {
                     const bool attackMoveEnabled = true;
                     if (attackMoveEnabled) {
-                        result.Add(UctAction.AttackMoveAction(mobId,
+                        result.Add(UctAction.AttackMoveAction(mob.MobId,
                                                               closestCoord.Value,
                                                               chosenAbilityId.Value,
                                                               targetId.Value));
                     } else {
-                        result.Add(UctAction.MoveAction(mobId, closestCoord.Value));
+                        result.Add(UctAction.MoveAction(mob.MobId, closestCoord.Value));
+                    }
+                }
+            }
+        }
+
+        public static bool GenerateDirectAbilityUse(GameInstance state,
+                                                    int mobId,
+                                                    MobInfo mobInfo,
+                                                    MobInstance mobInstance,
+                                                    List<UctAction> result) {
+            bool foundAbilityUse = false;
+            var mob = state.CachedMob(mobId);
+
+            foreach (var abilityId in mobInfo.Abilities) {
+                if (!state.IsAbilityUsableNoTarget(mobId, abilityId)) continue;
+
+                foreach (var targetId in state.MobManager.Mobs) {
+                    if (state.IsAbilityUsable(mob, state.CachedMob(targetId), abilityId)) {
+                        foundAbilityUse = true;
+                        result.Add(UctAction.AbilityUseAction(abilityId, mobId, targetId));
                     }
                 }
             }
 
-            //    //// TODO - properly define max actions
+            return foundAbilityUse;
+        }
+
+        public static void GenerateRandomMoveActions(GameInstance state, int mobId, int count, List<UctAction> result) {
+            throw new NotImplementedException();
             //    int count = 2;
             //    foreach (var coord in state.Map.AllCoords) {
             //        if (coord == mobInstance.Coord) continue;
@@ -208,43 +222,6 @@ namespace HexMage.Simulator {
             //    result.AddRange(moveActions.Take(20));
         }
 
-        public static bool GenerateDirectAbilityUse(GameInstance state,
-                                                    int mobId,
-                                                    MobInfo mobInfo,
-                                                    MobInstance mobInstance,
-                                                    List<UctAction> result) {
-            bool foundAbilityUse = false;
-
-            foreach (var abilityId in mobInfo.Abilities) {
-                var abilityInfo = state.MobManager.Abilities[abilityId];
-
-                // Skip abilities which are on cooldown
-                if (state.State.Cooldowns[abilityId] > 0) continue;
-
-                if (abilityInfo.Cost <= mobInstance.Ap) {
-                    foreach (var targetId in state.MobManager.Mobs) {
-                        var targetInfo = state.MobManager.MobInfos[targetId];
-                        var targetInstance = state.State.MobInstances[targetId];
-                        int enemyDistance = state.Map.AxialDistance(mobInstance.Coord, targetInstance.Coord);
-
-                        // TODO - nahradit za isAbilityUsable
-                        bool isVisible = state.Map.IsVisible(mobInstance.Coord, targetInstance.Coord);
-                        bool isEnemy = targetInfo.Team != mobInfo.Team;
-                        bool withinRange = enemyDistance <= abilityInfo.Range;
-                        bool targetAlive = targetInstance.Hp > 0;
-
-                        if (isEnemy && withinRange && targetAlive && isVisible) {
-                            foundAbilityUse = true;
-                            result.Add(UctAction.AbilityUseAction(abilityId, mobId, targetId));
-                        }
-                    }
-                }
-            }
-
-            return foundAbilityUse;
-        }
-
-
         public static List<UctAction> PossibleActions(GameInstance state, bool allowMove, bool allowEndTurn) {
             // TODO - zmerit poradne, jestli tohle vubec pomaha, a kolik to ma byt
             var result = new List<UctAction>(10);
@@ -256,18 +233,18 @@ namespace HexMage.Simulator {
                 var mobInstance = state.State.MobInstances[mobId];
                 var mobInfo = state.MobManager.MobInfos[mobId];
 
-                bool foundAbilityUse = ActionGenerator.GenerateDirectAbilityUse(state, mobId, mobInfo, mobInstance,
-                                                                                result);
+                bool foundAbilityUse = GenerateDirectAbilityUse(state, mobId, mobInfo, mobInstance,
+                                                                result);
 
                 const bool alwaysAttackMove = false;
 
                 // We disable movement if there is a possibility to cast abilities.
                 if (allowMove && (alwaysAttackMove || !foundAbilityUse)) {
-                    ActionGenerator.GenerateAttackMoveActions(state, mobInstance, mobId, result);
+                    GenerateAttackMoveActions(state, state.CachedMob(mobId), result);
                 }
 
                 if (allowMove) {
-                    ActionGenerator.GenerateDefensiveMoveActions(state, mobInstance, mobId, result);
+                    GenerateDefensiveMoveActions(state, mobInstance, mobId, result);
                 }
             } else {
                 throw new InvalidOperationException();

@@ -58,6 +58,7 @@
     <Compile Include="AI\RuleBasedFactory.cs" />
     <Compile Include="AI\UctAction.cs" />
     <Compile Include="AI\UctActionType.cs" />
+    <Compile Include="AI\UctDebug.cs" />
     <Compile Include="AI\UctNode.cs" />
     <Compile Include="AI\UctSearchResult.cs" />
     <Compile Include="AI\XmlTreePrinter.cs" />
