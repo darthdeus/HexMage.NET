@@ -77,7 +77,7 @@ namespace HexMage.Benchmarks {
                     var newFitness = CalculateFitness(newDna);
 
                     if (newFitness.HpFitness <= 0.015) {
-                        Console.WriteLine("Found extra good");
+                        Console.WriteLine($"Found extra good {newFitness.HpFitness}");
                     }
 
                     // We don't want to move into a timeouted state to save time
