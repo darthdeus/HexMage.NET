@@ -34,6 +34,8 @@ namespace HexMage.Simulator.AI {
 
             var result = new EvaluationResult();
 
+            result.Timeouted = false;
+
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
@@ -66,11 +68,21 @@ namespace HexMage.Simulator.AI {
                     float totalPercentage = 0;
 
                     foreach (var mobId in game.MobManager.Mobs) {
-                        totalPercentage += (float)game.State.MobInstances[mobId].Hp /
-                                           (float) game.MobManager.MobInfos[mobId].MaxHp;
+                        float mobPercentage = (float) game.State.MobInstances[mobId].Hp /
+                                              (float) game.MobManager.MobInfos[mobId].MaxHp;
+
+                        mobPercentage = Math.Min(Math.Max(0, mobPercentage), 1);
+
+                        Debug.Assert(mobPercentage <= 1);
+                        totalPercentage += mobPercentage;
                     }
 
-                    gameHpPercentageTotal += totalPercentage / game.MobManager.Mobs.Count;
+                    float gamePercentage = totalPercentage / game.MobManager.Mobs.Count;
+                    Debug.Assert(gamePercentage >= 0);
+
+                    gameHpPercentageTotal += gamePercentage;
+
+                    Debug.Assert(gameHpPercentageTotal / gameCount <= 1);
 
                     // TODO !!!!!!!!!!!!!!!! muze nastat remiza
                     if (game.IsFinished && game.VictoryTeam.HasValue) {
@@ -105,6 +117,7 @@ namespace HexMage.Simulator.AI {
                         }
                     } else {
                         result.Timeouts++;
+                        result.Timeouted = true;
                         _writer.Write("Timeout\t");
                     }
 
@@ -117,12 +130,15 @@ namespace HexMage.Simulator.AI {
             result.HpFitness = gameHpPercentageTotal / gameCount;
             result.TotalElapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
+            Debug.Assert(result.HpFitness >= 0);
+            Debug.Assert(result.HpFitness <= 1);
+
             //_writer.WriteLine();
 
             return result;
         }
 
-        private static void PreparePositions(GameInstance game, List<int> mobIds, int x, int y) {
+        public static void PreparePositions(GameInstance game, List<int> mobIds, int x, int y) {
             game.State.SetMobPosition(mobIds[0], new AxialCoord(x, y));
             game.State.SetMobPosition(mobIds[1], new AxialCoord(y, x));
 
@@ -132,35 +148,21 @@ namespace HexMage.Simulator.AI {
             game.PrepareEverything();
         }
 
-        public static List<EvaluationResult> EvaluateSetup(Setup setup, TextWriter writer) {
-            const int mapSize = 4;
+        //public static EvaluationResult EvaluateSetup(Setup setup, TextWriter writer) {
+        //    const int mapSize = 4;
 
-            var game = new GameInstance(new Map(mapSize));
-            var mobIds = new List<int>();
+        //    var game = new GameInstance(new Map(mapSize));
 
-            foreach (var mob in setup.red) {
-                var ids = mob.abilities.Select(ab => game.AddAbilityWithInfo(ab.ToAbility()));
-                mobIds.Add(game.AddMobWithInfo(mob.ToMobInfo(TeamColor.Red, ids)));
-            }
+        //    setup.UnpackIntoGame(game);
 
-            foreach (var mob in setup.blue) {
-                var ids = mob.abilities.Select(ab => game.AddAbilityWithInfo(ab.ToAbility()));
-                mobIds.Add(game.AddMobWithInfo(mob.ToMobInfo(TeamColor.Blue, ids)));
-            }
+        //        PreparePositions(game, game.MobManager.Mobs, 0, mapSize);
 
-            var results = new List<EvaluationResult>();
 
-            for (int i = 0; i < mapSize; i += 20) {
-                PreparePositions(game, mobIds, i, mapSize - i);
+        //        results.Add(result);
 
-                var result = new GameInstanceEvaluator(game, writer).Evaluate();
+        //    //writer.WriteLine($"\n***MCTS avg: {ExponentialMovingAverage.Instance.CurrentValue}ms/iter\n\n");
 
-                results.Add(result);
-            }
-
-            //writer.WriteLine($"\n***MCTS avg: {ExponentialMovingAverage.Instance.CurrentValue}ms/iter\n\n");
-
-            return results;
-        }
+        //    return results;
+        //}
     }
 }

@@ -12,15 +12,15 @@ namespace HexMage.Benchmarks {
                 int mobOffset = i * dna.MobSize;
 
                 var mob = new JsonMob();
-                mob.hp = (int) Math.Round(dna.Data[mobOffset] * Constants.HpMax);
-                mob.ap = (int) Math.Round(dna.Data[mobOffset + 1] * Constants.ApMax);
+                mob.hp = (int) Math.Ceiling(dna.Data[mobOffset] * Constants.HpMax);
+                mob.ap = (int) Math.Ceiling(dna.Data[mobOffset + 1] * Constants.ApMax);
 
                 for (int j = 0; j < dna.AbilityCount; j++) {
                     int offset = mobOffset + DNA.MobAttributeCount + j * DNA.AbilityAttributeCount;
 
-                    var ability = new JsonAbility((int) Math.Round(dna.Data[offset + 0] * Constants.DmgMax),
-                                                  (int) Math.Round(dna.Data[offset + 1] * Constants.CostMax),
-                                                  (int) Math.Round(dna.Data[offset + 2] * Constants.RangeMax),
+                    var ability = new JsonAbility((int) Math.Ceiling(dna.Data[offset + 0] * Constants.DmgMax),
+                                                  (int) Math.Ceiling(dna.Data[offset + 1] * Constants.CostMax),
+                                                  (int) Math.Ceiling(dna.Data[offset + 2] * Constants.RangeMax),
                                                   0);
                     mob.abilities.Add(ability);
                 }

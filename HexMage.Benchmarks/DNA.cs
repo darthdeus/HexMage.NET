@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 
 namespace HexMage.Benchmarks {
     public class DNA {
@@ -16,6 +17,26 @@ namespace HexMage.Benchmarks {
             AbilityCount = abilityCount;
             MobCount = mobCount;
             Data = data;
+        }
+
+        public DNA Copy() {
+            var dna = new DNA(MobCount, AbilityCount, new List<float>(Data.Count));
+
+            for (int i = 0; i < Data.Count; i++) {
+                dna.Data.Add(Data[i]);
+            }
+
+            return dna;
+        }
+
+        public string ToDNAString() {
+            var dnaString = new StringBuilder();
+            foreach (var num in Data) {
+                dnaString.Append(num.ToString(".00"));
+                dnaString.Append(",");
+            }
+
+            return dnaString.ToString();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using HexMage.Simulator;
 using HexMage.Simulator.AI;
@@ -19,9 +20,14 @@ namespace HexMage.Benchmarks {
             const bool evaluateAis = false;
 
             if (evaluateAis) {
-                new AiEvaluator().Run();
+                //new AiEvaluator().Run();
             } else {
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
                 new Evolution().Run();
+                stopwatch.Stop();
+
+                Console.WriteLine($"Total evolution time: {stopwatch.ElapsedMilliseconds}ms");
             }
 
             return;
@@ -32,7 +38,7 @@ namespace HexMage.Benchmarks {
 
             if (key.Key == ConsoleKey.D2) {
                 MctsController.EnableLogging = false;
-                RunEvaluator();
+                //RunEvaluator();
             } else if (key.Key == ConsoleKey.D3) {
                 MctsController.EnableLogging = false;
                 new Evolution().Run();
@@ -43,16 +49,16 @@ namespace HexMage.Benchmarks {
             }
         }
 
-        private static void RunEvaluator() {
-            string content = File.ReadAllText(@"simple.json");
-            var setup = JsonLoader.Load(content);
+        //private static void RunEvaluator() {
+        //    string content = File.ReadAllText(@"simple.json");
+        //    var setup = JsonLoader.Load(content);
 
-            var results = GameInstanceEvaluator.EvaluateSetup(setup, Console.Out);
-            Console.WriteLine("*************************");
-            foreach (var result in results) {
-                Console.WriteLine(result);
-            }
-            Console.WriteLine("*************************\n\n");
-        }
+        //    var results = GameInstanceEvaluator.EvaluateSetup(setup, Console.Out);
+        //    Console.WriteLine("*************************");
+        //    foreach (var result in results) {
+        //        Console.WriteLine(result);
+        //    }
+        //    Console.WriteLine("*************************\n\n");
+        //}
     }
 }
