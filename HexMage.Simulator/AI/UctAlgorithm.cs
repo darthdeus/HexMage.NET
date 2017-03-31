@@ -4,9 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 
@@ -38,7 +36,7 @@ namespace HexMage.Simulator {
 
             stopwatch.Stop();
 
-            PrintTreeRepresentation(root);
+            UctDebug.PrintTreeRepresentation(root);
             SearchCount++;
 
             //Console.WriteLine($"Total Q: {root.Children.Sum(c => c.Q)}, N: {root.Children.Sum(c => c.N)}");
@@ -265,55 +263,6 @@ namespace HexMage.Simulator {
             } while (current.Action.Type != UctActionType.EndTurn);
 
             return result;
-        }
-
-        private void PrintDotgraph(UctNode root) {
-            var builder = new StringBuilder();
-
-            builder.AppendLine("digraph G {");
-            int budget = 4;
-            PrintDotNode(builder, root, budget);
-            builder.AppendLine("}");
-
-            string str = builder.ToString();
-
-            string dirname = @"c:\dev\graphs";
-            if (!Directory.Exists(dirname)) {
-                Directory.CreateDirectory(dirname);
-            }
-
-            File.WriteAllText($"c:\\dev\\graphs\\graph{SearchCount}.dot", str);
-        }
-
-        private void PrintDotNode(StringBuilder builder, UctNode node, int budget) {
-            if (budget == 0) return;
-
-            foreach (var child in node.Children) {
-                builder.AppendLine($"\"{node}\" -> \"{child}\"");
-            }
-
-            foreach (var child in node.Children) {
-                PrintDotNode(builder, child, budget - 1);
-            }
-        }
-
-
-        private void PrintTreeRepresentation(UctNode root) {
-#if XML
-            var dirname = @"c:\dev\graphs\xml\";
-            if (!Directory.Exists(dirname)) {
-                Directory.CreateDirectory(dirname);
-            }
-
-            string filename = dirname + "iter-" + searchCount + ".xml";
-
-            using (var writer = new StreamWriter(filename)) {
-                new XmlTreePrinter(root).Print(writer);
-            }
-#endif
-#if DOTGRAPH
-            PrintDotgraph(root);            
-#endif
         }
     }
 }
