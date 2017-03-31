@@ -39,8 +39,9 @@ namespace HexMage.Simulator {
             }
 
             var mobId = initialState.TurnManager.CurrentMob.Value;
-            var mobInfo = initialState.MobManager.MobInfos[mobId];
-            var mobInstance = initialState.State.MobInstances[mobId];
+            var mob = initialState.CachedMob(mobId);
+            var mobInfo = mob.MobInfo;
+            var mobInstance = mob.MobInstance;
 
             {
                 var pathfinder = initialState.Pathfinder;
@@ -49,16 +50,16 @@ namespace HexMage.Simulator {
                 MobInstance moveTargetInstance = new MobInstance();
 
                 foreach (var possibleTargetId in initialState.MobManager.Mobs) {
-                    var possibleTargetInstance = initialState.State.MobInstances[possibleTargetId];
+                    var possibleTarget = initialState.CachedMob(possibleTargetId);
+                    var possibleTargetInstance = possibleTarget.MobInstance;
 
-                    if (possibleTargetInstance.Hp <= 0) continue;
+                    if (!initialState.IsTargetable(mob, possibleTarget)) continue;
 
                     foreach (var abilityId in mobInfo.Abilities) {
-                        if (initialState.IsAbilityUsable(mobId, abilityId, possibleTargetId)) {
+                        if (initialState.IsAbilityUsableApRangeCheck(mob, possibleTarget, abilityId)) {
                             var stateWithUsedAbility = initialState.DeepCopy();
 
                             stateWithUsedAbility.FastUse(abilityId, mobId, possibleTargetId);
-                            //stateWithUsedAbility.FastUse(mobId, possibleTargetId, abilityId);
 
                             possibleStates.Add(stateWithUsedAbility);
                         }

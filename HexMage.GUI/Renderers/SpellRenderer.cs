@@ -35,7 +35,7 @@ namespace HexMage.GUI.Renderers {
 
                 var isActive = _gameBoardController.SelectedAbilityIndex == _abilityIndex;
 
-                if (_gameInstance.IsAbilityUsable(mobId.Value, abilityId)) {
+                if (_gameInstance.IsAbilityUsableNoTarget(mobId.Value, abilityId)) {
                     isActive = true;
                 }
 

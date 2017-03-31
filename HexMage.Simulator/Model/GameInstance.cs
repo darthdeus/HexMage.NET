@@ -161,42 +161,57 @@ namespace HexMage.Simulator {
             return heatmap;
         }
 
-        public bool IsAbilityUsable(int mobId, int abilityId) {
+        public bool IsAbilityUsableNoTarget(int mobId, int abilityId) {
             var ability = MobManager.AbilityForId(abilityId);
             var mob = State.MobInstances[mobId];
             return mob.Ap >= ability.Cost && State.Cooldowns[abilityId] == 0;
         }
-        
-        public bool IsAbilityUsable(int mobId, int targetId, int abilityId) {
-            var mob = State.MobInstances[mobId];
-            var target = State.MobInstances[targetId];
 
-            var line = Map.AxialLinedraw(mob.Coord, target.Coord);
-            int distance = line.Count - 1;
+        //public bool IsAbilityUsable(int mobId, int targetId, int abilityId) {
+        //    var mob = State.MobInstances[mobId];
+        //    var target = State.MobInstances[targetId];
 
-            foreach (var coord in line) {
-                if (Map[coord] == HexType.Wall) {
-                    Utils.Log(LogSeverity.Debug, nameof(GameInstance), "Path obstructed, no usable abilities.");
-                    return false;
-                }
-            }
+        //    var line = Map.AxialLinedraw(mob.Coord, target.Coord);
+        //    int distance = line.Count - 1;
 
-            var ability = MobManager.AbilityForId(abilityId);
+        //    foreach (var coord in line) {
+        //        if (Map[coord] == HexType.Wall) {
+        //            Utils.Log(LogSeverity.Debug, nameof(GameInstance), "Path obstructed, no usable abilities.");
+        //            return false;
+        //        }
+        //    }
 
-            return ability.Range >= distance && IsAbilityUsable(mobId, abilityId);
+        //    var ability = MobManager.AbilityForId(abilityId);
+
+        //    return ability.Range >= distance && IsAbilityUsable(mobId, abilityId);
+        //}
+
+        public bool CanMoveTo(CachedMob mob, AxialCoord coord) {
+            bool isEmpty = Map[coord] == HexType.Empty && State.AtCoord(coord) == null;
+            bool enoughAp = mob.MobInstance.Ap >= Pathfinder.Distance(mob.MobInstance.Coord, coord);
+
+            return isEmpty && enoughAp;
+        }
+
+        public bool IsTargetable(CachedMob mob, CachedMob target) {
+            bool isVisible = Map.IsVisible(mob.MobInstance.Coord, target.MobInstance.Coord);
+            bool isTargetAlive = target.MobInstance.Hp > 0;
+            bool isEnemy = mob.MobInfo.Team != target.MobInfo.Team;
+
+            return isVisible && isTargetAlive && isEnemy;
+        }
+
+        public bool IsAbilityUsableApRangeCheck(CachedMob mob, CachedMob target, int abilityId) {
+            var abilityInfo = MobManager.Abilities[abilityId];
+
+            bool enoughAp = mob.MobInstance.Ap >= abilityInfo.Cost;
+            bool withinRange = mob.MobInstance.Coord.Distance(target.MobInstance.Coord) <= abilityInfo.Range;
+
+            return enoughAp && withinRange;
         }
 
         public bool IsAbilityUsable(CachedMob mob, CachedMob target, int abilityId) {
-            var abilityInfo = MobManager.Abilities[abilityId];
-
-            if (abilityInfo.Cost > mob.MobInstance.Ap) return false;
-
-            bool isVisible = Map.IsVisible(mob.MobInstance.Coord, target.MobInstance.Coord);
-            bool isEnemy = mob.MobInfo.Team != target.MobInfo.Team;
-            bool withinRange = mob.MobInstance.Coord.Distance(target.MobInstance.Coord) <= abilityInfo.Range;
-            bool isTargetAlive = target.MobInstance.Hp > 0;
-
-            return isVisible && isEnemy && withinRange && isTargetAlive;
+            return IsTargetable(mob, target) && IsAbilityUsableApRangeCheck(mob, target, abilityId);
         }
 
         public void FastUse(int abilityId, int mobId, int targetId) {
@@ -363,6 +378,10 @@ namespace HexMage.Simulator {
 
         public void FastMove(int mobId, AxialCoord coord) {
             State.FastMoveMob(Map, Pathfinder, mobId, coord);
+        }
+
+        public CachedMob CachedMob(int mobId) {
+            return Model.CachedMob.Create(this, mobId);
         }
     }
 }

@@ -245,10 +245,10 @@ namespace HexMage.GUI.Components {
             if (SelectedAbilityIndex.HasValue) {
                 if (SelectedAbilityIndex.Value == index) {
                     SelectedAbilityIndex = null;
-                } else if (_gameInstance.IsAbilityUsable(currentMob.Value, ability)) {
+                } else if (_gameInstance.IsAbilityUsableNoTarget(currentMob.Value, ability)) {
                     SelectedAbilityIndex = index;
                 }
-            } else if (_gameInstance.IsAbilityUsable(currentMob.Value, ability)) {
+            } else if (_gameInstance.IsAbilityUsableNoTarget(currentMob.Value, ability)) {
                 SelectedAbilityIndex = index;
             }
         }
@@ -505,7 +505,7 @@ namespace HexMage.GUI.Components {
             var mobInfo = _gameInstance.MobManager.MobInfos[mobId.Value];
             var selectedAbility = mobInfo.Abilities[SelectedAbilityIndex.Value];
 
-            if (!_gameInstance.IsAbilityUsable(mobId.Value, selectedAbility)) {
+            if (!_gameInstance.IsAbilityUsableNoTarget(mobId.Value, selectedAbility)) {
                 SelectedAbilityIndex = null;
             }
         }
