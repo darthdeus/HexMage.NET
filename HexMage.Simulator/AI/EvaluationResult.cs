@@ -6,6 +6,7 @@
         public int TotalTurns;
         public long TotalElapsedMilliseconds;
         public int TotalIterations;
+        public float HpFitness;
 
         public double MillisecondsPerIteration => (double) TotalElapsedMilliseconds / (double) TotalIterations;
         public double MillisecondsPerTurn => (double) TotalElapsedMilliseconds / (double) TotalTurns;

@@ -7,11 +7,11 @@ using HexMage.Simulator.PCG;
 namespace HexMage.Benchmarks {
     internal class Program {
         private static void Main(string[] args) {
-            Console.WriteLine("Choose:");
-            Console.WriteLine();
-            Console.WriteLine("\t1) Benchmark");
-            Console.WriteLine("\t2) Team evaluation");
-            Console.WriteLine("\t3) Generate new team");
+            //Console.WriteLine("Choose:");
+            //Console.WriteLine();
+            //Console.WriteLine("\t1) Benchmark");
+            //Console.WriteLine("\t2) Team evaluation");
+            //Console.WriteLine("\t3) Generate new team");
 
             Generator.Random = new Random(3);
             MctsController.EnableLogging = false;

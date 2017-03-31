@@ -48,13 +48,13 @@ namespace HexMage.Benchmarks {
                     foreach (var genTeam in generation) {
                         PopulationMember(team, genTeam, Console.Out);
 
-                        Console.WriteLine("Win stats:");
-                        foreach (var pair in GameInstanceEvaluator.GlobalControllerStatistics) {
-                            Console.WriteLine($"{pair.Key}: {pair.Value}");
-                        }
-                        Console.WriteLine(
-                            $"Expand: {UctAlgorithm.ExpandCount}, BestChild: {UctAlgorithm.BestChildCount}, Ratio: {(float) UctAlgorithm.ExpandCount / (float) UctAlgorithm.BestChildCount}");
-                        Console.WriteLine("\n\n");
+                        //Console.WriteLine("Win stats:");
+                        //foreach (var pair in GameInstanceEvaluator.GlobalControllerStatistics) {
+                        //    Console.WriteLine($"{pair.Key}: {pair.Value}");
+                        //}
+                        //Console.WriteLine(
+                        //    $"Expand: {UctAlgorithm.ExpandCount}, BestChild: {UctAlgorithm.BestChildCount}, Ratio: {(float) UctAlgorithm.ExpandCount / (float) UctAlgorithm.BestChildCount}");
+                        //Console.WriteLine("\n\n");
                     }
                 } else {
                     done = 0;
@@ -86,7 +86,10 @@ namespace HexMage.Benchmarks {
 
             var result = new EvaluationResult();
 
+            float totalHpFitness = 0;
+
             foreach (var res in results) {
+                totalHpFitness += res.HpFitness;
                 result.BlueWins += res.BlueWins;
                 result.RedWins += res.RedWins;
                 result.Timeouts += res.Timeouts;
@@ -95,18 +98,23 @@ namespace HexMage.Benchmarks {
                 result.TotalElapsedMilliseconds += res.TotalElapsedMilliseconds;
             }
 
+            float fitness = totalHpFitness / results.Count;
+
             genTeam.Rating = result.WinPercentage;
-            writer.WriteLine(genTeam.Rating);
+
+            string dnaString = string.Join(",", GenomeLoader.FromTeam(genTeam.Team).Data);
+
+            writer.WriteLine($"HP Fitness: {fitness}\tWinrate: {genTeam.Rating}\t{dnaString}");
 
             Mutate(genTeam.Team, result.WinPercentage - 0.5);
 
             double mpi = result.MillisecondsPerIteration;
             double mpt = result.MillisecondsPerTurn;
 
-            writer.WriteLine(
-                $"Total:\t\t{teamWatch.ElapsedMilliseconds}ms\nPer turn:\t{mpt}ms\nPer iteration:\t{mpi}ms");
-            writer.WriteLine();
-            writer.WriteLine();
+            //writer.WriteLine(
+            //    $"Total:\t\t{teamWatch.ElapsedMilliseconds}ms\nPer turn:\t{mpt}ms\nPer iteration:\t{mpi}ms");
+            //writer.WriteLine();
+            //writer.WriteLine();
         }
 
         public static void Mutate(Team team, double scale) {

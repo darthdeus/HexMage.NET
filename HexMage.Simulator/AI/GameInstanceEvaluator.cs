@@ -27,9 +27,9 @@ namespace HexMage.Simulator.AI {
         public EvaluationResult Evaluate() {
             var factories = new IAiFactory[] {
                 new RuleBasedFactory(),
-                new MctsFactory(1),
+                //new MctsFactory(1),
                 //new MctsFactory(10),
-                new RandomFactory(),
+                //new RandomFactory(),
             };
 
             var result = new EvaluationResult();
@@ -37,8 +37,13 @@ namespace HexMage.Simulator.AI {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
+            int gameCount = 0;
+            float gameHpPercentageTotal = 0;
+
             foreach (var factory1 in factories) {
                 foreach (var factory2 in factories) {
+                    gameCount++;
+
                     var game = _gameInstance.CopyStateOnly();
                     var hub = new GameEventHub(game);
 
@@ -58,13 +63,21 @@ namespace HexMage.Simulator.AI {
 
                     result.TotalIterations += maxIterations - iterations;
 
+                    float totalPercentage = 0;
+
+                    foreach (var mobId in game.MobManager.Mobs) {
+                        totalPercentage += (float)game.State.MobInstances[mobId].Hp /
+                                           (float) game.MobManager.MobInfos[mobId].MaxHp;
+                    }
+
+                    gameHpPercentageTotal += totalPercentage / game.MobManager.Mobs.Count;
+
                     // TODO !!!!!!!!!!!!!!!! muze nastat remiza
                     if (game.IsFinished && game.VictoryTeam.HasValue) {
                         Debug.Assert(game.VictoryTeam.HasValue);
                         Debug.Assert(game.VictoryController != null);
 
-                        _writer.Write(
-                            $"{game.VictoryController}:{game.LoserController}: {maxIterations - iterations}({game.VictoryTeam.ToString()[0]}), ");
+                        //_writer.Write($"{game.VictoryController}:{game.LoserController}: {maxIterations - iterations}({game.VictoryTeam.ToString()[0]}), ");
                         if (game.VictoryTeam == TeamColor.Red) {
                             result.RedWins++;
                         } else {
@@ -101,9 +114,10 @@ namespace HexMage.Simulator.AI {
 
             stopwatch.Stop();
 
+            result.HpFitness = gameHpPercentageTotal / gameCount;
             result.TotalElapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
-            _writer.WriteLine();
+            //_writer.WriteLine();
 
             return result;
         }
@@ -144,7 +158,7 @@ namespace HexMage.Simulator.AI {
                 results.Add(result);
             }
 
-            writer.WriteLine($"\n***MCTS avg: {ExponentialMovingAverage.Instance.CurrentValue}ms/iter\n\n");
+            //writer.WriteLine($"\n***MCTS avg: {ExponentialMovingAverage.Instance.CurrentValue}ms/iter\n\n");
 
             return results;
         }
