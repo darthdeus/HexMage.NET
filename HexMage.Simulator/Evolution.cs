@@ -57,7 +57,7 @@ namespace HexMage.Benchmarks {
             List<double> plotFit = new List<double>();
             List<double> plotProb = new List<double>();
 
-            int extraIterations = 10000;
+            int extraIterations = Constants.ExtraIterations;;
             int maxTotalHp = 0;
 
             int goodCount = 0;

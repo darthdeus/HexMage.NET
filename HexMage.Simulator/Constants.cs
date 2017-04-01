@@ -59,6 +59,7 @@ namespace HexMage.Simulator {
         public static bool SaveGoodOnes = true;
         public static double InitialT = 100;
         public static int NumGenerations = 100000;
+        public static int ExtraIterations = 10;
         public static int TeamsPerGeneration = 1;
         public static bool Logging = false;
 
