@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace HexMage.Simulator.AI {
@@ -10,6 +11,10 @@ namespace HexMage.Simulator.AI {
         }
 
         public static UctAction GenerateAction(GameInstance game) {
+            const bool fastActionGeneration = false;
+
+            if (fastActionGeneration) return ActionGenerator.DefaultPolicyAction(game);
+
             var result = new List<UctAction>();
 
             var currentMob = game.TurnManager.CurrentMob;
@@ -19,7 +24,19 @@ namespace HexMage.Simulator.AI {
             ActionGenerator.GenerateDirectAbilityUse(game, mob, result);
 
             if (result.Count > 0) {
-                return result[0];
+                UctAction max = result[0];
+                var maxAbilityInfo = game.MobManager.Abilities[max.AbilityId];
+
+                for (int i = 1; i < result.Count; i++) {
+                    var abilityInfo = game.MobManager.Abilities[result[i].AbilityId];
+
+                    if (abilityInfo.DmgCostRatio > maxAbilityInfo.DmgCostRatio) {
+                        max = result[i];
+                        maxAbilityInfo = abilityInfo;
+                    }
+                }
+
+                return max;
             }
 
             ActionGenerator.GenerateAttackMoveActions(game, mob, result);
@@ -39,7 +56,7 @@ namespace HexMage.Simulator.AI {
 
         public void FastPlayTurn(GameEventHub eventHub) {
             do {
-                var action = ActionGenerator.DefaultPolicyAction(_gameInstance);
+                var action = GenerateAction(_gameInstance);
 
                 if (action.Type == UctActionType.EndTurn)
                     break;
@@ -50,7 +67,7 @@ namespace HexMage.Simulator.AI {
 
         public async Task SlowPlayTurn(GameEventHub eventHub) {
             do {
-                var action = ActionGenerator.DefaultPolicyAction(_gameInstance);
+                var action = GenerateAction(_gameInstance);
 
                 if (action.Type == UctActionType.EndTurn)
                     break;

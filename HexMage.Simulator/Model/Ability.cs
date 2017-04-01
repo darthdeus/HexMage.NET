@@ -17,6 +17,8 @@ namespace HexMage.Simulator {
         public Buff Buff { get; set; }
         public AreaBuff AreaBuff { get; set; }
 
+        public float DmgCostRatio => (float) Dmg / (float) Cost;
+
         public Ability() {}
 
         public Ability(int dmg, int cost, int range, int cooldown, AbilityElement element)
@@ -75,7 +77,7 @@ namespace HexMage.Simulator {
                 hashCode = (hashCode * 397) ^ AreaBuff.GetHashCode();
                 return hashCode;
             }
-        }
+        }        
 
         public static bool operator ==(Ability left, Ability right) {
             return Equals(left, right);
