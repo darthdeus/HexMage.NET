@@ -93,16 +93,10 @@ namespace HexMage.Simulator.AI {
 
                             float avg = currHp / maxHp;
 
-                            Debug.Assert(avg >= 0);
-                            //Debug.Assert(avg <= 1);
-
                             if (avg > 1) {
                                 result.Tainted = true;
                                 avg = 1;
                             }
-
-                            // TODO - temporary hack
-
 
                             return avg;
                         });
@@ -124,8 +118,6 @@ namespace HexMage.Simulator.AI {
             Debug.Assert(result.TotalHpPercentage >= 0);
             Debug.Assert(result.TotalHpPercentage <= 1);
 
-            //_writer.WriteLine();
-
             return result;
         }
 
@@ -146,9 +138,9 @@ namespace HexMage.Simulator.AI {
 
                 // TODO - extract these
                 Constants.WriteLogLine(UctAction.EndTurnAction());
-                Console.WriteLine(Constants.GetLogBuffer());
-                Constants.ResetLogBuffer();
             }
+            Console.WriteLine(Constants.GetLogBuffer());
+            Constants.ResetLogBuffer();
 
             Console.WriteLine(iterations);
         }

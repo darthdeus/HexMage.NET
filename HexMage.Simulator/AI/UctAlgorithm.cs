@@ -25,7 +25,7 @@ namespace HexMage.Simulator {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            int totalIterations = _thinkTime * 1000;
+            int totalIterations = _thinkTime * 100;
             int iterations = totalIterations;
 
             while (iterations-- > 0) {
@@ -170,14 +170,15 @@ namespace HexMage.Simulator {
             Debug.Assert(game.CurrentTeam.HasValue, "game.CurrentTeam.HasValue");
 
             var copy = game.CopyStateOnly();
-            int iterations = 100;
+            int iterations = 200;
 
             while (!copy.IsFinished && iterations-- > 0) {
-                var action = ActionGenerator.DefaultPolicyAction(copy);
+                var action = ActionGenerator.RuleBasedAction(copy);
+             
                 if (action.Type == UctActionType.Null) {
                     throw new InvalidOperationException();
                 }
-
+                
                 FNoCopy(copy, action);
 
                 // TODO - odebrat az se opravi

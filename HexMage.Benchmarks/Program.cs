@@ -18,7 +18,7 @@ namespace HexMage.Benchmarks {
             Generator.Random = new Random(3);
             MctsController.EnableLogging = false;
 
-            const bool mctsBenchmark = false;
+            const bool mctsBenchmark = true;
             const bool evaluateAis = false;
 
             if (evaluateAis) {
@@ -54,20 +54,22 @@ namespace HexMage.Benchmarks {
         }
 
         public static void MctsBenchmark() {
-            var game = GameSetup.PrepareForSettings(3, 2);
             
             var d1 = new DNA(3, 2);
-            d1.Randomize();
-
+            var game = GameSetup.FromDNAs(d1, d1);
 
             List<double> xs = new List<double>();
             List<double> ys = new List<double>();
 
-            for (int i = 0; i < 100; i++) {                
+            for (int i = 1; i < 5; i++) {                
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
 
-                GameInstanceEvaluator.Playout(game, d1, d1, new MctsController(game), new MctsController(game));
+                var controller = new MctsController(game, i);
+                
+                //controller = new AiRuleBasedController(game);
+
+                GameInstanceEvaluator.Playout(game, d1, d1, controller, controller);
 
                 stopwatch.Stop();
 
@@ -75,9 +77,9 @@ namespace HexMage.Benchmarks {
                 ys.Add(stopwatch.ElapsedMilliseconds);
             }
 
-            GnuPlot.Plot(xs.ToArray(), ys.ToArray());
+            //GnuPlot.Plot(xs.ToArray(), ys.ToArray(), "with linespoints");
 
-            Console.ReadKey();
+            //Console.ReadKey();
         }
     }
 }

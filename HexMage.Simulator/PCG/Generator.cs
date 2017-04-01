@@ -121,6 +121,8 @@ namespace HexMage.Simulator.PCG {
             };
 
             var abilities = new List<int>();
+            int maxAp = RandomAp();
+            int maxHp = RandomHp();
 
             for (int i = 0; i < 1; i++) {
                 var element = elements[Random.Next(0, 4)];
@@ -133,7 +135,7 @@ namespace HexMage.Simulator.PCG {
                 var cooldown = 0;
 
                 var ability = new Ability(RandomDmg(),
-                    RandomCost(),
+                    RandomCost(maxAp),
                     RandomRange(),
                     cooldown,
                     element,
@@ -151,7 +153,7 @@ namespace HexMage.Simulator.PCG {
             int iniciative = Random.Next(10);
 
 #warning TODO - generated mobs do not have their coords assigned
-            return new MobInfo(team, RandomHp(), RandomAp(), iniciative, abilities);
+            return new MobInfo(team, maxHp, maxAp, iniciative, abilities);
         }
 
         public static int RandomHp() {
@@ -166,8 +168,8 @@ namespace HexMage.Simulator.PCG {
             return Random.Next(5, Constants.DmgMax);
         }
 
-        public static int RandomCost() {
-            return Random.Next(3, Constants.CostMax);
+        public static int RandomCost(int maxAp = Constants.CostMax) {
+            return Random.Next(3, Math.Min(Constants.CostMax, maxAp));
         }
 
         public static int RandomRange() {
