@@ -95,10 +95,12 @@ namespace HexMage.Simulator {
         }
 
 
-        public static void GenerateDefensiveMoveActions(GameInstance state, MobInstance mobInstance, int mobId,
-                                                        List<UctAction> result) {
+        public static void GenerateDefensiveMoveActions(GameInstance state, CachedMob mob, List<UctAction> result) {
             var heatmap = state.BuildHeatmap();
             var coords = new List<AxialCoord>();
+
+            var mobInstance = mob.MobInstance;
+            var mobId = mob.MobId;
 
             foreach (var coord in heatmap.Map.AllCoords) {
                 if (heatmap.Map[coord] != heatmap.MinValue) continue;
@@ -178,12 +180,11 @@ namespace HexMage.Simulator {
         }
 
         public static bool GenerateDirectAbilityUse(GameInstance state,
-                                                    int mobId,
-                                                    MobInfo mobInfo,
-                                                    MobInstance mobInstance,
+                                                    CachedMob mob,
                                                     List<UctAction> result) {
             bool foundAbilityUse = false;
-            var mob = state.CachedMob(mobId);
+            var mobInfo = mob.MobInfo;
+            var mobId = mob.MobId;
 
             foreach (var abilityId in mobInfo.Abilities) {
                 if (!state.IsAbilityUsableNoTarget(mobId, abilityId)) continue;
@@ -228,23 +229,20 @@ namespace HexMage.Simulator {
 
             var currentMob = state.TurnManager.CurrentMob;
             if (currentMob.HasValue) {
-                var mobId = currentMob.Value;
+                var mob = state.CachedMob(currentMob.Value);
 
-                var mobInstance = state.State.MobInstances[mobId];
-                var mobInfo = state.MobManager.MobInfos[mobId];
-
-                bool foundAbilityUse = GenerateDirectAbilityUse(state, mobId, mobInfo, mobInstance,
+                bool foundAbilityUse = GenerateDirectAbilityUse(state, mob,
                                                                 result);
 
                 const bool alwaysAttackMove = false;
 
                 // We disable movement if there is a possibility to cast abilities.
                 if (allowMove && (alwaysAttackMove || !foundAbilityUse)) {
-                    GenerateAttackMoveActions(state, state.CachedMob(mobId), result);
+                    GenerateAttackMoveActions(state, state.CachedMob(mob.MobId), result);
                 }
 
                 if (allowMove) {
-                    GenerateDefensiveMoveActions(state, mobInstance, mobId, result);
+                    GenerateDefensiveMoveActions(state, mob, result);
                 }
             } else {
                 throw new InvalidOperationException();
