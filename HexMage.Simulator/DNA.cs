@@ -40,7 +40,7 @@ namespace HexMage.Simulator {
             var dnaString = new StringBuilder();
             foreach (var num in Data) {
                 dnaString.Append(num.ToString(".00"));
-                dnaString.Append(",");
+                dnaString.Append("");
             }
 
             return dnaString.ToString();
