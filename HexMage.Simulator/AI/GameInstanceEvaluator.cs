@@ -41,7 +41,6 @@ namespace HexMage.Simulator.AI {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            int gameCount = 0;
             float gameHpPercentageTotal = 0;
 
             foreach (var factory1 in factories) {
@@ -58,9 +57,9 @@ namespace HexMage.Simulator.AI {
                     game.MobManager.Teams[TeamColor.Blue] = ai2;
 
                     const int maxIterations = 100;
-                    int iterations = maxIterations;
+                    int i = 0;
 
-                    while (!game.IsFinished && iterations-- > 0) {
+                    for (; i < maxIterations && !game.IsFinished; i++) {
                         game.TurnManager.CurrentController.FastPlayTurn(hub);
                         game.TurnManager.NextMobOrNewTurn(game.Pathfinder, game.State);
 
@@ -69,23 +68,8 @@ namespace HexMage.Simulator.AI {
                         Constants.WriteLogLine(UctAction.EndTurnAction());
                     }
 
-                    result.TotalIterations += maxIterations - iterations;
+                    result.TotalIterations += i;
 
-                    //float totalPercentage = 0;
-
-                    //foreach (var mobId in game.MobManager.Mobs) {
-                    //    float mobPercentage = (float) game.State.MobInstances[mobId].Hp /
-                    //                          (float) game.MobManager.MobInfos[mobId].MaxHp;
-
-                    //    mobPercentage = Math.Min(Math.Max(0, mobPercentage), 1);
-
-                    //    Debug.Assert(mobPercentage <= 1);
-                    //    totalPercentage += mobPercentage;
-
-                    //    result.TotalHp += game.State.MobInstances[mobId].Hp;
-                    //}
-
-                    //float gamePercentage = totalPercentage / game.MobManager.Mobs.Count;
                     float gamePercentage =
                         game.MobManager.Mobs.Average(mobId => {
                             float currHp = Math.Max(0, game.State.MobInstances[mobId].Hp);
@@ -100,6 +84,8 @@ namespace HexMage.Simulator.AI {
 
                             return avg;
                         });
+
+                    result.TotalHp = game.State.MobInstances.Sum(mobInstance => mobInstance.Hp);
                     Debug.Assert(gamePercentage >= 0);
 
                     gameHpPercentageTotal += gamePercentage;

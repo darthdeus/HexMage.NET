@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using HexMage.Simulator.Model;
+using HexMage.Simulator.AI;
 
-namespace HexMage.Simulator {
+namespace HexMage.Simulator.Model {
     public enum GameEventState {
         NotStarted,
         TurnInProgress,
@@ -54,9 +53,9 @@ namespace HexMage.Simulator {
             return totalTurns;
         }
 
-        public async Task SlowPlayAction(GameInstance instance, UctAction action) {
-            // TODDO - instance vs _gameInstance?
-            Debug.Assert(instance == _gameInstance, "instance == _gameInstance");
+        public async Task SlowPlayAction(GameInstance game, UctAction action) {
+            // TODDO - game vs _gameInstance?
+            Debug.Assert(game == _gameInstance, "instance == _gameInstance");
 
             switch (action.Type) {
                 case UctActionType.AbilityUse:
@@ -75,7 +74,7 @@ namespace HexMage.Simulator {
                 case UctActionType.DefensiveMove:
                 case UctActionType.Move:
                     // TODO - assert jenom na jednom miste?
-                    Debug.Assert(instance.State.AtCoord(action.Coord) == null, "Trying to move into a mob.");
+                    Debug.Assert(game.State.AtCoord(action.Coord) == null, "Trying to move into a mob.");
                     await SlowBroadcastMobMoved(action.MobId, action.Coord);
                     break;
 

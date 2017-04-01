@@ -1,6 +1,5 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator.AI {
     public class AiRuleBasedController : IMobController {

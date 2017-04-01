@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
@@ -48,8 +49,7 @@ namespace HexMage.Simulator {
             }
 
             string terminal = IsTerminal ? $"[T]" : "";
-            var value = Math.Round(UcbValue(), 2);
-            //return $"[{team}]{terminal}{Q}/{N}/{value}\\n{Action}";
+
             return $"[{team}]{terminal}\\n{Q}/{N}\\n{Action}";
         }
 

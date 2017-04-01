@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using HexMage.Simulator.AI;
+using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public class MctsController : IMobController {
@@ -39,13 +40,6 @@ namespace HexMage.Simulator {
             }
 
             LogActions(result);
-            //UctAction action;
-            //do {
-            //    var node = await Task.Run(() => new UctAlgorithm(_thinkTime).UctSearch(_gameInstance));
-            //    action = node.Action;
-
-            //    await eventHub.SlowPlayAction(_gameInstance, action);
-            //} while (action.Type != UctActionType.EndTurn);
         }
 
         private void LogActions(UctSearchResult result) {

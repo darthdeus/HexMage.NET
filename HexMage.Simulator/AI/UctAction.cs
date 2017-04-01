@@ -1,6 +1,6 @@
 using System;
 
-namespace HexMage.Simulator {
+namespace HexMage.Simulator.AI {
     public struct UctAction {
         public readonly UctActionType Type;
         public readonly int AbilityId;

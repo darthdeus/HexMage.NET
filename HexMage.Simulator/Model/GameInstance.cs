@@ -180,25 +180,6 @@ namespace HexMage.Simulator {
             return enoughAp && noCooldown;
         }
 
-        //public bool IsAbilityUsable(int mobId, int targetId, int abilityId) {
-        //    var mob = State.MobInstances[mobId];
-        //    var target = State.MobInstances[targetId];
-
-        //    var line = Map.AxialLinedraw(mob.Coord, target.Coord);
-        //    int distance = line.Count - 1;
-
-        //    foreach (var coord in line) {
-        //        if (Map[coord] == HexType.Wall) {
-        //            Utils.Log(LogSeverity.Debug, nameof(GameInstance), "Path obstructed, no usable abilities.");
-        //            return false;
-        //        }
-        //    }
-
-        //    var ability = MobManager.AbilityForId(abilityId);
-
-        //    return ability.Range >= distance && IsAbilityUsable(mobId, abilityId);
-        //}
-
         public bool CanMoveTo(CachedMob mob, AxialCoord coord) {
             int remainingAp, distance;
             return CanMoveTo(mob, coord, out remainingAp, out distance);

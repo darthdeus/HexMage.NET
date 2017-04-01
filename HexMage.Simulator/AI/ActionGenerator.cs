@@ -37,9 +37,7 @@ namespace HexMage.Simulator {
         }
 
         public static UctAction RuleBasedAction(GameInstance game) {
-            const bool fastActionGeneration = false;
-
-            if (fastActionGeneration) return ActionGenerator.DefaultPolicyAction(game);
+            if (Constants.fastActionGeneration) return ActionGenerator.DefaultPolicyAction(game);
 
             var result = new List<UctAction>();
 
@@ -47,23 +45,15 @@ namespace HexMage.Simulator {
             if (!currentMob.HasValue) return UctAction.EndTurnAction();
 
             var mob = game.CachedMob(currentMob.Value);
-            ActionGenerator.GenerateDirectAbilityUse(game, mob, result);
 
-            if (result.Count > 0) {
-                return MaxAbilityRatio(game, result);
-            }
+            GenerateDirectAbilityUse(game, mob, result);
+            if (result.Count > 0) return MaxAbilityRatio(game, result);
 
-            ActionGenerator.GenerateAttackMoveActions(game, mob, result);
+            GenerateAttackMoveActions(game, mob, result);
+            if (result.Count > 0) return MaxAbilityRatio(game, result);
 
-            if (result.Count > 0) {
-                return MaxAbilityRatio(game, result);
-            }
-
-            ActionGenerator.GenerateDefensiveMoveActions(game, mob, result);
-
-            if (result.Count > 0) {
-                return result[0];
-            }
+            GenerateDefensiveMoveActions(game, mob, result);
+            if (result.Count > 0) return result[0];
 
             return UctAction.EndTurnAction();
         }
@@ -98,10 +88,7 @@ namespace HexMage.Simulator {
 
                 moveTargetId = possibleTargetId;
 
-                // TODO - porovnat, co kdyz dovolim utocit na dead cile
-                const bool allowCorpseTargetting = false;
-
-                if (!allowCorpseTargetting && !state.IsTargetable(mob, possibleTarget)) continue;
+                if (!Constants.allowCorpseTargetting && !state.IsTargetable(mob, possibleTarget)) continue;
                 if (!abilityId.HasValue) continue;
 
                 if (state.IsAbilityUsableApRangeCheck(mob, possibleTarget, abilityId.Value)) {
@@ -219,8 +206,7 @@ namespace HexMage.Simulator {
                 }
 
                 if (closestCoord.HasValue) {
-                    const bool attackMoveEnabled = true;
-                    if (attackMoveEnabled) {
+                    if (Constants.attackMoveEnabled) {
                         result.Add(UctAction.AttackMoveAction(mob.MobId,
                                                               closestCoord.Value,
                                                               chosenAbilityId.Value,
@@ -287,10 +273,8 @@ namespace HexMage.Simulator {
                 bool foundAbilityUse = GenerateDirectAbilityUse(state, mob,
                                                                 result);
 
-                const bool alwaysAttackMove = false;
-
                 // We disable movement if there is a possibility to cast abilities.
-                if (allowMove && (alwaysAttackMove || !foundAbilityUse)) {
+                if (allowMove && (Constants.alwaysAttackMove || !foundAbilityUse)) {
                     GenerateAttackMoveActions(state, state.CachedMob(mob.MobId), result);
                 }
 
@@ -303,12 +287,10 @@ namespace HexMage.Simulator {
                           "Final state reached while trying to compute possible actions.");
             }
 
-            const bool endTurnAsLastResort = true;
-
             if (allowEndTurn) {
                 // We would skip end turn if there are not enough actions.
                 // TODO - generate more move actions if we don't have enough?
-                if (!endTurnAsLastResort || result.Count <= 1) {
+                if (!Constants.endTurnAsLastResort || result.Count <= 1) {
                     result.Add(UctAction.EndTurnAction());
                 }
             }

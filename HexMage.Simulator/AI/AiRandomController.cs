@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using HexMage.Simulator.Model;
 using HexMage.Simulator.PCG;
 
 namespace HexMage.Simulator.AI {

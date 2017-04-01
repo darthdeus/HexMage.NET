@@ -2,6 +2,40 @@
 
 namespace HexMage.Simulator {
     public static class Constants {
+        // Rule based AI
+        public const bool fastActionGeneration = false;
+        // TODO - porovnat, co kdyz dovolim utocit na dead cile
+        public const bool allowCorpseTargetting = false;
+
+        /// <summary>
+        /// Disabling this will only generate the respective MOVE action,
+        /// instead of a combined ATTACK-MOVE.
+        /// 
+        /// TODO - profile/benchmark both cases and create pretty graphs :)
+        /// </summary>
+        public const bool attackMoveEnabled = true;
+
+        /// <summary>
+        /// Triggers attack move generation even when a direct attack was found.
+        /// 
+        /// // TODO - again experiment with triggering this
+        /// </summary>
+        public const bool alwaysAttackMove = false;
+
+        /// <summary>
+        /// If `true` END-TURN actions will be generated even if there are enough
+        /// other actions.
+        /// 
+        /// // TODO - again experiment with triggering this
+        /// </summary>
+        public const bool endTurnAsLastResort = true;
+
+        // Evolution
+        public const bool alwaysJumpToBetter = false;
+        public const bool saveGoodOnes = true;
+        public const double initialT = 100;
+        public const int numGenerations = 100000;
+        public const int teamsPerGeneration = 1;
         public const bool Logging = false;
 
         // TODO - fuj, to sem nepatri

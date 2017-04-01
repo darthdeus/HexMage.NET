@@ -38,9 +38,7 @@ namespace HexMage.Benchmarks {
         public void Run() {
             var generation = new List<GenerationMember>();
 
-            const int numGenerations = 100000;
-            const int teamsPerGeneration = 1;
-            for (int i = 0; i < teamsPerGeneration; i++) {
+            for (int i = 0; i < Constants.teamsPerGeneration; i++) {
                 var copy = initialDna.Clone();
                 copy.Randomize();
 
@@ -52,9 +50,8 @@ namespace HexMage.Benchmarks {
                 generation.Add(member);
             }
 
-            const double initialT = 100;
             double Tpercentage = 1;
-            double T = initialT;
+            double T = Constants.initialT;
 
             List<double> plotT = new List<double>();
             List<double> plotFit = new List<double>();
@@ -66,10 +63,10 @@ namespace HexMage.Benchmarks {
             int goodCount = 0;
             bool goodEnough = false;
 
-            for (int i = 0; i < numGenerations; i++) {
-                Tpercentage = Math.Max(0, Tpercentage - 1.0 / numGenerations);
+            for (int i = 0; i < Constants.numGenerations; i++) {
+                Tpercentage = Math.Max(0, Tpercentage - 1.0 / Constants.numGenerations);
 
-                T = initialT * Tpercentage;
+                T = Constants.initialT * Tpercentage;
 
                 if (Tpercentage < 0.01) {
                     i -= extraIterations;
@@ -89,9 +86,7 @@ namespace HexMage.Benchmarks {
                     var newDna = Mutate(member.dna, (float) T);
                     var newFitness = CalculateFitness(newDna);
 
-                    const bool saveGoodOnes = true;
-
-                    if (saveGoodOnes && !goodEnough && newFitness.Fitness > 0.995) {
+                    if (Constants.saveGoodOnes && !goodEnough && newFitness.Fitness > 0.995) {
                         goodCount++;
                         if (goodCount > 50) goodEnough = true;
                         Console.WriteLine($"Found extra good {newFitness.Fitness}");
@@ -101,7 +96,7 @@ namespace HexMage.Benchmarks {
 
                     if (newFitness.Tainted) {
                         SaveTainted(newDna);
-                        i = numGenerations;
+                        i = Constants.numGenerations;
                     }
 
                     // We don't want to move into a timeouted state to save time
@@ -113,9 +108,8 @@ namespace HexMage.Benchmarks {
 
                     double probability = Math.Exp(-(ep - e) / T);
 
-                    const bool alwaysJumpToBetter = false;
 
-                    if (((ep - e) > 0 && alwaysJumpToBetter) || Probability.Uniform(probability)) {
+                    if (((ep - e) > 0 && Constants.alwaysJumpToBetter) || Probability.Uniform(probability)) {
                         member.result = newFitness;
                         member.dna = newDna;
                     }
@@ -134,11 +128,11 @@ namespace HexMage.Benchmarks {
                 //Console.WriteLine("****************************************************");
             }
 
-            var gnuplotConfigString = $"title '{numGenerations} generations," +
-                                      $"T_s = {initialT}'";
+            var gnuplotConfigString = $"title '{Constants.numGenerations} generations," +
+                                      $"T_s = {Constants.initialT}'";
 
             GnuPlot.HoldOn();
-            GnuPlot.Set($"xrange [{initialT}:0] reverse");
+            GnuPlot.Set($"xrange [{Constants.initialT}:0] reverse");
             GnuPlot.Set($"yrange [0:1] ");
             GnuPlot.Plot(plotT.ToArray(), plotFit.ToArray(), gnuplotConfigString);
             //GnuPlot.Plot(plotT.ToArray(), plotProb.ToArray(), gnuplotConfigString);
@@ -188,68 +182,6 @@ namespace HexMage.Benchmarks {
                 writer.WriteLine(initialDna.ToSerializableString());
                 writer.WriteLine(dna.ToSerializableString());
             }
-        }
-
-
-        // TODO - remove this
-        public static void Mutate(Team team, double scale) {
-            var rand = Generator.Random;
-
-            var mobIndex = rand.Next(team.mobs.Count);
-            var mob = team.mobs[mobIndex];
-            var abilities = mob.abilities;
-            var abilityIndex = rand.Next(abilities.Count);
-            var ability = abilities[abilityIndex];
-
-            switch (rand.Next(6)) {
-                case 0:
-                    ability.dmg = (int) Math.Max(1, ability.dmg + 2 * scale);
-                    break;
-                case 1:
-                    ability.ap = (int) Math.Max(1, ability.ap + 3 * scale);
-                    break;
-                case 2:
-                    ability.range = (int) Math.Max(1, ability.range - 3 * scale);
-                    break;
-                case 3:
-                    // TODO: cooldown mutations are disabled
-                    // (int) Math.Max(0, ability.cooldown + 1 * scale);
-                    ability.cooldown = 0;
-                    break;
-                case 4:
-                    mob.hp = (int) Math.Max(mob.hp + 5 * scale, 1);
-                    break;
-                case 5:
-                    mob.ap = (int) Math.Max(mob.ap + 5 * scale, 1);
-                    break;
-            }
-        }
-
-        // TODO - remove this
-
-        public static Team RandomTeam(int mobs, int spellsPerMob) {
-            var team = new Team();
-            team.mobs = new List<JsonMob>();
-
-            for (int i = 0; i < mobs; i++) {
-                var abilities = new List<JsonAbility>();
-
-                for (int j = 0; j < spellsPerMob; j++) {
-                    abilities.Add(new JsonAbility(Generator.RandomDmg(),
-                                                  Generator.RandomCost(),
-                                                  Generator.RandomRange(),
-                                                  0));
-                    // rand.Next(2)));
-                }
-
-                team.mobs.Add(new JsonMob {
-                    abilities = abilities,
-                    hp = Generator.RandomHp(),
-                    ap = Generator.RandomAp()
-                });
-            }
-
-            return team;
         }
 
         private static void LogStats() {
