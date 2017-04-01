@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading;
 using HexMage.Simulator.PCG;
 
 namespace HexMage.Simulator {
@@ -40,10 +42,25 @@ namespace HexMage.Simulator {
             var dnaString = new StringBuilder();
             foreach (var num in Data) {
                 dnaString.Append(num.ToString(".00"));
-                dnaString.Append("");
+                dnaString.Append(" ");
             }
 
             return dnaString.ToString();
+        }
+
+        public string ToSerializableString() {
+            return $"{MobCount},{AbilityCount},{string.Join(",", Data)}";
+        }
+
+        public static DNA FromSerializableString(string str) {
+            var split = str.Split(',');
+            var dna = new DNA();
+            dna.MobCount = int.Parse(split[0]);
+            dna.AbilityCount = int.Parse(split[1]);
+
+            dna.Data = split.Skip(2).Select(float.Parse).ToList();
+
+            return dna;
         }
 
         public override string ToString() {

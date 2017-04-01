@@ -11,7 +11,7 @@
         public int TotalHp;
         public bool Timeouted;
 
-        public float Fitness => (float) ((1 - TotalHpPercentage)); // * (Probability.Norm(TotalTurns)));
+        public float Fitness => (float) ((1 - TotalHpPercentage));// * (Probability.Norm(TotalTurns)));
 
         public double MillisecondsPerIteration => (double) TotalElapsedMilliseconds / (double) TotalIterations;
         public double MillisecondsPerTurn => (double) TotalElapsedMilliseconds / (double) TotalGames;

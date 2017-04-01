@@ -14,6 +14,9 @@ using HexMage.Simulator.PCG;
 
 namespace HexMage.Benchmarks {
     public class Evolution {
+        public static readonly string SaveFile = @"evo-save.txt";
+        public static readonly string SaveDir = "save-files/";
+
         public class GenerationMember {
             public DNA dna;
             public EvaluationResult result;
@@ -28,6 +31,10 @@ namespace HexMage.Benchmarks {
         const int evolutionMapSize = 5;
 
         public Evolution() {
+            if (!Directory.Exists(SaveDir)) {
+                Directory.CreateDirectory(SaveDir);
+            }
+
             string content = File.ReadAllText("team-1.json");
             var team = JsonLoader.LoadTeam(content);
             team.mobs.RemoveAt(0);
@@ -86,6 +93,8 @@ namespace HexMage.Benchmarks {
             int extraIterations = 10000;
             int maxTotalHp = 0;
 
+            int goodCount = 0;
+
             for (int i = 0; i < numGenerations; i++) {
                 Tpercentage = Math.Max(0, Tpercentage - 1.0 / numGenerations);
 
@@ -112,8 +121,16 @@ namespace HexMage.Benchmarks {
 
                     double probability;
 
-                    if (newFitness.Fitness > 0.995) {
-                        //Console.WriteLine($"Found extra good {newFitness.Fitness}");
+                    const bool saveGoodOnes = true;
+
+                    if (saveGoodOnes && newFitness.Fitness > 0.995) {
+                        goodCount++;
+                        Console.WriteLine($"Found extra good {newFitness.Fitness}");
+
+                        using (var writer = new StreamWriter(SaveDir + goodCount.ToString() + SaveFile)) {
+                            writer.WriteLine(initialDna.ToSerializableString());
+                            writer.WriteLine(member.dna.ToSerializableString());
+                        }
                     }
 
                     // We don't want to move into a timeouted state to save time

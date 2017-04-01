@@ -43,12 +43,12 @@ namespace HexMage.Simulator {
             foreach (var possibleTargetId in state.MobManager.Mobs) {
                 var possibleTarget = state.CachedMob(possibleTargetId);
 
-                const bool allowCorpseTargetting = false;
-                // TODO - porovnat, co kdyz dovolim utocit na dead cile
-                if (!allowCorpseTargetting && !state.IsTargetable(mob, possibleTarget)) continue;
-
                 moveTargetId = possibleTargetId;
 
+                // TODO - porovnat, co kdyz dovolim utocit na dead cile
+                const bool allowCorpseTargetting = false;
+
+                if (!allowCorpseTargetting && !state.IsTargetable(mob, possibleTarget)) continue;
                 if (!abilityId.HasValue) continue;
 
                 if (state.IsAbilityUsableApRangeCheck(mob, possibleTarget, abilityId.Value)) {
