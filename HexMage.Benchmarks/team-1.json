@@ -9,11 +9,19 @@
       ]
     },
     {
-      "hp": 50,
+      "hp": 80,
       "ap": 13,
       "abilities": [
         { "dmg": 6, "ap": 5, "range": 4, "cooldown": 0 },
         { "dmg": 5, "ap": 5, "range": 4, "cooldown": 0 }
+      ]
+    },
+    {
+      "hp": 50,
+      "ap": 13,
+      "abilities": [
+        { "dmg": 6, "ap": 5, "range": 4, "cooldown": 0 },
+        { "dmg": 12, "ap": 5, "range": 4, "cooldown": 0 }
       ]
     }
   ]
