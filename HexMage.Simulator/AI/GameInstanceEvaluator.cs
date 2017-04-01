@@ -113,7 +113,7 @@ namespace HexMage.Simulator.AI {
             game.MobManager.Teams[TeamColor.Red] = c1;
             game.MobManager.Teams[TeamColor.Blue] = c2;
 
-            int iterations = Constants.maxPlayoutEvaluationIterations;
+            int iterations = Constants.MaxPlayoutEvaluationIterations;
 
             var hub = new GameEventHub(game);
 

@@ -38,7 +38,7 @@ namespace HexMage.Benchmarks {
         public void Run() {
             var generation = new List<GenerationMember>();
 
-            for (int i = 0; i < Constants.teamsPerGeneration; i++) {
+            for (int i = 0; i < Constants.TeamsPerGeneration; i++) {
                 var copy = initialDna.Clone();
                 copy.Randomize();
 
@@ -51,7 +51,7 @@ namespace HexMage.Benchmarks {
             }
 
             double Tpercentage = 1;
-            double T = Constants.initialT;
+            double T = Constants.InitialT;
 
             List<double> plotT = new List<double>();
             List<double> plotFit = new List<double>();
@@ -63,10 +63,10 @@ namespace HexMage.Benchmarks {
             int goodCount = 0;
             bool goodEnough = false;
 
-            for (int i = 0; i < Constants.numGenerations; i++) {
-                Tpercentage = Math.Max(0, Tpercentage - 1.0 / Constants.numGenerations);
+            for (int i = 0; i < Constants.NumGenerations; i++) {
+                Tpercentage = Math.Max(0, Tpercentage - 1.0 / Constants.NumGenerations);
 
-                T = Constants.initialT * Tpercentage;
+                T = Constants.InitialT * Tpercentage;
 
                 if (Tpercentage < 0.01) {
                     i -= extraIterations;
@@ -86,7 +86,7 @@ namespace HexMage.Benchmarks {
                     var newDna = Mutate(member.dna, (float) T);
                     var newFitness = CalculateFitness(newDna);
 
-                    if (Constants.saveGoodOnes && !goodEnough && newFitness.Fitness > 0.995) {
+                    if (Constants.SaveGoodOnes && !goodEnough && newFitness.Fitness > 0.995) {
                         goodCount++;
                         if (goodCount > 50) goodEnough = true;
                         Console.WriteLine($"Found extra good {newFitness.Fitness}");
@@ -96,7 +96,7 @@ namespace HexMage.Benchmarks {
 
                     if (newFitness.Tainted) {
                         SaveTainted(newDna);
-                        i = Constants.numGenerations;
+                        i = Constants.NumGenerations;
                     }
 
                     // We don't want to move into a timeouted state to save time
@@ -109,7 +109,7 @@ namespace HexMage.Benchmarks {
                     double probability = Math.Exp(-(ep - e) / T);
 
 
-                    if (((ep - e) > 0 && Constants.alwaysJumpToBetter) || Probability.Uniform(probability)) {
+                    if (((ep - e) > 0 && Constants.AlwaysJumpToBetter) || Probability.Uniform(probability)) {
                         member.result = newFitness;
                         member.dna = newDna;
                     }
@@ -128,11 +128,11 @@ namespace HexMage.Benchmarks {
                 //Console.WriteLine("****************************************************");
             }
 
-            var gnuplotConfigString = $"title '{Constants.numGenerations} generations," +
-                                      $"T_s = {Constants.initialT}'";
+            var gnuplotConfigString = $"title '{Constants.NumGenerations} generations," +
+                                      $"T_s = {Constants.InitialT}'";
 
             GnuPlot.HoldOn();
-            GnuPlot.Set($"xrange [{Constants.initialT}:0] reverse");
+            GnuPlot.Set($"xrange [{Constants.InitialT}:0] reverse");
             GnuPlot.Set($"yrange [0:1] ");
             GnuPlot.Plot(plotT.ToArray(), plotFit.ToArray(), gnuplotConfigString);
             //GnuPlot.Plot(plotT.ToArray(), plotProb.ToArray(), gnuplotConfigString);

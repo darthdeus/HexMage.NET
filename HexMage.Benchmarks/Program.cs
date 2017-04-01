@@ -18,9 +18,9 @@ namespace HexMage.Benchmarks {
             Generator.Random = new Random(3);
             MctsController.EnableLogging = false;
 
-            if (Constants.evaluateAis) {
+            if (Constants.EvaluateAis) {
                 //new AiEvaluator().Run();
-            } else if (Constants.mctsBenchmark) {
+            } else if (Constants.MctsBenchmark) {
                 MctsBenchmark();
             } else {
                 var stopwatch = new Stopwatch();

@@ -37,7 +37,7 @@ namespace HexMage.Simulator {
         }
 
         public static UctAction RuleBasedAction(GameInstance game) {
-            if (Constants.fastActionGeneration) return ActionGenerator.DefaultPolicyAction(game);
+            if (Constants.FastActionGeneration) return ActionGenerator.DefaultPolicyAction(game);
 
             var result = new List<UctAction>();
 
@@ -88,7 +88,7 @@ namespace HexMage.Simulator {
 
                 moveTargetId = possibleTargetId;
 
-                if (!Constants.allowCorpseTargetting && !state.IsTargetable(mob, possibleTarget)) continue;
+                if (!Constants.AllowCorpseTargetting && !state.IsTargetable(mob, possibleTarget)) continue;
                 if (!abilityId.HasValue) continue;
 
                 if (state.IsAbilityUsableApRangeCheck(mob, possibleTarget, abilityId.Value)) {
@@ -206,7 +206,7 @@ namespace HexMage.Simulator {
                 }
 
                 if (closestCoord.HasValue) {
-                    if (Constants.attackMoveEnabled) {
+                    if (Constants.AttackMoveEnabled) {
                         result.Add(UctAction.AttackMoveAction(mob.MobId,
                                                               closestCoord.Value,
                                                               chosenAbilityId.Value,
@@ -274,7 +274,7 @@ namespace HexMage.Simulator {
                                                                 result);
 
                 // We disable movement if there is a possibility to cast abilities.
-                if (allowMove && (Constants.alwaysAttackMove || !foundAbilityUse)) {
+                if (allowMove && (Constants.AlwaysAttackMove || !foundAbilityUse)) {
                     GenerateAttackMoveActions(state, state.CachedMob(mob.MobId), result);
                 }
 
@@ -290,7 +290,7 @@ namespace HexMage.Simulator {
             if (allowEndTurn) {
                 // We would skip end turn if there are not enough actions.
                 // TODO - generate more move actions if we don't have enough?
-                if (!Constants.endTurnAsLastResort || result.Count <= 1) {
+                if (!Constants.EndTurnAsLastResort || result.Count <= 1) {
                     result.Add(UctAction.EndTurnAction());
                 }
             }
