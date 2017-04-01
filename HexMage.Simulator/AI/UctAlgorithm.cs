@@ -171,7 +171,7 @@ namespace HexMage.Simulator {
             int iterations = 200;
 
             while (!copy.IsFinished && iterations-- > 0) {
-                var action = ActionGenerator.RuleBasedAction(copy);
+                var action = ActionGenerator.DefaultPolicyAction(copy);
 
                 if (action.Type == UctActionType.Null) {
                     throw new InvalidOperationException();

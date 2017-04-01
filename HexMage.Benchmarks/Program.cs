@@ -101,9 +101,8 @@ namespace HexMage.Benchmarks {
                 ys.Add(stopwatch.ElapsedMilliseconds);
             }
 
-            //GnuPlot.Plot(xs.ToArray(), ys.ToArray(), "with linespoints");
-
-            //Console.ReadKey();
+            GnuPlot.Plot(xs.ToArray(), ys.ToArray(), "with linespoints");
+            Console.ReadKey();
         }
     }
 }
