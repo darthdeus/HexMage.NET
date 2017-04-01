@@ -34,6 +34,7 @@ namespace HexMage.Simulator.AI {
 
             var result = new EvaluationResult();
 
+            result.TotalHp = 0;
             result.Timeouted = false;
 
             var stopwatch = new Stopwatch();
@@ -61,6 +62,8 @@ namespace HexMage.Simulator.AI {
                     while (!game.IsFinished && iterations-- > 0) {
                         game.TurnManager.CurrentController.FastPlayTurn(hub);
                         game.TurnManager.NextMobOrNewTurn(game.Pathfinder, game.State);
+
+                        result.TotalTurns++;
                     }
 
                     result.TotalIterations += maxIterations - iterations;
@@ -75,6 +78,8 @@ namespace HexMage.Simulator.AI {
 
                         Debug.Assert(mobPercentage <= 1);
                         totalPercentage += mobPercentage;
+
+                        result.TotalHp += game.State.MobInstances[mobId].Hp;
                     }
 
                     float gamePercentage = totalPercentage / game.MobManager.Mobs.Count;
@@ -97,7 +102,6 @@ namespace HexMage.Simulator.AI {
                         }
 
                         var victoryControllerName = game.VictoryController.ToString();
-
                         var victoryControllerType = game.VictoryController.GetType();
 
                         if (victoryControllerType == typeof(MctsController)) {
@@ -118,20 +122,20 @@ namespace HexMage.Simulator.AI {
                     } else {
                         result.Timeouts++;
                         result.Timeouted = true;
-                        _writer.Write("Timeout\t");
+                        //_writer.Write("Timeout\t");
                     }
 
-                    result.TotalTurns++;
+                    result.TotalGames++;
                 }
             }
 
             stopwatch.Stop();
 
-            result.HpFitness = gameHpPercentageTotal / gameCount;
+            result.TotalHpPercentage = gameHpPercentageTotal / gameCount;
             result.TotalElapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
-            Debug.Assert(result.HpFitness >= 0);
-            Debug.Assert(result.HpFitness <= 1);
+            Debug.Assert(result.TotalHpPercentage >= 0);
+            Debug.Assert(result.TotalHpPercentage <= 1);
 
             //_writer.WriteLine();
 

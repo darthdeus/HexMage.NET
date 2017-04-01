@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
+using HexMage.Simulator.PCG;
 
 namespace HexMage.Simulator {
     public class DNA {
@@ -29,6 +30,12 @@ namespace HexMage.Simulator {
             return dna;
         }
 
+        public void Randomize() {
+            for (int j = 0; j < Data.Count; j++) {
+                Data[j] = (float) Generator.Random.NextDouble();
+            }
+        }
+
         public string ToDNAString() {
             var dnaString = new StringBuilder();
             foreach (var num in Data) {
@@ -37,6 +44,10 @@ namespace HexMage.Simulator {
             }
 
             return dnaString.ToString();
+        }
+
+        public override string ToString() {
+            return ToDNAString();
         }
     }
 }

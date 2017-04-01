@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,10 +16,10 @@ namespace HexMage.Benchmarks {
     public class Evolution {
         public class GenerationMember {
             public DNA dna;
-            public EvaluationResult fitness;
+            public EvaluationResult result;
 
             public override string ToString() {
-                return fitness.ToFitnessString(dna);
+                return result.ToFitnessString(dna);
             }
         }
 
@@ -32,6 +33,7 @@ namespace HexMage.Benchmarks {
             team.mobs.RemoveAt(0);
 
             initialDna = GenomeLoader.FromTeam(team);
+            initialDna.Randomize();
             Console.WriteLine($"Initial: {initialDna.ToDNAString()}\n\n");
 
             game = new GameInstance(evolutionMapSize);
@@ -48,21 +50,36 @@ namespace HexMage.Benchmarks {
             const int teamsPerGeneration = 1;
             for (int i = 0; i < teamsPerGeneration; i++) {
                 var copy = initialDna.Copy();
-                for (int j = 0; j < initialDna.Data.Count; j++) {
-                    copy.Data[j] = (float) Generator.Random.NextDouble();
-                }
+                copy.Randomize();
 
                 var member = new GenerationMember();
                 member.dna = copy;
-                member.fitness = CalculateFitness(copy);
+                member.result = CalculateFitness(copy);
 
                 generation.Add(member);
             }
 
-            double T = 1;
+            const double initialT = 10;
+            double Tpercentage = 1;
+            double T = initialT;
+
+            List<double> plotT = new List<double>();
+            List<double> plotFit = new List<double>();
+            List<double> plotProb = new List<double>();
+
+            int extraIterations = 10000;
+            int maxTotalHp = 0;
 
             for (int i = 0; i < numGenerations; i++) {
-                T -= 1.0 / numGenerations;
+                Tpercentage = Math.Max(0, Tpercentage - 1.0 / numGenerations);
+
+                T = initialT * Tpercentage;
+
+                if (Tpercentage < 0.01) {
+                    i -= extraIterations;
+                    extraIterations = 0;
+                    T = 0.01;
+                }
 
                 var genWatch = new Stopwatch();
                 genWatch.Start();
@@ -73,40 +90,60 @@ namespace HexMage.Benchmarks {
 
                     var member = generation[j];
 
-                    var newDna = Mutate(member.dna);
+                    var newDna = Mutate(member.dna, (float) T);
                     var newFitness = CalculateFitness(newDna);
 
-                    if (newFitness.HpFitness <= 0.015) {
-                        Console.WriteLine($"Found extra good {newFitness.HpFitness}");
+                    double probability;
+
+                    if (newFitness.Fitness <= 0.005) {
+                        //Console.WriteLine($"Found extra good {newFitness.HpFitness}");
                     }
 
                     // We don't want to move into a timeouted state to save time
                     // TODO - check if disabling this helps
                     if (newFitness.Timeouted) continue;
 
-                    float e = member.fitness.HpFitness;
-                    float ep = newFitness.HpFitness;
+                    float ep = member.result.Fitness;
+                    float e = newFitness.Fitness;
 
-                    if (e <= ep) {
-                        if (Probability.Uniform(1 - T)) {
-                            member.fitness = newFitness;
-                            member.dna = newDna;
-                        }
-                    } else {
-                        float probability = (float) Math.Exp(-(ep - e)/T);
+                    probability = Math.Exp(-(ep - e) / T);
 
-                        if (probability > Generator.Random.NextDouble()) {
-                            member.fitness = newFitness;
-                            member.dna = newDna;
-                            //Console.WriteLine($"Zih {probability}");
-                        } else {
-                            //Console.WriteLine($"Nezih {probability}");
-                        }
+                    //if (e - ep > 0) {
+                    //    probability = 0.05;
+                    //}
+
+                    if (Probability.Uniform(Tpercentage)) {
+                        member.result = newFitness;
+                        member.dna = newDna;
                     }
+
+                    plotT.Add(T);
+                    plotFit.Add(member.result.Fitness);
+                    plotProb.Add(probability);
+
+                    if (i % 1000 == 0) {
+                        Console.WriteLine($"P: {probability.ToString("0.000")}\tT:{T.ToString("0.0000")}\t{member}");
+                    }
+
+                    //if (e <= ep) {
+                    //    if (Probability.Uniform(1 - T)) {
+                    //        member.fitness = newFitness;
+                    //        member.dna = newDna;
+                    //    }
+                    //} else {
+                    //    float probability = (float) Math.Exp(-(ep - e)/T);
+
+                    //    if (probability > Generator.Random.NextDouble()) {
+                    //        member.fitness = newFitness;
+                    //        member.dna = newDna;
+                    //        //Console.WriteLine($"Zih {probability}");
+                    //    } else {
+                    //        //Console.WriteLine($"Nezih {probability}");
+                    //    }
+                    //}
 
                     //var fitness = CalculateFitness(dna);
 
-                    Console.WriteLine(member);
 
                     //writer.WriteLine(
                     //    $"Total:\t\t{teamWatch.ElapsedMilliseconds}ms\nPer turn:\t{mpt}ms\nPer iteration:\t{mpi}ms");
@@ -126,6 +163,16 @@ namespace HexMage.Benchmarks {
                 //Console.WriteLine($"Generation {i}. done in {genWatch.ElapsedMilliseconds}ms");
                 //Console.WriteLine("****************************************************");
             }
+
+            var gnuplotConfigString = $"title '{numGenerations} generations," +
+                                      $"T_s = {initialT}'";
+
+            GnuPlot.HoldOn();
+            GnuPlot.Set($"xrange [{initialT}:0] reverse");
+            GnuPlot.Set($"yrange [0:1] ");
+            GnuPlot.Plot(plotT.ToArray(), plotFit.ToArray(), gnuplotConfigString);
+            //GnuPlot.Plot(plotT.ToArray(), plotProb.ToArray(), gnuplotConfigString);
+            Console.ReadKey();
         }
 
         public EvaluationResult CalculateFitness(DNA dna) {
@@ -136,18 +183,19 @@ namespace HexMage.Benchmarks {
             return result;
         }
 
-        public static DNA Mutate(DNA dna) {
+        public static DNA Mutate(DNA dna, float T) {
             var copy = dna.Copy();
 
             do {
                 var i = Generator.Random.Next(0, dna.Data.Count);
 
                 //for (int i = 0; i < dna.Data.Count; i++) {
-                float delta = (float) Generator.Random.NextDouble() / dna.Data.Count;
+                double delta = Generator.Random.NextDouble() / dna.Data.Count;
 
-                float change = Generator.Random.Next(0, 2) == 0 ? 1 + delta : 1 - delta;
+                bool changeUp = Probability.Uniform(0.5);
+                double change = changeUp ? 1 + delta : 1 - delta;
 
-                copy.Data[i] = Mathf.Clamp(0.01f, dna.Data[i] * change, 1);
+                copy.Data[i] = (float) Mathf.Clamp(0.01f, dna.Data[i] * change, 1);
 
                 // TODO - zkusit ruzny pravdepodobnosti - ovlivnovat to teplotou?
             } while (Probability.Uniform(0.25f));
