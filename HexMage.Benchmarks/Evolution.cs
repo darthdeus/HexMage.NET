@@ -1,30 +1,15 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Security.AccessControl;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using HexMage.Simulator;
 using HexMage.Simulator.AI;
-using HexMage.Simulator.Model;
 using HexMage.Simulator.PCG;
 
 namespace HexMage.Benchmarks {
     public class Evolution {
-        public class GenerationMember {
-            public DNA dna;
-            public EvaluationResult result;
-
-            public override string ToString() {
-                return result.ToFitnessString(dna);
-            }
-        }
-
-        private GameInstance game;
-        private DNA initialDna;
+        private readonly GameInstance game;
+        private readonly DNA initialDna;
 
         public Evolution() {
             if (!Directory.Exists(Constants.SaveDir)) {
@@ -57,9 +42,10 @@ namespace HexMage.Benchmarks {
                 var copy = initialDna.Copy();
                 copy.Randomize();
 
-                var member = new GenerationMember();
-                member.dna = copy;
-                member.result = CalculateFitness(copy);
+                var member = new GenerationMember {
+                    dna = copy,
+                    result = CalculateFitness(copy)
+                };
 
                 generation.Add(member);
             }
@@ -101,8 +87,6 @@ namespace HexMage.Benchmarks {
                     var newDna = Mutate(member.dna, (float) T);
                     var newFitness = CalculateFitness(newDna);
 
-                    double probability;
-
                     const bool saveGoodOnes = true;
 
                     if (saveGoodOnes && !goodEnough && newFitness.Fitness > 0.995) {
@@ -110,22 +94,11 @@ namespace HexMage.Benchmarks {
                         if (goodCount > 50) goodEnough = true;
                         Console.WriteLine($"Found extra good {newFitness.Fitness}");
 
-                        using (var writer = new StreamWriter(Constants.BuildEvoSavePath(goodCount))) {
-                            writer.WriteLine(initialDna.ToSerializableString());
-                            writer.WriteLine(member.dna.ToSerializableString());
-                        }
+                        SaveDna(goodCount, member.dna);
                     }
 
                     if (newFitness.Tainted) {
-                        using (var logWriter = new StreamWriter(Constants.SaveDir + "tainted-log.txt")) {
-                            logWriter.Write(Constants.GetLogBuffer().ToString());
-                        }
-
-                        using (var writer = new StreamWriter(Constants.BuildEvoSavePath(666))) {
-                            writer.WriteLine(initialDna.ToSerializableString());
-                            writer.WriteLine(member.dna.ToSerializableString());
-                        }
-
+                        SaveTainted(newDna);
                         i = numGenerations;
                     }
 
@@ -136,7 +109,7 @@ namespace HexMage.Benchmarks {
                     float ep = member.result.Fitness;
                     float e = newFitness.Fitness;
 
-                    probability = Math.Exp(-(ep - e) / T);
+                    double probability = Math.Exp(-(ep - e) / T);
 
                     const bool alwaysJumpToBetter = false;
 
@@ -152,39 +125,6 @@ namespace HexMage.Benchmarks {
                     if (i % 1000 == 0) {
                         Console.WriteLine($"P: {probability.ToString("0.000")}\tT:{T.ToString("0.0000")}\t{member}");
                     }
-
-                    //if (e <= ep) {
-                    //    if (Probability.Uniform(1 - T)) {
-                    //        member.fitness = newFitness;
-                    //        member.dna = newDna;
-                    //    }
-                    //} else {
-                    //    float probability = (float) Math.Exp(-(ep - e)/T);
-
-                    //    if (probability > Generator.Random.NextDouble()) {
-                    //        member.fitness = newFitness;
-                    //        member.dna = newDna;
-                    //        //Console.WriteLine($"Zih {probability}");
-                    //    } else {
-                    //        //Console.WriteLine($"Nezih {probability}");
-                    //    }
-                    //}
-
-                    //var fitness = CalculateFitness(dna);
-
-
-                    //writer.WriteLine(
-                    //    $"Total:\t\t{teamWatch.ElapsedMilliseconds}ms\nPer turn:\t{mpt}ms\nPer iteration:\t{mpi}ms");
-                    //writer.WriteLine();
-                    //writer.WriteLine();
-
-                    //Console.WriteLine("Win stats:");
-                    //foreach (var pair in GameInstanceEvaluator.GlobalControllerStatistics) {
-                    //    Console.WriteLine($"{pair.Key}: {pair.Value}");
-                    //}
-                    //Console.WriteLine(
-                    //    $"Expand: {UctAlgorithm.ExpandCount}, BestChild: {UctAlgorithm.BestChildCount}, Ratio: {(float) UctAlgorithm.ExpandCount / (float) UctAlgorithm.BestChildCount}");
-                    //Console.WriteLine("\n\n");
                 }
 
                 //Console.WriteLine("****************************************************");
@@ -263,6 +203,21 @@ namespace HexMage.Benchmarks {
             GameInstanceEvaluator.ResetPositions(game);
         }
 
+        private void SaveTainted(DNA dna) {
+            using (var logWriter = new StreamWriter(Constants.SaveDir + "tainted-log.txt")) {
+                logWriter.Write(Constants.GetLogBuffer().ToString());
+            }
+
+            SaveDna(666, dna);
+        }
+
+        private void SaveDna(int savefileIndex, DNA dna) {
+            using (var writer = new StreamWriter(Constants.BuildEvoSavePath(savefileIndex))) {
+                writer.WriteLine(initialDna.ToSerializableString());
+                writer.WriteLine(dna.ToSerializableString());
+            }
+        }
+
 
         // TODO - remove this
         public static void Mutate(Team team, double scale) {
@@ -323,6 +278,21 @@ namespace HexMage.Benchmarks {
             }
 
             return team;
+        }
+
+        private static void LogStats() {
+            //writer.WriteLine(
+            //    $"Total:\t\t{teamWatch.ElapsedMilliseconds}ms\nPer turn:\t{mpt}ms\nPer iteration:\t{mpi}ms");
+            //writer.WriteLine();
+            //writer.WriteLine();
+
+            //Console.WriteLine("Win stats:");
+            //foreach (var pair in GameInstanceEvaluator.GlobalControllerStatistics) {
+            //    Console.WriteLine($"{pair.Key}: {pair.Value}");
+            //}
+            //Console.WriteLine(
+            //    $"Expand: {UctAlgorithm.ExpandCount}, BestChild: {UctAlgorithm.BestChildCount}, Ratio: {(float) UctAlgorithm.ExpandCount / (float) UctAlgorithm.BestChildCount}");
+            //Console.WriteLine("\n\n");
         }
     }
 }
