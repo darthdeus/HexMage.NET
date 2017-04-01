@@ -88,42 +88,8 @@ namespace HexMage.Simulator.AI {
                     gameHpPercentageTotal += gamePercentage;
 
                     Debug.Assert(gameHpPercentageTotal / gameCount <= 1);
-
-                    // TODO !!!!!!!!!!!!!!!! muze nastat remiza
-                    if (game.IsFinished && game.VictoryTeam.HasValue) {
-                        Debug.Assert(game.VictoryTeam.HasValue);
-                        Debug.Assert(game.VictoryController != null);
-
-                        //_writer.Write($"{game.VictoryController}:{game.LoserController}: {maxIterations - iterations}({game.VictoryTeam.ToString()[0]}), ");
-                        if (game.VictoryTeam == TeamColor.Red) {
-                            result.RedWins++;
-                        } else {
-                            result.BlueWins++;
-                        }
-
-                        var victoryControllerName = game.VictoryController.ToString();
-                        var victoryControllerType = game.VictoryController.GetType();
-
-                        if (victoryControllerType == typeof(MctsController)) {
-                            Interlocked.Increment(ref MctsWins);
-                        } else if (victoryControllerType == typeof(AiRandomController)) {
-                            Interlocked.Increment(ref RandomAiWins);
-                        } else if (victoryControllerType == typeof(AiRuleBasedController)) {
-                            Interlocked.Increment(ref RuleBasedAiWins);
-                        }
-
-                        if (CountGlobalStats) {
-                            if (GlobalControllerStatistics.ContainsKey(victoryControllerName)) {
-                                GlobalControllerStatistics[victoryControllerName]++;
-                            } else {
-                                GlobalControllerStatistics[victoryControllerName] = 1;
-                            }
-                        }
-                    } else {
-                        result.Timeouts++;
-                        result.Timeouted = true;
-                        //_writer.Write("Timeout\t");
-                    }
+                    
+                    EvaluationResult(game, ref result);
 
                     result.TotalGames++;
                 }
@@ -140,6 +106,44 @@ namespace HexMage.Simulator.AI {
             //_writer.WriteLine();
 
             return result;
+        }
+
+        private static void EvaluationResult(GameInstance game, ref EvaluationResult result) {
+            // TODO !!!!!!!!!!!!!!!! muze nastat remiza
+            if (game.IsFinished && game.VictoryTeam.HasValue) {
+                Debug.Assert(game.VictoryTeam.HasValue);
+                Debug.Assert(game.VictoryController != null);
+
+                //_writer.Write($"{game.VictoryController}:{game.LoserController}: {maxIterations - iterations}({game.VictoryTeam.ToString()[0]}), ");
+                if (game.VictoryTeam == TeamColor.Red) {
+                    result.RedWins++;
+                } else {
+                    result.BlueWins++;
+                }
+
+                var victoryControllerName = game.VictoryController.ToString();
+                var victoryControllerType = game.VictoryController.GetType();
+
+                if (victoryControllerType == typeof(MctsController)) {
+                    Interlocked.Increment(ref MctsWins);
+                } else if (victoryControllerType == typeof(AiRandomController)) {
+                    Interlocked.Increment(ref RandomAiWins);
+                } else if (victoryControllerType == typeof(AiRuleBasedController)) {
+                    Interlocked.Increment(ref RuleBasedAiWins);
+                }
+
+                if (CountGlobalStats) {
+                    if (GlobalControllerStatistics.ContainsKey(victoryControllerName)) {
+                        GlobalControllerStatistics[victoryControllerName]++;
+                    } else {
+                        GlobalControllerStatistics[victoryControllerName] = 1;
+                    }
+                }
+            } else {
+                result.Timeouts++;
+                result.Timeouted = true;
+                //_writer.Write("Timeout\t");
+            }
         }
 
         public static void UnpackTeamsIntoGame(GameInstance game, DNA team1, DNA team2) {
@@ -159,7 +163,7 @@ namespace HexMage.Simulator.AI {
             }            
         }
 
-        public static void PreparePositions(GameInstance game) {
+        public static void ResetPositions(GameInstance game) {
             int x = 0;
             int y = game.Size - 1;
             var mobIds = game.MobManager.Mobs;

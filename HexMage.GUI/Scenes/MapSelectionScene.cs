@@ -6,6 +6,7 @@ using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
+using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.PCG;
 using Microsoft.Xna.Framework;
@@ -102,6 +103,10 @@ namespace HexMage.GUI.Scenes {
                     LoadWorldFromSave();
                 }
 
+                if (InputManager.Instance.IsKeyJustReleased(Keys.F12)) {
+                    LoadEvolutionSave();
+                }
+
                 if (InputManager.Instance.IsKeyJustPressed(Keys.Space)) {
                     DoContinue();
                 }
@@ -163,11 +168,30 @@ namespace HexMage.GUI.Scenes {
 
                 game.PrepareEverything();
 
-#warning TODO - run montecarlo to see that it works
-                //new FlatMonteCarlo().Run(game);
-
                 LoadNewScene(arenaScene);
             }
+        }
+
+        public void LoadEvolutionSave() {
+            var lines = File.ReadAllLines(Constants.BuildEvoSavePath(1));
+
+            var d1 = DNA.FromSerializableString(lines[0]);
+            var d2 = DNA.FromSerializableString(lines[1]);
+
+            // TODO - extract evolution constants
+            var game = new GameInstance(Constants.EvolutionMapSize);
+
+            GameInstanceEvaluator.UnpackTeamsIntoGame(game, d1, d2);
+            game.PrepareEverything();
+
+            GameInstanceEvaluator.ResetPositions(game);
+
+            game.MobManager.Teams[TeamColor.Red] = new AiRuleBasedController(game);
+            game.MobManager.Teams[TeamColor.Blue] = new AiRuleBasedController(game);
+
+            var arenaScene = new ArenaScene(_gameManager, game);
+
+            LoadNewScene(arenaScene);
         }
     }
 }

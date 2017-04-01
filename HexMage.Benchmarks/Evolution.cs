@@ -14,9 +14,6 @@ using HexMage.Simulator.PCG;
 
 namespace HexMage.Benchmarks {
     public class Evolution {
-        public static readonly string SaveFile = @"evo-save.txt";
-        public static readonly string SaveDir = "save-files/";
-
         public class GenerationMember {
             public DNA dna;
             public EvaluationResult result;
@@ -28,11 +25,10 @@ namespace HexMage.Benchmarks {
 
         private GameInstance game;
         private DNA initialDna;
-        const int evolutionMapSize = 5;
 
         public Evolution() {
-            if (!Directory.Exists(SaveDir)) {
-                Directory.CreateDirectory(SaveDir);
+            if (!Directory.Exists(Constants.SaveDir)) {
+                Directory.CreateDirectory(Constants.SaveDir);
             }
 
             string content = File.ReadAllText("team-1.json");
@@ -40,16 +36,16 @@ namespace HexMage.Benchmarks {
             team.mobs.RemoveAt(0);
 
             initialDna = GenomeLoader.FromTeam(team);
-            initialDna.Randomize();
+            //initialDna.Randomize();
 
             Console.WriteLine($"Initial: {initialDna.ToDNAString()}\n\n");
 
-            game = new GameInstance(evolutionMapSize);
+            game = new GameInstance(Constants.EvolutionMapSize);
 
             GameInstanceEvaluator.UnpackTeamsIntoGame(game, initialDna, initialDna);
-            GameInstanceEvaluator.PreparePositions(game);
-
             game.PrepareEverything();
+
+            GameInstanceEvaluator.ResetPositions(game);
         }
 
         public void Run() {
@@ -93,6 +89,7 @@ namespace HexMage.Benchmarks {
             int maxTotalHp = 0;
 
             int goodCount = 0;
+            bool goodEnough = false;
 
             for (int i = 0; i < numGenerations; i++) {
                 Tpercentage = Math.Max(0, Tpercentage - 1.0 / numGenerations);
@@ -115,18 +112,19 @@ namespace HexMage.Benchmarks {
                     var member = generation[j];
 
                     var newDna = Mutate(member.dna, (float) T);
-                    GameInstanceEvaluator.PreparePositions(game);
+                    GameInstanceEvaluator.ResetPositions(game);
                     var newFitness = CalculateFitness(newDna);
 
                     double probability;
 
                     const bool saveGoodOnes = true;
 
-                    if (saveGoodOnes && newFitness.Fitness > 0.995) {
+                    if (saveGoodOnes && !goodEnough && newFitness.Fitness > 0.995) {
                         goodCount++;
+                        if (goodCount > 50) goodEnough = true;
                         Console.WriteLine($"Found extra good {newFitness.Fitness}");
 
-                        using (var writer = new StreamWriter(SaveDir + goodCount.ToString() + SaveFile)) {
+                        using (var writer = new StreamWriter(Constants.BuildEvoSavePath(goodCount))) {
                             writer.WriteLine(initialDna.ToSerializableString());
                             writer.WriteLine(member.dna.ToSerializableString());
                         }
@@ -143,7 +141,7 @@ namespace HexMage.Benchmarks {
 
                     const bool alwaysJumpToBetter = false;
 
-                    if (((e - ep) > 0 && alwaysJumpToBetter) || Probability.Uniform(probability)) {
+                    if (((ep - e) > 0 && alwaysJumpToBetter) || Probability.Uniform(probability)) {
                         member.result = newFitness;
                         member.dna = newDna;
                     }
