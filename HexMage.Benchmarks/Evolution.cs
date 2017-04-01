@@ -51,19 +51,6 @@ namespace HexMage.Benchmarks {
         public void Run() {
             var generation = new List<GenerationMember>();
 
-            //double[] xx = new double[5000];
-            //double[] yy = new double[5000];
-
-            //for (int i = 0; i < 5000; i++) {
-            //    double val = i * 30.0 / 5000.0;
-            //    xx[i] = val;
-            //    yy[i] = Probability.Norm(val);
-            //}
-
-            //GnuPlot.Plot(xx, yy);
-
-            //Console.ReadKey();
-
             const int numGenerations = 100000;
             const int teamsPerGeneration = 1;
             for (int i = 0; i < teamsPerGeneration; i++) {
@@ -77,7 +64,7 @@ namespace HexMage.Benchmarks {
                 generation.Add(member);
             }
 
-            const double initialT = 1;
+            const double initialT = 100;
             double Tpercentage = 1;
             double T = initialT;
 
@@ -112,7 +99,6 @@ namespace HexMage.Benchmarks {
                     var member = generation[j];
 
                     var newDna = Mutate(member.dna, (float) T);
-                    GameInstanceEvaluator.ResetPositions(game);
                     var newFitness = CalculateFitness(newDna);
 
                     double probability;
@@ -131,6 +117,10 @@ namespace HexMage.Benchmarks {
                     }
 
                     if (newFitness.Tainted) {
+                        using (var logWriter = new StreamWriter(Constants.SaveDir + "tainted-log.txt")) {
+                            logWriter.Write(Constants.GetLogBuffer().ToString());
+                        }
+
                         using (var writer = new StreamWriter(Constants.BuildEvoSavePath(666))) {
                             writer.WriteLine(initialDna.ToSerializableString());
                             writer.WriteLine(member.dna.ToSerializableString());
@@ -214,6 +204,7 @@ namespace HexMage.Benchmarks {
         }
 
         public EvaluationResult CalculateFitness(DNA dna) {
+            Constants.ResetLogBuffer();
             PrepareGame(dna);
 
             var result = new GameInstanceEvaluator(game, Console.Out).Evaluate();
@@ -267,6 +258,9 @@ namespace HexMage.Benchmarks {
 
                 game.MobManager.MobInfos[mobId] = mobInfo;
             }
+
+            game.State.Reset(game.MobManager);
+            GameInstanceEvaluator.ResetPositions(game);
         }
 
 

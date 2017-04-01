@@ -131,6 +131,8 @@ namespace HexMage.Simulator {
             Actions++;
             ActionCounts[action.Type]++;
 
+            Constants.WriteLogLine(action);
+
             switch (action.Type) {
                 case UctActionType.Null:
                     // do nothing

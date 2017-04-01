@@ -245,7 +245,7 @@ namespace HexMage.Simulator {
 
         public void FastUse(int abilityId, int mobId, int targetId) {
             var target = State.MobInstances[targetId];
-            var targetInfo = MobManager.MobInfos[targetId];
+
             Debug.Assert(State.Cooldowns[abilityId] == 0, "Trying to use an ability with non-zero cooldown.");
             Debug.Assert(target.Hp > 0, "Target is dead.");
 
@@ -265,6 +265,8 @@ namespace HexMage.Simulator {
 
             var targetInstance = State.MobInstances[targetId];
             var targetInfo = MobManager.MobInfos[targetId];
+
+            Constants.WriteLogLine($"Did {ability.Dmg} damage, HP: {targetInstance.Hp}/{targetInfo.MaxHp}");
 
             // TODO - combine with existing buffs
             if (ability.Buff.IsZero) {
@@ -407,7 +409,7 @@ namespace HexMage.Simulator {
         }
 
         public void FastMove(int mobId, AxialCoord coord) {
-            State.FastMoveMob(Map, Pathfinder, mobId, coord);
+            State.FastMoveMob(mobId, coord);
         }
 
         public CachedMob CachedMob(int mobId) {

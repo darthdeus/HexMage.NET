@@ -1,5 +1,29 @@
-﻿namespace HexMage.Simulator {
+﻿using System.IO;
+
+namespace HexMage.Simulator {
     public static class Constants {
+        public const bool Logging = false;
+
+        // TODO - fuj, to sem nepatri
+        private static StringWriter LogBuffer = new StringWriter();
+
+        public static StringWriter GetLogBuffer() {
+            return LogBuffer;
+        }
+
+        public static void ResetLogBuffer() {
+            if (Logging) {
+                LogBuffer = new StringWriter();
+            }
+        }
+
+
+        public static void WriteLogLine(object str) {
+            if (Logging) {
+                LogBuffer.WriteLine(str);
+            }
+        }
+
         public const int HpMax = 100;
         public const int ApMax = 25;
         public const int DmgMax = 30;

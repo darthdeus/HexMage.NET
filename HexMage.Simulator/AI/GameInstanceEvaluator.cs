@@ -65,6 +65,8 @@ namespace HexMage.Simulator.AI {
                         game.TurnManager.NextMobOrNewTurn(game.Pathfinder, game.State);
 
                         result.TotalTurns++;
+
+                        Constants.WriteLogLine(UctAction.EndTurnAction());
                     }
 
                     result.TotalIterations += maxIterations - iterations;
