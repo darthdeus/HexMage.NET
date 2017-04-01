@@ -3,11 +3,11 @@
 namespace HexMage.Simulator {
     public static class Constants {
         // Benchmark controls
-        public const bool mctsBenchmark = true;
-        public const bool evaluateAis = false;
+        public const bool MctsBenchmark = true;
+        public const bool EvaluateAis = false;
 
         // Game Evaluation
-        public const int maxPlayoutEvaluationIterations = 100;
+        public const int MaxPlayoutEvaluationIterations = 100;
 
         // MCTS
         /// <summary>
@@ -27,9 +27,9 @@ namespace HexMage.Simulator {
         public const double Sigma = 3;
 
         // Rule based AI
-        public const bool fastActionGeneration = false;
+        public const bool FastActionGeneration = false;
         // TODO - porovnat, co kdyz dovolim utocit na dead cile
-        public const bool allowCorpseTargetting = false;
+        public const bool AllowCorpseTargetting = false;
 
         /// <summary>
         /// Disabling this will only generate the respective MOVE action,
@@ -37,14 +37,14 @@ namespace HexMage.Simulator {
         /// 
         /// TODO - profile/benchmark both cases and create pretty graphs :)
         /// </summary>
-        public const bool attackMoveEnabled = true;
+        public const bool AttackMoveEnabled = true;
 
         /// <summary>
         /// Triggers attack move generation even when a direct attack was found.
         /// 
         /// // TODO - again experiment with triggering this
         /// </summary>
-        public const bool alwaysAttackMove = false;
+        public const bool AlwaysAttackMove = false;
 
         /// <summary>
         /// If `true` END-TURN actions will be generated even if there are enough
@@ -52,14 +52,14 @@ namespace HexMage.Simulator {
         /// 
         /// // TODO - again experiment with triggering this
         /// </summary>
-        public const bool endTurnAsLastResort = true;
+        public const bool EndTurnAsLastResort = true;
 
         // Evolution
-        public const bool alwaysJumpToBetter = false;
-        public const bool saveGoodOnes = true;
-        public const double initialT = 100;
-        public const int numGenerations = 100000;
-        public const int teamsPerGeneration = 1;
+        public const bool AlwaysJumpToBetter = false;
+        public const bool SaveGoodOnes = true;
+        public const double InitialT = 100;
+        public const int NumGenerations = 100000;
+        public const int TeamsPerGeneration = 1;
         public const bool Logging = false;
 
         // TODO - fuj, to sem nepatri
