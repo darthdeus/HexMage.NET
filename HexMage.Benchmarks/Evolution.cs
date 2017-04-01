@@ -34,6 +34,7 @@ namespace HexMage.Benchmarks {
 
             initialDna = GenomeLoader.FromTeam(team);
             initialDna.Randomize();
+
             Console.WriteLine($"Initial: {initialDna.ToDNAString()}\n\n");
 
             game = new GameInstance(evolutionMapSize);
@@ -41,10 +42,25 @@ namespace HexMage.Benchmarks {
             new Setup(team.mobs, team.mobs).UnpackIntoGame(game);
 
             GameInstanceEvaluator.PreparePositions(game, game.MobManager.Mobs, 0, evolutionMapSize);
+
+            game.PrepareEverything();
         }
 
         public void Run() {
             var generation = new List<GenerationMember>();
+
+            //double[] xx = new double[5000];
+            //double[] yy = new double[5000];
+
+            //for (int i = 0; i < 5000; i++) {
+            //    double val = i * 30.0 / 5000.0;
+            //    xx[i] = val;
+            //    yy[i] = Probability.Norm(val);
+            //}
+
+            //GnuPlot.Plot(xx, yy);
+
+            //Console.ReadKey();
 
             const int numGenerations = 100000;
             const int teamsPerGeneration = 1;
@@ -59,7 +75,7 @@ namespace HexMage.Benchmarks {
                 generation.Add(member);
             }
 
-            const double initialT = 10;
+            const double initialT = 1;
             double Tpercentage = 1;
             double T = initialT;
 
@@ -91,28 +107,27 @@ namespace HexMage.Benchmarks {
                     var member = generation[j];
 
                     var newDna = Mutate(member.dna, (float) T);
+                    GameInstanceEvaluator.PreparePositions(game, game.MobManager.Mobs, 0, evolutionMapSize);
                     var newFitness = CalculateFitness(newDna);
 
                     double probability;
 
-                    if (newFitness.Fitness <= 0.005) {
-                        //Console.WriteLine($"Found extra good {newFitness.HpFitness}");
+                    if (newFitness.Fitness > 0.995) {
+                        //Console.WriteLine($"Found extra good {newFitness.Fitness}");
                     }
 
                     // We don't want to move into a timeouted state to save time
                     // TODO - check if disabling this helps
-                    if (newFitness.Timeouted) continue;
+                    //if (newFitness.Timeouted) continue;
 
                     float ep = member.result.Fitness;
                     float e = newFitness.Fitness;
 
                     probability = Math.Exp(-(ep - e) / T);
 
-                    //if (e - ep > 0) {
-                    //    probability = 0.05;
-                    //}
+                    const bool alwaysJumpToBetter = false;
 
-                    if (Probability.Uniform(Tpercentage)) {
+                    if (((e - ep) > 0 && alwaysJumpToBetter) || Probability.Uniform(probability)) {
                         member.result = newFitness;
                         member.dna = newDna;
                     }
@@ -198,7 +213,7 @@ namespace HexMage.Benchmarks {
                 copy.Data[i] = (float) Mathf.Clamp(0.01f, dna.Data[i] * change, 1);
 
                 // TODO - zkusit ruzny pravdepodobnosti - ovlivnovat to teplotou?
-            } while (Probability.Uniform(0.25f));
+            } while (Probability.Uniform(0.85f));
 
             return copy;
         }

@@ -149,7 +149,6 @@ namespace HexMage.Simulator.AI {
             game.State.SetMobPosition(mobIds[2], new AxialCoord(-x, -y));
             game.State.SetMobPosition(mobIds[3], new AxialCoord(-y, -x));
 
-            game.PrepareEverything();
         }
 
         //public static EvaluationResult EvaluateSetup(Setup setup, TextWriter writer) {
