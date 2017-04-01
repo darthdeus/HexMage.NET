@@ -46,9 +46,8 @@ namespace HexMage.Benchmarks {
 
             game = new GameInstance(evolutionMapSize);
 
-            new Setup(team.mobs, team.mobs).UnpackIntoGame(game);
-
-            GameInstanceEvaluator.PreparePositions(game, game.MobManager.Mobs, 0, evolutionMapSize);
+            GameInstanceEvaluator.UnpackTeamsIntoGame(game, initialDna, initialDna);
+            GameInstanceEvaluator.PreparePositions(game);
 
             game.PrepareEverything();
         }

@@ -1,9 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using HexMage.Simulator;
 
-namespace HexMage.Benchmarks {
+namespace HexMage.Simulator {
     public static class GenomeLoader {
         public static Team FromDna(DNA dna) {
             var team = new Team();

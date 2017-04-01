@@ -66,5 +66,9 @@ namespace HexMage.Simulator {
         public override string ToString() {
             return ToDNAString();
         }
+
+        public Team ToTeam() {
+            return GenomeLoader.FromDna(this);
+        }
     }
 }

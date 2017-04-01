@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using HexMage.Simulator.Model;
 using Newtonsoft.Json;
 
@@ -45,27 +42,11 @@ namespace HexMage.Simulator {
         public List<JsonMob> red = new List<JsonMob>();
         public List<JsonMob> blue = new List<JsonMob>();
 
-        public Setup() {
-            
-        }
+        public Setup() {}
 
         public Setup(List<JsonMob> red, List<JsonMob> blue) {
             this.red = red;
             this.blue = blue;
-        }
-
-        public void UnpackIntoGame(GameInstance game) {
-            var mobIds = new List<int>();
-
-            foreach (var mob in red) {
-                var ids = mob.abilities.Select(ab => game.AddAbilityWithInfo(ab.ToAbility()));
-                mobIds.Add(game.AddMobWithInfo(mob.ToMobInfo(TeamColor.Red, ids)));
-            }
-
-            foreach (var mob in blue) {
-                var ids = mob.abilities.Select(ab => game.AddAbilityWithInfo(ab.ToAbility()));
-                mobIds.Add(game.AddMobWithInfo(mob.ToMobInfo(TeamColor.Blue, ids)));
-            }
         }
     }
 

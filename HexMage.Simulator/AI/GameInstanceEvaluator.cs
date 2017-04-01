@@ -142,7 +142,27 @@ namespace HexMage.Simulator.AI {
             return result;
         }
 
-        public static void PreparePositions(GameInstance game, List<int> mobIds, int x, int y) {
+        public static void UnpackTeamsIntoGame(GameInstance game, DNA team1, DNA team2) {
+            var red = team1.ToTeam();
+            var blue = team2.ToTeam();            
+
+            foreach (var mob in red.mobs)
+            {
+                var ids = mob.abilities.Select(ab => game.AddAbilityWithInfo(ab.ToAbility()));
+                game.AddMobWithInfo(mob.ToMobInfo(TeamColor.Red, ids));
+            }
+
+            foreach (var mob in blue.mobs)
+            {
+                var ids = mob.abilities.Select(ab => game.AddAbilityWithInfo(ab.ToAbility()));
+                game.AddMobWithInfo(mob.ToMobInfo(TeamColor.Blue, ids));
+            }            
+        }
+
+        public static void PreparePositions(GameInstance game) {
+            int x = 0;
+            int y = game.Size - 1;
+            var mobIds = game.MobManager.Mobs;
             game.State.SetMobPosition(mobIds[0], new AxialCoord(x, y));
             game.State.SetMobPosition(mobIds[1], new AxialCoord(y, x));
 
