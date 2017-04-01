@@ -11,8 +11,6 @@ using HexMage.Simulator.Model;
 namespace HexMage.Simulator {
     public class UctAlgorithm {
         // TODO - extrahovat do args nebo configuraku
-        public const bool UseHpPercentageScaling = true;
-
         public static int Actions = 0;
         public static int SearchCount = 0;
 
@@ -200,13 +198,13 @@ namespace HexMage.Simulator {
             // TODO - tohle duplikuje to dole
             if (victoryTeam.HasValue) {
                 if (startingTeam == victoryTeam.Value) {
-                    if (UseHpPercentageScaling) {
+                    if (Constants.UseHpPercentageScaling) {
                         return 1 * game.PercentageHp(startingTeam);
                     } else {
                         return 1;
                     }
                 } else {
-                    if (UseHpPercentageScaling) {
+                    if (Constants.UseHpPercentageScaling) {
                         return -1 * (1 - game.PercentageHp(victoryTeam.Value));
                     } else {
                         return -1;

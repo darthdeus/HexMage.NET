@@ -2,6 +2,30 @@
 
 namespace HexMage.Simulator {
     public static class Constants {
+        // Benchmark controls
+        public const bool mctsBenchmark = true;
+        public const bool evaluateAis = false;
+
+        // Game Evaluation
+        public const int maxPlayoutEvaluationIterations = 100;
+
+        // MCTS
+        /// <summary>
+        /// When enabled, UCB reward will be scaled by the HP percentage left.
+        /// 
+        /// TODO - experiment
+        /// </summary>
+        public const bool UseHpPercentageScaling = true;
+
+        /// <summary>
+        /// Probability
+        /// 
+        /// These represent the normal distribution of ideal game length.
+        /// Tweak to generate games of different length.
+        /// </summary>
+        public const double Mu = 15;
+        public const double Sigma = 3;
+
         // Rule based AI
         public const bool fastActionGeneration = false;
         // TODO - porovnat, co kdyz dovolim utocit na dead cile
