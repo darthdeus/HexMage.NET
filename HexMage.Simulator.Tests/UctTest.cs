@@ -65,7 +65,7 @@ namespace HexMage.Simulator.Tests {
 
             Assert.IsFalse(game.IsFinished);
 
-            var uct = new UctAlgorithm(10);
+            var uct = new UctAlgorithm(100);
             var result = UctAlgorithm.DefaultPolicy(game, TeamColor.Red);
 
             Assert.AreEqual(-1, result);

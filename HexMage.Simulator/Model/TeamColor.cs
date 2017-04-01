@@ -1,6 +1,5 @@
 ﻿namespace HexMage.Simulator.Model {
-    public enum TeamColor
-    {
+    public enum TeamColor {
         Red,
         Blue,
     }

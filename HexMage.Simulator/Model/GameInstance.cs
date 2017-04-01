@@ -212,9 +212,7 @@ namespace HexMage.Simulator {
         public bool IsTargetable(CachedMob mob, CachedMob target, bool checkVisibility = true) {
             bool isVisible = !checkVisibility || Map.IsVisible(mob.MobInstance.Coord, target.MobInstance.Coord);
 
-            // TODO - zkontrolovat vsude, ze netargetuju dead opponenty :)
-            // TODO - dat to pod flag
-            bool isTargetAlive = target.MobInstance.Hp > 0;
+            bool isTargetAlive = Constants.AllowCorpseTargetting || target.MobInstance.Hp > 0;
             bool isEnemy = mob.MobInfo.Team != target.MobInfo.Team;
 
             return isVisible && isTargetAlive && isEnemy;
@@ -258,9 +256,8 @@ namespace HexMage.Simulator {
 
             Constants.WriteLogLine($"Did {ability.Dmg} damage, HP: {targetInstance.Hp}/{targetInfo.MaxHp}");
 
-            // TODO - combine with existing buffs
             if (ability.Buff.IsZero) {
-                targetInstance.Buff = ability.ElementalEffect;
+                targetInstance.Buff = Buff.Combine(targetInstance.Buff, ability.ElementalEffect);
             } else {
                 targetInstance.Buff = ability.Buff;
             }
@@ -279,7 +276,6 @@ namespace HexMage.Simulator {
                 Map.AreaBuffs.Add(copy);
             }
 
-            // TODO - handle negative AP
             State.ChangeMobAp(mobId, -ability.Cost);
         }
 

@@ -10,7 +10,7 @@ namespace HexMage.Simulator {
         private readonly GameInstance _gameInstance;
         private readonly int _thinkTime;
 
-        public MctsController(GameInstance gameInstance, int thinkTime = 10) {
+        public MctsController(GameInstance gameInstance, int thinkTime = 100) {
             _gameInstance = gameInstance;
             _thinkTime = thinkTime;
         }

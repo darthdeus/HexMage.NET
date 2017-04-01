@@ -23,7 +23,7 @@ namespace HexMage.Simulator {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            int totalIterations = _thinkTime * 100;
+            int totalIterations = _thinkTime;
             int iterations = totalIterations;
 
             while (iterations-- > 0) {
@@ -172,11 +172,11 @@ namespace HexMage.Simulator {
 
             while (!copy.IsFinished && iterations-- > 0) {
                 var action = ActionGenerator.RuleBasedAction(copy);
-             
+
                 if (action.Type == UctActionType.Null) {
                     throw new InvalidOperationException();
                 }
-                
+
                 FNoCopy(copy, action);
 
                 // TODO - odebrat az se opravi

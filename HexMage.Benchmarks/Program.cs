@@ -85,7 +85,7 @@ namespace HexMage.Benchmarks {
             List<double> xs = new List<double>();
             List<double> ys = new List<double>();
 
-            for (int i = 1; i < 5; i++) {
+            for (int i = 1; i < 1000; i += 20) {
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
 
