@@ -260,6 +260,7 @@ namespace HexMage.Simulator {
         private void TargetHit(int abilityId, int mobId, int targetId) {
             var ability = MobManager.AbilityForId(abilityId);
 
+            Debug.Assert(ability.Dmg > 0);
             State.ChangeMobHp(this, targetId, -ability.Dmg);
 
             var targetInstance = State.MobInstances[targetId];

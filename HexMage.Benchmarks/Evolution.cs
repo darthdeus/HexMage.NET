@@ -130,6 +130,15 @@ namespace HexMage.Benchmarks {
                         }
                     }
 
+                    if (newFitness.Tainted) {
+                        using (var writer = new StreamWriter(Constants.BuildEvoSavePath(666))) {
+                            writer.WriteLine(initialDna.ToSerializableString());
+                            writer.WriteLine(member.dna.ToSerializableString());
+                        }
+
+                        i = numGenerations;
+                    }
+
                     // We don't want to move into a timeouted state to save time
                     // TODO - check if disabling this helps
                     //if (newFitness.Timeouted) continue;

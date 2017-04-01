@@ -104,7 +104,11 @@ namespace HexMage.GUI.Scenes {
                 }
 
                 if (InputManager.Instance.IsKeyJustReleased(Keys.F12)) {
-                    LoadEvolutionSave();
+                    LoadEvolutionSave(1);
+                }
+
+                if (InputManager.Instance.IsKeyJustPressed(Keys.F6)) {
+                    LoadEvolutionSave(666);
                 }
 
                 if (InputManager.Instance.IsKeyJustPressed(Keys.Space)) {
@@ -172,8 +176,8 @@ namespace HexMage.GUI.Scenes {
             }
         }
 
-        public void LoadEvolutionSave() {
-            var lines = File.ReadAllLines(Constants.BuildEvoSavePath(1));
+        public void LoadEvolutionSave(int index) {
+            var lines = File.ReadAllLines(Constants.BuildEvoSavePath(index));
 
             var d1 = DNA.FromSerializableString(lines[0]);
             var d2 = DNA.FromSerializableString(lines[1]);

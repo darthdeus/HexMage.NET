@@ -66,7 +66,7 @@ namespace HexMage.GUI.Components {
         }
 
         public async Task SlowEventAbilityUsed(int mobId, int targetId, Ability ability) {
-            Utils.Log(LogSeverity.Info, nameof(GameBoardController), "EventAbilityUsed");
+            //Utils.Log(LogSeverity.Info, nameof(GameBoardController), "EventAbilityUsed");
 
             var mobInstance = _gameInstance.State.MobInstances[mobId];
             var targetInstance = _gameInstance.State.MobInstances[targetId];

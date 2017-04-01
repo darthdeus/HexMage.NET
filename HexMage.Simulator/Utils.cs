@@ -105,8 +105,7 @@ namespace HexMage.Simulator {
                 //SynchronizationContext.Current.Post(_ => { throw task.Exception; }, null);
                 throw task.Exception;
             } else {
-                Log(LogSeverity.Info, nameof(task),
-                    $"Task {task} complete: {task.IsCompleted}, faulted: {task.IsFaulted}");
+                //Log(LogSeverity.Info, nameof(task), $"Task {task} complete: {task.IsCompleted}, faulted: {task.IsFaulted}");
             }
         }
 
@@ -117,8 +116,7 @@ namespace HexMage.Simulator {
                 //SynchronizationContext.Current.Post(_ => { throw task.Exception; }, null);
                 throw task.Exception;
             } else {
-                Log(LogSeverity.Info, nameof(task),
-                    $"Task<T> {task} complete: {task.IsCompleted}, result: {task.Result}, faulted: {task.IsFaulted}");
+                //Log(LogSeverity.Info, nameof(task), $"Task<T> {task} complete: {task.IsCompleted}, result: {task.Result}, faulted: {task.IsFaulted}");
             }
         }
 

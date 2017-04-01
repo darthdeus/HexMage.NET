@@ -11,6 +11,8 @@
         public int TotalHp;
         public bool Timeouted;
 
+        public bool Tainted;
+
         public float Fitness => (float) ((1 - TotalHpPercentage));// * (Probability.Norm(TotalTurns)));
 
         public double MillisecondsPerIteration => (double) TotalElapsedMilliseconds / (double) TotalIterations;

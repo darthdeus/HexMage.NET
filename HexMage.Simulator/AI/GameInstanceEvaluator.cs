@@ -36,6 +36,7 @@ namespace HexMage.Simulator.AI {
 
             result.TotalHp = 0;
             result.Timeouted = false;
+            result.Tainted = false;
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -45,7 +46,7 @@ namespace HexMage.Simulator.AI {
 
             foreach (var factory1 in factories) {
                 foreach (var factory2 in factories) {
-                    gameCount++;
+                    result.TotalGames++;
 
                     var game = _gameInstance.CopyStateOnly();
                     var hub = new GameEventHub(game);
@@ -68,36 +69,54 @@ namespace HexMage.Simulator.AI {
 
                     result.TotalIterations += maxIterations - iterations;
 
-                    float totalPercentage = 0;
+                    //float totalPercentage = 0;
 
-                    foreach (var mobId in game.MobManager.Mobs) {
-                        float mobPercentage = (float) game.State.MobInstances[mobId].Hp /
-                                              (float) game.MobManager.MobInfos[mobId].MaxHp;
+                    //foreach (var mobId in game.MobManager.Mobs) {
+                    //    float mobPercentage = (float) game.State.MobInstances[mobId].Hp /
+                    //                          (float) game.MobManager.MobInfos[mobId].MaxHp;
 
-                        mobPercentage = Math.Min(Math.Max(0, mobPercentage), 1);
+                    //    mobPercentage = Math.Min(Math.Max(0, mobPercentage), 1);
 
-                        Debug.Assert(mobPercentage <= 1);
-                        totalPercentage += mobPercentage;
+                    //    Debug.Assert(mobPercentage <= 1);
+                    //    totalPercentage += mobPercentage;
 
-                        result.TotalHp += game.State.MobInstances[mobId].Hp;
-                    }
+                    //    result.TotalHp += game.State.MobInstances[mobId].Hp;
+                    //}
 
-                    float gamePercentage = totalPercentage / game.MobManager.Mobs.Count;
+                    //float gamePercentage = totalPercentage / game.MobManager.Mobs.Count;
+                    float gamePercentage =
+                        game.MobManager.Mobs.Average(mobId => {
+                            float currHp = Math.Max(0, game.State.MobInstances[mobId].Hp);
+                            float maxHp = game.MobManager.MobInfos[mobId].MaxHp;
+
+                            float avg = currHp / maxHp;
+
+                            Debug.Assert(avg >= 0);
+                            //Debug.Assert(avg <= 1);
+
+                            if (avg > 1) {
+                                result.Tainted = true;
+                                avg = 1;
+                            }
+
+                            // TODO - temporary hack
+
+
+                            return avg;
+                        });
                     Debug.Assert(gamePercentage >= 0);
 
                     gameHpPercentageTotal += gamePercentage;
 
-                    Debug.Assert(gameHpPercentageTotal / gameCount <= 1);
-                    
-                    EvaluationResult(game, ref result);
+                    Debug.Assert(gameHpPercentageTotal / result.TotalGames <= 1);
 
-                    result.TotalGames++;
+                    EvaluationResult(game, ref result);
                 }
             }
 
             stopwatch.Stop();
 
-            result.TotalHpPercentage = gameHpPercentageTotal / gameCount;
+            result.TotalHpPercentage = gameHpPercentageTotal / result.TotalGames;
             result.TotalElapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
             Debug.Assert(result.TotalHpPercentage >= 0);
@@ -148,19 +167,17 @@ namespace HexMage.Simulator.AI {
 
         public static void UnpackTeamsIntoGame(GameInstance game, DNA team1, DNA team2) {
             var red = team1.ToTeam();
-            var blue = team2.ToTeam();            
+            var blue = team2.ToTeam();
 
-            foreach (var mob in red.mobs)
-            {
+            foreach (var mob in red.mobs) {
                 var ids = mob.abilities.Select(ab => game.AddAbilityWithInfo(ab.ToAbility()));
                 game.AddMobWithInfo(mob.ToMobInfo(TeamColor.Red, ids));
             }
 
-            foreach (var mob in blue.mobs)
-            {
+            foreach (var mob in blue.mobs) {
                 var ids = mob.abilities.Select(ab => game.AddAbilityWithInfo(ab.ToAbility()));
                 game.AddMobWithInfo(mob.ToMobInfo(TeamColor.Blue, ids));
-            }            
+            }
         }
 
         public static void ResetPositions(GameInstance game) {
@@ -172,7 +189,6 @@ namespace HexMage.Simulator.AI {
 
             game.State.SetMobPosition(mobIds[2], new AxialCoord(-x, -y));
             game.State.SetMobPosition(mobIds[3], new AxialCoord(-y, -x));
-
         }
 
         //public static EvaluationResult EvaluateSetup(Setup setup, TextWriter writer) {
