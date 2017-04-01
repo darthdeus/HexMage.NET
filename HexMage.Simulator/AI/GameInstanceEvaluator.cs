@@ -129,6 +129,30 @@ namespace HexMage.Simulator.AI {
             return result;
         }
 
+        public static void Playout(GameInstance game, DNA d1, DNA d2, IMobController c1, IMobController c2) {
+            GameSetup.OverrideGameDNA(game, d1, d2);
+
+            game.MobManager.Teams[TeamColor.Red] = c1;
+            game.MobManager.Teams[TeamColor.Blue] = c2;
+
+            const int maxIterations = 100;
+            int iterations = maxIterations;
+
+            var hub = new GameEventHub(game);
+
+            while (!game.IsFinished && iterations-- > 0) {
+                game.TurnManager.CurrentController.FastPlayTurn(hub);
+                game.TurnManager.NextMobOrNewTurn(game.Pathfinder, game.State);
+
+                // TODO - extract these
+                Constants.WriteLogLine(UctAction.EndTurnAction());
+                Console.WriteLine(Constants.GetLogBuffer());
+                Constants.ResetLogBuffer();
+            }
+
+            Console.WriteLine(iterations);
+        }
+
         private static void EvaluationResult(GameInstance game, ref EvaluationResult result) {
             // TODO !!!!!!!!!!!!!!!! muze nastat remiza
             if (game.IsFinished && game.VictoryTeam.HasValue) {
@@ -167,31 +191,6 @@ namespace HexMage.Simulator.AI {
             }
         }
 
-        public static void UnpackTeamsIntoGame(GameInstance game, DNA team1, DNA team2) {
-            var red = team1.ToTeam();
-            var blue = team2.ToTeam();
-
-            foreach (var mob in red.mobs) {
-                var ids = mob.abilities.Select(ab => game.AddAbilityWithInfo(ab.ToAbility()));
-                game.AddMobWithInfo(mob.ToMobInfo(TeamColor.Red, ids));
-            }
-
-            foreach (var mob in blue.mobs) {
-                var ids = mob.abilities.Select(ab => game.AddAbilityWithInfo(ab.ToAbility()));
-                game.AddMobWithInfo(mob.ToMobInfo(TeamColor.Blue, ids));
-            }
-        }
-
-        public static void ResetPositions(GameInstance game) {
-            int x = 0;
-            int y = game.Size - 1;
-            var mobIds = game.MobManager.Mobs;
-            game.State.SetMobPosition(mobIds[0], new AxialCoord(x, y));
-            game.State.SetMobPosition(mobIds[1], new AxialCoord(y, x));
-
-            game.State.SetMobPosition(mobIds[2], new AxialCoord(-x, -y));
-            game.State.SetMobPosition(mobIds[3], new AxialCoord(-y, -x));
-        }
 
         //public static EvaluationResult EvaluateSetup(Setup setup, TextWriter writer) {
         //    const int mapSize = 4;

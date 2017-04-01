@@ -16,13 +16,22 @@ namespace HexMage.Simulator {
 
         public DNA() {}
 
+        public DNA(int mobCount, int abilityCount) {
+            MobCount = mobCount;
+            AbilityCount = abilityCount;
+            Data = new List<float>(mobCount * MobSize);
+            for (int i = 0; i < Data.Capacity; i++) {
+                Data.Add(0.5f);
+            }
+        }
+
         public DNA(int mobCount, int abilityCount, List<float> data) {
             AbilityCount = abilityCount;
             MobCount = mobCount;
             Data = data;
         }
 
-        public DNA Copy() {
+        public DNA Clone() {
             var dna = new DNA(MobCount, AbilityCount, new List<float>(Data.Count));
 
             for (int i = 0; i < Data.Count; i++) {

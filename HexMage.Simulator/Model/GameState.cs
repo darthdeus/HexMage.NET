@@ -185,6 +185,8 @@ namespace HexMage.Simulator {
                 MobInstances[mobId].Ap = mobInfo.MaxAp;
                 SetMobPosition(mobId, mobInfo.OrigCoord);
             }
+            
+            SlowUpdateIsFinished(mobManager);            
         }
     }
 }

@@ -10,6 +10,22 @@ namespace HexMage.Simulator.AI {
             _gameInstance = gameInstance;
         }
 
+        public static UctAction MaxAbilityRatio(GameInstance game, List<UctAction> actions) {
+            UctAction max = actions[0];
+            var maxAbilityInfo = game.MobManager.Abilities[max.AbilityId];
+
+            for (int i = 1; i < actions.Count; i++) {
+                var abilityInfo = game.MobManager.Abilities[actions[i].AbilityId];
+
+                if (abilityInfo.DmgCostRatio > maxAbilityInfo.DmgCostRatio) {
+                    max = actions[i];
+                    maxAbilityInfo = abilityInfo;
+                }
+            }
+
+            return max;
+        }
+
         public static UctAction GenerateAction(GameInstance game) {
             const bool fastActionGeneration = false;
 
@@ -24,25 +40,13 @@ namespace HexMage.Simulator.AI {
             ActionGenerator.GenerateDirectAbilityUse(game, mob, result);
 
             if (result.Count > 0) {
-                UctAction max = result[0];
-                var maxAbilityInfo = game.MobManager.Abilities[max.AbilityId];
-
-                for (int i = 1; i < result.Count; i++) {
-                    var abilityInfo = game.MobManager.Abilities[result[i].AbilityId];
-
-                    if (abilityInfo.DmgCostRatio > maxAbilityInfo.DmgCostRatio) {
-                        max = result[i];
-                        maxAbilityInfo = abilityInfo;
-                    }
-                }
-
-                return max;
+                return MaxAbilityRatio(game, result);
             }
 
             ActionGenerator.GenerateAttackMoveActions(game, mob, result);
 
             if (result.Count > 0) {
-                return result[0];
+                return MaxAbilityRatio(game, result);
             }
 
             ActionGenerator.GenerateDefensiveMoveActions(game, mob, result);

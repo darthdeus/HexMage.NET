@@ -51,6 +51,7 @@
     <Compile Include="AI\AiRuleBasedController.cs" />
     <Compile Include="AI\EvaluationResult.cs" />
     <Compile Include="AI\ExponentialMovingAverage.cs" />
+    <Compile Include="AI\GameSetup.cs" />
     <Compile Include="AI\IAiFactory.cs" />
     <Compile Include="AI\MctsController.cs" />
     <Compile Include="AI\GameInstanceEvaluator.cs" />
@@ -66,6 +67,8 @@
     <Compile Include="AI\FlatMonteCarlo.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DNA.cs" />
+    <Compile Include="Evolution.cs" />
+    <Compile Include="GenerationMember.cs" />
     <Compile Include="GenomeLoader.cs" />
     <Compile Include="GnuPlot.cs" />
     <Compile Include="JsonLoader.cs" />

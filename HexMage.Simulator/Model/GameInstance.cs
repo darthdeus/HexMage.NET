@@ -48,11 +48,20 @@ namespace HexMage.Simulator {
 
         public void PrepareEverything() {
             State.Reset(MobManager);
+            State.SlowUpdateIsFinished(MobManager);
             Map.PrecomputeCubeLinedraw();
             Pathfinder.PathfindDistanceAll();
             TurnManager.PresortTurnOrder();
             TurnManager.StartNextTurn(Pathfinder, State);
+        }
+
+        public void PrepareTurnOrder() {
+            // TODO - je tohle potreba?
+            State.Reset(MobManager);
             State.SlowUpdateIsFinished(MobManager);
+
+            TurnManager.PresortTurnOrder();
+            TurnManager.StartNextTurn(Pathfinder, State);
         }
 
         public TeamColor? CurrentTeam {

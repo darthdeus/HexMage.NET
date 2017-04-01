@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using HexMage.Simulator;
@@ -17,10 +18,13 @@ namespace HexMage.Benchmarks {
             Generator.Random = new Random(3);
             MctsController.EnableLogging = false;
 
+            const bool mctsBenchmark = false;
             const bool evaluateAis = false;
 
             if (evaluateAis) {
                 //new AiEvaluator().Run();
+            } else if (mctsBenchmark) {
+                MctsBenchmark();
             } else {
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
@@ -49,16 +53,31 @@ namespace HexMage.Benchmarks {
             }
         }
 
-        //private static void RunEvaluator() {
-        //    string content = File.ReadAllText(@"simple.json");
-        //    var setup = JsonLoader.Load(content);
+        public static void MctsBenchmark() {
+            var game = GameSetup.PrepareForSettings(3, 2);
+            
+            var d1 = new DNA(3, 2);
+            d1.Randomize();
 
-        //    var results = GameInstanceEvaluator.EvaluateSetup(setup, Console.Out);
-        //    Console.WriteLine("*************************");
-        //    foreach (var result in results) {
-        //        Console.WriteLine(result);
-        //    }
-        //    Console.WriteLine("*************************\n\n");
-        //}
+
+            List<double> xs = new List<double>();
+            List<double> ys = new List<double>();
+
+            for (int i = 0; i < 100; i++) {                
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
+
+                GameInstanceEvaluator.Playout(game, d1, d1, new MctsController(game), new MctsController(game));
+
+                stopwatch.Stop();
+
+                xs.Add(i);
+                ys.Add(stopwatch.ElapsedMilliseconds);
+            }
+
+            GnuPlot.Plot(xs.ToArray(), ys.ToArray());
+
+            Console.ReadKey();
+        }
     }
 }

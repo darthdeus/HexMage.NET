@@ -182,13 +182,7 @@ namespace HexMage.GUI.Scenes {
             var d1 = DNA.FromSerializableString(lines[0]);
             var d2 = DNA.FromSerializableString(lines[1]);
 
-            // TODO - extract evolution constants
-            var game = new GameInstance(Constants.EvolutionMapSize);
-
-            GameInstanceEvaluator.UnpackTeamsIntoGame(game, d1, d2);
-            game.PrepareEverything();
-
-            GameInstanceEvaluator.ResetPositions(game);
+            var game = GameSetup.FromDNAs(d1, d2);
 
             game.MobManager.Teams[TeamColor.Red] = new AiRuleBasedController(game);
             game.MobManager.Teams[TeamColor.Blue] = new AiRuleBasedController(game);

@@ -36,6 +36,10 @@ namespace HexMage.Simulator {
 
     public class Team {
         public List<JsonMob> mobs = new List<JsonMob>();
+
+        public DNA ToDna() {
+            return GenomeLoader.FromTeam(this);
+        }
     }
 
     public class Setup {

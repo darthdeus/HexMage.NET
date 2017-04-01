@@ -25,12 +25,14 @@ namespace HexMage.Benchmarks {
 
             Console.WriteLine($"Initial: {initialDna.ToDNAString()}\n\n");
 
-            game = new GameInstance(Constants.EvolutionMapSize);
+            game = GameSetup.FromDNAs(initialDna, initialDna);
 
-            GameInstanceEvaluator.UnpackTeamsIntoGame(game, initialDna, initialDna);
-            game.PrepareEverything();
+            //game = new GameInstance(Constants.EvolutionMapSize);
 
-            GameInstanceEvaluator.ResetPositions(game);
+            //GameSetup.UnpackTeamsIntoGame(game, initialDna, initialDna);
+            //game.PrepareEverything();
+
+            //GameSetup.ResetPositions(game);
         }
 
         public void Run() {
@@ -39,7 +41,7 @@ namespace HexMage.Benchmarks {
             const int numGenerations = 100000;
             const int teamsPerGeneration = 1;
             for (int i = 0; i < teamsPerGeneration; i++) {
-                var copy = initialDna.Copy();
+                var copy = initialDna.Clone();
                 copy.Randomize();
 
                 var member = new GenerationMember {
@@ -145,7 +147,7 @@ namespace HexMage.Benchmarks {
 
         public EvaluationResult CalculateFitness(DNA dna) {
             Constants.ResetLogBuffer();
-            PrepareGame(dna);
+            GameSetup.OverrideGameDNA(game, initialDna, dna);
 
             var result = new GameInstanceEvaluator(game, Console.Out).Evaluate();
 
@@ -153,7 +155,7 @@ namespace HexMage.Benchmarks {
         }
 
         public static DNA Mutate(DNA dna, float T) {
-            var copy = dna.Copy();
+            var copy = dna.Clone();
 
             do {
                 var i = Generator.Random.Next(0, dna.Data.Count);
@@ -172,37 +174,7 @@ namespace HexMage.Benchmarks {
             return copy;
         }
 
-        public void PrepareGame(DNA dna) {
-            var genTeam = GenomeLoader.FromDna(dna);
-
-            for (int i = initialDna.MobCount, dnaIndex = 0; i < game.MobManager.Mobs.Count; i++, dnaIndex++) {
-                var mobId = game.MobManager.Mobs[i];
-
-                var genMob = genTeam.mobs[dnaIndex];
-
-                var mobInfo = game.MobManager.MobInfos[mobId];
-                mobInfo.MaxHp = genMob.hp;
-                mobInfo.MaxAp = genMob.ap;
-
-                for (int abilityIndex = 0; abilityIndex < mobInfo.Abilities.Count; abilityIndex++) {
-                    int abilityId = mobInfo.Abilities[abilityIndex];
-                    var genAbility = genMob.abilities[abilityIndex];
-
-                    var abilityInfo = game.MobManager.Abilities[abilityId];
-                    abilityInfo.Dmg = genAbility.dmg;
-                    abilityInfo.Cost = genAbility.ap;
-                    abilityInfo.Range = genAbility.range;
-
-                    game.MobManager.Abilities[abilityId] = abilityInfo;
-                }
-
-                game.MobManager.MobInfos[mobId] = mobInfo;
-            }
-
-            game.State.Reset(game.MobManager);
-            GameInstanceEvaluator.ResetPositions(game);
-        }
-
+      
         private void SaveTainted(DNA dna) {
             using (var logWriter = new StreamWriter(Constants.SaveDir + "tainted-log.txt")) {
                 logWriter.Write(Constants.GetLogBuffer().ToString());
