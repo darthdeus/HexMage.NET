@@ -16,6 +16,12 @@ namespace HexMage.Simulator {
         /// TODO - experiment
         /// </summary>
         public static bool UseHpPercentageScaling = true;
+        /// <summary>
+        /// When enabled, rewards are slowly dampened each turn, penalizing rewards
+        /// from longer games.
+        /// </summary>
+        public static bool DampenLongRewards = false;
+        public static float DampeningFactor = 0.95f;
 
         /// <summary>
         /// Probability

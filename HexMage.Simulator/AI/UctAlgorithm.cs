@@ -222,10 +222,10 @@ namespace HexMage.Simulator {
                 node.Q += delta;
                 node = node.Parent;
 
-                //delta *= 0.95f;
-                // 5. puntik, nema se delta prepnout kdyz ja jsem EndTurn, a ne muj rodic?
+                if (Constants.DampenLongRewards) {
+                    delta *= Constants.DampeningFactor;
+                }
                 if (node != null && node.Action.Type == UctActionType.EndTurn) {
-                    // 6. puntik, kdy se ma prepinat?
                     delta = -delta;
                 }
             }
