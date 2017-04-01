@@ -115,7 +115,7 @@ namespace HexMage.Benchmarks {
                     var member = generation[j];
 
                     var newDna = Mutate(member.dna, (float) T);
-                    GameInstanceEvaluator.PreparePositions(game, game.MobManager.Mobs, 0, evolutionMapSize);
+                    GameInstanceEvaluator.PreparePositions(game);
                     var newFitness = CalculateFitness(newDna);
 
                     double probability;
