@@ -3,11 +3,11 @@
 namespace HexMage.Simulator {
     public static class Constants {
         // Benchmark controls
-        public const bool MctsBenchmark = true;
-        public const bool EvaluateAis = false;
+        public static bool MctsBenchmark = false;
+        public static bool EvaluateAis = false;
 
         // Game Evaluation
-        public const int MaxPlayoutEvaluationIterations = 100;
+        public static int MaxPlayoutEvaluationIterations = 100;
 
         // MCTS
         /// <summary>
@@ -15,7 +15,7 @@ namespace HexMage.Simulator {
         /// 
         /// TODO - experiment
         /// </summary>
-        public const bool UseHpPercentageScaling = true;
+        public static bool UseHpPercentageScaling = true;
 
         /// <summary>
         /// Probability
@@ -23,13 +23,13 @@ namespace HexMage.Simulator {
         /// These represent the normal distribution of ideal game length.
         /// Tweak to generate games of different length.
         /// </summary>
-        public const double Mu = 15;
-        public const double Sigma = 3;
+        public static double Mu = 15;
+        public static double Sigma = 3;
 
         // Rule based AI
-        public const bool FastActionGeneration = false;
+        public static bool FastActionGeneration = false;
         // TODO - porovnat, co kdyz dovolim utocit na dead cile
-        public const bool AllowCorpseTargetting = false;
+        public static bool AllowCorpseTargetting = false;
 
         /// <summary>
         /// Disabling this will only generate the respective MOVE action,
@@ -37,14 +37,14 @@ namespace HexMage.Simulator {
         /// 
         /// TODO - profile/benchmark both cases and create pretty graphs :)
         /// </summary>
-        public const bool AttackMoveEnabled = true;
+        public static bool AttackMoveEnabled = true;
 
         /// <summary>
         /// Triggers attack move generation even when a direct attack was found.
         /// 
         /// // TODO - again experiment with triggering this
         /// </summary>
-        public const bool AlwaysAttackMove = false;
+        public static bool AlwaysAttackMove = false;
 
         /// <summary>
         /// If `true` END-TURN actions will be generated even if there are enough
@@ -52,15 +52,15 @@ namespace HexMage.Simulator {
         /// 
         /// // TODO - again experiment with triggering this
         /// </summary>
-        public const bool EndTurnAsLastResort = true;
+        public static bool EndTurnAsLastResort = true;
 
         // Evolution
-        public const bool AlwaysJumpToBetter = false;
-        public const bool SaveGoodOnes = true;
-        public const double InitialT = 100;
-        public const int NumGenerations = 100000;
-        public const int TeamsPerGeneration = 1;
-        public const bool Logging = false;
+        public static bool AlwaysJumpToBetter = false;
+        public static bool SaveGoodOnes = true;
+        public static double InitialT = 100;
+        public static int NumGenerations = 100000;
+        public static int TeamsPerGeneration = 1;
+        public static bool Logging = false;
 
         // TODO - fuj, to sem nepatri
         private static StringWriter LogBuffer = new StringWriter();
@@ -82,12 +82,12 @@ namespace HexMage.Simulator {
             }
         }
 
-        public const int HpMax = 100;
-        public const int ApMax = 25;
-        public const int DmgMax = 30;
-        public const int CostMax = 20;
-        public const int RangeMax = 10;
-        public const int EvolutionMapSize = 5;
+        public static int HpMax = 100;
+        public static int ApMax = 25;
+        public static int DmgMax = 30;
+        public static int CostMax = 20;
+        public static int RangeMax = 10;
+        public static int EvolutionMapSize = 5;
 
         public static readonly string SaveFile = @"evo-save.txt";
         public static readonly string SaveDir = "save-files/";

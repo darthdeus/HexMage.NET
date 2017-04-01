@@ -64,7 +64,6 @@
     <Compile Include="AI\UctSearchResult.cs" />
     <Compile Include="AI\XmlTreePrinter.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="AI\FlatMonteCarlo.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DNA.cs" />
     <Compile Include="Evolution.cs" />
@@ -88,7 +87,6 @@
     <Compile Include="Model\Buff.cs" />
     <Compile Include="Model\IMobController.cs" />
     <Compile Include="Model\IResettable.cs" />
-    <Compile Include="Model\ReplayRecorder.cs" />
     <Compile Include="Model\TeamColor.cs" />
     <Compile Include="Pathfinding\CoordPair.cs" />
     <Compile Include="Pathfinding\CoordRadiusCache.cs" />

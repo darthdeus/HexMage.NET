@@ -168,8 +168,9 @@ namespace HexMage.Simulator.PCG {
             return Random.Next(5, Constants.DmgMax);
         }
 
-        public static int RandomCost(int maxAp = Constants.CostMax) {
-            return Random.Next(3, Math.Min(Constants.CostMax, maxAp));
+        public static int RandomCost(int? maxAp) {
+            maxAp = maxAp ?? Constants.ApMax;
+            return Random.Next(3, Math.Min(Constants.CostMax, maxAp.Value));
         }
 
         public static int RandomRange() {
