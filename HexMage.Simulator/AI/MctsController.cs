@@ -52,7 +52,7 @@ namespace HexMage.Simulator {
             string endRatio = (endTurn / useCounts).ToString("0.00");
             string abilityMoveRatio = ((abilityUse + attackMove) / (move + defensiveMove)).ToString("0.00");
 
-            if (Constants.EnableLogging) {
+            if (Constants.MctsLogging) {
                 //Console.WriteLine($"*** MCTS SPEED: {result.MillisecondsPerIteration}ms/iter***");
 
                 foreach (var action in result.Actions) {
