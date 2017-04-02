@@ -2,10 +2,10 @@
 
 namespace HexMage.Simulator {
     public static class Constants {
-        public static bool GnuPlot = true;
+        public static bool GnuPlot = false;
 
         // Benchmark controls
-        public static bool MctsBenchmark = true;
+        public static bool MctsBenchmark = false;
         public static bool EvaluateAis = false;
 
         // Game Evaluation
@@ -68,7 +68,7 @@ namespace HexMage.Simulator {
         public static bool SaveGoodOnes = true;
         public static double InitialT = 100;
         public static int NumGenerations = 100000;
-        public static int ExtraIterations = 10;
+        public static int ExtraIterations = 0;
         public static int TeamsPerGeneration = 1;
         public static bool Logging = false;
         public static int EvolutionPrintModulo = 1000;

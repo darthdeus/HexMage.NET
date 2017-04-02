@@ -10,9 +10,7 @@ namespace HexMage.Benchmarks {
     internal class Program {
         private static void Main(string[] args) {
             Generator.Random = new Random(3);
-
-            Constants.MctsLogging = true;
-
+            
             if (!ProcessArguments(args)) return;
 
             if ((args.Length > 0 && args[0] == "mcts-benchmark") || Constants.MctsBenchmark) {
