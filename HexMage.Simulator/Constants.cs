@@ -2,7 +2,7 @@
 
 namespace HexMage.Simulator {
     public static class Constants {
-        public static bool GnuPlot = false;
+        public static bool GnuPlot = true;
 
         // Benchmark controls
         public static bool MctsBenchmark = false;
@@ -32,7 +32,7 @@ namespace HexMage.Simulator {
         /// These represent the normal distribution of ideal game length.
         /// Tweak to generate games of different length.
         /// </summary>
-        public static double Mu = 15;
+        public static double Mu = 10;
         public static double Sigma = 3;
 
         // Rule based AI
@@ -64,22 +64,28 @@ namespace HexMage.Simulator {
         public static bool EndTurnAsLastResort = true;
 
         // Evolution
-        public static bool AlwaysJumpToBetter = false;
+        public static bool RestartFailures = true;
+        public static double FitnessThreshold = 0.1;
+        public static bool AverageHpTotals = true;
         public static bool SaveGoodOnes = true;
-        public static double InitialT = 100;
+        public static double InitialT = 1;
         public static int ExtraIterations = 0;
         public static int TeamsPerGeneration = 1;
         public static bool Logging = false;
 
         // TODO - check if disabling this helps
-        public static bool ForbidTimeouts = false;
+        public static bool ForbidTimeouts = true;
 
-        public static int NumGenerations = 100;
-        public static int EvolutionPrintModulo = 1;
-        public static double MutationDelta = 0.05;
+        public static bool HillClimbing = false;
 
+        public static int NumGenerations = 100000;
+        public static int EvolutionPrintModulo = 1000;
+        public static double MutationDelta = 0.15;
+
+        /// <summary>
+        /// Take game length into account when evaluating the fitness function
+        /// </summary>
         public static bool FitnessGameLength = false;
-        public static bool SigmoidFitness = true;
 
         public static double SecondMutationProb = 0.35f;
 
@@ -88,7 +94,7 @@ namespace HexMage.Simulator {
         /// <summary>
         /// Misc
         /// </summary>        
-        public static int RandomSeed = 123456;
+        public static int RandomSeed = 1234;
         public static bool UseGlobalSeed = false;
 
         // TODO - fuj, to sem nepatri

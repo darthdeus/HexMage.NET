@@ -17,10 +17,14 @@ namespace HexMage.Simulator.AI {
 
         public float Fitness {
             get {
-                float result = 1 - TotalHpPercentage;
+                float f1 = 1 - TotalHpPercentage;
+                float f2 = (float) Probability.Norm(TotalTurns);
 
+                float result;
                 if (Constants.FitnessGameLength) {
-                    result *= (float)Probability.Norm(TotalTurns);
+                    result = (f1 + f2) - Math.Abs(f1 - f2);
+                } else {
+                    result = f1;
                 }
 
                 return result;

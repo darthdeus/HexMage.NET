@@ -69,20 +69,35 @@ namespace HexMage.Simulator.AI {
 
                     result.TotalIterations += i;
 
-                    float gamePercentage =
-                        game.MobManager.Mobs.Average(mobId => {
-                            float currHp = Math.Max(0, game.State.MobInstances[mobId].Hp);
-                            float maxHp = game.MobManager.MobInfos[mobId].MaxHp;
+                    float gamePercentage;
 
-                            float avg = currHp / maxHp;
+                    if (Constants.AverageHpTotals) {
+                        float totalMaxHp = 0;
+                        float totalCurrentHp = 0;
 
-                            if (avg > 1) {
-                                result.Tainted = true;
-                                avg = 1;
-                            }
+                        foreach (var mobId in game.MobManager.Mobs) {
+                            totalMaxHp += game.MobManager.MobInfos[mobId].MaxHp;
+                            totalCurrentHp += Math.Max(0, game.State.MobInstances[mobId].Hp);
+                        }
 
-                            return avg;
-                        });
+                        gamePercentage = totalCurrentHp / totalMaxHp;
+                    } else {
+                        gamePercentage =
+                            game.MobManager.Mobs.Average(mobId => {
+                                float currHp = Math.Max(0, game.State.MobInstances[mobId].Hp);
+                                float maxHp = game.MobManager.MobInfos[mobId].MaxHp;
+
+                                float avg = currHp / maxHp;
+
+                                if (avg > 1) {
+                                    result.Tainted = true;
+                                    avg = 1;
+                                }
+
+                                return avg;
+                            });
+                    }
+
 
                     result.TotalHp = game.State.MobInstances.Sum(mobInstance => mobInstance.Hp);
                     Debug.Assert(gamePercentage >= 0);
@@ -127,7 +142,7 @@ namespace HexMage.Simulator.AI {
                 Console.WriteLine(Constants.GetLogBuffer());
             }
             Constants.ResetLogBuffer();
-      
+
             return Constants.MaxPlayoutEvaluationIterations - iterations;
         }
 

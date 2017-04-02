@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Windows.Forms;
 using HexMage.Simulator;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.PCG;
@@ -10,6 +11,7 @@ namespace HexMage.Benchmarks {
     public class Evolution {
         private readonly GameInstance game;
         private readonly DNA initialDna;
+        private int _restartCount = 0;
 
         public Evolution() {
             if (!Directory.Exists(Constants.SaveDir)) {
@@ -83,16 +85,15 @@ namespace HexMage.Benchmarks {
 
                     var member = generation[j];
 
+                    if (Constants.RestartFailures && member.result.Fitness < Constants.FitnessThreshold) {
+                        member.dna.Randomize();
+                        _restartCount++;
+                    }
+
                     var newDna = Mutate(member.dna, (float) T);
                     var newFitness = CalculateFitness(newDna);
 
-                    if (Constants.SaveGoodOnes && !goodEnough && newFitness.Fitness > 0.995) {
-                        goodCount++;
-                        if (goodCount > 50) goodEnough = true;
-                        Console.WriteLine($"Found extra good {newFitness.Fitness}");
-
-                        SaveDna(goodCount, member.dna);
-                    }
+                    HandleGoodEnough(ref goodEnough, newFitness, member, ref goodCount);
 
                     if (newFitness.Tainted) {
                         SaveTainted(newDna);
@@ -104,16 +105,18 @@ namespace HexMage.Benchmarks {
                     float e = member.result.Fitness;
                     float ep = newFitness.Fitness;
 
+
                     double probability;
 
-                    if (Constants.SigmoidFitness) {
-                        probability = 1 / (1 + Math.Exp(ep - e));
+                    float delta = ep - e;
+
+                    if (delta > 0) {
+                        probability = 1;
                     } else {
-                        probability = Math.Exp(-(ep - e) / T);
+                        probability = Math.Exp(-Math.Abs(delta) / T);
                     }
 
-                    bool forcedJump = (ep - e) > 0 && Constants.AlwaysJumpToBetter;
-                    if (forcedJump || Probability.Uniform(probability)) {
+                    if (Constants.HillClimbing || (!Constants.HillClimbing && Probability.Uniform(probability))) {
                         member.result = newFitness;
                         member.dna = newDna;
                     }
@@ -122,23 +125,15 @@ namespace HexMage.Benchmarks {
                     plotFit.Add(member.result.Fitness);
                     plotProb.Add(probability);
 
-                    if (i % Constants.EvolutionPrintModulo == 0) {
-                        if (Constants.PrintFitnessDiff) {
-                            string se = e.ToString("0.00000");
-                            string sep = ep.ToString("0.00000");
-
-                            Console.WriteLine(
-                                $"P: {probability.ToString("0.00")}\tT:{T.ToString("0.0000")}\t{se} -> {sep} = {Math.Abs(ep - e).ToString("0.0000000")}");
-                        } else {
-                            Console.WriteLine($"P: {probability.ToString("0.00")}\tT:{T.ToString("0.0000")}\t{member}");
-                        }
-                    }
+                    PrintEvaluationResult(i, e, ep, probability, T, member);
                 }
 
                 //Console.WriteLine("****************************************************");
                 //Console.WriteLine($"Generation {i}. done in {genWatch.ElapsedMilliseconds}ms");
                 //Console.WriteLine("****************************************************");
             }
+
+            Console.WriteLine($"Restarts: {_restartCount}");
 
             if (Constants.GnuPlot) {
                 var gnuplotConfigString = $"title '{Constants.NumGenerations} generations," +
@@ -150,6 +145,35 @@ namespace HexMage.Benchmarks {
                 GnuPlot.Plot(plotT.ToArray(), plotFit.ToArray(), gnuplotConfigString);
                 //GnuPlot.Plot(plotT.ToArray(), plotProb.ToArray(), gnuplotConfigString);
                 Console.ReadKey();
+            }
+        }
+
+        private static void PrintEvaluationResult(int i, float e, float ep, double probability, double T,
+                                                  GenerationMember member) {
+            if (i % Constants.EvolutionPrintModulo == 0) {
+                string ps = probability.ToString("0.00");
+                string ts = T.ToString("0.0000");
+
+                if (Constants.PrintFitnessDiff) {
+                    string se = e.ToString("0.00000");
+                    string sep = ep.ToString("0.00000");
+
+                    Console.WriteLine(
+                        $"P: {ps}, d/T: {((ep - e) / T).ToString("0.000")}\tT:{ts}\t{se} -> {sep} = {Math.Abs(ep - e).ToString("0.0000000")}");
+                } else {
+                    Console.WriteLine($"P: {ps}\tT:{ts}\t{member}");
+                }
+            }
+        }
+
+        private void HandleGoodEnough(ref bool goodEnough, EvaluationResult newFitness, GenerationMember member,
+                                      ref int goodCount) {
+            if (Constants.SaveGoodOnes && !goodEnough && newFitness.Fitness > 0.995) {
+                goodCount++;
+                if (goodCount > 50) goodEnough = true;
+                Console.WriteLine($"Found extra good {newFitness.Fitness}");
+
+                SaveDna(goodCount, member.dna);
             }
         }
 
@@ -171,6 +195,7 @@ namespace HexMage.Benchmarks {
                 redo = false;
 
                 double delta = Generator.Random.NextDouble() * Constants.MutationDelta;
+                delta = Constants.MutationDelta;
                 double change = Probability.Uniform(0.5) ? 1 + delta : 1 - delta;
 
                 int i = Generator.Random.Next(0, dna.Data.Count);

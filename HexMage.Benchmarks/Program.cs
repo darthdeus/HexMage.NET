@@ -27,7 +27,7 @@ namespace HexMage.Benchmarks {
                 new Evolution().Run();
                 stopwatch.Stop();
 
-                Console.WriteLine($"Total evolution time: {stopwatch.ElapsedMilliseconds}ms");
+                Console.WriteLine($"Total evolution time: {stopwatch.ElapsedMilliseconds}ms, {Constants.NumGenerations} generations");
             }
 
             return;
