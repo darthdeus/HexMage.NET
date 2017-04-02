@@ -46,7 +46,7 @@ namespace HexMage.Benchmarks {
 
                 var member = new GenerationMember {
                     dna = copy,
-                    result = CalculateFitness(copy)
+                    result = CalculateFitness(game, initialDna, copy)
                 };
 
                 generation.Add(member);
@@ -91,7 +91,7 @@ namespace HexMage.Benchmarks {
                     }
 
                     var newDna = Mutate(member.dna, (float) T);
-                    var newFitness = CalculateFitness(newDna);
+                    var newFitness = CalculateFitness(game, initialDna, newDna);
 
                     HandleGoodEnough(ref goodEnough, newFitness, member, ref goodCount);
 
@@ -177,7 +177,7 @@ namespace HexMage.Benchmarks {
             }
         }
 
-        public EvaluationResult CalculateFitness(DNA dna) {
+        public static EvaluationResult CalculateFitness(GameInstance game, DNA initialDna, DNA dna) {
             Constants.ResetLogBuffer();
             GameSetup.OverrideGameDNA(game, initialDna, dna);
 

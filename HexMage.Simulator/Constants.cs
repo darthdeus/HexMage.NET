@@ -3,6 +3,9 @@
 namespace HexMage.Simulator {
     public static class Constants {
         public static bool GnuPlot = true;
+        public static bool MeasureSearchSpaceStats = false;
+        public static int MeasureSamples = 1000000;
+        public static int MeasureNeighboursPerSample = 100;        
 
         // Benchmark controls
         public static bool MctsBenchmark = false;

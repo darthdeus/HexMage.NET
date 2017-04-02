@@ -10,12 +10,16 @@ namespace HexMage.Benchmarks {
     internal class Program {
         private static void Main(string[] args) {
             Generator.Random = new Random(3);
-            
+
             if (!ProcessArguments(args)) return;
 
             if ((args.Length > 0 && args[0] == "mcts-benchmark") || Constants.MctsBenchmark) {
                 MctsBenchmark();
                 return;
+            }
+
+            if ((args.Length > 0 && args[0] == "stats") || Constants.MeasureSearchSpaceStats) {
+                MeasureSearchSpaceStats();
             }
 
 
@@ -27,7 +31,8 @@ namespace HexMage.Benchmarks {
                 new Evolution().Run();
                 stopwatch.Stop();
 
-                Console.WriteLine($"Total evolution time: {stopwatch.ElapsedMilliseconds}ms, {Constants.NumGenerations} generations");
+                Console.WriteLine(
+                    $"Total evolution time: {stopwatch.ElapsedMilliseconds}ms, {Constants.NumGenerations} generations");
             }
 
             return;
@@ -47,6 +52,43 @@ namespace HexMage.Benchmarks {
                     new Benchmarks().Run();
                 }
             }
+        }
+
+        private static void MeasureSearchSpaceStats() {
+            var d1 = new DNA(2, 2);
+            var d2 = new DNA(2, 2);
+
+            int down = 0;
+            int up = 0;
+
+            var game = GameSetup.FromDNAs(d1, d2);
+
+            int iterations = 0;
+
+            for (int i = 0; i < Constants.MeasureSamples; i++) {
+                d1.Randomize();
+                d2.Randomize();
+
+                var fitness = Evolution.CalculateFitness(game, d1, d2);
+
+                for (int j = 0; j < Constants.MeasureNeighboursPerSample; j++) {
+                    iterations++;
+                    if (iterations % 1000 == 0) Console.WriteLine($"D: {down}, U: {up}");
+                    var neighbour = Evolution.Mutate(d2, 0);
+
+                    var neighbourFitness = Evolution.CalculateFitness(game, d1, neighbour);
+
+                    float delta = neighbourFitness.Fitness - fitness.Fitness;
+
+                    if (delta > 0) {
+                        down++;
+                    } else {
+                        up++;
+                    }
+                }
+            }
+
+            Console.WriteLine($"Total got down: {down}, up: {up}");
         }
 
         private static bool ProcessArguments(string[] args) {
