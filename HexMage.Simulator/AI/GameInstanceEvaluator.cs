@@ -24,13 +24,12 @@ namespace HexMage.Simulator.AI {
             _writer = writer;
         }
 
+        public static List<IAiFactory> GlobalFactories = new List<IAiFactory>();
+
         public EvaluationResult Evaluate() {
-            var factories = new IAiFactory[] {
-                new RuleBasedFactory(),
-                //new MctsFactory(1),
-                //new MctsFactory(10),
-                //new RandomFactory(),
-            };
+            if (GlobalFactories.Count == 0) {
+                GlobalFactories.Add(new RuleBasedFactory());
+            }
 
             var result = new EvaluationResult();
 
@@ -43,8 +42,8 @@ namespace HexMage.Simulator.AI {
 
             float gameHpPercentageTotal = 0;
 
-            foreach (var factory1 in factories) {
-                foreach (var factory2 in factories) {
+            foreach (var factory1 in GlobalFactories) {
+                foreach (var factory2 in GlobalFactories) {
                     result.TotalGames++;
 
                     var game = _gameInstance.CopyStateOnly();

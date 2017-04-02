@@ -52,7 +52,30 @@ namespace HexMage.Benchmarks {
         }
 
         private static bool ProcessArguments(string[] args) {
+            const string mctsFactoryPrefix = "--factory=Mcts";
+
             foreach (var arg in args) {
+                if (arg == "--factory=Rule") {
+                    GameInstanceEvaluator.GlobalFactories.Add(new RuleBasedFactory());
+                    continue;
+                } else if (arg == "--factory=Random") {
+                    GameInstanceEvaluator.GlobalFactories.Add(new RandomFactory());
+                    continue;
+                } else if (arg.StartsWith(mctsFactoryPrefix)) {
+                    string mctsIterationsStr = arg.Replace(mctsFactoryPrefix, "");
+
+                    int mctsIterations;
+                    if (int.TryParse(mctsIterationsStr, out mctsIterations)) {
+                        GameInstanceEvaluator.GlobalFactories.Add(new MctsFactory(mctsIterations));
+                    } else {
+                        Console.WriteLine(
+                            $"Invalid format of {arg}, use --factory=MctsN instead (N can be multiple digits).");
+                        return false;
+                    }
+
+                    continue;
+                }
+
                 if (arg.StartsWith("--") && arg.Contains("=")) {
                     var newarg = arg.Replace("--", "").Split('=');
 
