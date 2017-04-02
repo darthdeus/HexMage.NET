@@ -28,7 +28,7 @@ namespace HexMage.Simulator {
 
         /// <summary>
         /// Probability
-        /// 
+        ///
         /// These represent the normal distribution of ideal game length.
         /// Tweak to generate games of different length.
         /// </summary>
@@ -72,6 +72,7 @@ namespace HexMage.Simulator {
         public static int TeamsPerGeneration = 1;
         public static bool Logging = false;
         public static int EvolutionPrintModulo = 1000;
+        public static bool FitnessGameLength = false;
 
         // TODO - fuj, to sem nepatri
         private static StringWriter LogBuffer = new StringWriter();

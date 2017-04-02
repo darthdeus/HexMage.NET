@@ -13,7 +13,17 @@
 
         public bool Tainted;
 
-        public float Fitness => (float) ((1 - TotalHpPercentage));// * (Probability.Norm(TotalTurns)));
+        public float Fitness {
+            get {
+                float result = 1 - TotalHpPercentage;
+
+                if (Constants.FitnessGameLength) {
+                    result *= (float)Probability.Norm(TotalTurns);
+                }
+
+                return result;
+            }
+        }
 
         public double MillisecondsPerIteration => (double) TotalElapsedMilliseconds / (double) TotalIterations;
         public double MillisecondsPerTurn => (double) TotalElapsedMilliseconds / (double) TotalGames;
