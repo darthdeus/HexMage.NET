@@ -104,12 +104,12 @@ namespace HexMage.Simulator {
 
         public static string ActionCountString() {
             return
-                $"EndTurn: {ActionCounts[UctActionType.EndTurn]}, " +
-                $"Ability: {ActionCounts[UctActionType.AbilityUse]}, " +
-                $"Move: {ActionCounts[UctActionType.Move]}, " +
-                $"Null: {ActionCounts[UctActionType.Null]}, " +
-                $"DefensiveMove: {ActionCounts[UctActionType.DefensiveMove]}, " +
-                $"AttackMove: {ActionCounts[UctActionType.AttackMove]}";
+                $"E: {ActionCounts[UctActionType.EndTurn]}, " +
+                $"A: {ActionCounts[UctActionType.AbilityUse]}, " +
+                $"M: {ActionCounts[UctActionType.Move]}, " +
+                $"N: {ActionCounts[UctActionType.Null]}, " +
+                $"D: {ActionCounts[UctActionType.DefensiveMove]}, " +
+                $"AM: {ActionCounts[UctActionType.AttackMove]}";
         }
 
         static UctAlgorithm() {

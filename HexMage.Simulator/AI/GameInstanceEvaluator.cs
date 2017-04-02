@@ -107,7 +107,7 @@ namespace HexMage.Simulator.AI {
             return result;
         }
 
-        public static void Playout(GameInstance game, DNA d1, DNA d2, IMobController c1, IMobController c2) {
+        public static int Playout(GameInstance game, DNA d1, DNA d2, IMobController c1, IMobController c2) {
             GameSetup.OverrideGameDNA(game, d1, d2);
 
             game.MobManager.Teams[TeamColor.Red] = c1;
@@ -124,10 +124,12 @@ namespace HexMage.Simulator.AI {
                 // TODO - extract these
                 Constants.WriteLogLine(UctAction.EndTurnAction());
             }
-            Console.WriteLine(Constants.GetLogBuffer());
+            if (Constants.GetLogBuffer().ToString().Length != 0) {
+                Console.WriteLine(Constants.GetLogBuffer());
+            }
             Constants.ResetLogBuffer();
-
-            Console.WriteLine(iterations);
+      
+            return Constants.MaxPlayoutEvaluationIterations - iterations;
         }
 
         private static void EvaluationResult(GameInstance game, ref EvaluationResult result) {

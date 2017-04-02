@@ -4,4 +4,4 @@ build:
 	xbuild /p:Configuration=Release
 
 run:
-	mono ./bin/Release/HexMage.Benchmarks.exe
+	mono ./bin/Release/HexMage.Benchmarks.exe --EnableGnuPlot=false

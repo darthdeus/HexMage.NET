@@ -43,17 +43,25 @@ namespace HexMage.Simulator {
         }
 
         private void LogActions(UctSearchResult result) {
-            float endRatio = (float) UctAlgorithm.ActionCounts[UctActionType.EndTurn] /
-                             UctAlgorithm.ActionCounts[UctActionType.AbilityUse];
+            float abilityUse = UctAlgorithm.ActionCounts[UctActionType.AbilityUse];
+            float attackMove = UctAlgorithm.ActionCounts[UctActionType.AttackMove];
+            float defensiveMove = UctAlgorithm.ActionCounts[UctActionType.DefensiveMove];
+            float move = UctAlgorithm.ActionCounts[UctActionType.Move];
+            float endTurn = UctAlgorithm.ActionCounts[UctActionType.EndTurn];
+
+            float useCounts = abilityUse + attackMove + defensiveMove + move;
+            string endRatio = (endTurn / useCounts).ToString("0.00");
+            string abilityMoveRatio = ((abilityUse + attackMove) / (move + defensiveMove)).ToString("0.00");
+
             if (EnableLogging) {
-                Console.WriteLine($"*** MCTS SPEED: {result.MillisecondsPerIteration}ms/iter***");
+                //Console.WriteLine($"*** MCTS SPEED: {result.MillisecondsPerIteration}ms/iter***");
 
                 foreach (var action in result.Actions) {
                     Console.WriteLine($"action: {action}");
                 }
 
                 Console.WriteLine(
-                    $"total: {UctAlgorithm.Actions} [end ratio: {endRatio}]\t{UctAlgorithm.ActionCountString()}");
+                    $"#sum: {UctAlgorithm.Actions}[ability/move ratio: {abilityMoveRatio}] [end ratio: {endRatio}] {UctAlgorithm.ActionCountString()}");
             }
         }
 

@@ -57,7 +57,8 @@ namespace HexMage.Benchmarks {
             List<double> plotFit = new List<double>();
             List<double> plotProb = new List<double>();
 
-            int extraIterations = Constants.ExtraIterations;;
+            int extraIterations = Constants.ExtraIterations;
+            ;
             int maxTotalHp = 0;
 
             int goodCount = 0;
@@ -128,15 +129,17 @@ namespace HexMage.Benchmarks {
                 //Console.WriteLine("****************************************************");
             }
 
-            var gnuplotConfigString = $"title '{Constants.NumGenerations} generations," +
-                                      $"T_s = {Constants.InitialT}'";
+            if (Constants.EnableGnuPlot) {
+                var gnuplotConfigString = $"title '{Constants.NumGenerations} generations," +
+                                          $"T_s = {Constants.InitialT}'";
 
-            GnuPlot.HoldOn();
-            GnuPlot.Set($"xrange [{Constants.InitialT}:0] reverse");
-            GnuPlot.Set($"yrange [0:1] ");
-            GnuPlot.Plot(plotT.ToArray(), plotFit.ToArray(), gnuplotConfigString);
-            //GnuPlot.Plot(plotT.ToArray(), plotProb.ToArray(), gnuplotConfigString);
-            Console.ReadKey();
+                GnuPlot.HoldOn();
+                GnuPlot.Set($"xrange [{Constants.InitialT}:0] reverse");
+                GnuPlot.Set($"yrange [0:1] ");
+                GnuPlot.Plot(plotT.ToArray(), plotFit.ToArray(), gnuplotConfigString);
+                //GnuPlot.Plot(plotT.ToArray(), plotProb.ToArray(), gnuplotConfigString);
+                Console.ReadKey();
+            }
         }
 
         public EvaluationResult CalculateFitness(DNA dna) {
@@ -168,7 +171,7 @@ namespace HexMage.Benchmarks {
             return copy;
         }
 
-      
+
         private void SaveTainted(DNA dna) {
             using (var logWriter = new StreamWriter(Constants.SaveDir + "tainted-log.txt")) {
                 logWriter.Write(Constants.GetLogBuffer().ToString());

@@ -2,8 +2,10 @@
 
 namespace HexMage.Simulator {
     public static class Constants {
+        public static bool EnableGnuPlot = true;
+
         // Benchmark controls
-        public static bool MctsBenchmark = false;
+        public static bool MctsBenchmark = true;
         public static bool EvaluateAis = false;
 
         // Game Evaluation
