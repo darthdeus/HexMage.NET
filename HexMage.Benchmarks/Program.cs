@@ -58,12 +58,22 @@ namespace HexMage.Benchmarks {
             var d1 = new DNA(2, 2);
             var d2 = new DNA(2, 2);
 
+            int iterations = 0;
+
             int down = 0;
             int up = 0;
+            double avgDown = 0;
+            double avgUp = 0;
+
+            Action printStats = () => Console.WriteLine($"I: {iterations.ToString("000000000")}\t" +
+                                                        $"D: {down.ToString("00000000")} " +
+                                                        $"({(avgDown / down).ToString("0.0000")})\t\t" +
+                                                        $"U: {up.ToString("00000000")} " +
+                                                        $"({(avgUp / up).ToString("0.0000")})\t\t" +
+                                                        $"Ratio D/U: {((float) down / (float) up).ToString("0.0000")}");
 
             var game = GameSetup.FromDNAs(d1, d2);
 
-            int iterations = 0;
 
             for (int i = 0; i < Constants.MeasureSamples; i++) {
                 d1.Randomize();
@@ -73,7 +83,7 @@ namespace HexMage.Benchmarks {
 
                 for (int j = 0; j < Constants.MeasureNeighboursPerSample; j++) {
                     iterations++;
-                    if (iterations % 1000 == 0) Console.WriteLine($"D: {down}, U: {up}");
+                    if (iterations % 1000 == 0) printStats();
                     var neighbour = Evolution.Mutate(d2, 0);
 
                     var neighbourFitness = Evolution.CalculateFitness(game, d1, neighbour);
@@ -82,13 +92,15 @@ namespace HexMage.Benchmarks {
 
                     if (delta > 0) {
                         down++;
+                        avgDown += Math.Abs(delta);
                     } else {
                         up++;
+                        avgUp += Math.Abs(delta);
                     }
                 }
             }
-
-            Console.WriteLine($"Total got down: {down}, up: {up}");
+            Console.WriteLine("TOTAL:");
+            printStats();
         }
 
         private static bool ProcessArguments(string[] args) {
