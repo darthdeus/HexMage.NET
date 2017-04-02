@@ -67,12 +67,29 @@ namespace HexMage.Simulator {
         public static bool AlwaysJumpToBetter = false;
         public static bool SaveGoodOnes = true;
         public static double InitialT = 100;
-        public static int NumGenerations = 100000;
         public static int ExtraIterations = 0;
         public static int TeamsPerGeneration = 1;
         public static bool Logging = false;
-        public static int EvolutionPrintModulo = 1000;
+
+        // TODO - check if disabling this helps
+        public static bool ForbidTimeouts = false;
+
+        public static int NumGenerations = 100;
+        public static int EvolutionPrintModulo = 1;
+        public static double MutationDelta = 0.05;
+
         public static bool FitnessGameLength = false;
+        public static bool SigmoidFitness = true;
+
+        public static double SecondMutationProb = 0.35f;
+
+        public static bool PrintFitnessDiff = true;
+
+        /// <summary>
+        /// Misc
+        /// </summary>        
+        public static int RandomSeed = 123456;
+        public static bool UseGlobalSeed = false;
 
         // TODO - fuj, to sem nepatri
         private static StringWriter LogBuffer = new StringWriter();

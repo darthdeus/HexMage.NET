@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using HexMage.Simulator.Model;
 using Newtonsoft.Json;
@@ -39,6 +40,16 @@ namespace HexMage.Simulator {
 
         public DNA ToDna() {
             return GenomeLoader.FromTeam(this);
+        }
+
+        public bool IsValid() {
+            foreach (var mob in mobs) {
+                foreach (var ability in mob.abilities) {
+                    if (ability.ap > mob.ap) return false;
+                }
+            }
+
+            return true;
         }
     }
 

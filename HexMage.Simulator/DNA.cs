@@ -42,9 +42,11 @@ namespace HexMage.Simulator {
         }
 
         public void Randomize() {
-            for (int j = 0; j < Data.Count; j++) {
-                Data[j] = (float) Generator.Random.NextDouble();
-            }
+            do {
+                for (int j = 0; j < Data.Count; j++) {
+                    Data[j] = (float) Generator.Random.NextDouble();
+                }
+            } while (!ToTeam().IsValid());
         }
 
         public string ToDNAString() {

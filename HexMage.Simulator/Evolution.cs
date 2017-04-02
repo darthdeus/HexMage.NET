@@ -58,7 +58,6 @@ namespace HexMage.Benchmarks {
             List<double> plotProb = new List<double>();
 
             int extraIterations = Constants.ExtraIterations;
-            ;
             int maxTotalHp = 0;
 
             int goodCount = 0;
@@ -100,17 +99,21 @@ namespace HexMage.Benchmarks {
                         i = Constants.NumGenerations;
                     }
 
-                    // We don't want to move into a timeouted state to save time
-                    // TODO - check if disabling this helps
-                    //if (newFitness.Timeouted) continue;
+                    if (Constants.ForbidTimeouts && newFitness.Timeouted) continue;
 
-                    float ep = member.result.Fitness;
-                    float e = newFitness.Fitness;
+                    float e = member.result.Fitness;
+                    float ep = newFitness.Fitness;
 
-                    double probability = Math.Exp(-(ep - e) / T);
+                    double probability;
 
+                    if (Constants.SigmoidFitness) {
+                        probability = 1 / (1 + Math.Exp(ep - e));
+                    } else {
+                        probability = Math.Exp(-(ep - e) / T);
+                    }
 
-                    if (((ep - e) > 0 && Constants.AlwaysJumpToBetter) || Probability.Uniform(probability)) {
+                    bool forcedJump = (ep - e) > 0 && Constants.AlwaysJumpToBetter;
+                    if (forcedJump || Probability.Uniform(probability)) {
                         member.result = newFitness;
                         member.dna = newDna;
                     }
@@ -120,7 +123,15 @@ namespace HexMage.Benchmarks {
                     plotProb.Add(probability);
 
                     if (i % Constants.EvolutionPrintModulo == 0) {
-                        Console.WriteLine($"P: {probability.ToString("0.000")}\tT:{T.ToString("0.0000")}\t{member}");
+                        if (Constants.PrintFitnessDiff) {
+                            string se = e.ToString("0.00000");
+                            string sep = ep.ToString("0.00000");
+
+                            Console.WriteLine(
+                                $"P: {probability.ToString("0.00")}\tT:{T.ToString("0.0000")}\t{se} -> {sep} = {Math.Abs(ep - e).ToString("0.0000000")}");
+                        } else {
+                            Console.WriteLine($"P: {probability.ToString("0.00")}\tT:{T.ToString("0.0000")}\t{member}");
+                        }
                     }
                 }
 
@@ -154,19 +165,24 @@ namespace HexMage.Benchmarks {
         public static DNA Mutate(DNA dna, float T) {
             var copy = dna.Clone();
 
+            bool redo = false;
+
             do {
-                var i = Generator.Random.Next(0, dna.Data.Count);
+                redo = false;
 
-                //for (int i = 0; i < dna.Data.Count; i++) {
-                double delta = Generator.Random.NextDouble() / dna.Data.Count;
+                double delta = Generator.Random.NextDouble() * Constants.MutationDelta;
+                double change = Probability.Uniform(0.5) ? 1 + delta : 1 - delta;
 
-                bool changeUp = Probability.Uniform(0.5);
-                double change = changeUp ? 1 + delta : 1 - delta;
-
+                int i = Generator.Random.Next(0, dna.Data.Count);
                 copy.Data[i] = (float) Mathf.Clamp(0.01f, dna.Data[i] * change, 1);
 
+                if (!copy.ToTeam().IsValid()) {
+                    copy = dna.Clone();
+                    redo = true;
+                }
+
                 // TODO - zkusit ruzny pravdepodobnosti - ovlivnovat to teplotou?
-            } while (Probability.Uniform(0.85f));
+            } while (redo || Probability.Uniform(Constants.SecondMutationProb));
 
             return copy;
         }

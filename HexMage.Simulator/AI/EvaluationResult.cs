@@ -1,4 +1,6 @@
-﻿namespace HexMage.Simulator.AI {
+﻿using System;
+
+namespace HexMage.Simulator.AI {
     public struct EvaluationResult {
         public int RedWins;
         public int BlueWins;
@@ -34,10 +36,10 @@
         }
 
         public string ToFitnessString(DNA dna) {
-            string fstr = Fitness.ToString("0.00");
+            string fstr = Fitness.ToString("0.000000");
             string wstr = WinPercentage.ToString("0.0");
 
-            return $"F:{fstr}\tW:{wstr}\t{dna.ToDNAString()}";
+            return $"F:{fstr}  W:{wstr}   {dna.ToDNAString()}";
         }
     }
 }
