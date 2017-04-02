@@ -2,7 +2,7 @@
 
 namespace HexMage.Simulator {
     public static class Constants {
-        public static bool EnableGnuPlot = true;
+        public static bool GnuPlot = true;
 
         // Benchmark controls
         public static bool MctsBenchmark = true;

@@ -129,7 +129,7 @@ namespace HexMage.Benchmarks {
                 //Console.WriteLine("****************************************************");
             }
 
-            if (Constants.EnableGnuPlot) {
+            if (Constants.GnuPlot) {
                 var gnuplotConfigString = $"title '{Constants.NumGenerations} generations," +
                                           $"T_s = {Constants.InitialT}'";
 
