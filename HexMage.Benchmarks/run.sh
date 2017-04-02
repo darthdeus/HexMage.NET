@@ -1,2 +1,2 @@
 #!/bin/sh
-mono ./bin/Release/HexMage.Benchmarks.exe --GnuPlot=false | tee /local/darthdeus/`date +%s`
+mono ./bin/Release/HexMage.Benchmarks.exe | tee /local/darthdeus/`date +%s`
