@@ -119,7 +119,7 @@ namespace HexMage.Benchmarks {
                     plotFit.Add(member.result.Fitness);
                     plotProb.Add(probability);
 
-                    if (i % 1000 == 0) {
+                    if (i % Constants.EvolutionPrintModulo == 0) {
                         Console.WriteLine($"P: {probability.ToString("0.000")}\tT:{T.ToString("0.0000")}\t{member}");
                     }
                 }

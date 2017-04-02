@@ -71,6 +71,7 @@ namespace HexMage.Simulator {
         public static int ExtraIterations = 10;
         public static int TeamsPerGeneration = 1;
         public static bool Logging = false;
+        public static int EvolutionPrintModulo = 1000;
 
         // TODO - fuj, to sem nepatri
         private static StringWriter LogBuffer = new StringWriter();

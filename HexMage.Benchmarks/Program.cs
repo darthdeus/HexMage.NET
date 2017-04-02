@@ -133,7 +133,7 @@ namespace HexMage.Benchmarks {
                 ys.Add(stopwatch.ElapsedMilliseconds);
             }
 
-            if (Constants.EnableGnuPlot) {
+            if (Constants.GnuPlot) {
                 GnuPlot.Plot(xs.ToArray(), ys.ToArray(), "with linespoints");
                 Console.ReadKey();
             }
