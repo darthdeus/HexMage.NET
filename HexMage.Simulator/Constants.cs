@@ -24,6 +24,7 @@ namespace HexMage.Simulator {
         /// </summary>
         public static bool DampenLongRewards = false;
         public static float DampeningFactor = 0.95f;
+        public static bool MctsLogging = false;
 
         /// <summary>
         /// Probability

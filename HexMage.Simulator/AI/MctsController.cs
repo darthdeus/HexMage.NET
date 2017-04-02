@@ -6,7 +6,6 @@ using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public class MctsController : IMobController {
-        public static bool EnableLogging = true;
         private readonly GameInstance _gameInstance;
         private readonly int _thinkTime;
 
@@ -53,7 +52,7 @@ namespace HexMage.Simulator {
             string endRatio = (endTurn / useCounts).ToString("0.00");
             string abilityMoveRatio = ((abilityUse + attackMove) / (move + defensiveMove)).ToString("0.00");
 
-            if (EnableLogging) {
+            if (Constants.EnableLogging) {
                 //Console.WriteLine($"*** MCTS SPEED: {result.MillisecondsPerIteration}ms/iter***");
 
                 foreach (var action in result.Actions) {

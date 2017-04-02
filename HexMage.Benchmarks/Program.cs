@@ -11,7 +11,7 @@ namespace HexMage.Benchmarks {
         private static void Main(string[] args) {
             Generator.Random = new Random(3);
 
-            MctsController.EnableLogging = true;
+            Constants.EnableLogging = true;
 
             if (!ProcessArguments(args)) return;
 
@@ -39,10 +39,10 @@ namespace HexMage.Benchmarks {
             Console.WriteLine();
 
             if (key.Key == ConsoleKey.D2) {
-                MctsController.EnableLogging = false;
+                Constants.EnableLogging = false;
                 //RunEvaluator();
             } else if (key.Key == ConsoleKey.D3) {
-                MctsController.EnableLogging = false;
+                Constants.EnableLogging = false;
                 new Evolution().Run();
             } else {
                 for (int i = 0; i < 10; i++) {
