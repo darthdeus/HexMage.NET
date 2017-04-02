@@ -103,7 +103,7 @@ namespace HexMage.Benchmarks {
 
                 Console.WriteLine("************************************");
                 Console.WriteLine(
-                    $"Took ${Constants.MaxPlayoutEvaluationIterations - iterations} iterations, time {stopwatch.ElapsedMilliseconds}ms");
+                    $"I:{i} Took ${Constants.MaxPlayoutEvaluationIterations - iterations} iterations, time {stopwatch.ElapsedMilliseconds}ms");
                 Console.WriteLine();
 
                 xs.Add(i);
