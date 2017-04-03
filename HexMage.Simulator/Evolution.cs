@@ -33,19 +33,15 @@ namespace HexMage.Benchmarks {
         }
 
         public void Run() {
-            var generation = new List<GenerationMember>();
+            var generation = new List<GenerationMember>(Constants.TeamsPerGeneration);
 
-            for (int i = 0; i < Constants.TeamsPerGeneration; i++) {
-                var copy = initialDna.Clone();
-                copy.Randomize();
+            var copy = initialDna.Clone();
+            copy.Randomize();
 
-                var member = new GenerationMember {
-                    dna = copy,
-                    result = CalculateFitness(game, initialDna, copy)
-                };
-
-                generation.Add(member);
-            }
+            var current = new GenerationMember {
+                dna = copy,
+                result = CalculateFitness(game, initialDna, copy)
+            };
 
             double Tpercentage = 1;
             double T = Constants.InitialT;
@@ -74,54 +70,59 @@ namespace HexMage.Benchmarks {
                 var genWatch = new Stopwatch();
                 genWatch.Start();
 
-                for (int j = 0; j < generation.Count; j++) {
-                    var teamWatch = new Stopwatch();
-                    teamWatch.Start();
+                var teamWatch = new Stopwatch();
+                teamWatch.Start();
 
-                    var member = generation[j];
+                if (Constants.RestartFailures && current.result.Fitness < Constants.FitnessThreshold) {
+                    current.dna.Randomize();
+                    _restartCount++;
+                }
 
-                    if (Constants.RestartFailures && member.result.Fitness < Constants.FitnessThreshold) {
-                        member.dna.Randomize();
-                        _restartCount++;
-                    }
+                generation.Clear();
 
-                    var newDna = Mutate(member.dna, (float) T);
+                for (int j = 0; j < Constants.TeamsPerGeneration; j++) {
+                    var newDna = Mutate(current.dna, (float)T);
                     var newFitness = CalculateFitness(game, initialDna, newDna);
 
-                    HandleGoodEnough(ref goodEnough, newFitness, member, ref goodCount);
-
-                    if (newFitness.Tainted) {
-                        SaveTainted(newDna);
-                        i = Constants.NumGenerations;
-                    }
-
-                    if (Constants.ForbidTimeouts && newFitness.Timeouted) continue;
-
-                    float e = member.result.Fitness;
-                    float ep = newFitness.Fitness;
-
-
-                    double probability;
-
-                    float delta = ep - e;
-
-                    if (delta > 0) {
-                        probability = 1;
-                    } else {
-                        probability = Math.Exp(-Math.Abs(delta) / T);
-                    }
-
-                    if (Constants.HillClimbing || (!Constants.HillClimbing && Probability.Uniform(probability))) {
-                        member.result = newFitness;
-                        member.dna = newDna;
-                    }
-
-                    plotT.Add(T);
-                    plotFit.Add(member.result.Fitness);
-                    plotProb.Add(probability);
-
-                    PrintEvaluationResult(i, e, ep, probability, T, member);
+                    generation.Add(new GenerationMember(newDna, newFitness));
                 }
+
+                var newMax = PickBestMember(generation);
+
+                HandleGoodEnough(ref goodEnough, newMax.result, current, ref goodCount);
+
+                if (goodEnough) break;
+
+                if (newMax.result.Tainted) {
+                    SaveTainted(newMax.dna);
+                    i = Constants.NumGenerations;
+                }
+
+                if (Constants.ForbidTimeouts && newMax.result.Timeouted) continue;
+
+                float e = current.result.Fitness;
+                float ep = newMax.result.Fitness;
+
+
+                double probability;
+
+                float delta = ep - e;
+
+                if (delta > 0) {
+                    probability = 1;
+                } else {
+                    probability = Math.Exp(-Math.Abs(delta) / T);
+                }
+
+                if (Constants.HillClimbing || (!Constants.HillClimbing && Probability.Uniform(probability))) {
+                    current = newMax;
+                }
+
+                plotT.Add(T);
+                plotFit.Add(current.result.Fitness);
+                plotProb.Add(probability);
+
+                PrintEvaluationResult(i, e, ep, probability, T, current);
 
                 //Console.WriteLine("****************************************************");
                 //Console.WriteLine($"Generation {i}. done in {genWatch.ElapsedMilliseconds}ms");
@@ -135,12 +136,25 @@ namespace HexMage.Benchmarks {
                                           $"T_s = {Constants.InitialT}'";
 
                 GnuPlot.HoldOn();
-                GnuPlot.Set($"xrange [{Constants.InitialT}:0] reverse");
+                GnuPlot.Set($"xrange [{Constants.InitialT}:{T}] reverse");
                 GnuPlot.Set($"yrange [0:1] ");
                 GnuPlot.Plot(plotT.ToArray(), plotFit.ToArray(), gnuplotConfigString);
                 //GnuPlot.Plot(plotT.ToArray(), plotProb.ToArray(), gnuplotConfigString);
                 Console.ReadKey();
             }
+        }
+
+        private static GenerationMember PickBestMember(List<GenerationMember> generation) {
+            GenerationMember newMax = generation[0];
+
+            for (int j = 1; j < Constants.TeamsPerGeneration; j++) {
+                var potentialMax = generation[j];
+
+                if (potentialMax.result.Fitness > newMax.result.Fitness) {
+                    newMax = potentialMax;
+                }
+            }
+            return newMax;
         }
 
         private static void PrintEvaluationResult(int i, float e, float ep, double probability, double T,

@@ -6,7 +6,7 @@ namespace HexMage.Simulator {
 
         public static bool MeasureSearchSpaceStats = false;
         public static int MeasureSamples = 1000000;
-        public static int MeasureNeighboursPerSample = 10;        
+        public static int MeasureNeighboursPerSample = 10;
 
         // Benchmark controls
         public static bool MctsBenchmark = false;
@@ -22,11 +22,13 @@ namespace HexMage.Simulator {
         /// TODO - experiment
         /// </summary>
         public static bool UseHpPercentageScaling = true;
+
         /// <summary>
         /// When enabled, rewards are slowly dampened each turn, penalizing rewards
         /// from longer games.
         /// </summary>
         public static bool DampenLongRewards = false;
+
         public static float DampeningFactor = 0.95f;
         public static bool MctsLogging = false;
 
@@ -69,9 +71,9 @@ namespace HexMage.Simulator {
 
         // Evolution
         public static bool RestartFailures = true;
-        public static double FitnessThreshold = 0.1;
+        public static double FitnessThreshold = 0.5;
 
-        public static bool RandomizeInitialTeam = true;
+        public static bool RandomizeInitialTeam = false;
 
         public static bool AverageHpTotals = true;
         public static bool SaveGoodOnes = true;
@@ -84,13 +86,16 @@ namespace HexMage.Simulator {
 
         public static bool HillClimbing = false;
 
-        public static int NumGenerations = 1000;
+        public static int NumGenerations = 10000;
         public static int EvolutionPrintModulo = 10;
-        public static int TeamsPerGeneration = 1;
+        public static int TeamsPerGeneration = 10;
         public static double MutationDelta = 0.05;
 
         /// <summary>
         /// Take game length into account when evaluating the fitness function
+        /// 
+        /// Note that this doesn't converge at all, never goes above 0.5
+        /// TODO: why?
         /// </summary>
         public static bool FitnessGameLength = false;
 
@@ -102,6 +107,7 @@ namespace HexMage.Simulator {
         /// Misc
         /// </summary>        
         public static int RandomSeed = 12345;
+
         public static bool UseGlobalSeed = false;
 
         // TODO - fuj, to sem nepatri

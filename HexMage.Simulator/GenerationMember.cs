@@ -6,6 +6,14 @@ namespace HexMage.Benchmarks {
         public DNA dna;
         public EvaluationResult result;
 
+        public GenerationMember() {
+        }
+
+        public GenerationMember(DNA dna, EvaluationResult result) {
+            this.dna = dna;
+            this.result = result;
+        }
+
         public override string ToString() {
             return result.ToFitnessString(dna);
         }
