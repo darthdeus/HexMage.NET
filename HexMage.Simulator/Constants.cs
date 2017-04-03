@@ -71,7 +71,7 @@ namespace HexMage.Simulator {
 
         // Evolution
         public static bool RestartFailures = true;
-        public static double FitnessThreshold = 0.5;
+        public static double FitnessThreshold = 0.1;
 
         public static bool RandomizeInitialTeam = true;
 
@@ -86,8 +86,8 @@ namespace HexMage.Simulator {
 
         public static bool HillClimbing = false;
 
-        public static int NumGenerations = 10000;
-        public static int EvolutionPrintModulo = 100;
+        public static int NumGenerations = 100000;
+        public static int EvolutionPrintModulo = 1000;
         public static int TeamsPerGeneration = 5;
         public static double MutationDelta = 0.15;
 
@@ -99,7 +99,7 @@ namespace HexMage.Simulator {
         /// </summary>
         public static bool FitnessGameLength = false;
 
-        public static double SecondMutationProb = 0.25f;
+        public static double SecondMutationProb = 0.35f;
 
         public static bool PrintFitnessDiff = true;
 

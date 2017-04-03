@@ -5,6 +5,7 @@ namespace HexMage.Benchmarks {
     public class GenerationMember {
         public DNA dna;
         public EvaluationResult result;
+        public int failCount = 0 ;
 
         public GenerationMember() {
         }

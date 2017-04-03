@@ -23,7 +23,6 @@ namespace HexMage.Benchmarks {
                 MeasureSearchSpaceStats();
             }
 
-
             if (Constants.EvaluateAis) {
                 //new AiEvaluator().Run();
             } else {

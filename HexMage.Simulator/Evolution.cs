@@ -101,21 +101,23 @@ namespace HexMage.Benchmarks {
 
                 float e = current.result.Fitness;
                 float ep = newMax.result.Fitness;
-
-
+                                        
                 double probability;
 
                 float delta = ep - e;
 
                 if (delta > 0) {
                     probability = 1;
+                    current = newMax;
                 } else {
                     probability = Math.Exp(-Math.Abs(delta) / T);
+                    if (Constants.HillClimbing ^ Probability.Uniform(probability)) {
+                        newMax.failCount = current.failCount;
+                        current = newMax;
+                    }
+                    current.failCount++;
                 }
 
-                if (Constants.HillClimbing || (!Constants.HillClimbing && Probability.Uniform(probability))) {
-                    current = newMax;
-                }
 
                 plotT.Add(T);
                 plotFit.Add(current.result.Fitness);
@@ -214,7 +216,6 @@ namespace HexMage.Benchmarks {
                 }
 
                 if (!copy.ToTeam().IsValid()) {
-                    Console.WriteLine("restarting mutation");
                     copy = dna.Clone();
                     redo = true;
                 }

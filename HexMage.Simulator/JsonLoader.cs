@@ -51,6 +51,8 @@ namespace HexMage.Simulator {
                 foreach (var ability in mob.abilities) {
                     if (ability.ap > mob.ap) return false;
                     if (ability.dmg == 0) return false;
+                    if (ability.ap == 0) return false;
+                    if (ability.range == 0) return false;
                 }
             }
 
@@ -62,7 +64,8 @@ namespace HexMage.Simulator {
         public List<JsonMob> red = new List<JsonMob>();
         public List<JsonMob> blue = new List<JsonMob>();
 
-        public Setup() {}
+        public Setup() {
+        }
 
         public Setup(List<JsonMob> red, List<JsonMob> blue) {
             this.red = red;
