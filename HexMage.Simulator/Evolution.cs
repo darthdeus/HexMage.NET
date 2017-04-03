@@ -207,9 +207,14 @@ namespace HexMage.Benchmarks {
                 double change = Probability.Uniform(0.5) ? 1 + delta : 1 - delta;
 
                 int i = Generator.Random.Next(0, dna.Data.Count);
-                copy.Data[i] = (float) Mathf.Clamp(0.01f, dna.Data[i] * change, 1);
+                if (copy.IsElementIndex(i)) {
+                    copy.Data[i] = Generator.Random.Next(0, 4) / (float)4;
+                } else {
+                    copy.Data[i] = (float)Mathf.Clamp(0.01f, dna.Data[i] * change, 1);
+                }
 
                 if (!copy.ToTeam().IsValid()) {
+                    Console.WriteLine("restarting mutation");
                     copy = dna.Clone();
                     redo = true;
                 }

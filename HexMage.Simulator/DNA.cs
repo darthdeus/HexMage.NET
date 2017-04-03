@@ -11,14 +11,14 @@ namespace HexMage.Simulator {
         public int MobCount;
 
         public const int MobAttributeCount = 2;
-        public const int AbilityAttributeCount = 3;
+        public const int AbilityAttributeCount = 4;
         public int MobSize => MobAttributeCount + AbilityCount * AbilityAttributeCount;
 
-        // TODO - element
         // TODO - buff
         // TODO - area buff
 
-        public DNA() {}
+        public DNA() {
+        }
 
         public DNA(int mobCount, int abilityCount) {
             MobCount = mobCount;
@@ -45,10 +45,18 @@ namespace HexMage.Simulator {
             return dna;
         }
 
+        public bool IsElementIndex(int index) {
+            return ((index % MobSize) - MobAttributeCount) % AbilityAttributeCount == AbilityAttributeCount - 1;
+        }
+
         public void Randomize() {
             do {
-                for (int j = 0; j < Data.Count; j++) {
-                    Data[j] = (float) Generator.Random.NextDouble();
+                for (int i = 0; i < Data.Count; i++) {
+                    if (IsElementIndex(i)) {
+                        Data[i] = Generator.Random.Next(0, 4) / (float)4;
+                    } else {
+                        Data[i] = (float)Generator.Random.NextDouble();
+                    }
                 }
             } while (!ToTeam().IsValid());
         }

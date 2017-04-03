@@ -73,7 +73,7 @@ namespace HexMage.Simulator {
         public static bool RestartFailures = true;
         public static double FitnessThreshold = 0.5;
 
-        public static bool RandomizeInitialTeam = false;
+        public static bool RandomizeInitialTeam = true;
 
         public static bool AverageHpTotals = true;
         public static bool SaveGoodOnes = true;
@@ -87,9 +87,9 @@ namespace HexMage.Simulator {
         public static bool HillClimbing = false;
 
         public static int NumGenerations = 10000;
-        public static int EvolutionPrintModulo = 10;
-        public static int TeamsPerGeneration = 10;
-        public static double MutationDelta = 0.05;
+        public static int EvolutionPrintModulo = 100;
+        public static int TeamsPerGeneration = 5;
+        public static double MutationDelta = 0.15;
 
         /// <summary>
         /// Take game length into account when evaluating the fitness function
@@ -136,6 +136,7 @@ namespace HexMage.Simulator {
         public static int CostMax = 20;
         public static int RangeMax = 10;
         public static int EvolutionMapSize = 5;
+        public static int ElementCount = 4;
 
         public static readonly string SaveFile = @"evo-save.txt";
         public static readonly string SaveDir = "save-files/";

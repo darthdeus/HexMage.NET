@@ -9,7 +9,8 @@ using HexMage.Simulator.PCG;
 namespace HexMage.Benchmarks {
     internal class Program {
         private static void Main(string[] args) {
-            Generator.Random = new Random(3);
+            // TODO - proc to ale s timhle nekonverguje?!?!?!?!??!
+            //Generator.Random = new Random(3);
 
             if (!ProcessArguments(args)) return;
 
