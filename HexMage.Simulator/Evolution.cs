@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Windows.Forms;
 using HexMage.Simulator;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.PCG;
