@@ -7,7 +7,7 @@ using System.Threading;
 // Taken from https://github.com/AwokeKnowing/GnuplotCSharp
 namespace HexMage.Simulator {
     public class GnuPlot {
-        public static string PathToGnuplot = @"C:\dev\tools\gnuplot\bin";
+        public static string PathToGnuplot;
         private static Process ExtPro;
         private static StreamWriter GnupStWr;
         private static List<StoredPlot> PlotBuffer;
@@ -17,10 +17,19 @@ namespace HexMage.Simulator {
         public static bool Hold { get; private set; }
 
         static GnuPlot() {
-            if (PathToGnuplot[PathToGnuplot.Length - 1].ToString() != @"\")
-                PathToGnuplot += @"\";
+            bool isMono = Type.GetType("Mono.Runtime") != null;
+
+            if (isMono) {
+                PathToGnuplot = @"/usr/bin/";
+            }
+            else {
+                PathToGnuplot = @"C:\dev\tools\gnuplot\bin";
+                if (PathToGnuplot[PathToGnuplot.Length - 1].ToString() != @"\") {
+                    PathToGnuplot += @"\";
+                }
+            }
             ExtPro = new Process();
-            ExtPro.StartInfo.FileName = PathToGnuplot + "gnuplot.exe";
+            ExtPro.StartInfo.FileName = PathToGnuplot + "gnuplot";
             ExtPro.StartInfo.UseShellExecute = false;
             ExtPro.StartInfo.RedirectStandardInput = true;
             ExtPro.Start();
@@ -206,8 +215,8 @@ namespace HexMage.Simulator {
             for (int i = 0; i < storedPlots.Count; i++) {
                 var p = storedPlots[i];
                 defcntopts = (p.Options.Length > 0 && (p.Options.Contains(" w") || p.Options[0] == 'w'))
-                                 ? " "
-                                 : " with lines ";
+                    ? " "
+                    : " with lines ";
                 switch (p.PlotType) {
                     case PlotTypes.PlotFileOrFunction:
                         if (p.File != null)
@@ -301,8 +310,8 @@ namespace HexMage.Simulator {
             for (int i = 0; i < storedPlots.Count; i++) {
                 var p = storedPlots[i];
                 defopts = (p.Options.Length > 0 && (p.Options.Contains(" w") || p.Options[0] == 'w'))
-                              ? " "
-                              : " with lines ";
+                    ? " "
+                    : " with lines ";
                 switch (p.PlotType) {
                     case PlotTypes.SplotFileOrFunction:
                         if (p.File != null)
@@ -500,7 +509,8 @@ namespace HexMage.Simulator {
             while (file == null) {
                 try {
                     file = new System.IO.StreamReader(filename);
-                } catch {
+                }
+                catch {
                     if (attempts-- > 0)
                         Thread.Sleep(100);
                     else
@@ -575,10 +585,10 @@ namespace HexMage.Simulator {
         public PlotTypes PlotType;
         public bool LabelContours;
 
-        public StoredPlot() {}
+        public StoredPlot() { }
 
         public StoredPlot(string functionOrfilename, string options = "",
-                          PlotTypes plotType = PlotTypes.PlotFileOrFunction) {
+            PlotTypes plotType = PlotTypes.PlotFileOrFunction) {
             if (IsFile(functionOrfilename))
                 File = functionOrfilename;
             else
@@ -609,7 +619,7 @@ namespace HexMage.Simulator {
         }
 
         public StoredPlot(double[] x, double[] y, double[] z, string options = "",
-                          PlotTypes plotType = PlotTypes.SplotXYZ) {
+            PlotTypes plotType = PlotTypes.SplotXYZ) {
             if (x.Length < 2)
                 YSize = 1;
             else

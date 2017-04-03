@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using HexMage.Simulator;
 using HexMage.Simulator.AI;
-using HexMage.Simulator.PCG;
 
 namespace HexMage.Benchmarks {
     internal class Program {
