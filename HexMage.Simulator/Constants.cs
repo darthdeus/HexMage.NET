@@ -70,11 +70,13 @@ namespace HexMage.Simulator {
         // Evolution
         public static bool RestartFailures = true;
         public static double FitnessThreshold = 0.1;
+
+        public static bool RandomizeInitialTeam = true;
+
         public static bool AverageHpTotals = true;
         public static bool SaveGoodOnes = true;
         public static double InitialT = 1;
         public static int ExtraIterations = 0;
-        public static int TeamsPerGeneration = 1;
         public static bool Logging = false;
 
         // TODO - check if disabling this helps
@@ -82,23 +84,24 @@ namespace HexMage.Simulator {
 
         public static bool HillClimbing = false;
 
-        public static int NumGenerations = 100000;
-        public static int EvolutionPrintModulo = 1000;
-        public static double MutationDelta = 0.15;
+        public static int NumGenerations = 1000;
+        public static int EvolutionPrintModulo = 10;
+        public static int TeamsPerGeneration = 1;
+        public static double MutationDelta = 0.05;
 
         /// <summary>
         /// Take game length into account when evaluating the fitness function
         /// </summary>
         public static bool FitnessGameLength = false;
 
-        public static double SecondMutationProb = 0.35f;
+        public static double SecondMutationProb = 0.25f;
 
         public static bool PrintFitnessDiff = true;
 
         /// <summary>
         /// Misc
         /// </summary>        
-        public static int RandomSeed = 1234;
+        public static int RandomSeed = 12345;
         public static bool UseGlobalSeed = false;
 
         // TODO - fuj, to sem nepatri

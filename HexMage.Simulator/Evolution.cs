@@ -23,18 +23,13 @@ namespace HexMage.Benchmarks {
             team.mobs.RemoveAt(0);
 
             initialDna = GenomeLoader.FromTeam(team);
-            //initialDna.Randomize();
+            if (Constants.RandomizeInitialTeam) {
+                initialDna.Randomize();
+            }
 
             Console.WriteLine($"Initial: {initialDna.ToDNAString()}\n\n");
 
             game = GameSetup.FromDNAs(initialDna, initialDna);
-
-            //game = new GameInstance(Constants.EvolutionMapSize);
-
-            //GameSetup.UnpackTeamsIntoGame(game, initialDna, initialDna);
-            //game.PrepareEverything();
-
-            //GameSetup.ResetPositions(game);
         }
 
         public void Run() {
