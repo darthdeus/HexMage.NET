@@ -14,6 +14,10 @@ namespace HexMage.Simulator {
         public const int AbilityAttributeCount = 3;
         public int MobSize => MobAttributeCount + AbilityCount * AbilityAttributeCount;
 
+        // TODO - element
+        // TODO - buff
+        // TODO - area buff
+
         public DNA() {}
 
         public DNA(int mobCount, int abilityCount) {
