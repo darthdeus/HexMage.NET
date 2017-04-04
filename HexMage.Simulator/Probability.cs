@@ -13,5 +13,15 @@ namespace HexMage.Simulator {
                             / (2 * Constants.Sigma * Constants.Sigma))
                    / Math.Sqrt(2 * Constants.Sigma * Constants.Sigma);
         }
+
+        public static double Exponential(double lambda, double u) {
+            // TODO - otestovat, co to vlastne ma delat :)
+            return Math.Log(1 - u) / -lambda;
+        }
+
+        public static double Exponential(double lambda) {
+            double u = Generator.Random.NextDouble();
+            return Exponential(lambda, u);
+        }
     }
 }

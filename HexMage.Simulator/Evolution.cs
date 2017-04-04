@@ -49,6 +49,22 @@ namespace HexMage.Benchmarks {
             List<double> plotFit = new List<double>();
             List<double> plotProb = new List<double>();
 
+            // TODO: exponencialni rozdeleni otestovat
+            //var xs = new List<double>();
+            //var ys = new List<double>();
+
+            //for (int i = 0; i < 1000; i++) {
+            //    double x = 1.0 / 1000.0 * i;
+            //    double y = Probability.Exponential(1, x);
+            //    y = Math.Exp(-x);
+
+            //    xs.Add(x);
+            //    ys.Add(y);
+            //}
+
+            //GnuPlot.Plot(xs.ToArray(), ys.ToArray());
+            //Console.ReadKey();
+
             int extraIterations = Constants.ExtraIterations;
             int maxTotalHp = 0;
 
@@ -137,8 +153,12 @@ namespace HexMage.Benchmarks {
                                           $"T_s = {Constants.InitialT}'";
 
                 GnuPlot.HoldOn();
-                GnuPlot.Set($"xrange [{Constants.InitialT}:{T}] reverse");
-                GnuPlot.Set($"yrange [0:1] ");
+                GnuPlot.Set($"xrange [{Constants.InitialT}:{T}] reverse",
+                            "yrange [0:1]",
+                            "style data lines",
+                            "key tmargin center horizontal");
+                //GnuPlot.Set($"yrange [0:1] ");
+                //GnuPlot.Set($"style data lines");
                 GnuPlot.Plot(plotT.ToArray(), plotFit.ToArray(), gnuplotConfigString);
                 //GnuPlot.Plot(plotT.ToArray(), plotProb.ToArray(), gnuplotConfigString);
                 Console.ReadKey();
@@ -146,6 +166,8 @@ namespace HexMage.Benchmarks {
         }
 
         private static GenerationMember PickBestMember(List<GenerationMember> generation) {
+            generation.Sort((a, b) => a.result.Fitness.CompareTo(b.result.Fitness));
+
             GenerationMember newMax = generation[0];
 
             for (int j = 1; j < Constants.TeamsPerGeneration; j++) {
