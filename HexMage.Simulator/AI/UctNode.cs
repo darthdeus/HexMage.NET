@@ -19,6 +19,9 @@ namespace HexMage.Simulator {
         public bool IsTerminal => State.State.IsFinished;
         public bool IsFullyExpanded => PossibleActions != null && PossibleActions.Count == Children.Count;
 
+        public UctNode(UctAction action, GameInstance state) : this(0, 0, action, state) {
+        }
+
         public UctNode(float q, int n, UctAction action, GameInstance state) {
             Id = _id++;
             Q = q;
@@ -26,6 +29,11 @@ namespace HexMage.Simulator {
             Action = action;
             State = state;
         }
+
+        public static UctNode FromAction(GameInstance game, UctAction action) {
+            return new UctNode(action, UctAlgorithm.F(game, action));
+        }
+
 
         public void PrecomputePossibleActions(bool allowMove, bool allowEndTurn) {
             if (PossibleActions == null) {
@@ -74,7 +82,7 @@ namespace HexMage.Simulator {
 
         public float UcbValue() {
             float parentN = Parent?.N ?? 0;
-            return (float) (Q / N + Math.Sqrt(2 * Math.Log(parentN) / N));
+            return (float)(Q / N + Math.Sqrt(2 * Math.Log(parentN) / N));
         }
 
         public void Print(int indentation) {

@@ -106,7 +106,8 @@ namespace HexMage.Benchmarks {
 
                 HandleGoodEnough(ref goodEnough, newMax.result, current, ref goodCount);
 
-                if (goodEnough) break;
+                // TODO: tohle pak budu mozna chtit vratit
+                //if (goodEnough) break;
 
                 if (newMax.result.Tainted) {
                     SaveTainted(newMax.dna);

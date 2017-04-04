@@ -3,11 +3,83 @@ using System.Collections.Generic;
 using System.Linq;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
+using HexMage.Simulator.PCG;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HexMage.Simulator.Tests {
     [TestClass]
     public class UctTest {
+
+        [TestMethod]
+        public void BasicUctTest() {
+            Generator.Random = new Random(123);
+
+            var dna = new DNA(1, 1);
+            dna.Randomize();
+
+            var game = GameSetup.FromDNAs(dna, dna);
+
+            var root = new UctNode(UctAction.NullAction(), game);
+
+            var result = new UctAlgorithm(100).UctSearch(game);
+
+            foreach (var action in result.Actions) {
+                Console.WriteLine(action);
+            }
+        }
+
+        [TestMethod]
+        public void FlatMonteCarloTest() {
+            Generator.Random = new Random(123);
+
+            var dna = new DNA(1, 1);
+            dna.Randomize();
+
+            var game = GameSetup.FromDNAs(dna, dna);
+            Assert.IsTrue(game.CurrentTeam.HasValue);
+
+            var startingTeam = game.CurrentTeam.Value;
+
+            var root = new UctNode(UctAction.NullAction(), game);
+
+            root.PossibleActions = new List<UctAction>();
+            root.PossibleActions.Add(UctAction.EndTurnAction());
+            root.PossibleActions.Add(UctAction.NullAction());
+
+            root.PrecomputePossibleActions(true, true);
+
+            UctAlgorithm.OneIteration(root, startingTeam);
+            UctDebug.PrintDotgraph(root, () => 0);
+
+            UctAlgorithm.OneIteration(root, startingTeam);
+            UctDebug.PrintDotgraph(root, () => 1);
+
+            //var endTurnChild = UctAlgorithm.Expand(root);
+            //var nullChild = UctAlgorithm.Expand(root);
+
+            //float endTurnReward = UctAlgorithm.DefaultPolicy(endTurnChild.State, startingTeam);
+            //float nullReward = UctAlgorithm.DefaultPolicy(nullChild.State, startingTeam);
+
+            //UctAlgorithm.Backup(endTurnChild, endTurnReward);
+            //UctAlgorithm.Backup(nullChild, nullReward);
+
+            //UctDebug.PrintDotgraph(root);
+
+            //var mc = new FlatMonteCarlo();
+
+            //var endNode = new UctNode(UctAction.EndTurnAction(), game.DeepCopy());
+
+            //var ability = game.MobManager.MobInfos[0].Abilities[0];
+            //var abilityAction = UctAction.AbilityUseAction(ability,
+            //                                               game.MobManager.Mobs[0],
+            //                                               game.MobManager.Mobs[1]);
+            //var abilityNode = new UctNode(abilityAction, game.DeepCopy());
+
+            //var result = FlatMonteCarlo.Search(game);
+
+            //Console.WriteLine(result);
+        }
+
         [TestMethod]
         public void StateDeepCopyTest() {
             var game = new GameInstance(3);

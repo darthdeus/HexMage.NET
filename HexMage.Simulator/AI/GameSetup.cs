@@ -44,7 +44,9 @@ namespace HexMage.Simulator.AI {
             game.State.SetMobPosition(mobIds[0], new AxialCoord(x, y));
             game.State.SetMobPosition(mobIds[1], new AxialCoord(y, x));
 
-            game.State.SetMobPosition(mobIds[2], new AxialCoord(-x, -y));
+            if (mobIds.Count > 2)
+                game.State.SetMobPosition(mobIds[2], new AxialCoord(-x, -y));
+            if (mobIds.Count > 3)
             game.State.SetMobPosition(mobIds[3], new AxialCoord(-y, -x));
         }
 

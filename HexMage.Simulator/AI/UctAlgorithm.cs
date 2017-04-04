@@ -4,11 +4,34 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
+    public class FlatMonteCarlo {
+        public static UctNode Search(GameInstance initial) {
+            var root = new UctNode(0, 0, UctAction.NullAction(), initial.DeepCopy());
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            while (!root.IsFullyExpanded) {
+                UctAlgorithm.Expand(root);
+            }
+
+            for (int i = 0; i < 10000; i++) {
+                var child = root.Children[i % root.Children.Count];
+
+                float reward = UctAlgorithm.DefaultPolicy(child.State, initial.CurrentTeam.Value);
+                UctAlgorithm.Backup(child, reward);
+            }
+
+            var bestChild = UctAlgorithm.BestChild(root);
+
+            return root;
+        }
+    }
+
     public class UctAlgorithm {
         // TODO - extrahovat do args nebo configuraku
         public static int Actions = 0;
@@ -23,13 +46,12 @@ namespace HexMage.Simulator {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
+            // TODO - for loop? lul
             int totalIterations = _thinkTime;
             int iterations = totalIterations;
 
             while (iterations-- > 0) {
-                UctNode v = TreePolicy(root);
-                float delta = DefaultPolicy(v.State, initialState.CurrentTeam.Value);
-                Backup(v, delta);
+                OneIteration(root, initialState.CurrentTeam.Value);
             }
 
             stopwatch.Stop();
@@ -43,8 +65,16 @@ namespace HexMage.Simulator {
             return new UctSearchResult(actions, (double) stopwatch.ElapsedMilliseconds / (double) totalIterations);
         }
 
+        public static float OneIteration(UctNode root, TeamColor startingTeam) {
+            UctNode v = TreePolicy(root);
+            // TODO: ma tu byt root node team, nebo aktualni?
+            float delta = DefaultPolicy(v.State, startingTeam);
+            Backup(v, delta);
+            return delta;
+        }
 
-        public UctNode TreePolicy(UctNode node) {
+
+        public static UctNode TreePolicy(UctNode node) {
             while (!node.IsTerminal) {
                 if (!node.IsFullyExpanded) {
                     ExpandCount++;
@@ -58,7 +88,7 @@ namespace HexMage.Simulator {
             return node;
         }
 
-        public UctNode BestChild(UctNode node) {
+        public static UctNode BestChild(UctNode node) {
             if (node.Children.Count == 0) return null;
 
             UctNode best = node.Children[0];
@@ -71,11 +101,11 @@ namespace HexMage.Simulator {
             return best;
         }
 
-        public float UcbValue(UctNode parent, UctNode node) {
+        public static float UcbValue(UctNode parent, UctNode node) {
             return (float) (node.Q / node.N + Math.Sqrt(2 * Math.Log(parent.N) / node.N));
         }
 
-        public UctNode Expand(UctNode node) {
+        public static UctNode Expand(UctNode node) {
             try {
                 var type = node.Action.Type;
 
@@ -99,6 +129,7 @@ namespace HexMage.Simulator {
             return FNoCopy(state.CopyStateOnly(), action);
         }
 
+        // TODO: extract all the accounting
         public static readonly Dictionary<UctActionType, int> ActionCounts = new Dictionary<UctActionType, int>();
         private readonly int _thinkTime;
 
@@ -159,6 +190,10 @@ namespace HexMage.Simulator {
             return state;
         }
 
+        public static float PlayoutAction(GameInstance game, UctAction action, TeamColor startingTeam) {
+            return DefaultPolicy(F(game, action), startingTeam);
+        }
+
         public static float DefaultPolicy(GameInstance game, TeamColor startingTeam) {
             if (game.IsFinished) {
                 Debug.Assert(game.VictoryTeam.HasValue, "game.VictoryTeam.HasValue");
@@ -216,7 +251,7 @@ namespace HexMage.Simulator {
             }
         }
 
-        public void Backup(UctNode node, float delta) {
+        public static void Backup(UctNode node, float delta) {
             while (node != null) {
                 node.N++;
                 node.Q += delta;

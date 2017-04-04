@@ -1,9 +1,12 @@
+//#define XML
+#define DOT
+using System;
 using System.IO;
 using System.Text;
 
 namespace HexMage.Simulator {
     public class UctDebug {
-        private void PrintDotgraph(UctNode root) {
+        public static void PrintDotgraph(UctNode root, Func<int> indexFunc = null) {
             var builder = new StringBuilder();
 
             builder.AppendLine("digraph G {");
@@ -18,10 +21,12 @@ namespace HexMage.Simulator {
                 Directory.CreateDirectory(dirname);
             }
 
-            File.WriteAllText($"c:\\dev\\graphs\\graph{UctAlgorithm.SearchCount}.dot", str);
+            int index = indexFunc == null ? UctAlgorithm.SearchCount : indexFunc();
+
+            File.WriteAllText($@"graph{index}.dot", str);
         }
 
-        private void PrintDotNode(StringBuilder builder, UctNode node, int budget) {
+        private static void PrintDotNode(StringBuilder builder, UctNode node, int budget) {
             if (budget == 0) return;
 
             foreach (var child in node.Children) {
@@ -47,7 +52,7 @@ namespace HexMage.Simulator {
                 new XmlTreePrinter(root).Print(writer);
             }
 #endif
-#if DOTGRAPH
+#if DOT
             PrintDotgraph(root);            
 #endif
         }
