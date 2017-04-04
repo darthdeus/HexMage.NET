@@ -58,9 +58,8 @@ namespace HexMage.Benchmarks {
                 GameInstanceEvaluator.PlayoutSingleGame(game, c1, c2);
                 iterationStopwatch.Stop();
 
+                Console.Write($"Iteration: {iterationStopwatch.ElapsedMilliseconds}ms");
                 GameInstanceEvaluator.PrintBookkeepingData();
-
-                Console.WriteLine($"Iteration: {iterationStopwatch.ElapsedMilliseconds}ms");
             }
         }
 

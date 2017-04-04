@@ -56,7 +56,6 @@ namespace HexMage.Simulator {
             }
         }
 
-
         public static void PrintTreeRepresentation(UctNode root) {
 #if XML
             var dirname = @"c:\dev\graphs\xml\";
