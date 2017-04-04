@@ -1,6 +1,6 @@
 //#define XML
+//#define DOT
 
-#define DOT
 using System;
 using System.IO;
 using System.Text;
@@ -13,7 +13,7 @@ namespace HexMage.Simulator {
             var builder = new StringBuilder();
 
             builder.AppendLine("digraph G {");
-            int budget = 5;
+            int budget = 6;
             PrintDotNode(builder, root, budget);
             builder.AppendLine("}");
 
@@ -39,7 +39,12 @@ namespace HexMage.Simulator {
                 var teamColor = child.State.CurrentTeam;
 
                 if (teamColor.HasValue) {
-                    color = teamColor.Value == TeamColor.Red ? "pink" : "lightblue";
+                    if (child.Action.Type == UctActionType.EndTurn) {
+                        // This is at a point when the currentTeam is already flipped
+                        color = teamColor.Value != TeamColor.Red ? "pink" : "lightblue";
+                    } else {
+                        color = teamColor.Value == TeamColor.Red ? "pink" : "lightblue";
+                    }
                 } else {
                     color = "gray";
                 }

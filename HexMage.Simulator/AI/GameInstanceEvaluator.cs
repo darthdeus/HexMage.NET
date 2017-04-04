@@ -24,6 +24,13 @@ namespace HexMage.Simulator.AI {
             _writer = writer;
         }
 
+        public static void PrintBookkeepingData() {
+            Console.WriteLine("Global stats:");
+            foreach (var pair in GlobalControllerStatistics) {
+                Console.WriteLine($"{pair.Key.PadRight(20)}: {pair.Value}");
+            }
+        }
+
         public static List<IAiFactory> GlobalFactories = new List<IAiFactory>();
 
         public EvaluationResult Evaluate() {
@@ -31,88 +38,30 @@ namespace HexMage.Simulator.AI {
                 GlobalFactories.Add(new RuleBasedFactory());
             }
 
-            var result = new EvaluationResult();
-
-            result.TotalHp = 0;
-            result.Timeouted = false;
-            result.Tainted = false;
+            // TODO - defaulty uz jsou takovyhle ne?
+            var result = new EvaluationResult {
+                TotalHp = 0,
+                Timeouted = false,
+                Tainted = false
+            };
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            float gameHpPercentageTotal = 0;
-
             foreach (var factory1 in GlobalFactories) {
                 foreach (var factory2 in GlobalFactories) {
-                    result.TotalGames++;
-
                     var game = _gameInstance.CopyStateOnly();
-                    var hub = new GameEventHub(game);
 
                     var ai1 = factory1.Build(game);
                     var ai2 = factory2.Build(game);
 
-                    game.MobManager.Teams[TeamColor.Red] = ai1;
-                    game.MobManager.Teams[TeamColor.Blue] = ai2;
-
-                    const int maxIterations = 100;
-                    int i = 0;
-
-                    for (; i < maxIterations && !game.IsFinished; i++) {
-                        game.TurnManager.CurrentController.FastPlayTurn(hub);
-                        game.TurnManager.NextMobOrNewTurn(game.Pathfinder, game.State);
-
-                        result.TotalTurns++;
-
-                        Constants.WriteLogLine(UctAction.EndTurnAction());
-                    }
-
-                    result.TotalIterations += i;
-
-                    float gamePercentage;
-
-                    if (Constants.AverageHpTotals) {
-                        float totalMaxHp = 0;
-                        float totalCurrentHp = 0;
-
-                        foreach (var mobId in game.MobManager.Mobs) {
-                            totalMaxHp += game.MobManager.MobInfos[mobId].MaxHp;
-                            totalCurrentHp += Math.Max(0, game.State.MobInstances[mobId].Hp);
-                        }
-
-                        gamePercentage = totalCurrentHp / totalMaxHp;
-                    } else {
-                        gamePercentage =
-                            game.MobManager.Mobs.Average(mobId => {
-                                float currHp = Math.Max(0, game.State.MobInstances[mobId].Hp);
-                                float maxHp = game.MobManager.MobInfos[mobId].MaxHp;
-
-                                float avg = currHp / maxHp;
-
-                                if (avg > 1) {
-                                    result.Tainted = true;
-                                    avg = 1;
-                                }
-
-                                return avg;
-                            });
-                    }
-
-
-                    result.TotalHp = game.State.MobInstances.Sum(mobInstance => mobInstance.Hp);
-                    Debug.Assert(gamePercentage >= 0);
-
-                    gameHpPercentageTotal += gamePercentage;
-
-                    Debug.Assert(gameHpPercentageTotal / result.TotalGames <= 1);
-
-                    EvaluationResult(game, ref result);
+                    Playout(game, ai1, ai2, ref result);
                 }
             }
 
             stopwatch.Stop();
 
-            result.TotalHpPercentage = gameHpPercentageTotal / result.TotalGames;
+            result.TotalHpPercentage /= result.TotalGames;
             result.TotalElapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
             Debug.Assert(result.TotalHpPercentage >= 0);
@@ -121,9 +70,61 @@ namespace HexMage.Simulator.AI {
             return result;
         }
 
+        public static EvaluationResult PlayoutSingleGame(GameInstance game, IMobController ai1, IMobController ai2) {
+            var result = new EvaluationResult();
+            Playout(game, ai1, ai2, ref result);
+            result.TotalHpPercentage /= result.TotalGames;
+            return result;
+        }
+
+        public static void Playout(GameInstance game, IMobController ai1, IMobController ai2,
+                                   ref EvaluationResult result) {
+            result.TotalGames++;
+
+            var hub = new GameEventHub(game);
+
+            game.MobManager.Teams[TeamColor.Red] = ai1;
+            game.MobManager.Teams[TeamColor.Blue] = ai2;
+
+            const int maxIterations = 100;
+            int i = 0;
+
+            for (; i < maxIterations && !game.IsFinished; i++) {
+                game.TurnManager.CurrentController.FastPlayTurn(hub);
+                game.TurnManager.NextMobOrNewTurn(game.Pathfinder, game.State);
+
+                result.TotalTurns++;
+
+                Constants.WriteLogLine(UctAction.EndTurnAction());
+            }
+
+            // TODO - jak se to lisi od TotalGames?
+            result.TotalIterations += i;
+
+            float totalMaxHp = 0;
+            float totalCurrentHp = 0;
+
+            foreach (var mobId in game.MobManager.Mobs) {
+                totalMaxHp += game.MobManager.MobInfos[mobId].MaxHp;
+                totalCurrentHp += Math.Max(0, game.State.MobInstances[mobId].Hp);
+            }
+
+            var gamePercentage = totalCurrentHp / totalMaxHp;
+
+
+            result.TotalHp = game.State.MobInstances.Sum(mobInstance => mobInstance.Hp);
+            Debug.Assert(gamePercentage >= 0);
+
+            result.TotalHpPercentage += gamePercentage;
+
+            Debug.Assert(result.TotalHpPercentage / result.TotalGames <= 1);
+
+            EvaluationResultBookkeeping(game, ref result);
+        }
+
         // TODO - na co tohle vlastne je?
         public static int Playout(GameInstance game, DNA d1, DNA d2, IMobController c1, IMobController c2) {
-            GameSetup.OverrideGameDNA(game, d1, d2);
+            GameSetup.OverrideGameDna(game, d1, d2);
 
             game.MobManager.Teams[TeamColor.Red] = c1;
             game.MobManager.Teams[TeamColor.Blue] = c2;
@@ -147,7 +148,7 @@ namespace HexMage.Simulator.AI {
             return Constants.MaxPlayoutEvaluationIterations - iterations;
         }
 
-        private static void EvaluationResult(GameInstance game, ref EvaluationResult result) {
+        public static void EvaluationResultBookkeeping(GameInstance game, ref EvaluationResult result) {
             // TODO !!!!!!!!!!!!!!!! muze nastat remiza
             if (game.IsFinished && game.VictoryTeam.HasValue) {
                 Debug.Assert(game.VictoryTeam.HasValue);

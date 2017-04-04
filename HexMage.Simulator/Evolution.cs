@@ -28,7 +28,7 @@ namespace HexMage.Benchmarks {
 
             Console.WriteLine($"Initial: {initialDna.ToDNAString()}\n\n");
 
-            game = GameSetup.FromDNAs(initialDna, initialDna);
+            game = GameSetup.GenerateFromDna(initialDna, initialDna);
         }
 
         public void Run() {
@@ -212,7 +212,7 @@ namespace HexMage.Benchmarks {
 
         public static EvaluationResult CalculateFitness(GameInstance game, DNA initialDna, DNA dna) {
             Constants.ResetLogBuffer();
-            GameSetup.OverrideGameDNA(game, initialDna, dna);
+            GameSetup.OverrideGameDna(game, initialDna, dna);
 
             var result = new GameInstanceEvaluator(game, Console.Out).Evaluate();
 

@@ -9,7 +9,6 @@ namespace HexMage.Simulator.AI {
             _gameInstance = gameInstance;
         }
 
-
         public void FastPlayTurn(GameEventHub eventHub) {
             do {
                 var action = ActionGenerator.RuleBasedAction(_gameInstance);
@@ -35,7 +34,7 @@ namespace HexMage.Simulator.AI {
         public string Name => nameof(AiRuleBasedController);
 
         public override string ToString() {
-            return "AI";
+            return "Rule";
         }
     }
 }

@@ -77,7 +77,7 @@ namespace HexMage.Benchmarks {
                                                         $"({(avgUp / up).ToString("0.0000")})\t\t" +
                                                         $"Ratio D/U: {((float) down / (float) up).ToString("0.0000")}");
 
-            var game = GameSetup.FromDNAs(d1, d2);
+            var game = GameSetup.GenerateFromDna(d1, d2);
 
 
             for (int i = 0; i < Constants.MeasureSamples; i++) {
@@ -166,7 +166,7 @@ namespace HexMage.Benchmarks {
             Generator.Random = new Random(3);
 
             var d1 = new DNA(3, 2);
-            var game = GameSetup.FromDNAs(d1, d1);
+            var game = GameSetup.GenerateFromDna(d1, d1);
 
             List<double> xs = new List<double>();
             List<double> ys = new List<double>();

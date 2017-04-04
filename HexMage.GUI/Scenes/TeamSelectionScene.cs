@@ -226,8 +226,9 @@ namespace HexMage.GUI.Scenes {
                 mi2.Team = t2;
                 _gameInstance.MobManager.MobInfos[m2] = mi2;
 
-                Generator.RandomPlaceMob(_gameInstance.MobManager, m1, _map, _gameInstance.State);
-                Generator.RandomPlaceMob(_gameInstance.MobManager, m2, _map, _gameInstance.State);
+                GameSetup.ResetPositions(_gameInstance);
+                //Generator.RandomPlaceMob(_gameInstance.MobManager, m1, _map, _gameInstance.State);
+                //Generator.RandomPlaceMob(_gameInstance.MobManager, m2, _map, _gameInstance.State);
 
                 _t1Preview.AddChild(BuildMobPreview(() => m1));
                 _t2Preview.AddChild(BuildMobPreview(() => m2));

@@ -156,7 +156,9 @@ namespace HexMage.Simulator {
             }
 
             Shuffle(coords);
-            for (int i = 0; i < Math.Min(coords.Count, 3); i++) {
+
+            int maximumMoveActions = Math.Max(0, 3 - result.Count);
+            for (int i = 0; i < Math.Min(coords.Count, maximumMoveActions); i++) {
                 result.Add(UctAction.DefensiveMoveAction(mobId, coords[i]));
             }
         }

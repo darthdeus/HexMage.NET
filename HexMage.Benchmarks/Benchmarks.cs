@@ -15,7 +15,7 @@ namespace HexMage.Benchmarks {
             var dna = new DNA(2, 2);
             dna.Randomize();
 
-            var game = GameSetup.FromDNAs(dna, dna);
+            var game = GameSetup.GenerateFromDna(dna, dna);
 
             // TODO: map editor
             game.Map[new AxialCoord(3, -3)] = HexType.Wall;
@@ -28,15 +28,37 @@ namespace HexMage.Benchmarks {
 
             game.PrepareEverything();
 
-            var mcts = new MctsController(game);
+            IMobController c1, c2;
+
+            switch (Constants.MctsBenchType) {
+                case 0:
+                    c1 = new MctsController(game, Constants.MctsBenchIterations);
+                    c2 = new AiRandomController(game);
+                    break;
+                case 1:
+                    c1 = new MctsController(game, Constants.MctsBenchIterations);
+                    c2 = new AiRuleBasedController(game);
+                    break;
+                case 2:
+                    c1 = new AiRandomController(game);
+                    c2 = new AiRuleBasedController(game);
+                    break;
+
+                default:
+                    throw new ArgumentException($"Invalid value of {Constants.MctsBenchType} for --MctsBenchType");
+            }
 
             var iterationStopwatch = new Stopwatch();
+            
+            for (int i = 0; i < 1000; i++) {
+                dna.Randomize();
+                GameSetup.OverrideGameDna(game, dna, dna);
 
-            for (int i = 0; i < 1; i++) {
-                game.Reset();
                 iterationStopwatch.Restart();
-                var result = GameInstanceEvaluator.Playout(game, dna, dna, mcts, mcts);
+                GameInstanceEvaluator.PlayoutSingleGame(game, c1, c2);
                 iterationStopwatch.Stop();
+
+                GameInstanceEvaluator.PrintBookkeepingData();
 
                 Console.WriteLine($"Iteration: {iterationStopwatch.ElapsedMilliseconds}ms");
             }

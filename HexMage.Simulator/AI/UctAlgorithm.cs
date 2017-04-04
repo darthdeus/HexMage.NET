@@ -22,7 +22,7 @@ namespace HexMage.Simulator.AI {
             stopwatch.Start();
 
             // TODO - for loop? lul
-            int totalIterations = 10000; // _thinkTime;
+            int totalIterations = _thinkTime;
             int iterations = totalIterations;
 
             while (iterations-- > 0) {
@@ -171,7 +171,7 @@ namespace HexMage.Simulator.AI {
 
         public static float DefaultPolicy(GameInstance game, TeamColor startingTeam) {
             if (game.IsFinished) {
-                Debug.Assert(game.VictoryTeam.HasValue, "game.VictoryTeam.HasValue");
+                Debug.Assert(game.VictoryTeam.HasValue || game.AllDead, "game.VictoryTeam.HasValue");
                 return CalculateDeltaReward(game, startingTeam, game.VictoryTeam);
             }
 
@@ -205,25 +205,23 @@ namespace HexMage.Simulator.AI {
         }
 
         public static float CalculateDeltaReward(GameInstance game, TeamColor startingTeam, TeamColor? victoryTeam) {
+            float result;
             // TODO - tohle duplikuje to dole
             if (victoryTeam.HasValue) {
                 if (startingTeam == victoryTeam.Value) {
-                    if (Constants.UseHpPercentageScaling) {
-                        return 1 * game.PercentageHp(startingTeam);
-                    } else {
-                        return 1;
-                    }
+                    result = 1;
                 } else {
-                    if (Constants.UseHpPercentageScaling) {
-                        return -1 * (1 - game.PercentageHp(victoryTeam.Value));
-                    } else {
-                        return -1;
-                    }
+                    result = -1;
                 }
             } else {
-                // The game was a draw
-                return 0;
+                result = 0;
             }
+
+            if (Constants.UseHpPercentageScaling) {
+                result *= game.PercentageHp(startingTeam);
+            }
+
+            return result;
         }
 
         public static void Backup(UctNode node, float delta) {
@@ -232,9 +230,6 @@ namespace HexMage.Simulator.AI {
                 node.Q += delta;
                 node = node.Parent;
 
-                if (Constants.DampenLongRewards) {
-                    delta *= Constants.DampeningFactor;
-                }
                 if (node != null && node.Action.Type == UctActionType.EndTurn) {
                     delta = -delta;
                 }
@@ -261,7 +256,7 @@ namespace HexMage.Simulator.AI {
                 UctNode max = current.Children[0];
 
                 foreach (var child in current.Children) {
-                    if (child.Q > max.Q) {
+                    if (child.Q/child.N > max.Q/max.N) {
                         max = child;
                     }
                 }

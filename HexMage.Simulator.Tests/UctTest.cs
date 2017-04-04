@@ -16,7 +16,7 @@ namespace HexMage.Simulator.Tests {
             var dna = new DNA(1, 1);
             dna.Randomize();
 
-            var game = GameSetup.FromDNAs(dna, dna);
+            var game = GameSetup.GenerateFromDna(dna, dna);
 
             var root = new UctNode(UctAction.NullAction(), game);
 
@@ -34,7 +34,7 @@ namespace HexMage.Simulator.Tests {
             var dna = new DNA(1, 1);
             dna.Randomize();
 
-            var game = GameSetup.FromDNAs(dna, dna);
+            var game = GameSetup.GenerateFromDna(dna, dna);
             Assert.IsTrue(game.CurrentTeam.HasValue);
 
             var startingTeam = game.CurrentTeam.Value;

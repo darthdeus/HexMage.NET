@@ -57,7 +57,7 @@ namespace HexMage.Simulator {
 
             string terminal = IsTerminal ? $"[T]" : "";
 
-            return $"[{team}]{terminal}\\n{Q}/{N}\\n{Action}";
+            return $"{Id}\n[{team}]{terminal}\\n{Q}/{N}\\n{Action}";
         }
 
         private string ShortTeam(TeamColor team) {

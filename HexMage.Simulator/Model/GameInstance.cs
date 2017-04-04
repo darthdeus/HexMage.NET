@@ -21,6 +21,7 @@ namespace HexMage.Simulator {
 
         public GameState State { get; set; }
 
+        public bool AllDead => State.RedAlive == 0 && State.BlueAlive == 0;
         public bool IsFinished => State.IsFinished;
 
         public GameInstance(Map map, MobManager mobManager) {
@@ -400,6 +401,16 @@ namespace HexMage.Simulator {
 
         public CachedMob CachedMob(int mobId) {
             return Model.CachedMob.Create(this, mobId);
+        }
+
+        public void PlaceMob(int mobId, AxialCoord coord) {
+            var atCoord = State.AtCoord(coord);
+            Debug.Assert(atCoord == null || atCoord == mobId);
+
+            State.SetMobPosition(mobId, coord);
+            var info = MobManager.MobInfos[mobId];
+            info.OrigCoord = coord;
+            MobManager.MobInfos[mobId] = info;
         }
     }
 }
