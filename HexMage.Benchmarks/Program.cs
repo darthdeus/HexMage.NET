@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using HexMage.Simulator;
 using HexMage.Simulator.AI;
+using HexMage.Simulator.PCG;
 
 namespace HexMage.Benchmarks {
     internal class Program {
@@ -11,6 +12,12 @@ namespace HexMage.Benchmarks {
             //Generator.Random = new Random(3);
 
             if (!ProcessArguments(args)) return;
+
+            Constants.MctsBenchmark = true;
+            Benchmarks.NewRun();
+            return;
+
+            //new Benchmarks().Run();
 
             if ((args.Length > 0 && args[0] == "mcts-benchmark") || Constants.MctsBenchmark) {
                 MctsBenchmark();
@@ -156,6 +163,8 @@ namespace HexMage.Benchmarks {
         }
 
         public static void MctsBenchmark() {
+            Generator.Random = new Random(3);
+
             var d1 = new DNA(3, 2);
             var game = GameSetup.FromDNAs(d1, d1);
 

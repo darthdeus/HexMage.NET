@@ -4,34 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 
-namespace HexMage.Simulator {
-    public class FlatMonteCarlo {
-        public static UctNode Search(GameInstance initial) {
-            var root = new UctNode(0, 0, UctAction.NullAction(), initial.DeepCopy());
-
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            while (!root.IsFullyExpanded) {
-                UctAlgorithm.Expand(root);
-            }
-
-            for (int i = 0; i < 10000; i++) {
-                var child = root.Children[i % root.Children.Count];
-
-                float reward = UctAlgorithm.DefaultPolicy(child.State, initial.CurrentTeam.Value);
-                UctAlgorithm.Backup(child, reward);
-            }
-
-            var bestChild = UctAlgorithm.BestChild(root);
-
-            return root;
-        }
-    }
-
+namespace HexMage.Simulator.AI {
     public class UctAlgorithm {
         // TODO - extrahovat do args nebo configuraku
         public static int Actions = 0;
@@ -47,7 +22,7 @@ namespace HexMage.Simulator {
             stopwatch.Start();
 
             // TODO - for loop? lul
-            int totalIterations = _thinkTime;
+            int totalIterations = 10000; // _thinkTime;
             int iterations = totalIterations;
 
             while (iterations-- > 0) {

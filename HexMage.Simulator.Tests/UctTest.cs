@@ -9,7 +9,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace HexMage.Simulator.Tests {
     [TestClass]
     public class UctTest {
-
         [TestMethod]
         public void BasicUctTest() {
             Generator.Random = new Random(123);
@@ -42,18 +41,17 @@ namespace HexMage.Simulator.Tests {
 
             var root = new UctNode(UctAction.NullAction(), game);
 
-            root.PossibleActions = new List<UctAction>();
-            root.PossibleActions.Add(UctAction.EndTurnAction());
-            root.PossibleActions.Add(UctAction.NullAction());
+            for (int i = 0; i < 30; i++) {
+                UctAlgorithm.OneIteration(root, startingTeam);
+                UctAlgorithm.OneIteration(root, startingTeam);
+                UctAlgorithm.OneIteration(root, startingTeam);
+                UctAlgorithm.OneIteration(root, startingTeam);
+                UctAlgorithm.OneIteration(root, startingTeam);
+                UctAlgorithm.OneIteration(root, startingTeam);
+                UctAlgorithm.OneIteration(root, startingTeam);
+            }
 
-            root.PrecomputePossibleActions(true, true);
-
-            UctAlgorithm.OneIteration(root, startingTeam);
             UctDebug.PrintDotgraph(root, () => 0);
-
-            UctAlgorithm.OneIteration(root, startingTeam);
-            UctDebug.PrintDotgraph(root, () => 1);
-
             //var endTurnChild = UctAlgorithm.Expand(root);
             //var nullChild = UctAlgorithm.Expand(root);
 

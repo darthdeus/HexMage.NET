@@ -5,11 +5,43 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using HexMage.Simulator;
+using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.PCG;
 
 namespace HexMage.Benchmarks {
     public class Benchmarks {
+        public static void NewRun() {
+            var dna = new DNA(2, 2);
+            dna.Randomize();
+
+            var game = GameSetup.FromDNAs(dna, dna);
+
+            // TODO: map editor
+            game.Map[new AxialCoord(3, -3)] = HexType.Wall;
+            game.Map[new AxialCoord(2, -2)] = HexType.Wall;
+            game.Map[new AxialCoord(1, -1)] = HexType.Wall;
+
+            game.Map[new AxialCoord(-1, 1)] = HexType.Wall;
+            game.Map[new AxialCoord(-2, 2)] = HexType.Wall;
+            game.Map[new AxialCoord(-3, 3)] = HexType.Wall;
+
+            game.PrepareEverything();
+
+            var mcts = new MctsController(game);
+
+            var iterationStopwatch = new Stopwatch();
+
+            for (int i = 0; i < 1; i++) {
+                game.Reset();
+                iterationStopwatch.Restart();
+                var result = GameInstanceEvaluator.Playout(game, dna, dna, mcts, mcts);
+                iterationStopwatch.Stop();
+
+                Console.WriteLine($"Iteration: {iterationStopwatch.ElapsedMilliseconds}ms");
+            }
+        }
+
         public void Run() {
             var size = 5;
 
@@ -117,7 +149,7 @@ namespace HexMage.Benchmarks {
 
                     turnManager.StartNextTurn(pathfinder, gameInstance.State);
 
-                    Console.WriteLine($"Starting, actions: {UctAlgorithm.Actions}");
+                    //Console.WriteLine($"Starting, actions: {UctAlgorithm.Actions}");
                     stopwatch.Start();
 #if FAST
                     var rounds = hub.FastMainLoop(TimeSpan.Zero);

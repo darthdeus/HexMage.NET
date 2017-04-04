@@ -51,6 +51,7 @@
     <Compile Include="AI\AiRuleBasedController.cs" />
     <Compile Include="AI\EvaluationResult.cs" />
     <Compile Include="AI\ExponentialMovingAverage.cs" />
+    <Compile Include="AI\FlatMonteCarlo.cs" />
     <Compile Include="AI\GameSetup.cs" />
     <Compile Include="AI\IAiFactory.cs" />
     <Compile Include="AI\MctsController.cs" />

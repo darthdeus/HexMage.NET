@@ -121,6 +121,7 @@ namespace HexMage.Simulator.AI {
             return result;
         }
 
+        // TODO - na co tohle vlastne je?
         public static int Playout(GameInstance game, DNA d1, DNA d2, IMobController c1, IMobController c2) {
             GameSetup.OverrideGameDNA(game, d1, d2);
 

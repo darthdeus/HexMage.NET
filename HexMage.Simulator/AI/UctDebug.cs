@@ -1,8 +1,11 @@
 //#define XML
+
 #define DOT
 using System;
 using System.IO;
 using System.Text;
+using HexMage.Simulator.AI;
+using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public class UctDebug {
@@ -10,20 +13,20 @@ namespace HexMage.Simulator {
             var builder = new StringBuilder();
 
             builder.AppendLine("digraph G {");
-            int budget = 4;
+            int budget = 5;
             PrintDotNode(builder, root, budget);
             builder.AppendLine("}");
 
             string str = builder.ToString();
 
-            string dirname = @"c:\dev\graphs";
+            string dirname = @"data\graphs";
             if (!Directory.Exists(dirname)) {
                 Directory.CreateDirectory(dirname);
             }
 
             int index = indexFunc == null ? UctAlgorithm.SearchCount : indexFunc();
 
-            File.WriteAllText($@"graph{index}.dot", str);
+            File.WriteAllText($@"data\graphs\graph{index}.dot", str);
         }
 
         private static void PrintDotNode(StringBuilder builder, UctNode node, int budget) {
@@ -31,6 +34,16 @@ namespace HexMage.Simulator {
 
             foreach (var child in node.Children) {
                 builder.AppendLine($"\"{node}\" -> \"{child}\"");
+
+                string color;
+                var teamColor = child.State.CurrentTeam;
+
+                if (teamColor.HasValue) {
+                    color = teamColor.Value == TeamColor.Red ? "pink" : "lightblue";
+                } else {
+                    color = "gray";
+                }
+                builder.AppendLine($"\"{child}\" [fillcolor = {color}, style=filled]");
             }
 
             foreach (var child in node.Children) {
@@ -53,7 +66,7 @@ namespace HexMage.Simulator {
             }
 #endif
 #if DOT
-            PrintDotgraph(root);            
+            PrintDotgraph(root);
 #endif
         }
     }

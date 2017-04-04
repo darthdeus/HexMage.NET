@@ -34,7 +34,6 @@ namespace HexMage.Simulator {
             return new UctNode(action, UctAlgorithm.F(game, action));
         }
 
-
         public void PrecomputePossibleActions(bool allowMove, bool allowEndTurn) {
             if (PossibleActions == null) {
                 if (Action.Type == UctActionType.DefensiveMove) {

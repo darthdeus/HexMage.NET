@@ -51,7 +51,7 @@ namespace HexMage.Simulator.AI {
                 case UctActionType.Move:
                     return $"M[{MobId}]:{Coord}";
                 case UctActionType.AttackMove:
-                    return $"AM[{MobId}->{Coord}]:{AbilityId}->{TargetId}";
+                    return $"AM[{Coord}]:{AbilityId}->{TargetId}";
                 case UctActionType.DefensiveMove:
                     return $"D[{MobId}]:{Coord}";
                 default:

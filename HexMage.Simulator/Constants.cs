@@ -13,7 +13,7 @@ namespace HexMage.Simulator {
         public static bool EvaluateAis = false;
 
         // Game Evaluation
-        public static int MaxPlayoutEvaluationIterations = 100;
+        public static int MaxPlayoutEvaluationIterations = 1;
 
         // MCTS
         /// <summary>
@@ -21,7 +21,7 @@ namespace HexMage.Simulator {
         /// 
         /// TODO - experiment
         /// </summary>
-        public static bool UseHpPercentageScaling = true;
+        public static bool UseHpPercentageScaling = false;
 
         /// <summary>
         /// When enabled, rewards are slowly dampened each turn, penalizing rewards
