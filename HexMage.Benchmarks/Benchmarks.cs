@@ -48,14 +48,21 @@ namespace HexMage.Benchmarks {
                     throw new ArgumentException($"Invalid value of {Constants.MctsBenchType} for --MctsBenchType");
             }
 
+            c1 = new AiRandomController(game);
+            c2 = new MctsController(game, 5);
+
             var iterationStopwatch = new Stopwatch();
             
             for (int i = 0; i < 1000; i++) {
                 dna.Randomize();
                 GameSetup.OverrideGameDna(game, dna, dna);
-
                 iterationStopwatch.Restart();
                 GameInstanceEvaluator.PlayoutSingleGame(game, c1, c2);
+                iterationStopwatch.Stop();
+
+                GameSetup.OverrideGameDna(game, dna, dna);
+                iterationStopwatch.Restart();
+                GameInstanceEvaluator.PlayoutSingleGame(game, c2, c1);
                 iterationStopwatch.Stop();
 
                 Console.Write($"Iteration: {iterationStopwatch.ElapsedMilliseconds}ms");

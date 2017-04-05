@@ -3,7 +3,7 @@
 namespace HexMage.Simulator {
     public static class Constants {
         // MCTS benchmarks
-        public static int MctsBenchIterations = 1000;
+        public static int MctsBenchIterations = 2;
         public static int MctsBenchType = 0;
 
         public static bool GnuPlot = true;

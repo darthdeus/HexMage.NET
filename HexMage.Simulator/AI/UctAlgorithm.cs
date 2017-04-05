@@ -211,7 +211,7 @@ namespace HexMage.Simulator.AI {
                 if (startingTeam == victoryTeam.Value) {
                     result = 1;
                 } else {
-                    result = -1;
+                    result = 0; // -1;
                 }
             } else {
                 result = 0;
