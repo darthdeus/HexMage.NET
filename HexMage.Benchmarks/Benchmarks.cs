@@ -49,7 +49,7 @@ namespace HexMage.Benchmarks {
             }
 
             c1 = new AiRandomController(game);
-            c2 = new MctsController(game, 5);
+            c2 = new MctsController(game, 1000);
 
             var iterationStopwatch = new Stopwatch();
             

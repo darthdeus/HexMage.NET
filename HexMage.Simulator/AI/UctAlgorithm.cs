@@ -205,23 +205,41 @@ namespace HexMage.Simulator.AI {
         }
 
         public static float CalculateDeltaReward(GameInstance game, TeamColor startingTeam, TeamColor? victoryTeam) {
-            float result;
-            // TODO - tohle duplikuje to dole
-            if (victoryTeam.HasValue) {
-                if (startingTeam == victoryTeam.Value) {
-                    result = 1;
-                } else {
-                    result = 0; // -1;
+            const bool rewardDamage = false;
+            if (rewardDamage) {
+                TeamColor opposingTeam = startingTeam == TeamColor.Red ? TeamColor.Blue : TeamColor.Red;
+
+                float totalMax = 0;
+                float totalCurrent = 0;
+                foreach (var mobId in game.MobManager.Mobs) {
+                    var mobInfo = game.MobManager.MobInfos[mobId];
+                    if (mobInfo.Team != opposingTeam) continue;
+
+                    totalMax += mobInfo.MaxHp;
+                    totalCurrent += game.State.MobInstances[mobId].Hp;
                 }
+
+                return 1 - (totalCurrent / totalMax);
             } else {
-                result = 0;
-            }
+                float result;
 
-            if (Constants.UseHpPercentageScaling) {
-                result *= game.PercentageHp(startingTeam);
-            }
+                // TODO - tohle duplikuje to dole
+                if (victoryTeam.HasValue) {
+                    if (startingTeam == victoryTeam.Value) {
+                        result = 1;
+                    } else {
+                        result = -1;
+                    }
+                } else {
+                    result = 0;
+                }
 
-            return result;
+                if (Constants.UseHpPercentageScaling) {
+                    result *= game.PercentageHp(startingTeam);
+                }
+
+                return result;
+            }
         }
 
         public static void Backup(UctNode node, float delta) {
@@ -256,7 +274,7 @@ namespace HexMage.Simulator.AI {
                 UctNode max = current.Children[0];
 
                 foreach (var child in current.Children) {
-                    if (child.Q/child.N > max.Q/max.N) {
+                    if (child.Q / child.N > max.Q / max.N) {
                         max = child;
                     }
                 }
