@@ -36,7 +36,8 @@ namespace HexMage.GUI.Scenes {
                 new AiRuleBasedController(_gameInstance),
                 new AiRandomController(_gameInstance),
                 new MctsController(_gameInstance),
-                new PlayerController(_arenaScene, _gameInstance)
+                new PlayerController(_arenaScene, _gameInstance),
+                new FlatMonteCarloController(_gameInstance)
             };
         }
 
@@ -132,6 +133,13 @@ namespace HexMage.GUI.Scenes {
                         _rightController = new PlayerController(_arenaScene, _gameInstance);
                     }
                     handPickedTeam = true;
+                } else if (InputManager.Instance.IsKeyJustPressed(Keys.G)) {
+                    if (first) {
+                        _leftController = new FlatMonteCarloController(_gameInstance);
+                    } else {
+                        _rightController = new FlatMonteCarloController(_gameInstance);
+                    }
+                    handPickedTeam = true;
                 }
 
                 if (handPickedTeam) {
@@ -192,7 +200,7 @@ namespace HexMage.GUI.Scenes {
                 LoadNewScene(_arenaScene);
             } else {
                 Utils.Log(LogSeverity.Warning, nameof(TeamSelectionScene),
-                    "Failed to start a game, no controllers selected.");
+                          "Failed to start a game, no controllers selected.");
             }
         }
 
@@ -290,7 +298,6 @@ namespace HexMage.GUI.Scenes {
             return wrapper;
         }
 
-        public override void Cleanup() {
-        }
+        public override void Cleanup() { }
     }
 }

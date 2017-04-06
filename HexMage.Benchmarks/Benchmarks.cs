@@ -1,5 +1,4 @@
 //#define COPY_BENCH
-
 #define FAST
 using System;
 using System.Diagnostics;
