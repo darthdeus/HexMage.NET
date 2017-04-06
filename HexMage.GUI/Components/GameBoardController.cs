@@ -158,7 +158,7 @@ namespace HexMage.GUI.Components {
 
                 if (inputManager.JustRightClicked())
                     if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                        _gameInstance.Map.Toogle(mouseHex);
+                        _gameInstance.Map.Toggle(mouseHex);
 
                         _gameInstance.Pathfinder.PathfindDistanceAll();
                         _gameInstance.Pathfinder.PathfindFromCurrentMob(_gameInstance.TurnManager,

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using HexMage.Simulator.Model;
+using HexMage.Simulator.Pathfinding;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator {

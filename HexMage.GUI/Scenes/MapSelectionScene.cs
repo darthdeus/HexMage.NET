@@ -8,6 +8,7 @@ using HexMage.GUI.UI;
 using HexMage.Simulator;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
+using HexMage.Simulator.Pathfinding;
 using HexMage.Simulator.PCG;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -114,6 +115,10 @@ namespace HexMage.GUI.Scenes {
                 if (InputManager.Instance.IsKeyJustPressed(Keys.Space)) {
                     DoContinue();
                 }
+
+                if (InputManager.Instance.IsKeyJustPressed(Keys.E)) {
+                    LoadMapEditor();
+                }
             });
 
             AddAndInitializeRootEntity(loaderEntity, _assetManager);
@@ -190,6 +195,10 @@ namespace HexMage.GUI.Scenes {
             var arenaScene = new ArenaScene(_gameManager, game);
 
             LoadNewScene(arenaScene);
+        }
+
+        public void LoadMapEditor() {
+            LoadNewScene(new MapEditorScene(_gameManager));
         }
     }
 }

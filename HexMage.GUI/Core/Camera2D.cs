@@ -23,6 +23,8 @@ namespace HexMage.GUI {
         public Vector3 Translate = Vector3.Zero;
         public float ZoomLevel = 1.0f;
 
+        public bool NavigationEnabled = true;
+
         private Point _lastMousePosition;
         private bool _dragging = false;
 
@@ -40,6 +42,8 @@ namespace HexMage.GUI {
         }
 
         public void Update(GameTime gameTime) {
+            if (!NavigationEnabled) return;
+
             if (HexMageGame.Instance.IsActive) {
                 var scrollOff = Mouse.GetState().ScrollWheelValue;
                 var diff = _lastWheel - scrollOff;

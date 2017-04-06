@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HexMage.Simulator.Pathfinding;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace HexMage.Simulator.Tests
-{
-    public class TestHelpers
-    {
+namespace HexMage.Simulator.Tests {
+    public static class TestHelpers {
         public static void GameInstancesEqual(GameInstance instance1, GameInstance instance2) {
             Assert.AreEqual(instance1.Size, instance2.Size);
             MapsEqual(instance1.Map, instance2.Map);

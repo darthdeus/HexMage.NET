@@ -7,6 +7,7 @@ using HexMage.GUI.UI;
 using HexMage.Simulator;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
+using HexMage.Simulator.Pathfinding;
 using HexMage.Simulator.PCG;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;

@@ -1,4 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
+using HexMage.Simulator.Pathfinding;
+using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
     public class MapRepresentation {
@@ -15,6 +19,22 @@ namespace HexMage.Simulator {
                 var coord = map.AllCoords[i];
                 Hexes[i] = new MapItem(coord, map[coord]);
             }
+        }
+
+        public void SaveToStream(TextWriter writer) {
+            writer.Write(JsonConvert.SerializeObject(this));
+        }
+
+        public static MapRepresentation FromFile(string filename) {
+            using (var reader = new StreamReader(filename)) {
+                var contents = reader.ReadToEnd();
+
+                return FromString(contents);
+            }
+        }
+
+        public static MapRepresentation FromString(string contents) {
+            return JsonConvert.DeserializeObject<MapRepresentation>(contents);
         }
 
         public void UpdateMap(Map map) {

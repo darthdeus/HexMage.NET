@@ -95,6 +95,9 @@
     <Compile Include="Renderers\ParticleSystemRenderer.cs" />
     <Compile Include="Components\HoverUpdater.cs" />
     <Compile Include="Core\PlayerController.cs" />
+    <Compile Include="Scenes\MapEditor.cs" />
+    <Compile Include="Scenes\MapEditorRenderer.cs" />
+    <Compile Include="Scenes\MapEditorScene.cs" />
     <Compile Include="Scenes\SceneSynchronizationContext.cs" />
     <Compile Include="Renderers\SpellRenderer.cs" />
     <Compile Include="Components\ColorChanger.cs" />
@@ -134,6 +137,7 @@
       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>

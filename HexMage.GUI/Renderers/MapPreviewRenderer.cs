@@ -2,6 +2,7 @@
 using HexMage.GUI.Core;
 using HexMage.Simulator;
 using HexMage.Simulator.Model;
+using HexMage.Simulator.Pathfinding;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;

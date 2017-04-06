@@ -5,8 +5,10 @@ using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
     public class HexMap<T> : IDeepCopyable<HexMap<T>> {
+        [JsonProperty]
         private readonly T[,] _data;
 
+        [JsonProperty]
         public readonly int Size;
 
         [JsonConstructor]

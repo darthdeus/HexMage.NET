@@ -13,7 +13,7 @@ namespace HexMage.Simulator {
             var builder = new StringBuilder();
 
             builder.AppendLine("digraph G {");
-            int budget = 6;
+            int budget = 100;
             PrintDotNode(builder, root, budget);
             builder.AppendLine("}");
 
@@ -48,7 +48,7 @@ namespace HexMage.Simulator {
                 } else {
                     color = "gray";
                 }
-                builder.AppendLine($"\"{child}\" [fillcolor = {color}, style=filled]");
+                //builder.AppendLine($"\"{child}\" [fillcolor = {color}, style=filled]");
             }
 
             foreach (var child in node.Children) {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using HexMage.Simulator.Model;
+using HexMage.Simulator.Pathfinding;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator {

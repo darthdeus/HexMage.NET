@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using HexMage.Simulator.Model;
+using HexMage.Simulator.Pathfinding;
 
 namespace HexMage.Simulator.PCG {
     // TODO - remove map seeds altogether

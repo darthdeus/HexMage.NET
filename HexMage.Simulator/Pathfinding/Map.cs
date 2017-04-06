@@ -1,22 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using HexMage.Simulator.Model;
+using Newtonsoft.Json;
 
-namespace HexMage.Simulator {
+namespace HexMage.Simulator.Pathfinding {
     public class Map : IDeepCopyable<Map>, IResettable {
-        private readonly HexMap<HexType> _hexes;
-        public int Size { get; set; }
-        // TODO - remove Guid, it's no longer needed
-        public Guid Guid = Guid.NewGuid();
+        [JsonProperty] private readonly HexMap<HexType> _hexes;
+
+        [JsonIgnore] private Dictionary<int, bool> _visibility = new Dictionary<int, bool>();
+
+        [JsonIgnore] private Dictionary<int, List<AxialCoord>> _visibilityLines =
+            new Dictionary<int, List<AxialCoord>>();
 
         public List<AreaBuff> AreaBuffs = new List<AreaBuff>();
 
-        public List<AxialCoord> AllCoords => _hexes.AllCoords;
+        public List<AxialCoord> BlueStartingPoints = new List<AxialCoord>();
+        public List<AxialCoord> RedStartingPoints = new List<AxialCoord>();
 
-        private Dictionary<int, List<AxialCoord>> _visibilityLines = new Dictionary<int, List<AxialCoord>>();
-        private Dictionary<int, bool> _visibility = new Dictionary<int, bool>();
+        // TODO - remove Guid, it's no longer needed
+        public Guid Guid = Guid.NewGuid();
+
+        [JsonConstructor]
+        public Map() { }
 
         public Map(int size, HexMap<HexType> hexes, List<AreaBuff> buffs) {
             Size = size;
@@ -29,12 +35,40 @@ namespace HexMage.Simulator {
             _hexes = new HexMap<HexType>(size);
         }
 
+        public int Size { get; set; }
+
+        [JsonIgnore]
+        public List<AxialCoord> AllCoords => _hexes.AllCoords;
+
         public HexType this[AxialCoord c] {
             get { return _hexes[c]; }
             set { _hexes[c] = value; }
         }
 
-        public void Toogle(AxialCoord coord) {
+        public Map DeepCopy() {
+            //var hexesCopy = new HexMap<HexType>(Size);
+            var buffsCopy = new List<AreaBuff>();
+
+            //foreach (var coord in AllCoords) {
+            //    hexesCopy[coord] = _hexes[coord];
+            //}
+
+            foreach (var buff in AreaBuffs) buffsCopy.Add(buff);
+
+            var map = new Map(Size, _hexes, buffsCopy) {
+                Guid = Guid
+            };
+
+            map._visibility = _visibility;
+            map._visibilityLines = _visibilityLines;
+            return map;
+        }
+
+        public void Reset() {
+            AreaBuffs.Clear();
+        }
+
+        public void Toggle(AxialCoord coord) {
             if (this[coord] == HexType.Empty) {
                 this[coord] = HexType.Wall;
             } else {
@@ -77,25 +111,23 @@ namespace HexMage.Simulator {
         }
 
         public void PrecomputeCubeLinedraw() {
-            foreach (var a in AllCoords) {
-                foreach (var b in AllCoords) {
-                    var result = ComputeCubeLinedraw(a, b);
-                    var line = result.Select(x => x.ToAxial()).ToList();
+            foreach (var a in AllCoords)
+            foreach (var b in AllCoords) {
+                var result = ComputeCubeLinedraw(a, b);
+                var line = result.Select(x => x.ToAxial()).ToList();
 
-                    var key = CoordPair.Build(a, b);
+                var key = CoordPair.Build(a, b);
 
-                    _visibilityLines[key] = line;
+                _visibilityLines[key] = line;
 
-                    bool targetVisible = true;
-                    foreach (var coord in line) {
-                        if (this[coord] != HexType.Empty) {
-                            targetVisible = false;
-                            break;
-                        }
+                var targetVisible = true;
+                foreach (var coord in line)
+                    if (this[coord] != HexType.Empty) {
+                        targetVisible = false;
+                        break;
                     }
 
-                    _visibility[key] = targetVisible;
-                }
+                _visibility[key] = targetVisible;
             }
         }
 
@@ -111,36 +143,24 @@ namespace HexMage.Simulator {
             }
 
             var N = CubeDistance(a, b);
-            for (int i = 0; i < N + 1; i++) {
-                result.Add(CubeLerp(a, b, ((float) i) / N));
-            }
+            for (var i = 0; i < N + 1; i++) result.Add(CubeLerp(a, b, (float) i / N));
 
             return result;
         }
 
-        public Map DeepCopy() {
-            //var hexesCopy = new HexMap<HexType>(Size);
-            var buffsCopy = new List<AreaBuff>();
+        public bool IsValidCoord(AxialCoord c) {
+            var a = c.X + c.Y;
+            var distance = ((c.X < 0 ? -c.X : c.X)
+                            + (a < 0 ? -a : a)
+                            + (c.Y < 0 ? -c.Y : c.Y)) / 2;
 
-            //foreach (var coord in AllCoords) {
-            //    hexesCopy[coord] = _hexes[coord];
-            //}
+            //int distance = (Math.Abs(c.X)
+            //                + Math.Abs(c.X + c.Y)
+            //                + Math.Abs(c.Y)) / 2;
+            return distance <= Size;
 
-            foreach (var buff in AreaBuffs) {
-                buffsCopy.Add(buff);
-            }
-
-            var map = new Map(Size, _hexes, buffsCopy) {
-                Guid = Guid
-            };
-
-            map._visibility = _visibility;
-            map._visibilityLines = _visibilityLines;
-            return map;
-        }
-
-        public void Reset() {
-            AreaBuffs.Clear();
+            //return _map.AxialDistance(c, new AxialCoord(0, 0)) <= _map.Size;
+            //return _map.CubeDistance(new CubeCoord(0, 0, 0), c) <= _map.Size;
         }
     }
 }
