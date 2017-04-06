@@ -40,6 +40,8 @@ namespace HexMage.GUI.Scenes {
             if (inputManager.IsKeyJustPressed(Keys.L)) {
                 var fileDialog = new OpenFileDialog {CheckFileExists = true};
                 if (fileDialog.ShowDialog() == DialogResult.OK) {
+                    Utils.Log(LogSeverity.Info, nameof(MapEditor), $"Loaded file {fileDialog.FileName}");
+
                     using (var stream = fileDialog.OpenFile()) {
                         using (var reader = new StreamReader(stream)) {
                             var content = reader.ReadToEnd();
@@ -57,6 +59,8 @@ namespace HexMage.GUI.Scenes {
                 };
                 try {
                     if (fileDialog.ShowDialog() == DialogResult.OK) {
+                        Utils.Log(LogSeverity.Info, nameof(MapEditor), $"Saved to file {fileDialog.FileName}");
+
                         using (var writer = new StreamWriter(fileDialog.FileName)) {
                             var data = JsonConvert.SerializeObject(map);
                             writer.Write(data);
