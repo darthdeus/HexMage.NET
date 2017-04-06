@@ -1,12 +1,17 @@
 using System;
 using System.Linq;
 using HexMage.Simulator.Model;
+using HexMage.Simulator.Pathfinding;
 using HexMage.Simulator.PCG;
 
 namespace HexMage.Simulator.AI {
     public static class GameSetup {
-        public static GameInstance GenerateForDnaSettings(int mobCount, int abilityCount) {
-            var game = new GameInstance(Constants.EvolutionMapSize);
+        public static GameInstance GenerateForDnaSettings(int mobCount, int abilityCount, Map map = null) {
+            if (map == null) {
+                map = new Map(Constants.EvolutionMapSize);
+            }
+
+            var game = new GameInstance(map);
 
             var dna = new DNA(mobCount, abilityCount);
 
@@ -16,8 +21,8 @@ namespace HexMage.Simulator.AI {
             return game;
         }
 
-        public static GameInstance GenerateFromDna(DNA d1, DNA d2) {
-            var game = GenerateForDnaSettings(d1.MobCount, d1.AbilityCount);
+        public static GameInstance GenerateFromDna(DNA d1, DNA d2, Map map = null) {
+            var game = GenerateForDnaSettings(d1.MobCount, d1.AbilityCount, map);
 
             OverrideGameDna(game, d1, d2);
 

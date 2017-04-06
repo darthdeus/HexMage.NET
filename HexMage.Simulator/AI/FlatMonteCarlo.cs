@@ -12,16 +12,23 @@ namespace HexMage.Simulator.AI {
                 UctAlgorithm.Expand(root);
             }
 
-            for (int i = 0; i < 10000; i++) {
-                var child = root.Children[i % root.Children.Count];
-
+            foreach (var child in root.Children) {
                 float reward = UctAlgorithm.DefaultPolicy(child.State, initial.CurrentTeam.Value);
-                UctAlgorithm.Backup(child, reward);
+                child.Q = reward;
             }
 
-            var bestChild = UctAlgorithm.BestChild(root);
+            //for (int i = 0; i < 10000; i++) {
+            //    var child = root.Children[i % root.Children.Count];
 
-            return root;
+            //    float reward = UctAlgorithm.DefaultPolicy(child.State, initial.CurrentTeam.Value);
+            //    UctAlgorithm.Backup(child, reward);
+            //}
+
+            var bestChild = UctAlgorithm.BestChild(root, 0);
+
+            UctDebug.PrintDotgraph(root, () => 0);
+
+            return bestChild;
         }
     }
 }

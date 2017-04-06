@@ -1,5 +1,5 @@
 //#define XML
-//#define DOT
+#define DOT
 
 using System;
 using System.IO;

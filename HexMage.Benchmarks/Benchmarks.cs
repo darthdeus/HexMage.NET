@@ -3,28 +3,26 @@
 #define FAST
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using HexMage.Simulator;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
+using HexMage.Simulator.Pathfinding;
 using HexMage.Simulator.PCG;
+using Newtonsoft.Json;
 
 namespace HexMage.Benchmarks {
     public class Benchmarks {
-        public static void NewRun() {
+        public static void CompareAi() {
             var dna = new DNA(2, 2);
             dna.Randomize();
 
-            var game = GameSetup.GenerateFromDna(dna, dna);
+            const string mapFilename = @"C: \Users\darth\Documents\map.json";
+            //var map = JsonConvert.DeserializeObject<Map>(File.ReadAllText(mapFilename));
+            var map = new Map(5);
 
-            // TODO: map editor
-            game.Map[new AxialCoord(3, -3)] = HexType.Wall;
-            game.Map[new AxialCoord(2, -2)] = HexType.Wall;
-            game.Map[new AxialCoord(1, -1)] = HexType.Wall;
-
-            game.Map[new AxialCoord(-1, 1)] = HexType.Wall;
-            game.Map[new AxialCoord(-2, 2)] = HexType.Wall;
-            game.Map[new AxialCoord(-3, 3)] = HexType.Wall;
+            var game = GameSetup.GenerateFromDna(dna, dna, map);
 
             game.PrepareEverything();
 
@@ -43,18 +41,36 @@ namespace HexMage.Benchmarks {
                     c1 = new AiRandomController(game);
                     c2 = new AiRuleBasedController(game);
                     break;
-
+                case 3:
+                    c1 = new FlatMonteCarloController(game);
+                    c2 = new AiRandomController(game);
+                    break;
+                case 4:
+                    c1 = new FlatMonteCarloController(game);
+                    c2 = new AiRuleBasedController(game);
+                    break;
+                case 5:
+                    c1 = new FlatMonteCarloController(game);
+                    c2 = new MctsController(game, Constants.MctsBenchIterations);
+                    break;
                 default:
                     throw new ArgumentException($"Invalid value of {Constants.MctsBenchType} for --MctsBenchType");
             }
 
-            c1 = new AiRandomController(game);
-            c2 = new MctsController(game, 1000);
+            //c1 = new MctsController(game, 3);
+            //c2 = new FlatMonteCarloController(game);
+            //c2 = new MctsController(game, 100000);
 
             var iterationStopwatch = new Stopwatch();
-            
+
             for (int i = 0; i < 1000; i++) {
                 dna.Randomize();
+                if (Probability.Uniform(0.5)) {
+                    var tmp = c1;
+                    c1 = c2;
+                    c2 = tmp;
+                }
+
                 GameSetup.OverrideGameDna(game, dna, dna);
                 iterationStopwatch.Restart();
                 GameInstanceEvaluator.PlayoutSingleGame(game, c1, c2);
@@ -64,6 +80,7 @@ namespace HexMage.Benchmarks {
                 iterationStopwatch.Restart();
                 GameInstanceEvaluator.PlayoutSingleGame(game, c2, c1);
                 iterationStopwatch.Stop();
+
 
                 Console.Write($"Iteration: {iterationStopwatch.ElapsedMilliseconds}ms");
                 GameInstanceEvaluator.PrintBookkeepingData();

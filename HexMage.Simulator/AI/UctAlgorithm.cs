@@ -63,12 +63,12 @@ namespace HexMage.Simulator.AI {
             return node;
         }
 
-        public static UctNode BestChild(UctNode node) {
+        public static UctNode BestChild(UctNode node, double c = 2) {
             if (node.Children.Count == 0) return null;
 
             UctNode best = node.Children[0];
             foreach (var child in node.Children) {
-                if (UcbValue(node, child) > UcbValue(node, best)) {
+                if (UcbValue(node, child, c) > UcbValue(node, best, c)) {
                     best = child;
                 }
             }
@@ -76,8 +76,8 @@ namespace HexMage.Simulator.AI {
             return best;
         }
 
-        public static float UcbValue(UctNode parent, UctNode node) {
-            return (float) (node.Q / node.N + Math.Sqrt(2 * Math.Log(parent.N) / node.N));
+        public static float UcbValue(UctNode parent, UctNode node, double c) {
+            return (float) (node.Q / node.N + Math.Sqrt(c * Math.Log(parent.N) / node.N));
         }
 
         public static UctNode Expand(UctNode node) {

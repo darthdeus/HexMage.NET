@@ -42,13 +42,9 @@ namespace HexMage.GUI.Scenes {
                 if (fileDialog.ShowDialog() == DialogResult.OK) {
                     Utils.Log(LogSeverity.Info, nameof(MapEditor), $"Loaded file {fileDialog.FileName}");
 
-                    using (var stream = fileDialog.OpenFile()) {
-                        using (var reader = new StreamReader(stream)) {
-                            var content = reader.ReadToEnd();
-                            var m = JsonConvert.DeserializeObject<Map>(content);
 
-                            _loadNewMap(m);
-                        }
+                    using (var stream = fileDialog.OpenFile()) {
+                        _loadNewMap(LoadMapFromStream(stream));
                     }
                 }
             }
@@ -129,6 +125,20 @@ namespace HexMage.GUI.Scenes {
                         togglePoints.Add(mouseHex);
                     }
                 }
+            }
+        }
+
+        public static Map LoadMapFromStream(Stream stream) {
+            using (var reader = new StreamReader(stream)) {
+                var content = reader.ReadToEnd();
+                return JsonConvert.DeserializeObject<Map>(content);
+            }
+        }
+
+        public static Map LoadMapFromFile(string filename) {
+            using (var reader = new StreamReader(filename)) {
+                var content = reader.ReadToEnd();
+                return JsonConvert.DeserializeObject<Map>(content);
             }
         }
 
