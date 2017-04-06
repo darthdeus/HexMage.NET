@@ -31,6 +31,12 @@ namespace HexMage.GUI.Scenes {
 
             camera.NavigationEnabled = false;
 
+            if (inputManager.IsKeyJustPressed(Keys.R) && Keyboard.GetState().IsKeyDown(Keys.LeftControl)) {
+                SceneManager.RollbackToFirst = true;
+                return;
+            }
+
+
             if (inputManager.IsKeyJustPressed(Keys.L)) {
                 var fileDialog = new OpenFileDialog {CheckFileExists = true};
                 if (fileDialog.ShowDialog() == DialogResult.OK) {

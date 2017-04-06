@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HexMage.Simulator;
-using HexMage.Simulator.Pathfinding;
+﻿using HexMage.Simulator.Pathfinding;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Label = HexMage.GUI.UI.Label;
@@ -26,13 +21,23 @@ namespace HexMage.GUI.Scenes {
                                     "S ... save\n" +
                                     "Q ... place red starting point\n" +
                                     "E ... place blue starting point\n" +
-                                    "W or RMB... toggle";
+                                    "W or RMB ... toggle walls\n" +
+                                    "1,2,3 ... reorder starting points\n" +
+                                    "Space ... CONTINUE";
+
+
             root.AddChild(new Label(helpText, _assetManager.Font));
 
             root.AddComponent(new MapEditor(() => _map, map => _map = map));
             root.Renderer = new MapEditorRenderer(() => _map);
+
+            root.AddComponent(() => {
+                if (InputManager.Instance.IsKeyJustPressed(Keys.Space)) {
+                    LoadNewScene(new TeamSelectionScene(_gameManager, _map.DeepCopy()));
+                }
+            });
         }
 
-        public override void Cleanup() {}
+        public override void Cleanup() { }
     }
 }

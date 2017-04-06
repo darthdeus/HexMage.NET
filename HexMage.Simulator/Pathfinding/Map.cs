@@ -59,6 +59,8 @@ namespace HexMage.Simulator.Pathfinding {
                 Guid = Guid
             };
 
+            map.RedStartingPoints = RedStartingPoints;
+            map.BlueStartingPoints = BlueStartingPoints;
             map._visibility = _visibility;
             map._visibilityLines = _visibilityLines;
             return map;
