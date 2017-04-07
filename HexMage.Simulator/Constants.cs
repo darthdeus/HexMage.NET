@@ -2,6 +2,8 @@
 
 namespace HexMage.Simulator {
     public static class Constants {
+        public static bool RecordReplays = true;
+
         // MCTS benchmarks
         public static int MctsBenchIterations = 10;
         public static int MctsBenchType = 5;

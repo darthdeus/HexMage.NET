@@ -120,9 +120,22 @@ namespace HexMage.GUI.Scenes {
                     LoadMapEditor();
                 }
 
+                if (InputManager.Instance.IsKeyJustPressed(Keys.T)) {
+                    var replay = ReplayRecorder.Instance.Load(0);
+
+                    var game = new GameInstance(replay.Map, replay.MobManager);
+                    game.PrepareEverything();
+                    game.Reset();
+
+                    game.MobManager.Teams[TeamColor.Red] = new AiRuleBasedController(game);
+                    game.MobManager.Teams[TeamColor.Blue] = new AiRuleBasedController(game);
+
+                    LoadNewScene(new ArenaScene(_gameManager, game));
+                }
+
                 if (InputManager.Instance.IsKeyJustPressed(Keys.R)) {
                     var replay = ReplayRecorder.Instance.Load(0);
-                    
+
                     LoadNewScene(new ArenaScene(_gameManager, replay));
                 }
             });
@@ -161,7 +174,7 @@ namespace HexMage.GUI.Scenes {
             _currentMap = _mapGenerator.Generate(_selectedSize ?? DefaultMapSize, _currentSeed);
         }
 
-        public override void Cleanup() {}
+        public override void Cleanup() { }
 
         public void LoadWorldFromSave() {
             using (var reader = new StreamReader(GameInstance.MapSaveFilename))

@@ -124,7 +124,7 @@ namespace HexMage.Simulator {
             if (moveTarget != null && pathfinder.Distance(mobInstance.Coord, moveTarget.Value) <= mobInstance.Ap) {
                 return UctAction.MoveAction(mobId, moveTarget.Value);
             } else if (moveTarget == null) {
-                Console.WriteLine("Move target is null");
+                //Console.WriteLine("Move target is null");
                 // TODO - intentionally doing nothing
                 return UctAction.EndTurnAction();
             } else {

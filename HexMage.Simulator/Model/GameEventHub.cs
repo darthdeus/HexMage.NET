@@ -26,9 +26,15 @@ namespace HexMage.Simulator.Model {
         }
 
         public async Task<int> PlayReplay(List<UctAction> actions) {
-            foreach (var action in actions) {
-                Console.WriteLine($"Replaying {action}");
-                await SlowPlayAction(_gameInstance, action);
+            using (var suspender = new TemporarilySuspendReplayRecording()) {
+                foreach (var action in actions) {
+                    if (action.Type == UctActionType.EndTurn) {
+                        UctAlgorithm.FNoCopy(_gameInstance, action);
+                    } else {
+                        await SlowPlayAction(_gameInstance, action);
+                    }
+                    Console.WriteLine($"Replaying {action}");
+                }
             }
 
             return actions.Count;
@@ -43,7 +49,7 @@ namespace HexMage.Simulator.Model {
 
             int totalTurns = 0;
             state.SlowUpdateIsFinished(_gameInstance.MobManager);
-            
+
 
             while (!_gameInstance.IsFinished) {
                 totalTurns++;
