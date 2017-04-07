@@ -185,12 +185,7 @@ namespace HexMage.Simulator.AI {
 
             while (!copy.IsFinished && iterations-- > 0) {
                 var action = ActionGenerator.DefaultPolicyAction(copy);
-
-                //Console.WriteLine(action);
-                //if (action.Type == UctActionType.EndTurn) {
-                //    Console.WriteLine("**************************");
-                //}
-
+                
                 if (action.Type == UctActionType.Null) {
                     throw new InvalidOperationException();
                 }

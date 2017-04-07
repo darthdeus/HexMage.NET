@@ -236,6 +236,8 @@ namespace HexMage.Simulator {
                 Map.AreaBuffs.Add(copy);
             }
 
+            Debug.Assert(State.MobInstances[mobId].Ap >= ability.Cost, "State.MobInstances[mobId].Ap >= ability.Cost");
+
             State.ChangeMobAp(mobId, -ability.Cost);
         }
 
