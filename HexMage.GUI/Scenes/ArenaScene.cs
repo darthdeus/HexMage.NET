@@ -20,6 +20,20 @@ namespace HexMage.GUI.Scenes {
 
         private GameBoardController _gameBoardController;
         private LogBox _logBox;
+        private Replay _replay;
+
+        public ArenaScene(GameManager gameManager, Replay replay) : base(gameManager) {
+            _replay = replay;
+
+            _gameInstance = new GameInstance(replay.Map, replay.MobManager);
+            _gameInstance.PrepareEverything();
+            _gameInstance.Reset();
+
+            _gameInstance.MobManager.Teams[TeamColor.Red] = new ReplayController();
+            _gameInstance.MobManager.Teams[TeamColor.Blue] = new ReplayController();
+
+            _gameEventHub = new GameEventHub(_gameInstance);
+        }
 
         public ArenaScene(GameManager gameManager, GameInstance gameInstance) : base(gameManager) {
             _gameInstance = gameInstance;
@@ -53,13 +67,15 @@ namespace HexMage.GUI.Scenes {
             AddAndInitializeRootEntity(_logBox, _assetManager);
 
             var gameBoardEntity = CreateRootEntity(Camera2D.SortBackground);
-            var gameBoardController = new GameBoardController(_gameInstance, _gameEventHub, this);
-            _gameBoardController = gameBoardController;
-            gameBoardEntity.AddComponent(gameBoardController);
-            gameBoardEntity.Renderer = new GameBoardRenderer(_gameInstance, gameBoardController, _gameEventHub, _camera);
+
+            _gameBoardController = new GameBoardController(_gameInstance, _gameEventHub, this, _replay);
+
+            gameBoardEntity.AddComponent(_gameBoardController);
+            gameBoardEntity.Renderer =
+                new GameBoardRenderer(_gameInstance, _gameBoardController, _gameEventHub, _camera);
             gameBoardEntity.CustomBatch = true;
 
-            _gameEventHub.AddSubscriber(gameBoardController);
+            _gameEventHub.AddSubscriber(_gameBoardController);
 
             BuildUi();
 
@@ -83,7 +99,7 @@ namespace HexMage.GUI.Scenes {
             NoParticles
         }
 
-        public override void Cleanup() {}
+        public override void Cleanup() { }
 
         private void BuildUi() {
             Func<string> gameStateTextFunc = () => _gameInstance.IsFinished ? "Game finished" : "Game in progress";
@@ -123,12 +139,14 @@ namespace HexMage.GUI.Scenes {
             };
 
             for (int i = 0; i < MobInfo.NumberOfAbilities; i++) {
-                currentLayout.AddChild(AbilityDetail(gameFunc, currentMobFunc, i, ParticleEffectSettings.HighlightParticles));
+                currentLayout.AddChild(AbilityDetail(gameFunc, currentMobFunc, i,
+                                                     ParticleEffectSettings.HighlightParticles));
                 hoverLayout.AddChild(AbilityDetail(gameFunc, hoverMobFunc, i, ParticleEffectSettings.NoParticles));
             }
         }
 
-        private Entity AbilityDetail(Func<GameInstance> gameFunc, Func<int?> mobFunc, int abilityIndex, ParticleEffectSettings particleEffectSettings) {
+        private Entity AbilityDetail(Func<GameInstance> gameFunc, Func<int?> mobFunc, int abilityIndex,
+                                     ParticleEffectSettings particleEffectSettings) {
             var abilityDetailWrapper = new Entity {
                 SizeFunc = () => new Vector2(120, 80)
             };
@@ -165,11 +183,11 @@ namespace HexMage.GUI.Scenes {
 
             Func<Random, Vector2> offsetFunc = rnd =>
                 new Vector2(
-                    (float) rnd.NextDouble()*horizontalOffset*2 - horizontalOffset, 0);
+                    (float) rnd.NextDouble() * horizontalOffset * 2 - horizontalOffset, 0);
 
             Func<Random, Vector2> velocityFunc = rnd =>
                 new Vector2((float) rnd.NextDouble() - 0.2f,
-                            (float) rnd.NextDouble()*speed - speed/2);
+                            (float) rnd.NextDouble() * speed - speed / 2);
 
             const int maximumNumberOfParticles = 200;
             const int particlesPerSecond = 20;
@@ -187,7 +205,9 @@ namespace HexMage.GUI.Scenes {
                     var mob = mobFunc();
                     if (_gameBoardController.SelectedAbilityIndex.HasValue && mob != null) {
                         int index = _gameBoardController.SelectedAbilityIndex.Value;
-                        var ability = _gameInstance.MobManager.AbilityForId(_gameInstance.MobManager.MobInfos[mob.Value].Abilities[index]);
+                        var ability =
+                            _gameInstance.MobManager.AbilityForId(
+                                _gameInstance.MobManager.MobInfos[mob.Value].Abilities[index]);
                         return ElementColor(ability.Element);
                     } else {
                         return Color.White;
@@ -210,9 +230,7 @@ namespace HexMage.GUI.Scenes {
                                                     buffsLabel);
             abilityDetail.AddComponent(abilityUpdater);
 
-            abilityUpdater.OnClick += index => {
-                _gameBoardController.SelectAbility(index);
-            };
+            abilityUpdater.OnClick += index => { _gameBoardController.SelectAbility(index); };
 
             return abilityDetailWrapper;
         }

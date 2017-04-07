@@ -137,6 +137,8 @@ namespace HexMage.Simulator.AI {
 
             Constants.WriteLogLine(action);
 
+            ReplayRecorder.Instance.Actions.Add(action);
+
             switch (action.Type) {
                 case UctActionType.Null:
                     // do nothing

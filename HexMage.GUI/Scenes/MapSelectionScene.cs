@@ -119,6 +119,12 @@ namespace HexMage.GUI.Scenes {
                 if (InputManager.Instance.IsKeyJustPressed(Keys.E)) {
                     LoadMapEditor();
                 }
+
+                if (InputManager.Instance.IsKeyJustPressed(Keys.R)) {
+                    var replay = ReplayRecorder.Instance.Load(0);
+                    
+                    LoadNewScene(new ArenaScene(_gameManager, replay));
+                }
             });
 
             AddAndInitializeRootEntity(loaderEntity, _assetManager);

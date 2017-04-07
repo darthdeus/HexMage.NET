@@ -82,7 +82,9 @@
     <Compile Include="IGameEventSubscriber.cs" />
     <Compile Include="Model\Heatmap.cs" />
     <Compile Include="Model\MobInstance.cs" />
+    <Compile Include="Model\ReplayController.cs" />
     <Compile Include="Probability.cs" />
+    <Compile Include="ReplayRecorder.cs" />
     <Compile Include="Serialization\MapItem.cs" />
     <Compile Include="Serialization\MapRepresentation.cs" />
     <Compile Include="Model\AreaBuff.cs" />

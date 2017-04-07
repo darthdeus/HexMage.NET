@@ -15,12 +15,14 @@ using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Scenes {
     public class TeamSelectionScene : GameScene {
+        // TODO - fuj, referencovat primo game instance
         private readonly Map _map;
         private readonly GameInstance _gameInstance;
         private IMobController _leftController;
         private IMobController _rightController;
         private readonly ArenaScene _arenaScene;
         private readonly List<IMobController> _controllerList;
+        // TODO - fuj, referencovat primo game instance
         private readonly MobManager _mobManager = new MobManager();
         private VerticalLayout _teamPreviewLayout;
         private HorizontalLayout _t1Preview;

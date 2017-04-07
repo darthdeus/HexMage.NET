@@ -191,7 +191,7 @@ namespace HexMage.Benchmarks {
                     //Console.WriteLine($"Starting, actions: {UctAlgorithm.Actions}");
                     stopwatch.Start();
 #if FAST
-                    var rounds = hub.FastMainLoop(TimeSpan.Zero);
+                    var rounds = hub.FastMainLoop();
                     stopwatch.Stop();
 
                     roundsPerThousand += rounds;

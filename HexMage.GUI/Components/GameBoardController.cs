@@ -36,12 +36,16 @@ namespace HexMage.GUI.Components {
         private VerticalLayout _mobPopover;
         private Vector4 _popoverPadding;
 
+        private Replay _replay;
+
         public int? SelectedAbilityIndex;
 
-        public GameBoardController(GameInstance gameInstance, GameEventHub eventHub, ArenaScene arenaScene) {
+        public GameBoardController(GameInstance gameInstance, GameEventHub eventHub, ArenaScene arenaScene,
+                                   Replay replay = null) {
             _gameInstance = gameInstance;
             _eventHub = eventHub;
             _arenaScene = arenaScene;
+            _replay = replay;
         }
 
         public void EventAbilityUsed(int mobId, int targetId, Ability ability) {
@@ -128,8 +132,13 @@ namespace HexMage.GUI.Components {
 
             BuildPopovers();
 
-            _eventHub.SlowMainLoop(TimeSpan.FromMilliseconds(500))
-                     .LogContinuation();
+            if (_replay == null) {
+                _eventHub.SlowMainLoop(TimeSpan.FromMilliseconds(500))
+                         .LogContinuation();
+            } else {
+                _eventHub.PlayReplay(_replay.Actions)
+                         .LogContinuation();
+            }
         }
 
         public override void Update(GameTime time) {
@@ -144,6 +153,7 @@ namespace HexMage.GUI.Components {
             }
 
             if (inputManager.IsKeyJustPressed(Keys.Pause)) {
+                // TODO - pausing
                 if (_eventHub.IsPaused) {
                     ShowMessage("Game resumed.");
                 } else {
@@ -153,18 +163,9 @@ namespace HexMage.GUI.Components {
             }
 
             var controller = _gameInstance.TurnManager.CurrentController as PlayerController;
-            if (controller != null && inputManager.UserInputEnabled && _eventHub.State == GameEventState.TurnInProgress) {
+            if (controller != null && inputManager.UserInputEnabled &&
+                _eventHub.State == GameEventState.TurnInProgress) {
                 HandleKeyboardAbilitySelect();
-
-                if (inputManager.JustRightClicked())
-                    if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                        _gameInstance.Map.Toggle(mouseHex);
-
-                        _gameInstance.Pathfinder.PathfindDistanceAll();
-                        _gameInstance.Pathfinder.PathfindFromCurrentMob(_gameInstance.TurnManager,
-                                                                        _gameInstance.Pathfinder);
-                        _gameInstance.Map.PrecomputeCubeLinedraw();
-                    }
 
                 if (inputManager.IsKeyJustPressed(Keys.Space)) {
                     controller.PlayerEndedTurn(_eventHub);

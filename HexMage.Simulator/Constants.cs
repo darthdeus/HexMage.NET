@@ -127,7 +127,6 @@ namespace HexMage.Simulator {
             }
         }
 
-
         public static void WriteLogLine(object str) {
             if (Logging) {
                 LogBuffer.WriteLine(str);

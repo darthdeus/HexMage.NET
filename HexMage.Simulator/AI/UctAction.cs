@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 
 namespace HexMage.Simulator.AI {
     public struct UctAction {
@@ -8,6 +9,7 @@ namespace HexMage.Simulator.AI {
         public readonly int TargetId;
         public readonly AxialCoord Coord;
 
+        [JsonConstructor]
         private UctAction(UctActionType type, int abilityId, int mobId, int targetId, AxialCoord coord) {
             Type = type;
             AbilityId = abilityId;

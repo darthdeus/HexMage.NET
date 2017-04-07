@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.Pathfinding;
 using Newtonsoft.Json;
@@ -12,6 +9,7 @@ namespace HexMage.Simulator {
     public class GameInstance : IDeepCopyable<GameInstance>, IResettable {
         // TODO - fuj hardcoded cesty
         public static string MapSaveFilename = @"C:\dev\HexMage\HexMage\HexMage.GUI\map.json";
+
         public static string MobsSaveFilename = @"C:\dev\HexMage\HexMage\HexMage.GUI\mobs.json";
 
         public Map Map { get; set; }
@@ -33,11 +31,20 @@ namespace HexMage.Simulator {
             Pathfinder = new Pathfinder(this);
             TurnManager = new TurnManager(this);
             State = new GameState();
+
+            Array.Resize(ref State.MobInstances, mobManager.Mobs.Count);
+
+            for (int i = 0; i < MobManager.Abilities.Count; i++) {
+                State.Cooldowns.Add(i);
+            }
+            foreach (var mobId in MobManager.Mobs) {
+                State.MobInstances[mobId].Id = mobId;
+            }
         }
 
-        public GameInstance(int size) : this(new Map(size)) {}
+        public GameInstance(int size) : this(new Map(size)) { }
 
-        public GameInstance(Map map) : this(map, new MobManager()) {}
+        public GameInstance(Map map) : this(map, new MobManager()) { }
 
         private GameInstance(int size, Map map, MobManager mobManager, Pathfinder pathfinder) {
             Size = size;
@@ -89,7 +96,8 @@ namespace HexMage.Simulator {
                     return null;
                 } else {
                     Debug.Assert(!IsFinished);
-                    throw new InvalidOperationException("Trying to access the victory team before the game is finished.");
+                    throw new InvalidOperationException(
+                        "Trying to access the victory team before the game is finished.");
                 }
             }
         }
@@ -310,6 +318,7 @@ namespace HexMage.Simulator {
         }
 
 #warning TODO - funguje tohle jeste?
+
         public void Reset() {
             Map.Reset();
             State.Reset(MobManager);

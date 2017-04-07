@@ -25,6 +25,15 @@ namespace HexMage.Simulator.Model {
             _gameInstance = gameInstance;
         }
 
+        public async Task<int> PlayReplay(List<UctAction> actions) {
+            foreach (var action in actions) {
+                Console.WriteLine($"Replaying {action}");
+                await SlowPlayAction(_gameInstance, action);
+            }
+
+            return actions.Count;
+        }
+
         public async Task<int> SlowMainLoop(TimeSpan turnDelay) {
             State = GameEventState.SettingUpTurn;
 
@@ -47,6 +56,7 @@ namespace HexMage.Simulator.Model {
                 UctAlgorithm.FNoCopy(_gameInstance, UctAction.EndTurnAction());
             }
 
+            ReplayRecorder.Instance.SaveAndClear(_gameInstance);
             Console.WriteLine(Constants.GetLogBuffer());
 
             return totalTurns;
@@ -82,7 +92,7 @@ namespace HexMage.Simulator.Model {
             }
         }
 
-        public int FastMainLoop(TimeSpan turnDelay) {
+        public int FastMainLoop() {
             var turnManager = _gameInstance.TurnManager;
             turnManager.StartNextTurn(_gameInstance.Pathfinder, _gameInstance.State);
 
