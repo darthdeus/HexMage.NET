@@ -244,6 +244,7 @@ namespace HexMage.Simulator {
         public void FastUse(int abilityId, int mobId, int targetId) {
             var target = State.MobInstances[targetId];
 
+            Debug.Assert(MobManager.AbilityForId(abilityId).Cooldown == 0, "Somehow generated an ability with non-zero cooldown.");
             Debug.Assert(State.Cooldowns[abilityId] == 0, "Trying to use an ability with non-zero cooldown.");
             Debug.Assert(State.MobInstances[mobId].Hp > 0, "Source is dead");
             Debug.Assert(target.Hp > 0, "Target is dead.");
@@ -252,6 +253,7 @@ namespace HexMage.Simulator {
 
             Debug.Assert(ability.Cooldown == 0);
             State.Cooldowns[abilityId] = ability.Cooldown;
+            Debug.Assert(ability.Cooldown == 0);
 
             TargetHit(abilityId, mobId, targetId);
         }

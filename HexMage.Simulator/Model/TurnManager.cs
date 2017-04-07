@@ -53,6 +53,7 @@ namespace HexMage.Simulator {
         }
 
         public void StartNextTurn(Pathfinder pathfinder, GameState state) {
+            
             TurnNumber++;
 
             for (int i = 0; i < state.MobInstances.Length; i++) {
@@ -71,6 +72,11 @@ namespace HexMage.Simulator {
 
         public TurnEndResult NextMobOrNewTurn(Pathfinder pathfinder, GameState state) {
             Debug.Assert(state.CurrentMobIndex.HasValue, "state.CurrentMobIndex.HasValue");
+            if (!state.CurrentMobIndex.HasValue) {
+                Utils.Log(LogSeverity.Error, nameof(TurnManager),
+                          "CurrentMob has no value but trying to move to the next.");
+                return TurnEndResult.NextMob;
+            }
 
             if (state.CurrentMobIndex.Value >= _turnOrder.Count - 1) {
                 StartNextTurn(pathfinder, state);

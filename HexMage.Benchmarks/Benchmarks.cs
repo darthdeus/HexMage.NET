@@ -186,6 +186,7 @@ namespace HexMage.Benchmarks {
                 while (iterations < totalIterations) {
                     iterations++;
 
+                    // TODO - fuj
                     turnManager.StartNextTurn(pathfinder, gameInstance.State);
 
                     //Console.WriteLine($"Starting, actions: {UctAlgorithm.Actions}");

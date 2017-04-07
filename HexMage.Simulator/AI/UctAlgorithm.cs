@@ -202,6 +202,7 @@ namespace HexMage.Simulator.AI {
             }
 
             if (iterations <= 0) {
+                ReplayRecorder.Instance.SaveAndClear(game);
                 Utils.Log(LogSeverity.Error, nameof(UctAlgorithm),
                           $"DefaultPolicy ran out of time (over {maxDefaultPolicyIterations} iterations for playout), computed results are likely wrong.");
                 return 0;
