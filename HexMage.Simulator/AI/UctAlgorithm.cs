@@ -9,7 +9,6 @@ using HexMage.Simulator.Model;
 namespace HexMage.Simulator.AI {
     public class UctAlgorithm {
         // TODO - extrahovat do args nebo configuraku
-        public static int Actions = 0;
         public static int SearchCount = 0;
 
         public static int ExpandCount = 0;
@@ -88,7 +87,7 @@ namespace HexMage.Simulator.AI {
                 node.PrecomputePossibleActions(allowMove, true || type != UctActionType.EndTurn);
 
                 var action = node.PossibleActions[node.Children.Count];
-                var child = new UctNode(0, 0, action, F(node.State, action));
+                var child = new UctNode(0, 0, action, ActionEvaluator.F(node.State, action));
                 child.Parent = node;
 
                 node.Children.Add(child);
@@ -100,77 +99,16 @@ namespace HexMage.Simulator.AI {
             }
         }
 
-        public static GameInstance F(GameInstance state, UctAction action) {
-            return FNoCopy(state.CopyStateOnly(), action);
-        }
-
-        // TODO: extract all the accounting
-        public static readonly Dictionary<UctActionType, int> ActionCounts = new Dictionary<UctActionType, int>();
         private readonly int _thinkTime;
 
-        public static string ActionCountString() {
-            return
-                $"E: {ActionCounts[UctActionType.EndTurn]}, " +
-                $"A: {ActionCounts[UctActionType.AbilityUse]}, " +
-                $"M: {ActionCounts[UctActionType.Move]}, " +
-                $"N: {ActionCounts[UctActionType.Null]}, " +
-                $"D: {ActionCounts[UctActionType.DefensiveMove]}, " +
-                $"AM: {ActionCounts[UctActionType.AttackMove]}";
-        }
-
-        static UctAlgorithm() {
-            ActionCounts.Add(UctActionType.Null, 0);
-            ActionCounts.Add(UctActionType.EndTurn, 0);
-            ActionCounts.Add(UctActionType.AbilityUse, 0);
-            ActionCounts.Add(UctActionType.Move, 0);
-            ActionCounts.Add(UctActionType.DefensiveMove, 0);
-            ActionCounts.Add(UctActionType.AttackMove, 0);
-        }
 
         public UctAlgorithm(int thinkTime) {
             _thinkTime = thinkTime;
         }
 
-        public static GameInstance FNoCopy(GameInstance state, UctAction action) {
-            Actions++;
-            ActionCounts[action.Type]++;
-
-            Constants.WriteLogLine(action);
-
-            if (Constants.RecordReplays) {
-                ReplayRecorder.Instance.Actions.Add(action);
-            }
-
-            switch (action.Type) {
-                case UctActionType.Null:
-                    // do nothing
-                    break;
-                case UctActionType.EndTurn:
-                    state.NextMobOrNewTurn();
-                    break;
-                case UctActionType.AbilityUse:
-                    state.FastUse(action.AbilityId, action.MobId, action.TargetId);
-                    break;
-                case UctActionType.AttackMove:
-                    Debug.Assert(state.State.AtCoord(action.Coord) == null, "Trying to move into a mob.");
-                    state.FastMove(action.MobId, action.Coord);
-                    state.FastUse(action.AbilityId, action.MobId, action.TargetId);
-                    break;
-                case UctActionType.DefensiveMove:
-                case UctActionType.Move:
-                    // TODO - gameinstance co se jmenuje state?
-                    Debug.Assert(state.State.AtCoord(action.Coord) == null, "Trying to move into a mob.");
-                    state.FastMove(action.MobId, action.Coord);
-                    break;
-                default:
-                    throw new InvalidOperationException($"Invalid value of {action.Type}");
-            }
-
-            return state;
-        }
 
         public static float PlayoutAction(GameInstance game, UctAction action, TeamColor startingTeam) {
-            return DefaultPolicy(F(game, action), startingTeam);
+            return DefaultPolicy(ActionEvaluator.F(game, action), startingTeam);
         }
 
         public static float DefaultPolicy(GameInstance game, TeamColor startingTeam) {
@@ -187,12 +125,12 @@ namespace HexMage.Simulator.AI {
 
             while (!copy.IsFinished && iterations-- > 0) {
                 var action = ActionGenerator.DefaultPolicyAction(copy);
-                
+
                 if (action.Type == UctActionType.Null) {
                     throw new InvalidOperationException();
                 }
 
-                FNoCopy(copy, action);
+                ActionEvaluator.FNoCopy(copy, action);
 
                 // TODO - odebrat az se opravi
                 copy.State.SlowUpdateIsFinished(copy.MobManager);

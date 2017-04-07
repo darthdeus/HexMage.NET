@@ -21,7 +21,7 @@ namespace HexMage.Simulator {
             foreach (var action in result.Actions) {
                 Debug.Assert(action.Type != UctActionType.EndTurn, "node.Action.Type != UctActionType.EndTurn");
 
-                UctAlgorithm.FNoCopy(_gameInstance, action);
+                ActionEvaluator.FNoCopy(_gameInstance, action);
             }
 
             ExponentialMovingAverage.Instance.Average(result.MillisecondsPerIteration);
@@ -42,11 +42,22 @@ namespace HexMage.Simulator {
         }
 
         private void LogActions(UctSearchResult result) {
-            float abilityUse = UctAlgorithm.ActionCounts[UctActionType.AbilityUse];
-            float attackMove = UctAlgorithm.ActionCounts[UctActionType.AttackMove];
-            float defensiveMove = UctAlgorithm.ActionCounts[UctActionType.DefensiveMove];
-            float move = UctAlgorithm.ActionCounts[UctActionType.Move];
-            float endTurn = UctAlgorithm.ActionCounts[UctActionType.EndTurn];
+            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
+            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
+            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
+            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
+            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
+            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
+            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
+            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
+            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
+            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
+            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
+            float abilityUse = ActionEvaluator.ActionCounts[UctActionType.AbilityUse];
+            float attackMove = ActionEvaluator.ActionCounts[UctActionType.AttackMove];
+            float defensiveMove = ActionEvaluator.ActionCounts[UctActionType.DefensiveMove];
+            float move = ActionEvaluator.ActionCounts[UctActionType.Move];
+            float endTurn = ActionEvaluator.ActionCounts[UctActionType.EndTurn];
 
             float useCounts = abilityUse + attackMove + defensiveMove + move;
             string endRatio = (endTurn / useCounts).ToString("0.00");
@@ -60,7 +71,7 @@ namespace HexMage.Simulator {
                 }
 
                 Console.WriteLine(
-                    $"#sum: {UctAlgorithm.Actions}[ability/move ratio: {abilityMoveRatio}] [end ratio: {endRatio}] {UctAlgorithm.ActionCountString()}");
+                    $"#sum: {ActionEvaluator.Actions}[ability/move ratio: {abilityMoveRatio}] [end ratio: {endRatio}] {ActionEvaluator.ActionCountString()}");
             }
         }
 

@@ -8,7 +8,7 @@ namespace HexMage.Simulator.Tests {
         public void IsFinishedWithSlowUpdateTest() {
             var game = new GameInstance(3);
 
-            var a1 = game.AddAbilityWithInfo(new Ability(5, 1, 5, 0, AbilityElement.Fire));
+            var a1 = game.AddAbilityWithInfo(new AbilityInfo(5, 1, 5, 0, AbilityElement.Fire));
 
             var m1 = game.AddMobWithInfo(new MobInfo(TeamColor.Red, 1, 10, 0, new[] {a1}));
             var m2 = game.AddMobWithInfo(new MobInfo(TeamColor.Blue, 1, 10, 0, new[] {a1}));
@@ -28,7 +28,7 @@ namespace HexMage.Simulator.Tests {
         public void IsFinishedFastAutoUpdateTest() {
             var game = new GameInstance(3);
 
-            var a1 = game.AddAbilityWithInfo(new Ability(5, 1, 5, 0, AbilityElement.Fire));
+            var a1 = game.AddAbilityWithInfo(new AbilityInfo(5, 1, 5, 0, AbilityElement.Fire));
 
             var m1 = game.AddMobWithInfo(new MobInfo(TeamColor.Red, 1, 10, 0, new[] {a1}));
             var m2 = game.AddMobWithInfo(new MobInfo(TeamColor.Blue, 1, 10, 0, new[] {a1}));
@@ -46,7 +46,7 @@ namespace HexMage.Simulator.Tests {
         public void IsFinishedFastAutoUpdateWithDotsTest() {
             var game = new GameInstance(3);
 
-            var a1 = game.AddAbilityWithInfo(new Ability(0, 1, 5, 0, AbilityElement.Fire));
+            var a1 = game.AddAbilityWithInfo(new AbilityInfo(0, 1, 5, 0, AbilityElement.Fire));
 
             var m1 = game.AddMobWithInfo(new MobInfo(TeamColor.Red, 1, 10, 0, new[] {a1}));
             var m2 = game.AddMobWithInfo(new MobInfo(TeamColor.Blue, 1, 10, 0, new[] {a1}));

@@ -26,10 +26,10 @@ namespace HexMage.Simulator.Model {
         }
 
         public async Task<int> PlayReplay(List<UctAction> actions) {
-            using (var suspender = new TemporarilySuspendReplayRecording()) {
+            using (new TemporarilySuspendReplayRecording()) {
                 foreach (var action in actions) {
                     if (action.Type == UctActionType.EndTurn) {
-                        UctAlgorithm.FNoCopy(_gameInstance, action);
+                        ActionEvaluator.FNoCopy(_gameInstance, action);
                     } else {
                         await SlowPlayAction(_gameInstance, action);
                     }
@@ -59,7 +59,7 @@ namespace HexMage.Simulator.Model {
                 // TODO - try to use this to find some more race conditions :)
                 // Delay used to find random race conditions
                 //await Task.Delay(TimeSpan.FromMilliseconds(1000));
-                UctAlgorithm.FNoCopy(_gameInstance, UctAction.EndTurnAction());
+                ActionEvaluator.FNoCopy(_gameInstance, UctAction.EndTurnAction());
             }
 
             ReplayRecorder.Instance.SaveAndClear(_gameInstance);
@@ -82,14 +82,14 @@ namespace HexMage.Simulator.Model {
                     break;
 
                 case UctActionType.AttackMove:
+                    ActionEvaluator.AssertValidMoveAction(_gameInstance, action);
                     await SlowBroadcastMobMoved(action.MobId, action.Coord);
                     await SlowBroadcastAbilityUsed(action.MobId, action.TargetId, action.AbilityId);
                     break;
 
                 case UctActionType.DefensiveMove:
                 case UctActionType.Move:
-                    // TODO - assert jenom na jednom miste?
-                    Debug.Assert(game.State.AtCoord(action.Coord) == null, "Trying to move into a mob.");
+                    ActionEvaluator.AssertValidMoveAction(_gameInstance, action);
                     await SlowBroadcastMobMoved(action.MobId, action.Coord);
                     break;
 
@@ -109,7 +109,7 @@ namespace HexMage.Simulator.Model {
                 totalTurns++;
 
                 turnManager.CurrentController.FastPlayTurn(this);
-                UctAlgorithm.FNoCopy(_gameInstance, UctAction.EndTurnAction());
+                ActionEvaluator.FNoCopy(_gameInstance, UctAction.EndTurnAction());
             }
 
             return totalTurns;
@@ -123,7 +123,7 @@ namespace HexMage.Simulator.Model {
         public async Task SlowBroadcastMobMoved(int mob, AxialCoord pos) {
             await Task.WhenAll(_subscribers.Select(x => x.SlowEventMobMoved(mob, pos)));
 
-            UctAlgorithm.FNoCopy(_gameInstance, UctAction.MoveAction(mob, pos));
+            ActionEvaluator.FNoCopy(_gameInstance, UctAction.MoveAction(mob, pos));
         }
 
         public void FastBroadcastMobMoved(int mob, AxialCoord pos) {
@@ -131,14 +131,14 @@ namespace HexMage.Simulator.Model {
                 subscriber.EventMobMoved(mob, pos);
             }
 
-            UctAlgorithm.FNoCopy(_gameInstance, UctAction.MoveAction(mob, pos));
+            ActionEvaluator.FNoCopy(_gameInstance, UctAction.MoveAction(mob, pos));
         }
 
         public async Task SlowBroadcastAbilityUsed(int mobId, int targetId, int abilityId) {
             var ability = _gameInstance.MobManager.AbilityForId(abilityId);
             await Task.WhenAll(_subscribers.Select(x => x.SlowEventAbilityUsed(mobId, targetId, ability)));
 
-            UctAlgorithm.FNoCopy(_gameInstance, UctAction.AbilityUseAction(abilityId, mobId, targetId));
+            ActionEvaluator.FNoCopy(_gameInstance, UctAction.AbilityUseAction(abilityId, mobId, targetId));
         }
 
         public void FastBroadcastAbilityUsed(int mobId, int targetId, int abilityId) {
@@ -147,7 +147,7 @@ namespace HexMage.Simulator.Model {
                 subscriber.EventAbilityUsed(mobId, targetId, ability);
             }
 
-            UctAlgorithm.FNoCopy(_gameInstance, UctAction.AbilityUseAction(abilityId, mobId, targetId));
+            ActionEvaluator.FNoCopy(_gameInstance, UctAction.AbilityUseAction(abilityId, mobId, targetId));
         }
     }
 }

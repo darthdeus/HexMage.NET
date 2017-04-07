@@ -1,14 +1,11 @@
 ﻿using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using HexMage.Simulator.Model;
 using Newtonsoft.Json;
 
-namespace HexMage.Simulator {
+namespace HexMage.Simulator.Model {
     // TODO - rename
 
 #warning TODO - this should be a struct
-    public class Ability {
+    public class AbilityInfo {
         public int Dmg { get; set; }
         public int Cost { get; set; }
         public int Range { get; set; }
@@ -19,12 +16,12 @@ namespace HexMage.Simulator {
 
         public float DmgCostRatio => (float) Dmg / (float) Cost;
 
-        public Ability() {}
+        public AbilityInfo() {}
 
-        public Ability(int dmg, int cost, int range, int cooldown, AbilityElement element)
+        public AbilityInfo(int dmg, int cost, int range, int cooldown, AbilityElement element)
             : this(dmg, cost, range, cooldown, element, Buff.ZeroBuff(), AreaBuff.ZeroBuff()) {}
 
-        public Ability(int dmg, int cost, int range, int cooldown, AbilityElement element, Buff buff,
+        public AbilityInfo(int dmg, int cost, int range, int cooldown, AbilityElement element, Buff buff,
                        AreaBuff areaBuff) {
             Dmg = dmg;
             Cost = cost;
@@ -54,7 +51,7 @@ namespace HexMage.Simulator {
             }
         }
 
-        protected bool Equals(Ability other) {
+        protected bool Equals(AbilityInfo other) {
             return Dmg == other.Dmg && Cost == other.Cost && Range == other.Range && Cooldown == other.Cooldown &&
                    Element == other.Element && Buff.Equals(other.Buff) && AreaBuff.Equals(other.AreaBuff);
         }
@@ -63,7 +60,7 @@ namespace HexMage.Simulator {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Ability) obj);
+            return Equals((AbilityInfo) obj);
         }
 
         public override int GetHashCode() {
@@ -79,11 +76,11 @@ namespace HexMage.Simulator {
             }
         }        
 
-        public static bool operator ==(Ability left, Ability right) {
+        public static bool operator ==(AbilityInfo left, AbilityInfo right) {
             return Equals(left, right);
         }
 
-        public static bool operator !=(Ability left, Ability right) {
+        public static bool operator !=(AbilityInfo left, AbilityInfo right) {
             return !Equals(left, right);
         }
     }

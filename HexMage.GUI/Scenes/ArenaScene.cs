@@ -32,6 +32,7 @@ namespace HexMage.GUI.Scenes {
             _gameInstance.MobManager.Teams[TeamColor.Red] = new ReplayController();
             _gameInstance.MobManager.Teams[TeamColor.Blue] = new ReplayController();
 
+            Constants.RecordReplays = false;
             _gameEventHub = new GameEventHub(_gameInstance);
         }
 

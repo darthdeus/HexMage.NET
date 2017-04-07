@@ -82,7 +82,7 @@ namespace HexMage.Simulator.Tests {
         public void StateDeepCopyTest() {
             var game = new GameInstance(3);
 
-            var ability = new Ability(3, 1, 1, 0, AbilityElement.Fire);
+            var ability = new AbilityInfo(3, 1, 1, 0, AbilityElement.Fire);
             var abilityId = game.AddAbilityWithInfo(ability);
 
             var abilities1 = new List<int>();
@@ -114,10 +114,10 @@ namespace HexMage.Simulator.Tests {
         public void DefaultPolicyTest() {
             var game = new GameInstance(3);
 
-            var ability1 = new Ability(1, 1, 1, 0, AbilityElement.Fire);
+            var ability1 = new AbilityInfo(1, 1, 1, 0, AbilityElement.Fire);
             var a1 = game.AddAbilityWithInfo(ability1);
 
-            var ability2 = new Ability(3, 1, 1, 0, AbilityElement.Fire);
+            var ability2 = new AbilityInfo(3, 1, 1, 0, AbilityElement.Fire);
             var a2 = game.AddAbilityWithInfo(ability2);
 
             var abilities1 = new List<int>();
@@ -156,7 +156,7 @@ namespace HexMage.Simulator.Tests {
         public void NodeActionComputeTest() {
             var game = new GameInstance(3);
 
-            var ability = new Ability(3, 1, 1, 0, AbilityElement.Fire);
+            var ability = new AbilityInfo(3, 1, 1, 0, AbilityElement.Fire);
             var abilityId = game.AddAbilityWithInfo(ability);
 
             var abilities1 = new List<int>();
@@ -200,7 +200,7 @@ namespace HexMage.Simulator.Tests {
             Assert.AreEqual(m1, useAction.TargetId);
             Assert.AreEqual(abilityId, useAction.AbilityId);
 
-            var updatedState = UctAlgorithm.F(game, useAction);
+            var updatedState = ActionEvaluator.F(game, useAction);
 
             var m1i = updatedState.State.MobInstances[m1];
             var m2i = updatedState.State.MobInstances[m2];

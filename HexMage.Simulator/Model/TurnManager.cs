@@ -61,6 +61,10 @@ namespace HexMage.Simulator {
 
             state.ApplyDots(_gameInstance.Map, _gameInstance);
 
+            foreach (var mobInstance in state.MobInstances) {
+                Debug.Assert(mobInstance.Hp >= 0, "mobInstance.Hp >= 0");
+            }
+
             _turnOrder.RemoveAll(x => state.MobInstances[x].Hp <= 0);
 
             state.LowerCooldowns();

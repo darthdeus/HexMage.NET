@@ -16,7 +16,7 @@ namespace HexMage.GUI.Components {
         private readonly Label _elementLabel;
         private readonly Label _cooldownLabel;
         private readonly Label _buffsLabel;
-        private Ability _ability;
+        private AbilityInfo _abilityInfo;
 
         public event Action<int> OnClick;
 
@@ -51,7 +51,7 @@ namespace HexMage.GUI.Components {
                 }
 
                 var abilityId = mobInfo.Abilities[_abilityIndex];
-                _ability = mobManager.AbilityForId(abilityId);
+                _abilityInfo = mobManager.AbilityForId(abilityId);
 
                 var inputManager = InputManager.Instance;
                 var aabb = new Rectangle(Entity.RenderPosition.ToPoint(),
@@ -64,26 +64,26 @@ namespace HexMage.GUI.Components {
                     }
                 }
 
-                _dmgLabel.Text = $"DMG {_ability.Dmg}, Cost {_ability.Cost}";
-                _rangeLabel.Text = $"Range {_ability.Range}";
-                _elementLabel.Text = _ability.Element.ToString();
+                _dmgLabel.Text = $"DMG {_abilityInfo.Dmg}, Cost {_abilityInfo.Cost}";
+                _rangeLabel.Text = $"Range {_abilityInfo.Range}";
+                _elementLabel.Text = _abilityInfo.Element.ToString();
 
                 var cooldown = gameInstance.State.Cooldowns[abilityId];
                 if (cooldown == 0) {
-                    _cooldownLabel.Text = $"Cooldown: {_ability.Cooldown} turns";
+                    _cooldownLabel.Text = $"Cooldown: {_abilityInfo.Cooldown} turns";
                 } else {
                     _cooldownLabel.Text = $"Again in {cooldown} turns";
                 }
 
                 var buffTextBuilder = new StringBuilder();
 
-                if (!_ability.Buff.IsZero) {
-                    var buff = _ability.Buff;
+                if (!_abilityInfo.Buff.IsZero) {
+                    var buff = _abilityInfo.Buff;
                     buffTextBuilder.AppendLine($"Buff {buff.HpChange}/{buff.ApChange}\nover {buff.Lifetime} turns");
                 }
 
-                if (!_ability.AreaBuff.IsZero) {
-                    var areaBuff = _ability.AreaBuff;
+                if (!_abilityInfo.AreaBuff.IsZero) {
+                    var areaBuff = _abilityInfo.AreaBuff;
                     buffTextBuilder.AppendLine($"Area buff {areaBuff.Effect.HpChange}/{areaBuff.Effect.ApChange}\nover {areaBuff.Effect.Lifetime}, radius {areaBuff.Radius}");
                 }
 

@@ -8,27 +8,12 @@ using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator.AI {
     public class GameInstanceEvaluator {
-        public static bool CountGlobalStats = true;
-
         private readonly GameInstance _gameInstance;
         private readonly TextWriter _writer;
-
-        public static int MctsWins = 0;
-        public static int RandomAiWins = 0;
-        public static int RuleBasedAiWins = 0;
-
-        public static readonly Dictionary<string, int> GlobalControllerStatistics = new Dictionary<string, int>();
 
         public GameInstanceEvaluator(GameInstance gameInstance, TextWriter writer) {
             _gameInstance = gameInstance;
             _writer = writer;
-        }
-
-        public static void PrintBookkeepingData() {
-            Console.WriteLine("Global stats:");
-            foreach (var pair in GlobalControllerStatistics) {
-                Console.WriteLine($"{pair.Key.PadRight(20)}: {pair.Value}");
-            }
         }
 
         public static List<IAiFactory> GlobalFactories = new List<IAiFactory>();
@@ -91,7 +76,7 @@ namespace HexMage.Simulator.AI {
 
             for (; i < maxIterations && !game.IsFinished; i++) {
                 game.TurnManager.CurrentController.FastPlayTurn(hub);
-                UctAlgorithm.FNoCopy(game, UctAction.EndTurnAction());
+                ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
 
                 result.TotalTurns++;
             }
@@ -133,7 +118,7 @@ namespace HexMage.Simulator.AI {
 
             while (!game.IsFinished && iterations-- > 0) {
                 game.TurnManager.CurrentController.FastPlayTurn(hub);
-                UctAlgorithm.FNoCopy(game, UctAction.EndTurnAction());
+                ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
             }
 
             if (Constants.GetLogBuffer().ToString().Length != 0) {
@@ -157,24 +142,7 @@ namespace HexMage.Simulator.AI {
                     result.BlueWins++;
                 }
 
-                var victoryControllerName = game.VictoryController.ToString();
-                var victoryControllerType = game.VictoryController.GetType();
-
-                if (victoryControllerType == typeof(MctsController)) {
-                    Interlocked.Increment(ref MctsWins);
-                } else if (victoryControllerType == typeof(AiRandomController)) {
-                    Interlocked.Increment(ref RandomAiWins);
-                } else if (victoryControllerType == typeof(AiRuleBasedController)) {
-                    Interlocked.Increment(ref RuleBasedAiWins);
-                }
-
-                if (CountGlobalStats) {
-                    if (GlobalControllerStatistics.ContainsKey(victoryControllerName)) {
-                        GlobalControllerStatistics[victoryControllerName]++;
-                    } else {
-                        GlobalControllerStatistics[victoryControllerName] = 1;
-                    }
-                }
+                Accounting.IncrementWinner(game.VictoryController);
             } else {
                 result.Timeouts++;
                 result.Timeouted = true;

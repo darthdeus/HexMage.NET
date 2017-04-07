@@ -31,7 +31,7 @@ namespace HexMage.Simulator {
         }
 
         public static UctNode FromAction(GameInstance game, UctAction action) {
-            return new UctNode(action, UctAlgorithm.F(game, action));
+            return new UctNode(action, ActionEvaluator.F(game, action));
         }
 
         public void PrecomputePossibleActions(bool allowMove, bool allowEndTurn) {

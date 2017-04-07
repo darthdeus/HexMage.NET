@@ -24,8 +24,8 @@ namespace HexMage.Simulator {
             this.element = element;
         }
 
-        public Ability ToAbility() {
-            return new Ability(dmg, ap, range, cooldown, element);
+        public AbilityInfo ToAbility() {
+            return new AbilityInfo(dmg, ap, range, cooldown, element);
         }
     }
 

@@ -52,6 +52,7 @@ namespace HexMage.Simulator.Model {
                 var hashCode = (int) Element;
                 hashCode = (hashCode * 397) ^ HpChange;
                 hashCode = (hashCode * 397) ^ ApChange;
+                // TODO: nemuze tohle zpusobovat nejaky problemy?
                 hashCode = (hashCode * 397) ^ Lifetime;
                 return hashCode;
             }

@@ -13,7 +13,7 @@ namespace HexMage.Simulator.Tests {
         public void AbilityElementTest() {
             var game = new GameInstance(3);
 
-            var ability = new Ability(1, 1, 1, 0, AbilityElement.Fire);
+            var ability = new AbilityInfo(1, 1, 1, 0, AbilityElement.Fire);
             var abilityId = game.AddAbilityWithInfo(ability);
 
             var m1 = game.AddMobWithInfo(new MobInfo(TeamColor.Red, 10, 10, 0, new List<int> {abilityId}));

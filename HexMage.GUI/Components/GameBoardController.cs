@@ -48,8 +48,8 @@ namespace HexMage.GUI.Components {
             _replay = replay;
         }
 
-        public void EventAbilityUsed(int mobId, int targetId, Ability ability) {
-            SlowEventAbilityUsed(mobId, targetId, ability).Wait();
+        public void EventAbilityUsed(int mobId, int targetId, AbilityInfo abilityInfo) {
+            SlowEventAbilityUsed(mobId, targetId, abilityInfo).Wait();
         }
 
         public void EventMobMoved(int mobId, AxialCoord pos) {
@@ -69,15 +69,15 @@ namespace HexMage.GUI.Components {
             }
         }
 
-        public async Task SlowEventAbilityUsed(int mobId, int targetId, Ability ability) {
+        public async Task SlowEventAbilityUsed(int mobId, int targetId, AbilityInfo abilityInfo) {
             //Utils.Log(LogSeverity.Info, nameof(GameBoardController), "EventAbilityUsed");
 
             var mobInstance = _gameInstance.State.MobInstances[mobId];
             var targetInstance = _gameInstance.State.MobInstances[targetId];
 
-            BuildUsedAbilityPopover(mobId, ability).LogContinuation();
+            BuildUsedAbilityPopover(mobId, abilityInfo).LogContinuation();
 
-            var projectileSprite = AssetManager.ProjectileSpriteForElement(ability.Element);
+            var projectileSprite = AssetManager.ProjectileSpriteForElement(abilityInfo.Element);
 
             var projectileAnimation = new Animation(projectileSprite,
                                                     TimeSpan.FromMilliseconds(50),
@@ -108,7 +108,7 @@ namespace HexMage.GUI.Components {
 
             explosion.AddComponent(new PositionAtMob(_gameInstance.MobManager, targetId, _gameInstance));
 
-            var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(ability.Element);
+            var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(abilityInfo.Element);
 
             var explosionAnimation = new Animation(
                 explosionSprite,
@@ -472,7 +472,7 @@ namespace HexMage.GUI.Components {
 
         private readonly TimeSpan _abilityPopoverDisplayTime = TimeSpan.FromSeconds(3);
 
-        private async Task BuildUsedAbilityPopover(int mobId, Ability ability) {
+        private async Task BuildUsedAbilityPopover(int mobId, AbilityInfo abilityInfo) {
             var result = new VerticalLayout {
                 Renderer = new ColorRenderer(Color.LightGray),
                 Padding = _popoverPadding,
@@ -489,7 +489,7 @@ namespace HexMage.GUI.Components {
                         _usedAbilityOffset;
                 });
 
-            string labelText = $"{ability.Dmg}DMG cost {ability.Cost}";
+            string labelText = $"{abilityInfo.Dmg}DMG cost {abilityInfo.Cost}";
             result.AddChild(new Label(labelText, _assetManager.Font));
 
             Entity.Scene.AddAndInitializeRootEntity(result, _assetManager);

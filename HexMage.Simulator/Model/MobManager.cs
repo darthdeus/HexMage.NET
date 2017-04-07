@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
     public class MobManager {
-        public readonly List<Ability> Abilities = new List<Ability>();
+        public readonly List<AbilityInfo> Abilities = new List<AbilityInfo>();
         public readonly List<int> Mobs = new List<int>();
         public readonly List<MobInfo> MobInfos = new List<MobInfo>();
 
@@ -12,7 +12,7 @@ namespace HexMage.Simulator {
         public readonly Dictionary<TeamColor, IMobController> Teams =
             new Dictionary<TeamColor, IMobController>();
 
-        public Ability AbilityForId(int id) {
+        public AbilityInfo AbilityForId(int id) {
             return Abilities[id];
         }
 

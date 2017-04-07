@@ -15,7 +15,7 @@ namespace HexMage.Simulator.AI {
 
                 if (action.Type == UctActionType.EndTurn) break;
 
-                UctAlgorithm.FNoCopy(_game, action);
+                ActionEvaluator.FNoCopy(_game, action);
             } while (!_game.IsFinished);
         }
 

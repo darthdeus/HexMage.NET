@@ -53,8 +53,8 @@ namespace HexMage.GUI.Renderers {
             batch.End();
         }
 
-        private string ElementBg(Ability ability, bool active = false) {
-            switch (ability.Element) {
+        private string ElementBg(AbilityInfo abilityInfo, bool active = false) {
+            switch (abilityInfo.Element) {
                 case AbilityElement.Earth:
                     return active ? AssetManager.SpellEarthActiveBg : AssetManager.SpellEarthBg;
                 case AbilityElement.Fire:
@@ -64,7 +64,7 @@ namespace HexMage.GUI.Renderers {
                 case AbilityElement.Water:
                     return active ? AssetManager.SpellWaterActiveBg : AssetManager.SpellWaterBg;
                 default:
-                    throw new ArgumentException("Invalid ability element", nameof(ability));
+                    throw new ArgumentException("Invalid ability element", nameof(abilityInfo));
             }
         }
     }

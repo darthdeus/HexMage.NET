@@ -15,6 +15,7 @@ namespace HexMage.Simulator.AI {
             foreach (var child in root.Children) {
                 float reward = UctAlgorithm.DefaultPolicy(child.State, initial.CurrentTeam.Value);
                 child.Q = reward;
+                child.N++;
             }
 
             //for (int i = 0; i < 10000; i++) {

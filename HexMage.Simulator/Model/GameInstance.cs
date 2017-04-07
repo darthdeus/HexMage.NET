@@ -229,13 +229,16 @@ namespace HexMage.Simulator {
             //    targetInstance.Buffs.Add(abilityBuff);
             //}
 
-
             if (!ability.AreaBuff.IsZero) {
                 var copy = ability.AreaBuff;
                 copy.Coord = targetInstance.Coord;
                 Map.AreaBuffs.Add(copy);
             }
 
+            if (State.MobInstances[mobId].Ap < ability.Cost) {
+                ReplayRecorder.Instance.SaveAndClear(this, 0);
+                throw new InvalidOperationException("Trying to use an ability with not enough AP.");
+            }
             Debug.Assert(State.MobInstances[mobId].Ap >= ability.Cost, "State.MobInstances[mobId].Ap >= ability.Cost");
 
             State.ChangeMobAp(mobId, -ability.Cost);
@@ -249,7 +252,6 @@ namespace HexMage.Simulator {
 
             return game;
         }
-
 
         public GameInstance DeepCopy() {
 #warning TODO - tohle prepsat poradne!
@@ -351,8 +353,8 @@ namespace HexMage.Simulator {
             return id;
         }
 
-        public int AddAbilityWithInfo(Ability ability) {
-            MobManager.Abilities.Add(ability);
+        public int AddAbilityWithInfo(AbilityInfo abilityInfo) {
+            MobManager.Abilities.Add(abilityInfo);
             State.Cooldowns.Add(0);
             return MobManager.Abilities.Count - 1;
         }

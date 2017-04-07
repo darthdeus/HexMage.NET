@@ -39,8 +39,7 @@ namespace HexMage.Simulator {
             Debug.Assert(AtCoord(pos) == null, "Trying to move into a mob.");
 
             // TODO - odebrat dvojte kopirovani tady
-            mobInstance.Ap -= distance;
-            MobInstances[mobId] = mobInstance;
+            ChangeMobAp(mobId, -distance);
             SetMobPosition(mobId, pos);
         }
 
@@ -66,12 +65,12 @@ namespace HexMage.Simulator {
         }
 
         public void ChangeMobHp(GameInstance gameInstance, int mobId, int hpChange) {
-            MobInstances[mobId].Hp += hpChange;
+            MobInstances[mobId].Hp = Math.Max(0, MobInstances[mobId].Hp  + hpChange);
             MobHpChanged(MobInstances[mobId].Hp, gameInstance.MobManager.MobInfos[mobId].Team);
         }
 
         public void ChangeMobAp(int mobId, int apChange) {
-            MobInstances[mobId].Ap += apChange;
+            MobInstances[mobId].Ap = Math.Max(0, MobInstances[mobId].Ap + apChange);
         }
 
         public void SetMobPosition(int mobId, AxialCoord coord) {

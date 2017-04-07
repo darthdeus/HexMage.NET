@@ -74,7 +74,7 @@ namespace HexMage.Simulator {
             var mobInfo = mob.MobInfo;
 
             int? abilityId = null;
-            Ability ability = null;
+            AbilityInfo abilityInfo = null;
             foreach (var possibleAbilityId in mobInfo.Abilities) {
                 if (state.IsAbilityUsableNoTarget(mobId.Value, possibleAbilityId)) {
                     abilityId = possibleAbilityId;
@@ -241,30 +241,7 @@ namespace HexMage.Simulator {
 
             return foundAbilityUse;
         }
-
-        public static void GenerateRandomMoveActions(GameInstance state, int mobId, int count, List<UctAction> result) {
-            throw new NotImplementedException();
-            //    int count = 2;
-            //    foreach (var coord in state.Map.AllCoords) {
-            //        if (coord == mobInstance.Coord) continue;
-
-            //        if (state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {
-            //            if (state.State.AtCoord(coord) == null && count-- > 0) {
-            //                moveActions.Add(UctAction.MoveAction(mobId, coord));
-            //                //result.Add(UctAction.MoveAction(mobId, coord));
-            //            }
-            //        }
-            //    }
-
-            //    if (count == 0) {
-            //        //Console.WriteLine("More than 100 possible move actions.");
-            //    }
-
-            //    Shuffle(moveActions);
-
-            //    result.AddRange(moveActions.Take(20));
-        }
-
+        
         public static List<UctAction> PossibleActions(GameInstance state, bool allowMove, bool allowEndTurn) {
             // TODO - zmerit poradne, jestli tohle vubec pomaha, a kolik to ma byt
             var result = new List<UctAction>(10);
