@@ -26,7 +26,7 @@ namespace HexMage.GUI.Renderers {
         public BoardRenderMode Mode { get; set; }
 
         public GameBoardRenderer(GameInstance gameInstance, GameBoardController gameBoardController,
-            GameEventHub eventHub, Camera2D camera) {
+                                 GameEventHub eventHub, Camera2D camera) {
             _gameInstance = gameInstance;
             _gameBoardController = gameBoardController;
             _eventHub = eventHub;
@@ -135,7 +135,7 @@ namespace HexMage.GUI.Renderers {
                 var mouseMob = state.AtCoord(_camera.MouseHex);
 
                 if (mouseMob.HasValue) {
-                    var heatmap = _gameInstance.BuildHeatmap(mouseMob);
+                    var heatmap = Heatmap.BuildHeatmap(_gameInstance, mouseMob);
 
                     DrawHeatmap(heatmap);
                 }
@@ -146,7 +146,7 @@ namespace HexMage.GUI.Renderers {
             var state = _gameInstance.State;
 
             var mouseMob = state.AtCoord(_camera.MouseHex);
-            var heatmap = _gameInstance.BuildHeatmap(mouseMob);
+            var heatmap = Heatmap.BuildHeatmap(_gameInstance, mouseMob);
 
             DrawHeatmap(heatmap);
         }
@@ -191,7 +191,9 @@ namespace HexMage.GUI.Renderers {
                     var mouseMob = _gameInstance.State.AtCoord(mouseHex);
                     if (mouseMob != null) {
                         path = _gameInstance.Pathfinder.PathToMob(mobInstance.Coord,
-                            _gameInstance.State.MobInstances[mouseMob.Value].Coord);
+                                                                  _gameInstance
+                                                                      .State.MobInstances[mouseMob.Value]
+                                                                      .Coord);
                     } else {
                         path = _gameInstance.Pathfinder.PathTo(mobInstance.Coord, mouseHex);
                     }
@@ -206,7 +208,7 @@ namespace HexMage.GUI.Renderers {
                         foreach (var cubeCoord in cubepath) {
                             if (!_gameInstance.Pathfinder.IsValidCoord(cubeCoord)) {
                                 Utils.Log(LogSeverity.Warning, nameof(GameBoardRenderer),
-                                    $"Computed invalid cube visibility path of {cubeCoord}.");
+                                          $"Computed invalid cube visibility path of {cubeCoord}.");
                                 continue;
                             }
                             if (_gameInstance.Map[cubeCoord] == HexType.Wall) {

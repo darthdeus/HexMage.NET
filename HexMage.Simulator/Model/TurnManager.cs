@@ -53,7 +53,6 @@ namespace HexMage.Simulator {
         }
 
         public void StartNextTurn(Pathfinder pathfinder, GameState state) {
-            
             TurnNumber++;
 
             for (int i = 0; i < state.MobInstances.Length; i++) {
@@ -67,7 +66,11 @@ namespace HexMage.Simulator {
             state.LowerCooldowns();
 
             state.CurrentMobIndex = 0;
-            Debug.Assert(state.MobInstances[CurrentMob.Value].Hp > 0, "Current mob is dead");
+
+            // TODO: wut, ma tu tohle vubec byt?
+            if (CurrentMob.HasValue) {
+                Debug.Assert(state.MobInstances[CurrentMob.Value].Hp > 0, "Current mob is dead");
+            }
         }
 
         public TurnEndResult NextMobOrNewTurn(Pathfinder pathfinder, GameState state) {
@@ -110,7 +113,8 @@ namespace HexMage.Simulator {
 
             // TODO - this is certainly the wrong place to do it, but at some point the game instance needs to be initialized
             if (_presortedOrder == null) {
-                Utils.Log(LogSeverity.Warning, nameof(TurnManager), "Initiated DeepCopy on an uninitialized GameInstance");
+                Utils.Log(LogSeverity.Warning, nameof(TurnManager),
+                          "Initiated DeepCopy on an uninitialized GameInstance");
                 PresortTurnOrder();
             }
 

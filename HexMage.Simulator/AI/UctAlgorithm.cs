@@ -180,7 +180,7 @@ namespace HexMage.Simulator.AI {
             Debug.Assert(game.CurrentTeam.HasValue, "game.CurrentTeam.HasValue");
 
             var copy = game.CopyStateOnly();
-            const int maxDefaultPolicyIterations = 200;
+            const int maxDefaultPolicyIterations = 400;
             int iterations = maxDefaultPolicyIterations;
 
             while (!copy.IsFinished && iterations-- > 0) {

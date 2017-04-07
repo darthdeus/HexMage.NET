@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -50,6 +51,10 @@ namespace HexMage.Simulator {
         public Replay Load(int index) {
             using (var reader = new StreamReader($@"{ReplayDirectory}\replay{index}.json")) {
                 var replay = JsonConvert.DeserializeObject<Replay>(reader.ReadToEnd());
+
+                foreach (var ability in replay.MobManager.Abilities) {
+                    Debug.Assert(ability.Cooldown == 0, "ability.Cooldown == 0");
+                }
                 return replay;
             }
         }
