@@ -59,12 +59,14 @@ namespace HexMage.Simulator {
                 state.MobInstances[i].Ap = MobManager.MobInfos[i].MaxAp;
             }
 
+            state.ApplyDots(_gameInstance.Map, _gameInstance);
+
             _turnOrder.RemoveAll(x => state.MobInstances[x].Hp <= 0);
 
-            state.ApplyDots(_gameInstance.Map, _gameInstance);
             state.LowerCooldowns();
 
             state.CurrentMobIndex = 0;
+            Debug.Assert(state.MobInstances[CurrentMob.Value].Hp > 0, "Current mob is dead");
         }
 
         public TurnEndResult NextMobOrNewTurn(Pathfinder pathfinder, GameState state) {

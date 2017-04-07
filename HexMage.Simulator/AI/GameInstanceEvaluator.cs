@@ -91,11 +91,9 @@ namespace HexMage.Simulator.AI {
 
             for (; i < maxIterations && !game.IsFinished; i++) {
                 game.TurnManager.CurrentController.FastPlayTurn(hub);
-                game.TurnManager.NextMobOrNewTurn(game.Pathfinder, game.State);
+                UctAlgorithm.FNoCopy(game, UctAction.EndTurnAction());
 
                 result.TotalTurns++;
-
-                Constants.WriteLogLine(UctAction.EndTurnAction());
             }
 
             // TODO - jak se to lisi od TotalGames?
@@ -135,11 +133,9 @@ namespace HexMage.Simulator.AI {
 
             while (!game.IsFinished && iterations-- > 0) {
                 game.TurnManager.CurrentController.FastPlayTurn(hub);
-                game.TurnManager.NextMobOrNewTurn(game.Pathfinder, game.State);
-
-                // TODO - extract these
-                Constants.WriteLogLine(UctAction.EndTurnAction());
+                UctAlgorithm.FNoCopy(game, UctAction.EndTurnAction());
             }
+
             if (Constants.GetLogBuffer().ToString().Length != 0) {
                 Console.WriteLine(Constants.GetLogBuffer());
             }

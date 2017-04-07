@@ -13,7 +13,7 @@ namespace HexMage.Simulator.Tests {
         public void AbilityElementTest() {
             var game = new GameInstance(3);
 
-            var ability = new Ability(0, 1, 1, 0, AbilityElement.Fire);
+            var ability = new Ability(1, 1, 1, 0, AbilityElement.Fire);
             var abilityId = game.AddAbilityWithInfo(ability);
 
             var m1 = game.AddMobWithInfo(new MobInfo(TeamColor.Red, 10, 10, 0, new List<int> {abilityId}));
@@ -27,8 +27,8 @@ namespace HexMage.Simulator.Tests {
             Assert.AreEqual(2, fireDebuff.Lifetime);
 
             Assert.AreEqual(9, game.State.MobInstances[m1].Ap);
-            // No damage has been done yet
-            Assert.AreEqual(10, game.State.MobInstances[m2].Hp);
+            // No damage has been done yet by the AOE
+            Assert.AreEqual(9, game.State.MobInstances[m2].Hp);
 
             game.NextMobOrNewTurn();
 
@@ -42,7 +42,7 @@ namespace HexMage.Simulator.Tests {
             Assert.AreEqual(m1, game.TurnManager.CurrentMob);
 
             var targetAfter = game.State.MobInstances[m2];
-            Assert.AreEqual(9, targetAfter.Hp);
+            Assert.AreEqual(8, targetAfter.Hp);
             Assert.AreEqual(10, targetAfter.Ap);
             Assert.AreEqual(1, targetAfter.Buff.Lifetime);
             Assert.AreEqual(10, game.State.MobInstances[m1].Ap);
@@ -53,7 +53,7 @@ namespace HexMage.Simulator.Tests {
             Assert.AreEqual(3, game.TurnManager.TurnNumber);
             Assert.AreEqual(m1, game.TurnManager.CurrentMob);
 
-            Assert.AreEqual(8, game.State.MobInstances[m2].Hp);
+            Assert.AreEqual(7, game.State.MobInstances[m2].Hp);
 
             var buffAfter = game.State.MobInstances[m2].Buff;
             Assert.IsTrue(buffAfter.IsZero);

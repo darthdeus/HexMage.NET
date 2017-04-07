@@ -64,11 +64,6 @@ namespace HexMage.Benchmarks {
 
             for (int i = 0; i < 1000; i++) {
                 dna.Randomize();
-                if (Probability.Uniform(0.5)) {
-                    var tmp = c1;
-                    c1 = c2;
-                    c2 = tmp;
-                }
 
                 GameSetup.OverrideGameDna(game, dna, dna);
                 iterationStopwatch.Restart();

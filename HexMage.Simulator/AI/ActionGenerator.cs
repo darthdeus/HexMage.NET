@@ -62,9 +62,10 @@ namespace HexMage.Simulator {
             var mobId = state.TurnManager.CurrentMob;
 
             // TODO - shortcut pokud nemam zadny AP, tak rovnou end turn :)
-
             if (mobId == null)
                 throw new InvalidOperationException("Requesting mob action when there is no current mob.");
+
+            Debug.Assert(state.State.MobInstances[mobId.Value].Hp > 0, "Current mob is dead");
 
             var mob = state.CachedMob(mobId.Value);
 
@@ -123,6 +124,7 @@ namespace HexMage.Simulator {
             if (moveTarget != null && pathfinder.Distance(mobInstance.Coord, moveTarget.Value) <= mobInstance.Ap) {
                 return UctAction.MoveAction(mobId, moveTarget.Value);
             } else if (moveTarget == null) {
+                Console.WriteLine("Move target is null");
                 // TODO - intentionally doing nothing
                 return UctAction.EndTurnAction();
             } else {

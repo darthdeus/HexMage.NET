@@ -56,7 +56,7 @@ namespace HexMage.Simulator {
 
             if (path.Count == 0 && mob.Coord.Distance(target.Coord) == 1) {
                 return null;
-            }
+            }            
 
             AxialCoord? furthestPoint = null;
             foreach (var coord in path) {
@@ -71,7 +71,6 @@ namespace HexMage.Simulator {
                     break;
                 }                
             }
-
             
             return furthestPoint;
 

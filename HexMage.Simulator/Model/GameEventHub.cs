@@ -34,6 +34,7 @@ namespace HexMage.Simulator.Model {
 
             int totalTurns = 0;
             state.SlowUpdateIsFinished(_gameInstance.MobManager);
+            
 
             while (!_gameInstance.IsFinished) {
                 totalTurns++;
@@ -43,9 +44,7 @@ namespace HexMage.Simulator.Model {
                 // TODO - try to use this to find some more race conditions :)
                 // Delay used to find random race conditions
                 //await Task.Delay(TimeSpan.FromMilliseconds(1000));
-                turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder, state);
-
-                Constants.WriteLogLine(UctAction.EndTurnAction());                
+                UctAlgorithm.FNoCopy(_gameInstance, UctAction.EndTurnAction());
             }
 
             Console.WriteLine(Constants.GetLogBuffer());
@@ -94,9 +93,7 @@ namespace HexMage.Simulator.Model {
                 totalTurns++;
 
                 turnManager.CurrentController.FastPlayTurn(this);
-                turnManager.NextMobOrNewTurn(_gameInstance.Pathfinder, _gameInstance.State);
-
-                Constants.WriteLogLine(UctAction.EndTurnAction());
+                UctAlgorithm.FNoCopy(_gameInstance, UctAction.EndTurnAction());
             }
 
             return totalTurns;
@@ -111,7 +108,6 @@ namespace HexMage.Simulator.Model {
             await Task.WhenAll(_subscribers.Select(x => x.SlowEventMobMoved(mob, pos)));
 
             UctAlgorithm.FNoCopy(_gameInstance, UctAction.MoveAction(mob, pos));
-            //_gameInstance.State.FastMoveMob(mob, pos);
         }
 
         public void FastBroadcastMobMoved(int mob, AxialCoord pos) {
@@ -120,7 +116,6 @@ namespace HexMage.Simulator.Model {
             }
 
             UctAlgorithm.FNoCopy(_gameInstance, UctAction.MoveAction(mob, pos));
-            //_gameInstance.State.FastMoveMob(mob, pos);
         }
 
         public async Task SlowBroadcastAbilityUsed(int mobId, int targetId, int abilityId) {
@@ -128,7 +123,6 @@ namespace HexMage.Simulator.Model {
             await Task.WhenAll(_subscribers.Select(x => x.SlowEventAbilityUsed(mobId, targetId, ability)));
 
             UctAlgorithm.FNoCopy(_gameInstance, UctAction.AbilityUseAction(abilityId, mobId, targetId));
-            //_gameInstance.FastUse(abilityId, mobId, targetId);
         }
 
         public void FastBroadcastAbilityUsed(int mobId, int targetId, int abilityId) {
@@ -138,7 +132,6 @@ namespace HexMage.Simulator.Model {
             }
 
             UctAlgorithm.FNoCopy(_gameInstance, UctAction.AbilityUseAction(abilityId, mobId, targetId));
-            //_gameInstance.FastUse(abilityId, mobId, targetId);
         }
     }
 }

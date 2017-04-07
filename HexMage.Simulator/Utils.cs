@@ -36,7 +36,8 @@ namespace HexMage.Simulator {
             Console.WriteLine(message);
 
             if (logLevel == LogSeverity.Error) {
-                Console.WriteLine(new StackTrace());
+                // TODO: reenable
+                //Console.WriteLine(new StackTrace());
             }
 
             Console.ForegroundColor = ConsoleColor.White;

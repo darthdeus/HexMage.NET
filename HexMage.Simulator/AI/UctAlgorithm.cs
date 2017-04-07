@@ -63,12 +63,12 @@ namespace HexMage.Simulator.AI {
             return node;
         }
 
-        public static UctNode BestChild(UctNode node, double c = 2) {
+        public static UctNode BestChild(UctNode node, double k = 2) {
             if (node.Children.Count == 0) return null;
 
             UctNode best = node.Children[0];
             foreach (var child in node.Children) {
-                if (UcbValue(node, child, c) > UcbValue(node, best, c)) {
+                if (UcbValue(node, child, k) > UcbValue(node, best, k)) {
                     best = child;
                 }
             }
@@ -76,8 +76,8 @@ namespace HexMage.Simulator.AI {
             return best;
         }
 
-        public static float UcbValue(UctNode parent, UctNode node, double c) {
-            return (float) (node.Q / node.N + Math.Sqrt(c * Math.Log(parent.N) / node.N));
+        public static float UcbValue(UctNode parent, UctNode node, double k) {
+            return (float) (node.Q / node.N + Math.Sqrt(k * Math.Log(parent.N) / node.N));
         }
 
         public static UctNode Expand(UctNode node) {
@@ -178,10 +178,16 @@ namespace HexMage.Simulator.AI {
             Debug.Assert(game.CurrentTeam.HasValue, "game.CurrentTeam.HasValue");
 
             var copy = game.CopyStateOnly();
-            int iterations = 200;
+            const int maxDefaultPolicyIterations = 200;
+            int iterations = maxDefaultPolicyIterations;
 
             while (!copy.IsFinished && iterations-- > 0) {
                 var action = ActionGenerator.DefaultPolicyAction(copy);
+
+                //Console.WriteLine(action);
+                //if (action.Type == UctActionType.EndTurn) {
+                //    Console.WriteLine("**************************");
+                //}
 
                 if (action.Type == UctActionType.Null) {
                     throw new InvalidOperationException();
@@ -195,7 +201,7 @@ namespace HexMage.Simulator.AI {
 
             if (iterations <= 0) {
                 Utils.Log(LogSeverity.Error, nameof(UctAlgorithm),
-                          "DefaultPolicy ran out of time (over 100 iterations for playout), computed results are likely wrong.");
+                          $"DefaultPolicy ran out of time (over {maxDefaultPolicyIterations} iterations for playout), computed results are likely wrong.");
                 return 0;
             }
 

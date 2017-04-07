@@ -237,6 +237,7 @@ namespace HexMage.Simulator {
             var target = State.MobInstances[targetId];
 
             Debug.Assert(State.Cooldowns[abilityId] == 0, "Trying to use an ability with non-zero cooldown.");
+            Debug.Assert(State.MobInstances[mobId].Hp > 0, "Source is dead");
             Debug.Assert(target.Hp > 0, "Target is dead.");
 
             var ability = MobManager.AbilityForId(abilityId);

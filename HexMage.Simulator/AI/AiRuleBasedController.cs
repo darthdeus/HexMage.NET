@@ -11,23 +11,27 @@ namespace HexMage.Simulator.AI {
 
         public void FastPlayTurn(GameEventHub eventHub) {
             do {
-                var action = ActionGenerator.RuleBasedAction(_gameInstance);
+                var action = ActionGenerator.DefaultPolicyAction(_gameInstance);
 
                 if (action.Type == UctActionType.EndTurn)
                     break;
 
                 UctAlgorithm.FNoCopy(_gameInstance, action);
+
+                if (action.Type == UctActionType.DefensiveMove) break;
             } while (!_gameInstance.IsFinished);
         }
 
         public async Task SlowPlayTurn(GameEventHub eventHub) {
             do {
-                var action = ActionGenerator.RuleBasedAction(_gameInstance);
+                var action = ActionGenerator.DefaultPolicyAction(_gameInstance);
 
                 if (action.Type == UctActionType.EndTurn)
                     break;
 
                 await eventHub.SlowPlayAction(_gameInstance, action);
+
+                if (action.Type == UctActionType.DefensiveMove) break;
             } while (!_gameInstance.IsFinished);
         }
 
