@@ -76,7 +76,7 @@ namespace HexMage.Simulator {
             int? abilityId = null;
             AbilityInfo abilityInfo = null;
             foreach (var possibleAbilityId in mobInfo.Abilities) {
-                if (state.IsAbilityUsableNoTarget(mobId.Value, possibleAbilityId)) {
+                if (GameInvariants.IsAbilityUsableNoTarget(state, mobId.Value, possibleAbilityId)) {
                     abilityId = possibleAbilityId;
                 }
             }
@@ -89,10 +89,11 @@ namespace HexMage.Simulator {
 
                 moveTargetId = possibleTargetId;
 
-                if (!Constants.AllowCorpseTargetting && !state.IsTargetable(mob, possibleTarget)) continue;
+                if (!Constants.AllowCorpseTargetting &&
+                    !GameInvariants.IsTargetable(state, mob, possibleTarget)) continue;
                 if (!abilityId.HasValue) continue;
 
-                if (state.IsAbilityUsableApRangeCheck(mob, possibleTarget, abilityId.Value)) {
+                if (GameInvariants.IsAbilityUsableApRangeCheck(state, mob, possibleTarget, abilityId.Value)) {
                     spellTarget = possibleTargetId;
                     break;
                 }
@@ -174,7 +175,7 @@ namespace HexMage.Simulator {
             foreach (var enemyId in state.MobManager.Mobs) {
                 var enemy = state.CachedMob(enemyId);
 
-                if (!state.IsTargetable(mob, enemy, checkVisibility: false)) continue;
+                if (!GameInvariants.IsTargetable(state, mob, enemy, checkVisibility: false)) continue;
 
                 MobInstance enemyInstance = state.State.MobInstances[enemyId];
 
@@ -188,10 +189,10 @@ namespace HexMage.Simulator {
                     if (!state.Map.IsVisible(coord, enemyInstance.Coord)) continue;
 
                     int remainingAp, possibleDistance;
-                    if (!state.CanMoveTo(mob, coord, out remainingAp, out possibleDistance)) continue;
+                    if (!GameInvariants.CanMoveTo(state, mob, coord, out remainingAp, out possibleDistance)) continue;
 
                     foreach (var abilityId in mobInfo.Abilities) {
-                        if (!state.IsAbilityUsableFrom(mob, coord, enemy, abilityId)) continue;
+                        if (!GameInvariants.IsAbilityUsableFrom(state, mob, coord, enemy, abilityId)) continue;
 
                         int myDistance = state.Pathfinder.Distance(myCoord, coord);
 
@@ -229,10 +230,10 @@ namespace HexMage.Simulator {
             var mobId = mob.MobId;
 
             foreach (var abilityId in mobInfo.Abilities) {
-                if (!state.IsAbilityUsableNoTarget(mobId, abilityId)) continue;
+                if (!GameInvariants.IsAbilityUsableNoTarget(state, mobId, abilityId)) continue;
 
                 foreach (var targetId in state.MobManager.Mobs) {
-                    if (state.IsAbilityUsable(mob, state.CachedMob(targetId), abilityId)) {
+                    if (GameInvariants.IsAbilityUsable(state, mob, state.CachedMob(targetId), abilityId)) {
                         foundAbilityUse = true;
                         result.Add(UctAction.AbilityUseAction(abilityId, mobId, targetId));
                     }
@@ -241,7 +242,7 @@ namespace HexMage.Simulator {
 
             return foundAbilityUse;
         }
-        
+
         public static List<UctAction> PossibleActions(GameInstance state, bool allowMove, bool allowEndTurn) {
             // TODO - zmerit poradne, jestli tohle vubec pomaha, a kolik to ma byt
             var result = new List<UctAction>(10);

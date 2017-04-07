@@ -79,10 +79,12 @@
     <Compile Include="Model\ActionEvaluator.cs" />
     <Compile Include="Model\CachedMob.cs" />
     <Compile Include="Model\GameEventHub.cs" />
+    <Compile Include="Model\GameInvariants.cs" />
     <Compile Include="Model\GameState.cs" />
     <Compile Include="IDeepCopyable.cs" />
     <Compile Include="IGameEventSubscriber.cs" />
     <Compile Include="Model\Heatmap.cs" />
+    <Compile Include="Model\InvariantViolationException.cs" />
     <Compile Include="Model\MobInstance.cs" />
     <Compile Include="Model\ReplayController.cs" />
     <Compile Include="Model\TemporarilySuspendReplayRecording.cs" />

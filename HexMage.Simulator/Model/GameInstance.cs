@@ -126,67 +126,6 @@ namespace HexMage.Simulator {
             }
         }
 
-        public bool IsAbilityUsableNoTarget(int mobId, int abilityId) {
-            var ability = MobManager.AbilityForId(abilityId);
-            var mobInstance = State.MobInstances[mobId];
-
-            bool enoughAp = mobInstance.Ap >= ability.Cost;
-            bool noCooldown = State.Cooldowns[abilityId] == 0;
-
-            return enoughAp && noCooldown;
-        }
-
-        public bool CanMoveTo(CachedMob mob, AxialCoord coord) {
-            int remainingAp, distance;
-            return CanMoveTo(mob, coord, out remainingAp, out distance);
-        }
-
-        public bool CanMoveTo(CachedMob mob, AxialCoord coord, out int remainingAp, out int distance) {
-            bool isEmpty = Map[coord] == HexType.Empty && State.AtCoord(coord) == null;
-
-            distance = Pathfinder.Distance(mob.MobInstance.Coord, coord);
-            remainingAp = mob.MobInstance.Ap - distance;
-            bool enoughAp = remainingAp >= 0;
-
-            return isEmpty && enoughAp;
-        }
-
-        public bool IsAbilityUsableAtCoord(CachedMob mob, AxialCoord coord, int abilityId) {
-            throw new NotImplementedException();
-        }
-
-        public bool IsAbilityUsableFrom(CachedMob mob, AxialCoord from, CachedMob target, int abilityId) {
-            var ability = MobManager.Abilities[abilityId];
-
-            // TODO - kontrolovat i ze na to policko dojdu?
-            bool withinRange = ability.Range >= from.Distance(target.MobInstance.Coord);
-            bool enoughAp = mob.MobInstance.Ap >= ability.Cost;
-
-            return withinRange && enoughAp;
-        }
-
-        public bool IsTargetable(CachedMob mob, CachedMob target, bool checkVisibility = true) {
-            bool isVisible = !checkVisibility || Map.IsVisible(mob.MobInstance.Coord, target.MobInstance.Coord);
-
-            bool isTargetAlive = Constants.AllowCorpseTargetting || target.MobInstance.Hp > 0;
-            bool isEnemy = mob.MobInfo.Team != target.MobInfo.Team;
-
-            return isVisible && isTargetAlive && isEnemy;
-        }
-
-        public bool IsAbilityUsableApRangeCheck(CachedMob mob, CachedMob target, int abilityId) {
-            var abilityInfo = MobManager.Abilities[abilityId];
-
-            bool enoughAp = mob.MobInstance.Ap >= abilityInfo.Cost;
-            bool withinRange = mob.MobInstance.Coord.Distance(target.MobInstance.Coord) <= abilityInfo.Range;
-
-            return enoughAp && withinRange;
-        }
-
-        public bool IsAbilityUsable(CachedMob mob, CachedMob target, int abilityId) {
-            return IsTargetable(mob, target) && IsAbilityUsableApRangeCheck(mob, target, abilityId);
-        }
-
         public void FastUse(int abilityId, int mobId, int targetId) {
             var target = State.MobInstances[targetId];
 

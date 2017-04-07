@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using HexMage.Simulator.AI;
@@ -99,7 +98,7 @@ namespace HexMage.Simulator.Model {
 
         [Conditional("DEBUG")]
         public static void AssertAndRecord(GameInstance game, bool condition, string message) {
-            if (!condition) {
+            if (!condition) {                
                 ReplayRecorder.Instance.SaveAndClear(game, 0);
                 
                 throw new InvariantViolationException(message);
@@ -113,12 +112,5 @@ namespace HexMage.Simulator.Model {
             Debug.Assert(atCoord != action.MobId, "Trying to move into the coord you're already standing on.");
             Debug.Assert(atCoord == null, "Trying to move into a mob.");
         }
-    }
-
-    public class InvariantViolationException : Exception {
-        public InvariantViolationException() { }
-        public InvariantViolationException(string message) : base(message) { }
-        public InvariantViolationException(string message, Exception innerException) : base(message, innerException) { }
-        protected InvariantViolationException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

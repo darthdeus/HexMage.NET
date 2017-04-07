@@ -13,7 +13,8 @@ namespace HexMage.GUI.Renderers {
         private readonly Func<int?> _mobFunc;
         private readonly int _abilityIndex;
 
-        public SpellRenderer(GameInstance gameInstance, GameBoardController gameBoardController, Func<int?> mobFunc , int abilityIndex) {
+        public SpellRenderer(GameInstance gameInstance, GameBoardController gameBoardController, Func<int?> mobFunc,
+                             int abilityIndex) {
             _gameInstance = gameInstance;
             _gameBoardController = gameBoardController;
             _mobFunc = mobFunc;
@@ -23,7 +24,7 @@ namespace HexMage.GUI.Renderers {
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
             var effect = assetManager.LoadEffect(AssetManager.ShaderAbility);
 
-            var time = ((float) DateTime.Now.Millisecond)/1000*2 - 1;
+            var time = ((float) DateTime.Now.Millisecond) / 1000 * 2 - 1;
 
             //effect.Parameters["Time"].SetValue(time);
             batch.Begin(effect: effect, samplerState: Camera2D.SamplerState);
@@ -35,7 +36,7 @@ namespace HexMage.GUI.Renderers {
 
                 var isActive = _gameBoardController.SelectedAbilityIndex == _abilityIndex;
 
-                if (_gameInstance.IsAbilityUsableNoTarget(mobId.Value, abilityId)) {
+                if (GameInvariants.IsAbilityUsableNoTarget(_gameInstance, mobId.Value, abilityId)) {
                     isActive = true;
                 }
 
