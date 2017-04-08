@@ -5,13 +5,37 @@ using HexMage.Simulator.AI;
 namespace HexMage.Simulator.Model {
     public static class GameInvariants {
         [Conditional("DEBUG")]
+        public static void AssertValidAction(GameInstance game, UctAction action) {
+            switch (action.Type) {
+                case UctActionType.Null:
+                    break;
+                case UctActionType.EndTurn:
+                    break;
+                case UctActionType.Move:
+                case UctActionType.DefensiveMove:
+                    AssertValidMoveAction(game, action);
+                    break;
+                case UctActionType.AbilityUse:
+                    AssertValidAbilityUseAction(game, action);
+                    break;
+                case UctActionType.AttackMove:
+                    AssertValidMoveAction(game, action);
+                    var afterMove = ActionEvaluator.F(game, action.ToPureMove());
+                    AssertValidAbilityUseAction(afterMove, action.ToPureAbilityUse());
+                    break;
+            }
+        }
+
+        [Conditional("DEBUG")]
         public static void AssertValidAbilityUseAction(GameInstance game, UctAction action) {
             var mobInstance = game.State.MobInstances[action.MobId];
             var targetInstance = game.State.MobInstances[action.TargetId];
             var abilityInfo = game.MobManager.Abilities[action.AbilityId];
 
-            AssertAndRecord(game, abilityInfo.Cooldown == 0, "Accidentaly created an ability with non-zero cooldown. Those are currently not supported.");
-            AssertAndRecord(game, game.State.Cooldowns[action.AbilityId] == 0, "game.State.Cooldowns[action.AbilityId] == 0");
+            AssertAndRecord(game, abilityInfo.Cooldown == 0,
+                            "Accidentaly created an ability with non-zero cooldown. Those are currently not supported.");
+            AssertAndRecord(game, game.State.Cooldowns[action.AbilityId] == 0,
+                            "game.State.Cooldowns[action.AbilityId] == 0");
 
             AssertAndRecord(game, mobInstance.Ap >= abilityInfo.Cost, "mobInstance.Ap >= abilityInfo.Cost");
             AssertAndRecord(game, mobInstance.Hp > 0, $"Using an ability with {mobInstance.Hp}HP");
@@ -21,15 +45,6 @@ namespace HexMage.Simulator.Model {
             AssertAndRecord(game, isVisible, "Target is not visible");
             AssertAndRecord(game, abilityInfo.Range >= mobInstance.Coord.Distance(targetInstance.Coord),
                             "abilityInfo.Range >= mobInstance.Coord.Distance(targetInstance.Coord)");
-        }
-
-        [Conditional("DEBUG")]
-        public static void AssertAndRecord(GameInstance game, bool condition, string message) {
-            if (!condition) {
-                ReplayRecorder.Instance.SaveAndClear(game, 0);
-
-                throw new InvariantViolationException(message);
-            }
         }
 
         [Conditional("DEBUG")]
@@ -43,6 +58,15 @@ namespace HexMage.Simulator.Model {
             AssertAndRecord(game, game.Map[action.Coord] == HexType.Empty, "Trying to move into a wall");
             AssertAndRecord(game, atCoord != action.MobId, "Trying to move into the coord you're already standing on.");
             AssertAndRecord(game, atCoord == null, "Trying to move into a mob.");
+        }
+
+        [Conditional("DEBUG")]
+        public static void AssertAndRecord(GameInstance game, bool condition, string message) {
+            if (!condition) {
+                ReplayRecorder.Instance.SaveAndClear(game, 0);
+
+                throw new InvariantViolationException(message);
+            }
         }
 
         public static bool IsAbilityUsableNoTarget(GameInstance game, int mobId, int abilityId) {

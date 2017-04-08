@@ -161,7 +161,10 @@ namespace HexMage.Simulator {
 
             int maximumMoveActions = Math.Max(0, 3 - result.Count);
             for (int i = 0; i < Math.Min(coords.Count, maximumMoveActions); i++) {
-                result.Add(UctAction.DefensiveMoveAction(mobId, coords[i]));
+                var action = UctAction.DefensiveMoveAction(mobId, coords[i]);
+                GameInvariants.AssertValidAction(state, action);
+
+                result.Add(action);
             }
         }
 
@@ -211,12 +214,19 @@ namespace HexMage.Simulator {
 
                 if (closestCoord.HasValue) {
                     if (Constants.AttackMoveEnabled) {
-                        result.Add(UctAction.AttackMoveAction(mob.MobId,
-                                                              closestCoord.Value,
-                                                              chosenAbilityId.Value,
-                                                              targetId.Value));
+                        var action = UctAction.AttackMoveAction(mob.MobId,
+                                                                closestCoord.Value,
+                                                                chosenAbilityId.Value,
+                                                                targetId.Value);
+
+                        GameInvariants.AssertValidAction(state, action);
+
+                        result.Add(action);
                     } else {
-                        result.Add(UctAction.MoveAction(mob.MobId, closestCoord.Value));
+                        var action = UctAction.MoveAction(mob.MobId, closestCoord.Value);
+                        GameInvariants.AssertValidAction(state, action);
+
+                        result.Add(action);
                     }
                 }
             }
@@ -235,7 +245,11 @@ namespace HexMage.Simulator {
                 foreach (var targetId in state.MobManager.Mobs) {
                     if (GameInvariants.IsAbilityUsable(state, mob, state.CachedMob(targetId), abilityId)) {
                         foundAbilityUse = true;
-                        result.Add(UctAction.AbilityUseAction(abilityId, mobId, targetId));
+
+                        var action = UctAction.AbilityUseAction(abilityId, mobId, targetId);
+                        GameInvariants.AssertValidAction(state, action);
+
+                        result.Add(action);
                     }
                 }
             }

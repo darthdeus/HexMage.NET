@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator.AI {
@@ -40,6 +41,16 @@ namespace HexMage.Simulator.AI {
 
         public static UctAction AttackMoveAction(int mobId, AxialCoord coord, int abilityId, int targetId) {
             return new UctAction(UctActionType.AttackMove, abilityId, mobId, targetId, coord);
+        }
+
+        public UctAction ToPureMove() {
+            Debug.Assert(Type == UctActionType.DefensiveMove || Type == UctActionType.AttackMove);
+            return MoveAction(MobId, Coord);
+        }
+
+        public UctAction ToPureAbilityUse() {
+            Debug.Assert(Type == UctActionType.AttackMove);
+            return AbilityUseAction(AbilityId, MobId, TargetId);
         }
 
         public override string ToString() {

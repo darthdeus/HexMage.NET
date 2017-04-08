@@ -44,6 +44,8 @@ namespace HexMage.Simulator.Model {
                 ReplayRecorder.Instance.Actions.Add(action);
             }
 
+            GameInvariants.AssertValidAction(state, action);
+
             switch (action.Type) {
                 case UctActionType.Null:
                     // do nothing
@@ -52,21 +54,14 @@ namespace HexMage.Simulator.Model {
                     state.NextMobOrNewTurn();
                     break;
                 case UctActionType.AbilityUse:
-                    GameInvariants.AssertValidAbilityUseAction(state, action);
-
                     FastUse(state, action.AbilityId, action.MobId, action.TargetId);
                     break;
                 case UctActionType.AttackMove:
-                    GameInvariants.AssertValidMoveAction(state, action);
-                    GameInvariants.AssertValidAbilityUseAction(state, action);
-
                     FastMove(state, action.MobId, action.Coord);
                     FastUse(state, action.AbilityId, action.MobId, action.TargetId);
                     break;
-                case UctActionType.DefensiveMove:
                 case UctActionType.Move:
-                    GameInvariants.AssertValidMoveAction(state, action);
-
+                case UctActionType.DefensiveMove:
                     FastMove(state, action.MobId, action.Coord);
                     break;
                 default:
@@ -76,6 +71,7 @@ namespace HexMage.Simulator.Model {
             return state;
         }
 
+        // TODO - rename
         public static void FastMove(GameInstance game, int mobId, AxialCoord coord) {
             var mobInstance = game.State.MobInstances[mobId];
 
@@ -85,7 +81,7 @@ namespace HexMage.Simulator.Model {
             game.State.SetMobPosition(mobId, coord);
         }
 
-
+        // TODO - rename
         public static void FastUse(GameInstance game, int abilityId, int mobId, int targetId) {
             var ability = game.MobManager.AbilityForId(abilityId);
 
@@ -94,6 +90,7 @@ namespace HexMage.Simulator.Model {
             TargetHit(game, abilityId, mobId, targetId);
         }
 
+        // TODO - rename
         private static void TargetHit(GameInstance game, int abilityId, int mobId, int targetId) {
             var ability = game.MobManager.AbilityForId(abilityId);
 
