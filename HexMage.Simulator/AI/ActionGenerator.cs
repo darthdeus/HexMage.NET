@@ -191,6 +191,12 @@ namespace HexMage.Simulator {
                     if (!GameInvariants.CanMoveTo(state, mob, coord, out remainingAp, out possibleDistance)) continue;
 
                     foreach (var abilityId in mobInfo.Abilities) {
+                        // TODO - remove this later when the bug is found
+                        var ability = state.MobManager.Abilities[abilityId];
+                        int viewDistance = coord.Distance(enemy.MobInstance.Coord);
+
+                        if (ability.Range < viewDistance) continue;
+
                         if (!GameInvariants.IsAbilityUsableFrom(state, mob, coord, enemy, abilityId)) continue;
 
                         int myDistance = state.Pathfinder.Distance(myCoord, coord);
@@ -215,7 +221,7 @@ namespace HexMage.Simulator {
                                                                 chosenAbilityId.Value,
                                                                 targetId.Value);
 
-                        //GameInvariants.AssertValidAction(state, action);
+                        GameInvariants.AssertValidAction(state, action);
 
                         result.Add(action);
                     } else {

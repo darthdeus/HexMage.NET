@@ -97,8 +97,7 @@ namespace HexMage.Simulator.Model {
             return CanMoveTo(game, mob, coord, out remainingAp, out distance);
         }
 
-        public static bool CanMoveTo(GameInstance game, CachedMob mob, AxialCoord coord, out int remainingAp,
-                                     out int distance) {
+        public static bool CanMoveTo(GameInstance game, CachedMob mob, AxialCoord coord, out int remainingAp, out int distance) {
             bool isEmpty = game.Map[coord] == HexType.Empty && game.State.AtCoord(coord) == null;
 
             distance = game.Pathfinder.Distance(mob.MobInstance.Coord, coord);
@@ -112,8 +111,7 @@ namespace HexMage.Simulator.Model {
             throw new NotImplementedException();
         }
 
-        public static bool IsAbilityUsableFrom(GameInstance game, CachedMob mob, AxialCoord from, CachedMob target,
-                                               int abilityId) {
+        public static bool IsAbilityUsableFrom(GameInstance game, CachedMob mob, AxialCoord from, CachedMob target, int abilityId) {
             var ability = game.MobManager.Abilities[abilityId];
 
             int remainingAp = mob.MobInstance.Ap - game.Pathfinder.Distance(mob.MobInstance.Coord,
