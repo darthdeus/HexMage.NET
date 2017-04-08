@@ -94,19 +94,11 @@ namespace HexMage.Simulator.PCG {
 
             state.MobInstances[mobId].Coord = AxialCoord.Zero;
 
+            // TODO: when run out of iteration, sequential scan
             int iterations = 10000;
 
             while (--iterations > 0) {
-                // +1 since .Next is inclusive of the lower bound
-                var x = Random.Next(-size+1, size);
-                var y = Random.Next(-size+1, size);
-
-                if (Math.Abs(x) + Math.Abs(y) >= size) continue;
-
-                Debug.Assert(Math.Abs(x) < size);
-                Debug.Assert(Math.Abs(y) < size);
-
-                var coord = new AxialCoord(x, y);
+                var coord = map.RandomCoord();
 
                 if (map.RedStartingPoints.Contains(coord) ||
                     map.BlueStartingPoints.Contains(coord)) continue;

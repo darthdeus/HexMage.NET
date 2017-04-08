@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using HexMage.Simulator.Model;
+using HexMage.Simulator.PCG;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator.Pathfinding {
@@ -66,6 +68,25 @@ namespace HexMage.Simulator.Pathfinding {
 
         public void Reset() {
             AreaBuffs.Clear();
+        }
+
+        public AxialCoord RandomCoord() {
+            for (int i = 0; i < 1000; i++) {
+                // +1 since .Next is inclusive of the lower bound
+                var x = Generator.Random.Next(-Size + 1, Size);
+                var y = Generator.Random.Next(-Size + 1, Size);
+
+                if (Math.Abs(x) + Math.Abs(y) >= Size) continue;
+
+                Debug.Assert(Math.Abs(x) < Size);
+                Debug.Assert(Math.Abs(y) < Size);
+
+                var coord = new AxialCoord(x, y);
+
+                return coord;
+            }
+
+            throw new InvalidOperationException("Something went wrong with the random number generator, unable to generate a valid coord under 1000 iterations.");
         }
 
         public void Toggle(AxialCoord coord) {
