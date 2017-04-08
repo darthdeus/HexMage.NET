@@ -9,6 +9,7 @@ namespace HexMage.Simulator.AI {
         public static GameInstance GenerateForDnaSettings(int mobCount, int abilityCount, Map map = null) {
             if (map == null) {
                 map = new Map(Constants.EvolutionMapSize);
+                map.PrecomputeCubeLinedraw();                
             }
 
             var game = new GameInstance(map);
@@ -69,26 +70,13 @@ namespace HexMage.Simulator.AI {
                     }
                 }
 
-                if (!placed && game.Map.RedStartingPoints.Count > 0 && game.Map.BlueStartingPoints.Count > 0) {
+                if (!placed) {
                     Utils.Log(LogSeverity.Warning, nameof(GameSetup), $"Ran out of placeholders for {mobInfo.Team}.");
-                    Generator.RandomPlaceMob(game.MobManager, mobId, game.Map, game.State);
+                    Generator.RandomPlaceMob(game, mobId);
                 }
             }
 
-            //int x = 0;
-            //// TODO: vratit zpatky
-            ////int y = game.Size - 1;
-            //int y = 2;
-            //var mobIds = game.MobManager.Mobs;
-            //game.PlaceMob(mobIds[0], new AxialCoord(x, y));
-            //game.PlaceMob(mobIds[1], new AxialCoord(y, x));
-
-            //if (mobIds.Count > 2) {
-            //    game.PlaceMob(mobIds[2], new AxialCoord(-x, -y));
-            //}
-            //if (mobIds.Count > 3) {
-            //    game.PlaceMob(mobIds[3], new AxialCoord(-y, -x));
-            //}
+            GameInvariants.AssertMobsNotStandingOnEachother(game, checkOrigCoord: true);
         }
 
         private static void UnpackTeamsIntoGame(GameInstance game, DNA team1, DNA team2) {

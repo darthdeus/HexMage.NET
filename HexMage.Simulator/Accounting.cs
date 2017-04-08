@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 using HexMage.Simulator.AI;
 
@@ -25,10 +26,13 @@ namespace HexMage.Simulator.Model {
         }
 
         public static string GetStats() {
-            return $"MCTS: {MctsWins}\n" +
-                   $"Random: {RandomAiWins}\n" +
-                   $"Rule: {RuleBasedAiWins}\n" +
-                   $"Flat: {FlatMonteCarloWins}";
+            var builder = new StringBuilder();
+            if (MctsWins > 0) builder.AppendLine($"MCTS: {MctsWins}");
+            if (RandomAiWins > 0) builder.AppendLine($"Random: {MctsWins}");
+            if (RuleBasedAiWins > 0) builder.AppendLine($"Rule: {MctsWins}");
+            if (FlatMonteCarloWins > 0) builder.AppendLine($"Flat: {MctsWins}");
+
+            return builder.ToString();
         }
     }
 }

@@ -79,19 +79,20 @@ namespace HexMage.Simulator.PCG {
         //    return game;
         //}
 
-        public static void RandomPlaceMob(MobManager mobManager, int mob, Map map, GameState state) {
+        public static void RandomPlaceMob(GameInstance game, int mobId) {
+            var map = game.Map;
+            var state = game.State;
+            var mobManager = game.MobManager;
             int size = map.Size;
 
             Predicate<AxialCoord> isCoordAvailable = c => {
                 bool isWall = map[c] == HexType.Wall;
                 var atCoord = state.AtCoord(c);
 
-                return !isWall && (!atCoord.HasValue || atCoord.Value == mob);
+                return !isWall && (!atCoord.HasValue || atCoord.Value == mobId);
             };
 
-            var mobInstance = state.MobInstances[mob];
-            mobInstance.Coord = AxialCoord.Zero;
-            state.MobInstances[mob] = mobInstance;
+            state.MobInstances[mobId].Coord = AxialCoord.Zero;
 
             int iterations = 10000;
 
@@ -107,14 +108,14 @@ namespace HexMage.Simulator.PCG {
 
                 var coord = new AxialCoord(x, y);
 
+                if (map.RedStartingPoints.Contains(coord) ||
+                    map.BlueStartingPoints.Contains(coord)) continue;
+
                 bool isWall = map[coord] == HexType.Wall;
                 bool isTaken = mobManager.MobInfos.Any(info => info.OrigCoord == coord);
 
                 if (!isWall && !isTaken) {
-                    var infoCopy = mobManager.MobInfos[mob];
-                    infoCopy.OrigCoord = coord;
-                    //Console.WriteLine($"Placed at {coord}");
-                    mobManager.MobInfos[mob] = infoCopy;
+                    game.PlaceMob(mobId, coord);
                     break;
                 }
             }

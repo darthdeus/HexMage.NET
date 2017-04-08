@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -21,7 +22,7 @@ namespace HexMage.Simulator.Tests {
 
             game.PrepareEverything();
 
-            ActionEvaluator.FastUse(game, abilityId, m1, m2);
+            ActionEvaluator.FNoCopy(game, UctAction.AbilityUseAction(abilityId, m1, m2));
 
             var fireDebuff = game.State.MobInstances[m2].Buff;
             Assert.AreEqual(2, fireDebuff.Lifetime);

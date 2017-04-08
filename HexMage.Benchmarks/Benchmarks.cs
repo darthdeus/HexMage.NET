@@ -25,6 +25,8 @@ namespace HexMage.Benchmarks {
 
             game.PrepareEverything();
 
+            GameInvariants.AssertMobsNotStandingOnEachother(game);
+
             IMobController c1, c2;
 
             switch (Constants.MctsBenchType) {
@@ -110,8 +112,8 @@ namespace HexMage.Benchmarks {
                 int m1 = gameInstance.AddMobWithInfo(mi1);
                 int m2 = gameInstance.AddMobWithInfo(mi2);
 
-                Generator.RandomPlaceMob(mobManager, m1, gameInstance.Map, gameInstance.State);
-                Generator.RandomPlaceMob(mobManager, m2, gameInstance.Map, gameInstance.State);
+                Generator.RandomPlaceMob(gameInstance, m1);
+                Generator.RandomPlaceMob(gameInstance, m2);
             }
 
             mobManager.Teams[t1] = new MctsController(gameInstance);

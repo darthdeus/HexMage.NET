@@ -1,4 +1,5 @@
-﻿using HexMage.Simulator.Model;
+﻿using HexMage.Simulator.AI;
+using HexMage.Simulator.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HexMage.Simulator.Tests {
@@ -18,7 +19,7 @@ namespace HexMage.Simulator.Tests {
             game.State.SlowUpdateIsFinished(game.MobManager);
             Assert.IsFalse(game.IsFinished);
 
-            ActionEvaluator.FastUse(game, a1, m1, m2);
+            ActionEvaluator.FNoCopy(game, UctAction.AbilityUseAction(a1, m1, m2));
 
             game.State.SlowUpdateIsFinished(game.MobManager);
             Assert.IsTrue(game.IsFinished);
@@ -37,7 +38,7 @@ namespace HexMage.Simulator.Tests {
 
             Assert.IsFalse(game.IsFinished);
 
-            ActionEvaluator.FastUse(game, a1, m1, m2);
+            ActionEvaluator.FNoCopy(game, UctAction.AbilityUseAction(a1, m1, m2));
             Assert.IsTrue(game.IsFinished);
         }
 
@@ -54,7 +55,7 @@ namespace HexMage.Simulator.Tests {
             game.PrepareEverything();
             Assert.IsFalse(game.IsFinished);
 
-            ActionEvaluator.FastUse(game, a1, m1, m2);
+            ActionEvaluator.FNoCopy(game, UctAction.AbilityUseAction(a1, m1, m2));
             Assert.IsFalse(game.IsFinished);
 
             game.NextMobOrNewTurn();

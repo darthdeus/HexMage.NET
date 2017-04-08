@@ -38,6 +38,8 @@ namespace HexMage.Simulator.Model {
             Actions++;
             ActionCounts[action.Type]++;
 
+            GameInvariants.AssertMobsNotStandingOnEachother(state);
+
             Constants.WriteLogLine(action);
 
             if (Constants.RecordReplays) {
@@ -72,7 +74,7 @@ namespace HexMage.Simulator.Model {
         }
 
         // TODO - rename
-        public static void FastMove(GameInstance game, int mobId, AxialCoord coord) {
+        private static void FastMove(GameInstance game, int mobId, AxialCoord coord) {
             var mobInstance = game.State.MobInstances[mobId];
 
             int distance = mobInstance.Coord.Distance(coord);
@@ -82,7 +84,7 @@ namespace HexMage.Simulator.Model {
         }
 
         // TODO - rename
-        public static void FastUse(GameInstance game, int abilityId, int mobId, int targetId) {
+        private static void FastUse(GameInstance game, int abilityId, int mobId, int targetId) {
             var ability = game.MobManager.AbilityForId(abilityId);
 
             game.State.Cooldowns[abilityId] = ability.Cooldown;

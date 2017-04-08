@@ -136,7 +136,7 @@ namespace HexMage.Simulator.Tests {
             TestHelpers.GameInstancesEqual(game, copy);
 
             var copy2 = copy.DeepCopy();
-            ActionEvaluator.FastUse(copy2, abilityId, m1, m2);
+            ActionEvaluator.F(copy2, UctAction.AbilityUseAction(abilityId, m1, m2));
 
             TestHelpers.GameInstancesEqual(game, copy);
 

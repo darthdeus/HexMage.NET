@@ -82,6 +82,25 @@ namespace HexMage.Simulator.Model {
             }
         }
 
+        [Conditional("DEBUG")]
+        public static void AssertMobsNotStandingOnEachother(GameInstance game, bool checkOrigCoord = false) {
+            var taken = new HashSet<AxialCoord>();
+
+            foreach (var mobId in game.MobManager.Mobs) {
+                var mobInstance = game.State.MobInstances[mobId];
+                var mobInfo = game.MobManager.MobInfos[mobId];
+
+                var coord = checkOrigCoord ? mobInfo.OrigCoord : mobInstance.Coord;
+
+                if (taken.Contains(coord)) {
+                    throw new InvariantViolationException(
+                        $"Coord {mobInstance.Coord} is already taken by someone else.");
+                } else {
+                    taken.Add(mobInstance.Coord);
+                }
+            }
+        }
+
         public static bool IsAbilityUsableNoTarget(GameInstance game, int mobId, int abilityId) {
             var ability = game.MobManager.AbilityForId(abilityId);
             var mobInstance = game.State.MobInstances[mobId];
@@ -97,7 +116,8 @@ namespace HexMage.Simulator.Model {
             return CanMoveTo(game, mob, coord, out remainingAp, out distance);
         }
 
-        public static bool CanMoveTo(GameInstance game, CachedMob mob, AxialCoord coord, out int remainingAp, out int distance) {
+        public static bool CanMoveTo(GameInstance game, CachedMob mob, AxialCoord coord, out int remainingAp,
+                                     out int distance) {
             bool isEmpty = game.Map[coord] == HexType.Empty && game.State.AtCoord(coord) == null;
 
             distance = game.Pathfinder.Distance(mob.MobInstance.Coord, coord);
@@ -111,7 +131,8 @@ namespace HexMage.Simulator.Model {
             throw new NotImplementedException();
         }
 
-        public static bool IsAbilityUsableFrom(GameInstance game, CachedMob mob, AxialCoord from, CachedMob target, int abilityId) {
+        public static bool IsAbilityUsableFrom(GameInstance game, CachedMob mob, AxialCoord from, CachedMob target,
+                                               int abilityId) {
             var ability = game.MobManager.Abilities[abilityId];
 
             int remainingAp = mob.MobInstance.Ap - game.Pathfinder.Distance(mob.MobInstance.Coord,
