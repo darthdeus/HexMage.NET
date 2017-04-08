@@ -20,6 +20,11 @@ namespace HexMage.Simulator.Pathfinding {
 
         public List<AxialCoord> EmptyCoords = new List<AxialCoord>();
 
+        public int Size { get; set; }
+
+        [JsonIgnore]
+        public List<AxialCoord> AllCoords => _hexes.AllCoords;
+
         // TODO - remove Guid, it's no longer needed
         public Guid Guid = Guid.NewGuid();
 
@@ -37,23 +42,13 @@ namespace HexMage.Simulator.Pathfinding {
             _hexes = new HexMap<HexType>(size);
         }
 
-        public int Size { get; set; }
-
-        [JsonIgnore]
-        public List<AxialCoord> AllCoords => _hexes.AllCoords;
-
         public HexType this[AxialCoord c] {
             get { return _hexes[c]; }
             set { _hexes[c] = value; }
         }
 
         public Map DeepCopy() {
-            //var hexesCopy = new HexMap<HexType>(Size);
             var buffsCopy = new List<AreaBuff>();
-
-            //foreach (var coord in AllCoords) {
-            //    hexesCopy[coord] = _hexes[coord];
-            //}
 
             foreach (var buff in AreaBuffs) buffsCopy.Add(buff);
 
@@ -61,6 +56,7 @@ namespace HexMage.Simulator.Pathfinding {
                 Guid = Guid
             };
 
+            map.EmptyCoords = EmptyCoords;
             map.RedStartingPoints = RedStartingPoints;
             map.BlueStartingPoints = BlueStartingPoints;
             map._visibility = _visibility;
@@ -115,6 +111,9 @@ namespace HexMage.Simulator.Pathfinding {
         }
 
         public void PrecomputeCubeLinedraw() {
+            EmptyCoords.Clear();
+            _visibility.Clear();
+
             foreach (var a in AllCoords) {
                 if (this[a] == HexType.Empty) {
                     EmptyCoords.Add(a);

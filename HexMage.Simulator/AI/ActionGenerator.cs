@@ -220,6 +220,9 @@ namespace HexMage.Simulator {
                                                                 chosenAbilityId.Value,
                                                                 target.MobId);
 
+                        var after = ActionEvaluator.F(state, action.ToPureMove());
+                        GameInvariants.AssertValidAbilityUseAction(after, action.ToPureAbilityUse());
+
                         GameInvariants.AssertValidAction(state, action);
 
                         result.Add(action);

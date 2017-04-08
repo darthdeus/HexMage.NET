@@ -10,6 +10,40 @@ namespace HexMage.Simulator.Tests {
     [TestClass]
     public class UctTest {
         [TestMethod]
+        public void AttackMoveEquivalentToSeparateActionsTest() {
+            for (int i = 0; i < 100; i++) {
+                var dna = new DNA(1, 1);
+                dna.Randomize();
+
+                var game = GameSetup.GenerateForDnaSettings(1, 1);
+                GameSetup.ResetPositions(game);
+                game.PrepareEverything();
+
+                var mobId = game.MobManager.Mobs[0];
+                var mobInfo = game.MobManager.MobInfos[mobId];
+                var abilityId = mobInfo.Abilities[0];
+                var targetId = game.MobManager.Mobs.First(m => game.MobManager.MobInfos[m].Team != mobInfo.Team);
+
+                var c = new AxialCoord(0, 1);
+
+                var attackMoveAction = UctAction.AttackMoveAction(mobId, c, abilityId, targetId);
+                GameInvariants.AssertValidAction(game, attackMoveAction);
+
+                var afterAttackMove = ActionEvaluator.F(game, attackMoveAction);
+
+                var moveAction = UctAction.MoveAction(mobId, c);
+                GameInvariants.AssertValidAction(game, moveAction);
+                var afterMove = ActionEvaluator.F(game, moveAction);
+
+                var abilityUseAction = UctAction.AbilityUseAction(abilityId, mobId, targetId);
+                GameInvariants.AssertValidAction(afterMove, abilityUseAction);
+                var afterMoveAndAttack = ActionEvaluator.F(afterMove, abilityUseAction);
+
+                TestHelpers.GameInstancesEqual(afterAttackMove, afterMoveAndAttack);
+            }
+        }
+
+        [TestMethod]
         public void BasicUctTest() {
             Generator.Random = new Random(123);
 
