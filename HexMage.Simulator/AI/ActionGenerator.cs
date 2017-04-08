@@ -187,26 +187,24 @@ namespace HexMage.Simulator {
                 foreach (var coord in state.Map.EmptyCoords) {
                     if (!state.Map.IsVisible(coord, target.MobInstance.Coord)) continue;
 
-                    int remainingAp, possibleDistance;
-                    if (!GameInvariants.CanMoveTo(state, mob, coord, out remainingAp, out possibleDistance)) continue;
+                    var possibleMoveAction = GameInvariants.CanMoveTo(state, mob, coord);
+
+                    if (possibleMoveAction.Type == UctActionType.Null) continue;
+                    Debug.Assert(possibleMoveAction.Type == UctActionType.Move);
+
 
                     foreach (var abilityId in mobInfo.Abilities) {
-                        // TODO - remove this later when the bug is found
-                        var ability = state.MobManager.Abilities[abilityId];
-                        int viewDistance = coord.Distance(target.MobInstance.Coord);
-
-                        if (ability.Range < viewDistance) continue;
-
                         if (!GameInvariants.IsAbilityUsableFrom(state, mob, coord, target, abilityId)) continue;
 
                         int myDistance = state.Pathfinder.Distance(myCoord, coord);
 
-                        chosenAbilityId = abilityId;
 
                         if (!closestCoord.HasValue) {
+                            chosenAbilityId = abilityId;
                             closestCoord = coord;
                             distance = myDistance;
                         } else if (distance.Value > myDistance) {
+                            chosenAbilityId = abilityId;
                             closestCoord = coord;
                             distance = myDistance;
                         }

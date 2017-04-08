@@ -137,12 +137,12 @@ namespace HexMage.Simulator.PCG {
                 var cooldown = 0;
 
                 var ability = new AbilityInfo(RandomDmg(),
-                    RandomCost(maxAp),
-                    RandomRange(),
-                    cooldown,
-                    element,
-                    buff,
-                    areaBuff);
+                                              RandomCost(maxAp),
+                                              RandomRange(),
+                                              cooldown,
+                                              element,
+                                              buff,
+                                              areaBuff);
 
                 // TODO - use GameInstance.AddAbilityWithInfo instead
                 int id = mobManager.Abilities.Count;

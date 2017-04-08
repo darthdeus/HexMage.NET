@@ -111,20 +111,18 @@ namespace HexMage.Simulator.Model {
             return enoughAp && noCooldown;
         }
 
-        public static bool CanMoveTo(GameInstance game, CachedMob mob, AxialCoord coord) {
-            int remainingAp, distance;
-            return CanMoveTo(game, mob, coord, out remainingAp, out distance);
-        }
-
-        public static bool CanMoveTo(GameInstance game, CachedMob mob, AxialCoord coord, out int remainingAp,
-                                     out int distance) {
+        public static UctAction CanMoveTo(GameInstance game, CachedMob mob, AxialCoord coord) {
             bool isEmpty = game.Map[coord] == HexType.Empty && game.State.AtCoord(coord) == null;
 
-            distance = game.Pathfinder.Distance(mob.MobInstance.Coord, coord);
-            remainingAp = mob.MobInstance.Ap - distance;
+            int distance = game.Pathfinder.Distance(mob.MobInstance.Coord, coord);
+            int remainingAp = mob.MobInstance.Ap - distance;
             bool enoughAp = remainingAp >= 0;
 
-            return isEmpty && enoughAp;
+            if (isEmpty && enoughAp) {
+                return UctAction.MoveAction(mob.MobId, coord);
+            } else {
+                return UctAction.NullAction();
+            }
         }
 
         public static bool IsAbilityUsableAtCoord(CachedMob mob, AxialCoord coord, int abilityId) {
