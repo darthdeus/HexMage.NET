@@ -32,18 +32,20 @@ namespace HexMage.Simulator.Model {
             var targetInstance = game.State.MobInstances[action.TargetId];
             var abilityInfo = game.MobManager.Abilities[action.AbilityId];
 
-            AssertAndRecord(game, abilityInfo.Cooldown == 0,
+            AssertAndRecord(game, action, abilityInfo.Cooldown == 0,
                             "Accidentaly created an ability with non-zero cooldown. Those are currently not supported.");
-            AssertAndRecord(game, game.State.Cooldowns[action.AbilityId] == 0,
+            AssertAndRecord(game, action, game.State.Cooldowns[action.AbilityId] == 0,
                             "game.State.Cooldowns[action.AbilityId] == 0");
 
-            AssertAndRecord(game, mobInstance.Ap >= abilityInfo.Cost, "mobInstance.Ap >= abilityInfo.Cost");
-            AssertAndRecord(game, mobInstance.Hp > 0, $"Using an ability with {mobInstance.Hp}HP");
-            AssertAndRecord(game, targetInstance.Hp > 0, $"Using an ability on a target with {mobInstance.Hp}HP");
+            AssertAndRecord(game, action, mobInstance.Ap >= abilityInfo.Cost, "mobInstance.Ap >= abilityInfo.Cost");
+            AssertAndRecord(game, action, mobInstance.Hp > 0, $"Using an ability with {mobInstance.Hp}HP");
+            AssertAndRecord(game, action, targetInstance.Hp > 0,
+                            $"Using an ability on a target with {mobInstance.Hp}HP");
 
             var isVisible = game.Map.IsVisible(mobInstance.Coord, targetInstance.Coord);
-            AssertAndRecord(game, isVisible, "Target is not visible");
-            AssertAndRecord(game, abilityInfo.Range >= mobInstance.Coord.Distance(targetInstance.Coord),
+            // TODO: do invariant checku se pise pozitivni nebo negativni cas?
+            AssertAndRecord(game, action, isVisible, "Target is not visible");
+            AssertAndRecord(game, action, abilityInfo.Range >= mobInstance.Coord.Distance(targetInstance.Coord),
                             "abilityInfo.Range >= mobInstance.Coord.Distance(targetInstance.Coord)");
         }
 
@@ -53,19 +55,20 @@ namespace HexMage.Simulator.Model {
             var mobInstance = game.State.MobInstances[action.MobId];
 
             var distance = game.Pathfinder.Distance(mobInstance.Coord, action.Coord);
-            AssertAndRecord(game, mobInstance.Ap >= distance, "mobInstance.Ap >= distance");
+            AssertAndRecord(game, action, mobInstance.Ap >= distance, "mobInstance.Ap >= distance");
 
-            AssertAndRecord(game, game.Map[action.Coord] == HexType.Empty, "Trying to move into a wall");
-            AssertAndRecord(game, atCoord != action.MobId, "Trying to move into the coord you're already standing on.");
-            AssertAndRecord(game, atCoord == null, "Trying to move into a mob.");
+            AssertAndRecord(game, action, game.Map[action.Coord] == HexType.Empty, "Trying to move into a wall");
+            AssertAndRecord(game, action, atCoord != action.MobId,
+                            "Trying to move into the coord you're already standing on.");
+            AssertAndRecord(game, action, atCoord == null, "Trying to move into a mob.");
         }
 
         [Conditional("DEBUG")]
-        public static void AssertAndRecord(GameInstance game, bool condition, string message) {
+        public static void AssertAndRecord(GameInstance game, UctAction action, bool condition, string message) {
             if (!condition) {
                 ReplayRecorder.Instance.SaveAndClear(game, 0);
 
-                throw new InvariantViolationException(message);
+                throw new InvariantViolationException($"Check failed for action {action}, reason: {message}");
             }
         }
 
@@ -110,14 +113,19 @@ namespace HexMage.Simulator.Model {
             return withinRange && enoughAp;
         }
 
+        public static bool IsTargetableNoSource(GameInstance game, CachedMob mob, CachedMob target) {
+            bool isTargetAlive = Constants.AllowCorpseTargetting || target.MobInstance.Hp > 0;
+            bool isEnemy = mob.MobInfo.Team != target.MobInfo.Team;
+
+            return isTargetAlive && isEnemy;
+        }
+
         public static bool IsTargetable(GameInstance game, CachedMob mob, CachedMob target,
                                         bool checkVisibility = true) {
             bool isVisible = !checkVisibility || game.Map.IsVisible(mob.MobInstance.Coord, target.MobInstance.Coord);
 
-            bool isTargetAlive = Constants.AllowCorpseTargetting || target.MobInstance.Hp > 0;
-            bool isEnemy = mob.MobInfo.Team != target.MobInfo.Team;
-
-            return isVisible && isTargetAlive && isEnemy;
+         
+            return isVisible && IsTargetableNoSource(game, mob, target);
         }
 
         public static bool IsAbilityUsableApRangeCheck(GameInstance game, CachedMob mob, CachedMob target,

@@ -69,8 +69,8 @@ namespace HexMage.Simulator.AI {
                     }
                 }
 
-                if (!placed) {
-                    Utils.Log(LogSeverity.Error, nameof(GameSetup), $"Ran out of placeholders for {mobInfo.Team}.");
+                if (!placed && game.Map.RedStartingPoints.Count > 0 && game.Map.BlueStartingPoints.Count > 0) {
+                    Utils.Log(LogSeverity.Warning, nameof(GameSetup), $"Ran out of placeholders for {mobInfo.Team}.");
                     Generator.RandomPlaceMob(game.MobManager, mobId, game.Map, game.State);
                 }
             }

@@ -172,15 +172,11 @@ namespace HexMage.Simulator {
             var mobInfo = mob.MobInfo;
             var mobInstance = mob.MobInstance;
 
-            var enemyDistances = new HexMap<int>(state.Size);
-
             // TODO - preferovat blizsi policka pri vyberu akci?
             foreach (var enemyId in state.MobManager.Mobs) {
                 var enemy = state.CachedMob(enemyId);
 
-                if (!GameInvariants.IsTargetable(state, mob, enemy, checkVisibility: false)) continue;
-
-                MobInstance enemyInstance = state.State.MobInstances[enemyId];
+                if (!GameInvariants.IsTargetableNoSource(state, mob, enemy)) continue;
 
                 AxialCoord myCoord = mobInstance.Coord;
                 AxialCoord? closestCoord = null;
@@ -188,8 +184,8 @@ namespace HexMage.Simulator {
                 int? chosenAbilityId = null;
                 int? targetId = null;
 
-                foreach (var coord in enemyDistances.AllCoords) {
-                    if (!state.Map.IsVisible(coord, enemyInstance.Coord)) continue;
+                foreach (var coord in state.Map.AllCoords) {
+                    if (!state.Map.IsVisible(coord, enemy.MobInstance.Coord)) continue;
 
                     int remainingAp, possibleDistance;
                     if (!GameInvariants.CanMoveTo(state, mob, coord, out remainingAp, out possibleDistance)) continue;
@@ -219,7 +215,7 @@ namespace HexMage.Simulator {
                                                                 chosenAbilityId.Value,
                                                                 targetId.Value);
 
-                        GameInvariants.AssertValidAction(state, action);
+                        //GameInvariants.AssertValidAction(state, action);
 
                         result.Add(action);
                     } else {
