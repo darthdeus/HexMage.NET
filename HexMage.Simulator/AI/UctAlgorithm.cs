@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator.AI {
@@ -31,7 +32,7 @@ namespace HexMage.Simulator.AI {
             stopwatch.Stop();
 
             UctDebug.PrintTreeRepresentation(root);
-            SearchCount++;
+            Interlocked.Increment(ref SearchCount);
 
             //Console.WriteLine($"Total Q: {root.Children.Sum(c => c.Q)}, N: {root.Children.Sum(c => c.N)}");
 
@@ -51,10 +52,10 @@ namespace HexMage.Simulator.AI {
         public static UctNode TreePolicy(UctNode node) {
             while (!node.IsTerminal) {
                 if (!node.IsFullyExpanded) {
-                    ExpandCount++;
+                    Interlocked.Increment(ref ExpandCount);
                     return Expand(node);
                 } else {
-                    BestChildCount++;
+                    Interlocked.Increment(ref BestChildCount);
                     node = BestChild(node);
                 }
             }
@@ -153,17 +154,7 @@ namespace HexMage.Simulator.AI {
             if (rewardDamage) {
                 TeamColor opposingTeam = startingTeam == TeamColor.Red ? TeamColor.Blue : TeamColor.Red;
 
-                float totalMax = 0;
-                float totalCurrent = 0;
-                foreach (var mobId in game.MobManager.Mobs) {
-                    var mobInfo = game.MobManager.MobInfos[mobId];
-                    if (mobInfo.Team != opposingTeam) continue;
-
-                    totalMax += mobInfo.MaxHp;
-                    totalCurrent += game.State.MobInstances[mobId].Hp;
-                }
-
-                return 1 - (totalCurrent / totalMax);
+                return 1 - game.PercentageHp(opposingTeam);
             } else {
                 float result;
 

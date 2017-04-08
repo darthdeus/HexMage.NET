@@ -129,7 +129,8 @@ namespace HexMage.Simulator {
         public void FastUse(int abilityId, int mobId, int targetId) {
             var target = State.MobInstances[targetId];
 
-            Debug.Assert(MobManager.AbilityForId(abilityId).Cooldown == 0, "Somehow generated an ability with non-zero cooldown.");
+            Debug.Assert(MobManager.AbilityForId(abilityId).Cooldown == 0,
+                         "Somehow generated an ability with non-zero cooldown.");
             Debug.Assert(State.Cooldowns[abilityId] == 0, "Trying to use an ability with non-zero cooldown.");
             Debug.Assert(State.MobInstances[mobId].Hp > 0, "Source is dead");
             Debug.Assert(target.Hp > 0, "Target is dead.");
@@ -250,28 +251,21 @@ namespace HexMage.Simulator {
             }
         }
 
-        public static GameInstance FromJSON(string jsonStr) {
-            var mapRepresentation = JsonConvert.DeserializeObject<MapRepresentation>(jsonStr);
-
-            var map = new Map(5);
-
-            var result = new GameInstance(map);
-            return result;
-        }
-
         public float PercentageHp(TeamColor team) {
-            int totalMaxHp = 0;
-            int totalCurrentHp = 0;
+            float totalMaxHp = 0;
+            float totalCurrentHp = 0;
 
             foreach (var mobId in MobManager.Mobs) {
                 var mobInfo = MobManager.MobInfos[mobId];
+                if (mobInfo.Team != team) continue;
+
                 var mobInstance = State.MobInstances[mobId];
 
                 totalMaxHp += mobInfo.MaxHp;
                 totalCurrentHp += mobInstance.Hp;
             }
 
-            return (float) totalCurrentHp / (float) totalMaxHp;
+            return totalCurrentHp / totalMaxHp;
         }
 
         /// TODO - fix stuff below

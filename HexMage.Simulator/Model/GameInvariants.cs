@@ -1,7 +1,42 @@
 ﻿using System;
+using System.Diagnostics;
+using HexMage.Simulator.AI;
 
 namespace HexMage.Simulator.Model {
     public static class GameInvariants {
+        [Conditional("DEBUG")]
+        public static void AssertValidAbilityUseAction(GameInstance game, UctAction action) {
+            var mobInstance = game.State.MobInstances[action.MobId];
+            var targetInstance = game.State.MobInstances[action.TargetId];
+            var abilityInfo = game.MobManager.Abilities[action.AbilityId];
+
+            AssertAndRecord(game, mobInstance.Ap >= abilityInfo.Cost, "mobInstance.Ap >= abilityInfo.Cost");
+            AssertAndRecord(game, mobInstance.Hp > 0, $"Using an ability with {mobInstance.Hp}HP");
+            AssertAndRecord(game, targetInstance.Hp > 0, $"Using an ability on a target with {mobInstance.Hp}HP");
+
+            var isVisible = game.Map.IsVisible(mobInstance.Coord, targetInstance.Coord);
+            AssertAndRecord(game, isVisible, "Target is not visible");
+            AssertAndRecord(game, abilityInfo.Range >= mobInstance.Coord.Distance(targetInstance.Coord),
+                            "abilityInfo.Range >= mobInstance.Coord.Distance(targetInstance.Coord)");
+        }
+
+        [Conditional("DEBUG")]
+        public static void AssertAndRecord(GameInstance game, bool condition, string message) {
+            if (!condition) {
+                ReplayRecorder.Instance.SaveAndClear(game, 0);
+
+                throw new InvariantViolationException(message);
+            }
+        }
+
+        [Conditional("DEBUG")]
+        public static void AssertValidMoveAction(GameInstance game, UctAction action) {
+            var atCoord = game.State.AtCoord(action.Coord);
+
+            Debug.Assert(atCoord != action.MobId, "Trying to move into the coord you're already standing on.");
+            Debug.Assert(atCoord == null, "Trying to move into a mob.");
+        }
+
         public static bool IsAbilityUsableNoTarget(GameInstance game, int mobId, int abilityId) {
             var ability = game.MobManager.AbilityForId(abilityId);
             var mobInstance = game.State.MobInstances[mobId];

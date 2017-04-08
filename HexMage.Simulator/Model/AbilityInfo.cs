@@ -5,6 +5,7 @@ namespace HexMage.Simulator.Model {
     // TODO - rename
 
 #warning TODO - this should be a struct
+
     public class AbilityInfo {
         public int Dmg { get; set; }
         public int Cost { get; set; }
@@ -16,13 +17,13 @@ namespace HexMage.Simulator.Model {
 
         public float DmgCostRatio => (float) Dmg / (float) Cost;
 
-        public AbilityInfo() {}
+        public AbilityInfo() { }
 
         public AbilityInfo(int dmg, int cost, int range, int cooldown, AbilityElement element)
-            : this(dmg, cost, range, cooldown, element, Buff.ZeroBuff(), AreaBuff.ZeroBuff()) {}
+            : this(dmg, cost, range, cooldown, element, Buff.ZeroBuff(), AreaBuff.ZeroBuff()) { }
 
         public AbilityInfo(int dmg, int cost, int range, int cooldown, AbilityElement element, Buff buff,
-                       AreaBuff areaBuff) {
+                           AreaBuff areaBuff) {
             Dmg = dmg;
             Cost = cost;
             Range = range;
@@ -33,6 +34,7 @@ namespace HexMage.Simulator.Model {
         }
 
 #warning TODO - ulozit je do nejaky tabulky a jenom referencovat
+
         [JsonIgnore]
         public Buff ElementalEffect {
             get {
@@ -74,7 +76,7 @@ namespace HexMage.Simulator.Model {
                 hashCode = (hashCode * 397) ^ AreaBuff.GetHashCode();
                 return hashCode;
             }
-        }        
+        }
 
         public static bool operator ==(AbilityInfo left, AbilityInfo right) {
             return Equals(left, right);
@@ -82,6 +84,36 @@ namespace HexMage.Simulator.Model {
 
         public static bool operator !=(AbilityInfo left, AbilityInfo right) {
             return !Equals(left, right);
+        }
+
+        public static AbilityElement BonusElement(AbilityElement element) {
+            switch (element) {
+                case AbilityElement.Earth:
+                    return AbilityElement.Fire;
+                case AbilityElement.Fire:
+                    return AbilityElement.Air;
+                case AbilityElement.Air:
+                    return AbilityElement.Water;
+                case AbilityElement.Water:
+                    return AbilityElement.Earth;
+                default:
+                    throw new InvalidOperationException("Invalid element type");
+            }
+        }
+
+        public static AbilityElement OppositeElement(AbilityElement element) {
+            switch (element) {
+                case AbilityElement.Earth:
+                    return AbilityElement.Air;
+                case AbilityElement.Fire:
+                    return AbilityElement.Water;
+                case AbilityElement.Air:
+                    return AbilityElement.Earth;
+                case AbilityElement.Water:
+                    return AbilityElement.Fire;
+                default:
+                    throw new InvalidOperationException("Invalid element type");
+            }
         }
     }
 }

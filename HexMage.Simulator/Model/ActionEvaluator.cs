@@ -54,21 +54,22 @@ namespace HexMage.Simulator.Model {
                     state.NextMobOrNewTurn();
                     break;
                 case UctActionType.AbilityUse:
-                    AssertValidAbilityUseAction(state, action);
+                    GameInvariants.AssertValidAbilityUseAction(state, action);
 
                     state.FastUse(action.AbilityId, action.MobId, action.TargetId);
                     break;
                 case UctActionType.AttackMove:
-                    AssertValidMoveAction(state, action);
-                    AssertValidAbilityUseAction(state, action);
+                    GameInvariants.AssertValidMoveAction(state, action);
+                    GameInvariants.AssertValidAbilityUseAction(state, action);
 
+                    // TODO - tohle uz tu neni potreba :)
                     Debug.Assert(state.State.AtCoord(action.Coord) == null, "Trying to move into a mob.");
                     state.FastMove(action.MobId, action.Coord);
                     state.FastUse(action.AbilityId, action.MobId, action.TargetId);
                     break;
                 case UctActionType.DefensiveMove:
                 case UctActionType.Move:
-                    AssertValidMoveAction(state, action);
+                    GameInvariants.AssertValidMoveAction(state, action);
 
                     // TODO - gameinstance co se jmenuje state?
                     //Debug.Assert(state.State.AtCoord(action.Coord) == null, "Trying to move into a mob.");
@@ -81,36 +82,5 @@ namespace HexMage.Simulator.Model {
             return state;
         }
 
-        [Conditional("DEBUG")]
-        public static void AssertValidAbilityUseAction(GameInstance game, UctAction action) {
-            var mobInstance = game.State.MobInstances[action.MobId];
-            var targetInstance = game.State.MobInstances[action.TargetId];
-            var abilityInfo = game.MobManager.Abilities[action.AbilityId];
-
-            AssertAndRecord(game, mobInstance.Ap >= abilityInfo.Cost, "mobInstance.Ap >= abilityInfo.Cost");
-            AssertAndRecord(game, mobInstance.Hp > 0, $"Using an ability with {mobInstance.Hp}HP");
-            AssertAndRecord(game, targetInstance.Hp > 0, $"Using an ability on a target with {mobInstance.Hp}HP");
-
-            var isVisible = game.Map.IsVisible(mobInstance.Coord, targetInstance.Coord);
-            AssertAndRecord(game, isVisible, "Target is not visible");
-            AssertAndRecord(game, abilityInfo.Range >= mobInstance.Coord.Distance(targetInstance.Coord), "abilityInfo.Range >= mobInstance.Coord.Distance(targetInstance.Coord)");
-        }
-
-        [Conditional("DEBUG")]
-        public static void AssertAndRecord(GameInstance game, bool condition, string message) {
-            if (!condition) {                
-                ReplayRecorder.Instance.SaveAndClear(game, 0);
-                
-                throw new InvariantViolationException(message);
-            }
-        }
-
-        [Conditional("DEBUG")]
-        public static void AssertValidMoveAction(GameInstance game, UctAction action) {
-            var atCoord = game.State.AtCoord(action.Coord);
-
-            Debug.Assert(atCoord != action.MobId, "Trying to move into the coord you're already standing on.");
-            Debug.Assert(atCoord == null, "Trying to move into a mob.");
-        }
     }
 }
