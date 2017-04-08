@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.PCG;
@@ -174,18 +175,17 @@ namespace HexMage.Simulator {
 
             // TODO - preferovat blizsi policka pri vyberu akci?
             foreach (var enemyId in state.MobManager.Mobs) {
-                var enemy = state.CachedMob(enemyId);
+                var target = state.CachedMob(enemyId);
 
-                if (!GameInvariants.IsTargetableNoSource(state, mob, enemy)) continue;
+                if (!GameInvariants.IsTargetableNoSource(state, mob, target)) continue;
 
                 AxialCoord myCoord = mobInstance.Coord;
                 AxialCoord? closestCoord = null;
                 int? distance = null;
                 int? chosenAbilityId = null;
-                int? targetId = null;
 
-                foreach (var coord in state.Map.AllCoords) {
-                    if (!state.Map.IsVisible(coord, enemy.MobInstance.Coord)) continue;
+                foreach (var coord in state.Map.EmptyCoords) {
+                    if (!state.Map.IsVisible(coord, target.MobInstance.Coord)) continue;
 
                     int remainingAp, possibleDistance;
                     if (!GameInvariants.CanMoveTo(state, mob, coord, out remainingAp, out possibleDistance)) continue;
@@ -193,16 +193,15 @@ namespace HexMage.Simulator {
                     foreach (var abilityId in mobInfo.Abilities) {
                         // TODO - remove this later when the bug is found
                         var ability = state.MobManager.Abilities[abilityId];
-                        int viewDistance = coord.Distance(enemy.MobInstance.Coord);
+                        int viewDistance = coord.Distance(target.MobInstance.Coord);
 
                         if (ability.Range < viewDistance) continue;
 
-                        if (!GameInvariants.IsAbilityUsableFrom(state, mob, coord, enemy, abilityId)) continue;
+                        if (!GameInvariants.IsAbilityUsableFrom(state, mob, coord, target, abilityId)) continue;
 
                         int myDistance = state.Pathfinder.Distance(myCoord, coord);
 
                         chosenAbilityId = abilityId;
-                        targetId = enemyId;
 
                         if (!closestCoord.HasValue) {
                             closestCoord = coord;
@@ -219,7 +218,7 @@ namespace HexMage.Simulator {
                         var action = UctAction.AttackMoveAction(mob.MobId,
                                                                 closestCoord.Value,
                                                                 chosenAbilityId.Value,
-                                                                targetId.Value);
+                                                                target.MobId);
 
                         GameInvariants.AssertValidAction(state, action);
 

@@ -18,6 +18,8 @@ namespace HexMage.Simulator.Pathfinding {
         public List<AxialCoord> BlueStartingPoints = new List<AxialCoord>();
         public List<AxialCoord> RedStartingPoints = new List<AxialCoord>();
 
+        public List<AxialCoord> EmptyCoords = new List<AxialCoord>();
+
         // TODO - remove Guid, it's no longer needed
         public Guid Guid = Guid.NewGuid();
 
@@ -113,23 +115,28 @@ namespace HexMage.Simulator.Pathfinding {
         }
 
         public void PrecomputeCubeLinedraw() {
-            foreach (var a in AllCoords)
-            foreach (var b in AllCoords) {
-                var result = ComputeCubeLinedraw(a, b);
-                var line = result.Select(x => x.ToAxial()).ToList();
+            foreach (var a in AllCoords) {
+                if (this[a] == HexType.Empty) {
+                    EmptyCoords.Add(a);
+                }
 
-                var key = CoordPair.Build(a, b);
+                foreach (var b in AllCoords) {
+                    var result = ComputeCubeLinedraw(a, b);
+                    var line = result.Select(x => x.ToAxial()).ToList();
 
-                _visibilityLines[key] = line;
+                    var key = CoordPair.Build(a, b);
 
-                var targetVisible = true;
-                foreach (var coord in line)
-                    if (this[coord] != HexType.Empty) {
-                        targetVisible = false;
-                        break;
-                    }
+                    _visibilityLines[key] = line;
 
-                _visibility[key] = targetVisible;
+                    var targetVisible = true;
+                    foreach (var coord in line)
+                        if (this[coord] != HexType.Empty) {
+                            targetVisible = false;
+                            break;
+                        }
+
+                    _visibility[key] = targetVisible;
+                }
             }
         }
 
