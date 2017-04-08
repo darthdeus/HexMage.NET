@@ -6,13 +6,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Color = Microsoft.Xna.Framework.Color;
 
-namespace HexMage.GUI
-{
-    /// <summary>
-    ///     This is the main type for your game.
-    /// </summary>
-    public class HexMageGame : Game
-    {
+namespace HexMage.GUI {
+    public class HexMageGame : Game {
         private GraphicsDeviceManager _graphics;
         private SceneManager _sceneManager;
 
@@ -51,15 +46,12 @@ namespace HexMage.GUI
 
             _assetManager.Preload();
             _assetManager.RegisterTexture(AssetManager.SolidGrayColor,
-                TextureGenerator.SolidColor(GraphicsDevice, 32, 32, Color.LightGray));
+                                          TextureGenerator.SolidColor(GraphicsDevice, 32, 32, Color.LightGray));
 
-            LogBox.Initialize(_assetManager.Font, 1200, _assetManager);
-            Utils.InitializeLoggerMainThread();          
-            Utils.RegisterLogger(LogBox.Instance);
+            Utils.InitializeLoggerMainThread();
             Utils.RegisterLogger(new StdoutLogger());
 
             _gameManager = new GameManager(_camera, _inputManager, _assetManager, _spriteBatch);
-            //_sceneManager = new SceneManager(new ArenaScene(_gameManager));
             _sceneManager = new SceneManager(new MapSelectionScene(_gameManager));
             _sceneManager.Initialize();
         }
@@ -83,6 +75,5 @@ namespace HexMage.GUI
 
             base.Draw(gameTime);
         }
-
     }
 }

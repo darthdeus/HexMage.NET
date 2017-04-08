@@ -112,7 +112,6 @@
     <Compile Include="UI\ElementMouseState.cs" />
     <Compile Include="UI\HorizontalLayout.cs" />
     <Compile Include="UI\Label.cs" />
-    <Compile Include="UI\LogBox.cs" />
     <Compile Include="UI\Panel.cs" />
     <Compile Include="UI\Separator.cs" />
     <Compile Include="UI\ShowOnHover.cs" />

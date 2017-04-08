@@ -362,7 +362,7 @@ namespace HexMage.GUI.Components {
                     var map = _gameInstance.Map;
 
                     var labelText = new StringBuilder();
-
+                    
                     // If there's no mob we can't calculate a distance from it
                     if (_gameInstance.TurnManager.CurrentMob.HasValue) {
                         var mobInstance = _gameInstance.State.MobInstances[_gameInstance.TurnManager.CurrentMob.Value];

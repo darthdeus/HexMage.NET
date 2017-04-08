@@ -19,7 +19,6 @@ namespace HexMage.GUI.Scenes {
         public readonly Dictionary<int, MobEntity> MobEntities = new Dictionary<int, MobEntity>();
 
         private GameBoardController _gameBoardController;
-        private LogBox _logBox;
         private Replay _replay;
 
         public ArenaScene(GameManager gameManager, Replay replay) : base(gameManager) {
@@ -60,12 +59,6 @@ namespace HexMage.GUI.Scenes {
             //_gameInstance.TurnManager.StartNextTurn(_gameInstance.Pathfinder);
 
             Camera2D.Instance.Translate = new Vector3(600, 500, 0);
-
-            _logBox = LogBox.Instance;
-            _logBox.Hidden = true;
-            _logBox.SortOrder = Camera2D.SortUI + 100;
-
-            AddAndInitializeRootEntity(_logBox, _assetManager);
 
             var gameBoardEntity = CreateRootEntity(Camera2D.SortBackground);
 
