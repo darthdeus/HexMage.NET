@@ -1,9 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using HexMage.Simulator.AI;
 
 namespace HexMage.Simulator.Model {
     public static class GameInvariants {
+        [Conditional("DEBUG")]
+        public static void AssertValidActions(GameInstance game, List<UctAction> actions) {
+            foreach (var action in actions) {
+                AssertValidAction(game, action);
+            }
+        }
+
         [Conditional("DEBUG")]
         public static void AssertValidAction(GameInstance game, UctAction action) {
             switch (action.Type) {
@@ -45,7 +53,9 @@ namespace HexMage.Simulator.Model {
             var isVisible = game.Map.IsVisible(mobInstance.Coord, targetInstance.Coord);
             // TODO: do invariant checku se pise pozitivni nebo negativni cas?
             AssertAndRecord(game, action, isVisible, "Target is not visible");
-            AssertAndRecord(game, action, abilityInfo.Range >= mobInstance.Coord.Distance(targetInstance.Coord),
+
+            int distance = mobInstance.Coord.Distance(targetInstance.Coord);
+            AssertAndRecord(game, action, abilityInfo.Range >= distance,
                             "abilityInfo.Range >= mobInstance.Coord.Distance(targetInstance.Coord)");
         }
 
@@ -106,9 +116,12 @@ namespace HexMage.Simulator.Model {
                                                int abilityId) {
             var ability = game.MobManager.Abilities[abilityId];
 
+            int remainingAp = mob.MobInstance.Ap - game.Pathfinder.Distance(mob.MobInstance.Coord,
+                                                                            from);
+
             // TODO - kontrolovat i ze na to policko dojdu?
             bool withinRange = ability.Range >= from.Distance(target.MobInstance.Coord);
-            bool enoughAp = mob.MobInstance.Ap >= ability.Cost;
+            bool enoughAp = remainingAp >= ability.Cost;
 
             return withinRange && enoughAp;
         }
@@ -124,7 +137,7 @@ namespace HexMage.Simulator.Model {
                                         bool checkVisibility = true) {
             bool isVisible = !checkVisibility || game.Map.IsVisible(mob.MobInstance.Coord, target.MobInstance.Coord);
 
-         
+
             return isVisible && IsTargetableNoSource(game, mob, target);
         }
 

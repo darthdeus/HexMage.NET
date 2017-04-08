@@ -286,6 +286,8 @@ namespace HexMage.Simulator {
                 }
             }
 
+            GameInvariants.AssertValidActions(state, result);
+
             return result;
         }
     }
