@@ -21,7 +21,7 @@ namespace HexMage.Simulator.Tests {
 
             game.PrepareEverything();
 
-            game.FastUse(abilityId, m1, m2);
+            ActionEvaluator.FastUse(game, abilityId, m1, m2);
 
             var fireDebuff = game.State.MobInstances[m2].Buff;
             Assert.AreEqual(2, fireDebuff.Lifetime);

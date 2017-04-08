@@ -18,7 +18,7 @@ namespace HexMage.Simulator.Tests {
             game.State.SlowUpdateIsFinished(game.MobManager);
             Assert.IsFalse(game.IsFinished);
 
-            game.FastUse(a1, m1, m2);
+            ActionEvaluator.FastUse(game, a1, m1, m2);
 
             game.State.SlowUpdateIsFinished(game.MobManager);
             Assert.IsTrue(game.IsFinished);
@@ -37,7 +37,7 @@ namespace HexMage.Simulator.Tests {
 
             Assert.IsFalse(game.IsFinished);
 
-            game.FastUse(a1, m1, m2);
+            ActionEvaluator.FastUse(game, a1, m1, m2);
             Assert.IsTrue(game.IsFinished);
         }
 
@@ -54,7 +54,7 @@ namespace HexMage.Simulator.Tests {
             game.PrepareEverything();
             Assert.IsFalse(game.IsFinished);
 
-            game.FastUse(a1, m1, m2);
+            ActionEvaluator.FastUse(game, a1, m1, m2);
             Assert.IsFalse(game.IsFinished);
 
             game.NextMobOrNewTurn();

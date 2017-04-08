@@ -82,14 +82,18 @@ namespace HexMage.Simulator.Model {
                     break;
 
                 case UctActionType.AttackMove:
-                    ActionEvaluator.AssertValidMoveAction(_gameInstance, action);
+                    // TODO - tohle se deje uz jinde
+                    GameInvariants.AssertValidMoveAction(_gameInstance, action);
+
                     await SlowBroadcastMobMoved(action.MobId, action.Coord);
                     await SlowBroadcastAbilityUsed(action.MobId, action.TargetId, action.AbilityId);
                     break;
 
                 case UctActionType.DefensiveMove:
                 case UctActionType.Move:
-                    ActionEvaluator.AssertValidMoveAction(_gameInstance, action);
+                    // TODO - tohle se deje uz jinde
+                    GameInvariants.AssertValidMoveAction(_gameInstance, action);
+
                     await SlowBroadcastMobMoved(action.MobId, action.Coord);
                     break;
 

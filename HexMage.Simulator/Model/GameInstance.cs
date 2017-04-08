@@ -125,65 +125,6 @@ namespace HexMage.Simulator {
                 }
             }
         }
-
-        public void FastUse(int abilityId, int mobId, int targetId) {
-            var target = State.MobInstances[targetId];
-
-            Debug.Assert(MobManager.AbilityForId(abilityId).Cooldown == 0,
-                         "Somehow generated an ability with non-zero cooldown.");
-            Debug.Assert(State.Cooldowns[abilityId] == 0, "Trying to use an ability with non-zero cooldown.");
-            Debug.Assert(State.MobInstances[mobId].Hp > 0, "Source is dead");
-            Debug.Assert(target.Hp > 0, "Target is dead.");
-
-            var ability = MobManager.AbilityForId(abilityId);
-
-            Debug.Assert(ability.Cooldown == 0);
-            State.Cooldowns[abilityId] = ability.Cooldown;
-            Debug.Assert(State.Cooldowns[abilityId] == 0);
-            Debug.Assert(ability.Cooldown == 0);
-
-            TargetHit(abilityId, mobId, targetId);
-        }
-
-        private void TargetHit(int abilityId, int mobId, int targetId) {
-            var ability = MobManager.AbilityForId(abilityId);
-
-            Debug.Assert(ability.Dmg > 0);
-            State.ChangeMobHp(this, targetId, -ability.Dmg);
-
-            var targetInstance = State.MobInstances[targetId];
-            var targetInfo = MobManager.MobInfos[targetId];
-
-            Constants.WriteLogLine($"Did {ability.Dmg} damage, HP: {targetInstance.Hp}/{targetInfo.MaxHp}");
-
-            if (ability.Buff.IsZero) {
-                targetInstance.Buff = Buff.Combine(targetInstance.Buff, ability.ElementalEffect);
-            } else {
-                targetInstance.Buff = ability.Buff;
-            }
-
-            State.MobInstances[targetId] = targetInstance;
-            //targetInstance.Buffs.Add(ability.ElementalEffect);
-            //foreach (var abilityBuff in ability.Buffs) {
-            //    // TODO - handle lifetimes
-            //    targetInstance.Buffs.Add(abilityBuff);
-            //}
-
-            if (!ability.AreaBuff.IsZero) {
-                var copy = ability.AreaBuff;
-                copy.Coord = targetInstance.Coord;
-                Map.AreaBuffs.Add(copy);
-            }
-
-            if (State.MobInstances[mobId].Ap < ability.Cost) {
-                ReplayRecorder.Instance.SaveAndClear(this, 0);
-                throw new InvalidOperationException("Trying to use an ability with not enough AP.");
-            }
-            Debug.Assert(State.MobInstances[mobId].Ap >= ability.Cost, "State.MobInstances[mobId].Ap >= ability.Cost");
-
-            State.ChangeMobAp(mobId, -ability.Cost);
-        }
-
         public GameInstance CopyStateOnly() {
             var game = new GameInstance(Map.Size, Map, MobManager, null);
             game.TurnManager = TurnManager.DeepCopy(game);
@@ -219,36 +160,6 @@ namespace HexMage.Simulator {
             Pathfinder.Reset();
 
             State.SlowUpdateIsFinished(MobManager);
-        }
-
-        private AbilityElement BonusElement(AbilityElement element) {
-            switch (element) {
-                case AbilityElement.Earth:
-                    return AbilityElement.Fire;
-                case AbilityElement.Fire:
-                    return AbilityElement.Air;
-                case AbilityElement.Air:
-                    return AbilityElement.Water;
-                case AbilityElement.Water:
-                    return AbilityElement.Earth;
-                default:
-                    throw new InvalidOperationException("Invalid element type");
-            }
-        }
-
-        private AbilityElement OppositeElement(AbilityElement element) {
-            switch (element) {
-                case AbilityElement.Earth:
-                    return AbilityElement.Air;
-                case AbilityElement.Fire:
-                    return AbilityElement.Water;
-                case AbilityElement.Air:
-                    return AbilityElement.Earth;
-                case AbilityElement.Water:
-                    return AbilityElement.Fire;
-                default:
-                    throw new InvalidOperationException("Invalid element type");
-            }
         }
 
         public float PercentageHp(TeamColor team) {
@@ -290,10 +201,6 @@ namespace HexMage.Simulator {
             MobManager.Abilities.Add(abilityInfo);
             State.Cooldowns.Add(0);
             return MobManager.Abilities.Count - 1;
-        }
-
-        public void FastMove(int mobId, AxialCoord coord) {
-            State.FastMoveMob(mobId, coord);
         }
 
         public CachedMob CachedMob(int mobId) {

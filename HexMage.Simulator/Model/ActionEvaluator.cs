@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using HexMage.Simulator.AI;
 
 namespace HexMage.Simulator.Model {
@@ -37,6 +34,7 @@ namespace HexMage.Simulator.Model {
         }
 
         public static GameInstance FNoCopy(GameInstance state, UctAction action) {
+            // TODO - atomic?
             Actions++;
             ActionCounts[action.Type]++;
 
@@ -56,24 +54,20 @@ namespace HexMage.Simulator.Model {
                 case UctActionType.AbilityUse:
                     GameInvariants.AssertValidAbilityUseAction(state, action);
 
-                    state.FastUse(action.AbilityId, action.MobId, action.TargetId);
+                    FastUse(state, action.AbilityId, action.MobId, action.TargetId);
                     break;
                 case UctActionType.AttackMove:
                     GameInvariants.AssertValidMoveAction(state, action);
                     GameInvariants.AssertValidAbilityUseAction(state, action);
 
-                    // TODO - tohle uz tu neni potreba :)
-                    Debug.Assert(state.State.AtCoord(action.Coord) == null, "Trying to move into a mob.");
-                    state.FastMove(action.MobId, action.Coord);
-                    state.FastUse(action.AbilityId, action.MobId, action.TargetId);
+                    FastMove(state, action.MobId, action.Coord);
+                    FastUse(state, action.AbilityId, action.MobId, action.TargetId);
                     break;
                 case UctActionType.DefensiveMove:
                 case UctActionType.Move:
                     GameInvariants.AssertValidMoveAction(state, action);
 
-                    // TODO - gameinstance co se jmenuje state?
-                    //Debug.Assert(state.State.AtCoord(action.Coord) == null, "Trying to move into a mob.");
-                    state.FastMove(action.MobId, action.Coord);
+                    FastMove(state, action.MobId, action.Coord);
                     break;
                 default:
                     throw new InvalidOperationException($"Invalid value of {action.Type}");
@@ -82,5 +76,62 @@ namespace HexMage.Simulator.Model {
             return state;
         }
 
+        public static void FastMove(GameInstance game, int mobId, AxialCoord coord) {
+            var mobInstance = game.State.MobInstances[mobId];
+
+            int distance = mobInstance.Coord.Distance(coord);
+
+            game.State.ChangeMobAp(mobId, -distance);
+            game.State.SetMobPosition(mobId, coord);
+        }
+
+
+        public static void FastUse(GameInstance game, int abilityId, int mobId, int targetId) {
+            var ability = game.MobManager.AbilityForId(abilityId);
+
+            game.State.Cooldowns[abilityId] = ability.Cooldown;
+
+            TargetHit(game, abilityId, mobId, targetId);
+        }
+
+        private static void TargetHit(GameInstance game, int abilityId, int mobId, int targetId) {
+            var ability = game.MobManager.AbilityForId(abilityId);
+
+            Debug.Assert(ability.Dmg > 0);
+            game.State.ChangeMobHp(game, targetId, -ability.Dmg);
+
+            var targetInstance = game.State.MobInstances[targetId];
+            var targetInfo = game.MobManager.MobInfos[targetId];
+
+            Constants.WriteLogLine($"Did {ability.Dmg} damage, HP: {targetInstance.Hp}/{targetInfo.MaxHp}");
+
+            if (ability.Buff.IsZero) {
+                targetInstance.Buff = Buff.Combine(targetInstance.Buff, ability.ElementalEffect);
+            } else {
+                targetInstance.Buff = ability.Buff;
+            }
+
+            game.State.MobInstances[targetId] = targetInstance;
+            //targetInstance.Buffs.Add(ability.ElementalEffect);
+            //foreach (var abilityBuff in ability.Buffs) {
+            //    // TODO - handle lifetimes
+            //    targetInstance.Buffs.Add(abilityBuff);
+            //}
+
+            if (!ability.AreaBuff.IsZero) {
+                var copy = ability.AreaBuff;
+                copy.Coord = targetInstance.Coord;
+                game.Map.AreaBuffs.Add(copy);
+            }
+
+            if (game.State.MobInstances[mobId].Ap < ability.Cost) {
+                ReplayRecorder.Instance.SaveAndClear(game, 0);
+                throw new InvalidOperationException("Trying to use an ability with not enough AP.");
+            }
+            Debug.Assert(game.State.MobInstances[mobId].Ap >= ability.Cost,
+                         "State.MobInstances[mobId].Ap >= ability.Cost");
+
+            game.State.ChangeMobAp(mobId, -ability.Cost);
+        }
     }
 }

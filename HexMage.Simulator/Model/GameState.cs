@@ -29,20 +29,6 @@ namespace HexMage.Simulator {
             return MobInstances[mobId].Hp > 0;
         }
 
-        public void FastMoveMob(int mobId, AxialCoord pos) {
-            var mobInstance = MobInstances[mobId];
-
-            int distance = mobInstance.Coord.Distance(pos);
-
-            Debug.Assert(distance <= mobInstance.Ap, "Trying to move a mob that doesn't have enough AP.");
-            //Debug.Assert(Map[pos] == HexType.Empty, "Trying to move a mob into a wall.");
-            Debug.Assert(AtCoord(pos) == null, "Trying to move into a mob.");
-
-            // TODO - odebrat dvojte kopirovani tady
-            ChangeMobAp(mobId, -distance);
-            SetMobPosition(mobId, pos);
-        }
-
         public void LowerCooldowns() {
             for (int i = 0; i < Cooldowns.Count; i++) {
                 if (Cooldowns[i] > 0) {
