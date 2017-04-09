@@ -11,7 +11,7 @@ namespace HexMage.Simulator.AI {
 
         public void FastPlayTurn(GameEventHub eventHub) {
             do {
-                var action = ActionGenerator.DefaultPolicyAction(_gameInstance);
+                var action = ActionGenerator.RuleBasedAction(_gameInstance);
 
                 if (action.Type == UctActionType.EndTurn)
                     break;
@@ -24,7 +24,7 @@ namespace HexMage.Simulator.AI {
 
         public async Task SlowPlayTurn(GameEventHub eventHub) {
             do {
-                var action = ActionGenerator.DefaultPolicyAction(_gameInstance);
+                var action = ActionGenerator.RuleBasedAction(_gameInstance);
 
                 if (action.Type == UctActionType.EndTurn)
                     break;

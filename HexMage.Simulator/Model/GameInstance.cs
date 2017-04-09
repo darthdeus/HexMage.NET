@@ -20,13 +20,18 @@ namespace HexMage.Simulator {
 
         public int Size { get; set; }
 
+        [JsonIgnore]
         public bool AllDead => State.RedAlive == 0 && State.BlueAlive == 0;
+        [JsonIgnore]
         public bool IsFinished => State.IsFinished;
 
+        [JsonIgnore]
         public IMobController CurrentController
             => CurrentMob != null ? MobManager.Teams[MobManager.MobInfos[CurrentMob.Value].Team] : null;
 
-        public int? CurrentMob {
+        [JsonIgnore]
+        public int? CurrentMob
+        {
             get {
                 if (!State.CurrentMobIndex.HasValue) {
                     return null;
@@ -38,6 +43,8 @@ namespace HexMage.Simulator {
             }
         }
 
+        [JsonConstructor]
+        public GameInstance() {}
 
         public GameInstance(Map map, MobManager mobManager) {
             Map = map;
@@ -86,6 +93,7 @@ namespace HexMage.Simulator {
             State.Reset(this);
         }
 
+        [JsonIgnore]
         public TeamColor? CurrentTeam {
             get {
                 var currentMob = CurrentMob;
@@ -98,6 +106,7 @@ namespace HexMage.Simulator {
             }
         }
 
+        [JsonIgnore]
         public TeamColor? VictoryTeam {
             get {
 #warning TODO - RedAlive/BlueAlive je obcas i zaporne!
@@ -115,6 +124,7 @@ namespace HexMage.Simulator {
             }
         }
 
+        [JsonIgnore]
         public IMobController VictoryController {
             get {
                 if (VictoryTeam.HasValue) {
@@ -125,6 +135,7 @@ namespace HexMage.Simulator {
             }
         }
 
+        [JsonIgnore]
         public IMobController LoserController {
             get {
                 if (VictoryTeam.HasValue) {

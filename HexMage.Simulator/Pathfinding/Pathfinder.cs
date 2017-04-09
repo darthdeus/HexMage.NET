@@ -2,21 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using HexMage.Simulator.Model;
+using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
     public class Pathfinder {
-        private readonly GameInstance _gameInstance;
+        public HexMap<HexMap<Path>> AllPaths;
         private readonly List<AxialCoord> _neighbourDiffs;
-        public readonly HexMap<HexMap<Path>> AllPaths;
-        private int Size => _gameInstance.Size;
 
         private Dictionary<int, List<AxialCoord>> _precomputedPaths =
             new Dictionary<int, List<AxialCoord>>();
 
-        public Pathfinder(GameInstance gameInstance) {
-            _gameInstance = gameInstance;
-            AllPaths = new HexMap<HexMap<Path>>(_gameInstance.Size);
 
+        [JsonIgnore] public GameInstance Game;
+
+        [JsonIgnore]
+        private int Size => Game.Size;
+
+        [JsonConstructor]
+        public Pathfinder() {
             _neighbourDiffs = new List<AxialCoord> {
                 new AxialCoord(-1, 0),
                 new AxialCoord(1, 0),
@@ -27,8 +30,13 @@ namespace HexMage.Simulator {
             };
         }
 
-        private Pathfinder(GameInstance gameInstance, List<AxialCoord> neighbourDiffs, HexMap<HexMap<Path>> allPaths) {
-            _gameInstance = gameInstance;
+        public Pathfinder(GameInstance game) : this() {
+            Game = game;
+            AllPaths = new HexMap<HexMap<Path>>(Game.Size);
+        }
+
+        private Pathfinder(GameInstance game, List<AxialCoord> neighbourDiffs, HexMap<HexMap<Path>> allPaths) {
+            Game = game;
             _neighbourDiffs = neighbourDiffs;
             AllPaths = allPaths;
         }
@@ -43,15 +51,15 @@ namespace HexMage.Simulator {
             AxialCoord? furthestPoint = null;
             foreach (var coord in path) {
                 int distance = Distance(mob.MobInstance.Coord, coord);
-                var mobAtCoord = _gameInstance.State.AtCoord(coord, true);
+                var mobAtCoord = Game.State.AtCoord(coord, true);
 
                 if (distance <= mob.MobInstance.Ap) {
                     if (mobAtCoord == null) {
                         furthestPoint = coord;
                     } else {
                         var coordMobId = mobAtCoord.Value;
-                        var coordInfo = _gameInstance.MobManager.MobInfos[coordMobId];
-                        var coordhp = _gameInstance.State.MobInstances[coordMobId].Hp;
+                        var coordInfo = Game.MobManager.MobInfos[coordMobId];
+                        var coordhp = Game.State.MobInstances[coordMobId].Hp;
                         //Console.WriteLine($"NEKDO MI TAM STOJI, JA: {mob.MobInfo.Team}, AP: {mob.MobInstance.Ap}, PRD: {coordInfo.Team}, {coordhp}HP");
                     }
                 } else {
@@ -128,8 +136,8 @@ namespace HexMage.Simulator {
 
 
         private bool IsWalkable(AxialCoord coord) {
-            return IsValidCoord(coord) && (_gameInstance.Map[coord] == HexType.Empty) &&
-                   (_gameInstance.State.AtCoord(coord, true) == null);
+            return IsValidCoord(coord) && (Game.Map[coord] == HexType.Empty) &&
+                   (Game.State.AtCoord(coord, true) == null);
         }
 
         public void PathfindDistanceAll() {
@@ -139,7 +147,7 @@ namespace HexMage.Simulator {
             var sw = Stopwatch.StartNew();
 
             foreach (var source in AllPaths.AllCoords) {
-                AllPaths[source] = new HexMap<Path>(_gameInstance.Size);
+                AllPaths[source] = new HexMap<Path>(Game.Size);
                 PathfindDistanceOnlyFrom(AllPaths[source], source);
                 done++;
                 if (done == 100) {
@@ -155,6 +163,8 @@ namespace HexMage.Simulator {
             foreach (var source in AllPaths.AllCoords) {
                 foreach (var destination in AllPaths.AllCoords) {
                     var key = CoordPair.Build(source, destination);
+
+                    if (_precomputedPaths.ContainsKey(key)) continue;
 
                     // TODO - path returns a reversed path including the starting point
                     var path = PathTo(source, destination);
@@ -173,7 +183,7 @@ namespace HexMage.Simulator {
 
         public void PathfindDistanceOnlyFrom(HexMap<Path> distanceMap, AxialCoord start) {
             var queue = new Queue<AxialCoord>();
-            var states = new HexMap<VertexState>(_gameInstance.Size);
+            var states = new HexMap<VertexState>(Game.Size);
 
             foreach (var coord in distanceMap.AllCoords) {
                 distanceMap[coord] = new Path() {Reachable = false, Distance = int.MaxValue};
@@ -203,7 +213,7 @@ namespace HexMage.Simulator {
                 foreach (var diff in _neighbourDiffs) {
                     var neighbour = current + diff;
 
-                    if (IsValidCoord(neighbour) && _gameInstance.Map[neighbour] != HexType.Wall) {
+                    if (IsValidCoord(neighbour) && Game.Map[neighbour] != HexType.Wall) {
                         // We can immediately skip the starting position
                         if (neighbour == start) continue;
 
@@ -256,7 +266,7 @@ namespace HexMage.Simulator {
             //int distance = (Math.Abs(c.X)
             //                + Math.Abs(c.X + c.Y)
             //                + Math.Abs(c.Y)) / 2;
-            return distance <= _gameInstance.Size;
+            return distance <= Game.Size;
 
             //return _map.AxialDistance(c, new AxialCoord(0, 0)) <= _map.Size;
             //return _map.CubeDistance(new CubeCoord(0, 0, 0), c) <= _map.Size;

@@ -12,13 +12,11 @@ using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
     public class Replay {
-        public Map Map;
-        public MobManager MobManager;
+        public GameInstance Game;
         public List<UctAction> Actions;
 
-        public Replay(Map map, MobManager mobManager, List<UctAction> actions) {
-            Map = map;
-            MobManager = mobManager;
+        public Replay(GameInstance game, List<UctAction> actions) {
+            Game = game;
             Actions = actions;
         }
     }
@@ -48,8 +46,8 @@ namespace HexMage.Simulator {
                 Directory.CreateDirectory(ReplayDirectory);
             }
 
-            var replay = new Replay(game.Map, game.MobManager, Actions);
-            var contents = JsonConvert.SerializeObject(replay);
+            var replay = new Replay(game, Actions);
+            var contents = JsonConvert.SerializeObject(replay, Formatting.Indented);
 
             using (var writer = new StreamWriter($@"{ReplayDirectory}\replay{index}.json")) {
                 writer.Write(contents);
@@ -64,9 +62,11 @@ namespace HexMage.Simulator {
             using (var reader = new StreamReader($@"{ReplayDirectory}\replay{index}.json")) {
                 var replay = JsonConvert.DeserializeObject<Replay>(reader.ReadToEnd());
 
-                foreach (var ability in replay.MobManager.Abilities) {
-                    Debug.Assert(ability.Cooldown == 0, "ability.Cooldown == 0");
-                }
+                replay.Game.TurnManager.Game = replay.Game;
+                replay.Game.Pathfinder.Game = replay.Game;
+                replay.Game.Pathfinder.AllPaths = new HexMap<HexMap<Path>>(replay.Game.Size);
+                replay.Game.Pathfinder.PathfindDistanceAll();
+
                 return replay;
             }
         }

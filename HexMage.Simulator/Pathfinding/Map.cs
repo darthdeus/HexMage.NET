@@ -8,16 +8,19 @@ using Newtonsoft.Json;
 
 namespace HexMage.Simulator.Pathfinding {
     public class Map : IDeepCopyable<Map> {
-        [JsonProperty] private readonly HexMap<HexType> _hexes;
+        [JsonProperty]
+        private readonly HexMap<HexType> _hexes;
 
-        [JsonIgnore] private Dictionary<int, bool> _visibility = new Dictionary<int, bool>();
+        [JsonProperty]
+        private Dictionary<int, bool> _visibility = new Dictionary<int, bool>();
 
-        [JsonIgnore] private Dictionary<int, List<AxialCoord>> _visibilityLines =
+        [JsonProperty]
+        private Dictionary<int, List<AxialCoord>> _visibilityLines =
             new Dictionary<int, List<AxialCoord>>();
 
         public List<AxialCoord> BlueStartingPoints = new List<AxialCoord>();
         public List<AxialCoord> RedStartingPoints = new List<AxialCoord>();
-
+        
         public List<AxialCoord> EmptyCoords = new List<AxialCoord>();
 
         public int Size { get; set; }

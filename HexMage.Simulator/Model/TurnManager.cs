@@ -2,45 +2,47 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
     public class TurnManager {
-        private readonly GameInstance _game;
         public List<int> PresortedOrder;
 
-        private MobManager MobManager => _game.MobManager;
-        private GameState State => _game.State;
+        [JsonIgnore] public GameInstance Game;
+
+        [JsonConstructor]
+        public TurnManager() {}
 
         public TurnManager(GameInstance game) {
-            _game = game;
+            Game = game;
         }
 
         /// <summary>
         /// Prepare turn order for the initial mob configuration
         /// </summary>
         public void PresortTurnOrder() {
-            PresortedOrder = MobManager.Mobs.ToList();
+            PresortedOrder = Game.MobManager.Mobs.ToList();
             PresortedOrder.Sort((a, b) => {
-                var aInfo = MobManager.MobInfos[a];
-                var bInfo = MobManager.MobInfos[b];
+                var aInfo = Game.MobManager.MobInfos[a];
+                var bInfo = Game.MobManager.MobInfos[b];
                 return aInfo.Iniciative.CompareTo(bInfo.Iniciative);
             });
 
-            State.CurrentMobIndex = 0;
+            Game.State.CurrentMobIndex = 0;
         }
 
         public void NextMobOrNewTurn() {
-            var currentMobIndex = State.CurrentMobIndex;
+            var currentMobIndex = Game.State.CurrentMobIndex;
             if (!currentMobIndex.HasValue)
                 throw new InvalidOperationException("CurrentMob has no value but trying to move to the next.");
 
-            if (currentMobIndex.Value >= State.TurnOrder.Count - 1) {
-                StartNextTurn(State);
+            if (currentMobIndex.Value >= Game.State.TurnOrder.Count - 1) {
+                StartNextTurn(Game.State);
             } else {
-                State.CurrentMobIndex = currentMobIndex.Value + 1;
+                Game.State.CurrentMobIndex = currentMobIndex.Value + 1;
 
-                Debug.Assert(_game.CurrentMob.HasValue, "There's no current mob but still trying to move to one.");
-                var mobInstance = State.MobInstances[_game.CurrentMob.Value];
+                Debug.Assert(Game.CurrentMob.HasValue, "There's no current mob but still trying to move to one.");
+                var mobInstance = Game.State.MobInstances[Game.CurrentMob.Value];
                 if (mobInstance.Hp <= 0) NextMobOrNewTurn();
             }
         }
@@ -62,10 +64,10 @@ namespace HexMage.Simulator {
 
         private void StartNextTurn(GameState state) {
             for (int i = 0; i < state.MobInstances.Length; i++) {
-                state.MobInstances[i].Ap = MobManager.MobInfos[i].MaxAp;
+                state.MobInstances[i].Ap = Game.MobManager.MobInfos[i].MaxAp;
             }
 
-            state.ApplyDots(_game.Map, _game);
+            state.ApplyDots(Game.Map, Game);
 
             foreach (var mobInstance in state.MobInstances) {
                 Debug.Assert(mobInstance.Hp >= 0, "mobInstance.Hp >= 0");
@@ -78,8 +80,8 @@ namespace HexMage.Simulator {
             state.CurrentMobIndex = 0;
 
             // TODO: wut, ma tu tohle vubec byt?
-            if (_game.CurrentMob.HasValue) {
-                Debug.Assert(state.MobInstances[_game.CurrentMob.Value].Hp > 0, "Current mob is dead");
+            if (Game.CurrentMob.HasValue) {
+                Debug.Assert(state.MobInstances[Game.CurrentMob.Value].Hp > 0, "Current mob is dead");
             }
         }
     }

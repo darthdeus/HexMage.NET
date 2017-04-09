@@ -21,11 +21,10 @@ namespace HexMage.Simulator {
         // TODO - pole lepsi?
         //[JsonIgnore] public Dictionary<int, AxialCoord> MobPositions = new Dictionary<int, AxialCoord>();
         public int RedAlive = 0;
-
         public int BlueAlive = 0;
 
+        [JsonIgnore]
         public bool IsFinished => RedAlive <= 0 || BlueAlive <= 0;
-
 
         public bool IsAlive(int mobId) {
             return MobInstances[mobId].Hp > 0;

@@ -5,14 +5,12 @@ using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
     public class HexMap<T> : IDeepCopyable<HexMap<T>> {
-        [JsonProperty]
-        private readonly T[,] _data;
+        [JsonProperty] private readonly T[,] _data;
 
-        [JsonProperty]
-        public readonly int Size;
+        [JsonProperty] public readonly int Size;
 
         [JsonConstructor]
-        public HexMap() {}
+        public HexMap() { }
 
         public HexMap(int size) {
             Debug.Assert(size > 0);
@@ -33,6 +31,19 @@ namespace HexMage.Simulator {
         private static readonly Dictionary<int, List<AxialCoord>> _allCoordDictionary =
             new Dictionary<int, List<AxialCoord>>();
 
+        // TODO - tohle by melo byt mnohem lepe udelana globalni cache (nebo thread local?)
+        public List<AxialCoord> AllCoords {
+            get {
+                lock (_allCoordDictionary) {
+                    if (!_allCoordDictionary.ContainsKey(Size)) {
+                        _allCoordDictionary[Size] = CalculateAllCoords(Size);
+                    }
+                }
+
+                return _allCoordDictionary[Size];
+            }
+        }
+
         private List<AxialCoord> CalculateAllCoords(int size) {
             var result = new List<AxialCoord>();
 
@@ -49,19 +60,6 @@ namespace HexMage.Simulator {
                 }
             }
             return result;
-        }
-
-        // TODO - tohle by melo byt mnohem lepe udelana globalni cache (nebo thread local?)
-        public List<AxialCoord> AllCoords {
-            get {
-                lock (_allCoordDictionary) {
-                    if (!_allCoordDictionary.ContainsKey(Size)) {
-                        _allCoordDictionary[Size] = CalculateAllCoords(Size);
-                    }
-                }
-
-                return _allCoordDictionary[Size];
-            }
         }
 
         public void Initialize(Func<T> builder) {

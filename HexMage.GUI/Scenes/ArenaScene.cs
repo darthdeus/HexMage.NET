@@ -24,9 +24,7 @@ namespace HexMage.GUI.Scenes {
         public ArenaScene(GameManager gameManager, Replay replay) : base(gameManager) {
             _replay = replay;
 
-            _gameInstance = new GameInstance(replay.Map, replay.MobManager);
-            _gameInstance.PrepareEverything();
-            _gameInstance.Reset();
+            _gameInstance = replay.Game;
 
             _gameInstance.MobManager.Teams[TeamColor.Red] = new ReplayController();
             _gameInstance.MobManager.Teams[TeamColor.Blue] = new ReplayController();

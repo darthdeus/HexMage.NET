@@ -42,8 +42,10 @@ namespace HexMage.Simulator.AI {
 
             //throw new InvalidOperationException();
 
-            var actions = SelectBestActions(root);
-            return new UctSearchResult(actions, (double) stopwatch.ElapsedMilliseconds / (double) totalIterations);
+            var actions = SelectBestActions(root);            
+
+            var millisecondsPerIteration = (double) stopwatch.ElapsedMilliseconds / (double) totalIterations;
+            return new UctSearchResult(actions, millisecondsPerIteration);
         }
 
         public static float OneIteration(UctNode root, TeamColor startingTeam) {
@@ -131,9 +133,20 @@ namespace HexMage.Simulator.AI {
             int iterations = maxDefaultPolicyIterations;
 
             ReplayRecorder.Instance.Clear();
+            bool wasMove = false;
 
             while (!copy.IsFinished && iterations-- > 0) {
                 var action = ActionGenerator.DefaultPolicyAction(copy);
+                if (action.Type == UctActionType.Move) {
+                    if (wasMove) {
+                        action = UctAction.EndTurnAction();
+                    }
+                    wasMove = true;
+                }
+
+                if (action.Type == UctActionType.EndTurn) {
+                    wasMove = false;
+                }
 
                 if (action.Type == UctActionType.Null) {
                     throw new InvalidOperationException();
@@ -146,7 +159,7 @@ namespace HexMage.Simulator.AI {
             }
 
             if (iterations <= 0) {
-                ReplayRecorder.Instance.SaveAndClear(copy, 0);
+                ReplayRecorder.Instance.SaveAndClear(game, 0);
                 throw new InvariantViolationException("MCTS playout timeout");
                 ReplayRecorder.Instance.SaveAndClear(game);
                 Utils.Log(LogSeverity.Error, nameof(UctAlgorithm),
@@ -173,7 +186,7 @@ namespace HexMage.Simulator.AI {
                     if (startingTeam == victoryTeam.Value) {
                         result = 1;
                     } else {
-                        result = -1;
+                        result = 0;
                     }
                 } else {
                     result = 0;
@@ -197,7 +210,7 @@ namespace HexMage.Simulator.AI {
                     bool teamColorChanged = node.State.CurrentTeam != node.State.State.LastTeamColor;
 
                     if (teamColorChanged) {
-                        delta = -delta;
+                        //delta = -delta;
                     }
                 }
             }
@@ -228,12 +241,16 @@ namespace HexMage.Simulator.AI {
                     }
                 }
 
+                if (max.Q / max.N < 0.1) {
+                    Console.WriteLine($"Chooosing bad action {max.Q} / {max.N}");
+                }
+
                 if (max.Action.Type != UctActionType.EndTurn) {
                     result.Add(max.Action);
                 }
 
                 current = max;
-            } while (current.Action.Type != UctActionType.EndTurn);
+            } while (current.Action.Type != UctActionType.EndTurn);            
 
             return result;
         }

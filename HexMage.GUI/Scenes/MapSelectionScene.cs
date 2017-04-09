@@ -123,9 +123,7 @@ namespace HexMage.GUI.Scenes {
                 if (InputManager.Instance.IsKeyJustPressed(Keys.T)) {
                     var replay = ReplayRecorder.Instance.Load(0);
 
-                    var game = new GameInstance(replay.Map, replay.MobManager);
-                    game.PrepareEverything();
-                    game.Reset();
+                    var game = replay.Game;
 
                     game.MobManager.Teams[TeamColor.Red] = new AiRuleBasedController(game);
                     game.MobManager.Teams[TeamColor.Blue] = new AiRuleBasedController(game);
