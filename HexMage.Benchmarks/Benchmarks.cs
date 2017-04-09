@@ -17,7 +17,7 @@ namespace HexMage.Benchmarks {
             var dna = new DNA(2, 2);
             dna.Randomize();
 
-            const string mapFilename = @"C: \Users\darth\Documents\map.json";
+            const string mapFilename = @"data/map.json";
             var map = JsonConvert.DeserializeObject<Map>(File.ReadAllText(mapFilename));
             //var map = new Map(5);
 
