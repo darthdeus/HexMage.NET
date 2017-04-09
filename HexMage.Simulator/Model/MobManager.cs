@@ -17,6 +17,7 @@ namespace HexMage.Simulator {
         }
 
         public void InitializeState(GameState state) {
+#warning DEPRECATED: InitializeState by se asi nemelo pouzivat vubec? K cemu to vlastne je?
             state.Cooldowns.Clear();
             state.MobInstances = new MobInstance[Mobs.Count];
 
@@ -28,8 +29,6 @@ namespace HexMage.Simulator {
             foreach (var _ in Abilities) {
                 state.Cooldowns.Add(0);
             }
-
-            state.Reset(this);
         }
 
         public void Clear() {

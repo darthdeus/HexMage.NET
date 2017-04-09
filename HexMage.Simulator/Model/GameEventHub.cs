@@ -43,7 +43,6 @@ namespace HexMage.Simulator.Model {
         public async Task<int> SlowMainLoop(TimeSpan turnDelay) {
             State = GameEventState.SettingUpTurn;
 
-            var turnManager = _gameInstance.TurnManager;
             var state = _gameInstance.State;
 
             _gameInstance.Reset();
@@ -54,7 +53,7 @@ namespace HexMage.Simulator.Model {
             while (!_gameInstance.IsFinished) {
                 totalTurns++;
 
-                await turnManager.CurrentController.SlowPlayTurn(this);
+                await _gameInstance.CurrentController.SlowPlayTurn(this);
 
                 // TODO - try to use this to find some more race conditions :)
                 // Delay used to find random race conditions
@@ -115,7 +114,7 @@ namespace HexMage.Simulator.Model {
             while (!_gameInstance.IsFinished) {
                 totalTurns++;
 
-                turnManager.CurrentController.FastPlayTurn(this);
+                _gameInstance.CurrentController.FastPlayTurn(this);
                 ActionEvaluator.FNoCopy(_gameInstance, UctAction.EndTurnAction());
             }
 

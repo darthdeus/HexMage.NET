@@ -205,8 +205,8 @@ namespace HexMage.Simulator.Tests {
             var m2 = game.AddMobWithInfo(info2);
             game.PrepareEverything();
 
-            Assert.IsTrue(game.TurnManager.CurrentMob.HasValue);
-            Assert.AreEqual(m1, game.TurnManager.CurrentMob.Value);
+            Assert.IsTrue(game.CurrentMob.HasValue);
+            Assert.AreEqual(m1, game.CurrentMob.Value);
 
             var firstNode = new UctNode(0, 0, UctAction.NullAction(), game);
             firstNode.PrecomputePossibleActions(true, true);
@@ -222,8 +222,8 @@ namespace HexMage.Simulator.Tests {
 
             ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
 
-            Assert.IsTrue(game.TurnManager.CurrentMob.HasValue);
-            Assert.AreEqual(m2, game.TurnManager.CurrentMob.Value);
+            Assert.IsTrue(game.CurrentMob.HasValue);
+            Assert.AreEqual(m2, game.CurrentMob.Value);
 
             var secondNode = new UctNode(0, 0, UctAction.NullAction(), game);
             secondNode.PrecomputePossibleActions(true, true);

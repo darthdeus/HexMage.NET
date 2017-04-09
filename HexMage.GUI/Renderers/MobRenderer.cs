@@ -28,7 +28,7 @@ namespace HexMage.GUI.Renderers {
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
             var pos = entity.RenderPosition;
 
-            if (_gameInstance.TurnManager.CurrentMob == _mobId) {
+            if (_gameInstance.CurrentMob == _mobId) {
                 batch.Draw(assetManager[AssetManager.HexHoverSprite], pos, Color.White);
             }
 

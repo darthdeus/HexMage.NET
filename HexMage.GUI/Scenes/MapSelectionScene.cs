@@ -187,7 +187,9 @@ namespace HexMage.GUI.Scenes {
                 var mobManager = JsonConvert.DeserializeObject<MobManager>(mobReader.ReadToEnd());
                 game.MobManager = mobManager;
 
-                mobManager.InitializeState(game.State);
+                // TODO: potrebuju InitializeState????
+                game.PrepareEverything();
+                game.Reset();
 
                 var arenaScene = new ArenaScene(_gameManager, game);
 

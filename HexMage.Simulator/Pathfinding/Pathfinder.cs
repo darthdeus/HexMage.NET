@@ -4,7 +4,7 @@ using System.Diagnostics;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
-    public class Pathfinder : IResettable {
+    public class Pathfinder {
         private readonly GameInstance _gameInstance;
         private readonly List<AxialCoord> _neighbourDiffs;
         public readonly HexMap<HexMap<Path>> AllPaths;
@@ -31,10 +31,6 @@ namespace HexMage.Simulator {
             _gameInstance = gameInstance;
             _neighbourDiffs = neighbourDiffs;
             AllPaths = allPaths;
-        }
-
-        public void Reset() {
-            // Right now we're not caching anything, so there's nothing to reset
         }
 
         public AxialCoord? FurthestPointToTarget(MobInstance mob, MobInstance target) {

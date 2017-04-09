@@ -75,7 +75,7 @@ namespace HexMage.Simulator.AI {
             int i = 0;
 
             for (; i < maxIterations && !game.IsFinished; i++) {
-                game.TurnManager.CurrentController.FastPlayTurn(hub);
+                game.CurrentController.FastPlayTurn(hub);
                 ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
 
                 result.TotalTurns++;
@@ -117,7 +117,7 @@ namespace HexMage.Simulator.AI {
             var hub = new GameEventHub(game);
 
             while (!game.IsFinished && iterations-- > 0) {
-                game.TurnManager.CurrentController.FastPlayTurn(hub);
+                game.CurrentController.FastPlayTurn(hub);
                 ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
             }
 

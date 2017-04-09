@@ -39,8 +39,8 @@ namespace HexMage.GUI.Renderers {
 
             DrawBackground();
 
-            if (_gameInstance.TurnManager.CurrentController is PlayerController) {
-                var currentMob = _gameInstance.TurnManager.CurrentMob;
+            if (_gameInstance.CurrentController is PlayerController) {
+                var currentMob = _gameInstance.CurrentMob;
                 if (currentMob.HasValue) {
                     if (Mode == BoardRenderMode.HoverHeatmap) {
                         DrawHoverHeatmap(currentMob.Value);
@@ -170,7 +170,7 @@ namespace HexMage.GUI.Renderers {
 
             var mouseHex = _camera.MouseHex;
 
-            var currentMob = _gameInstance.TurnManager.CurrentMob;
+            var currentMob = _gameInstance.CurrentMob;
 
             if (currentMob.HasValue) {
                 var mobInfo = _gameInstance.MobManager.MobInfos[currentMob.Value];

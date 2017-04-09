@@ -33,14 +33,12 @@ namespace HexMage.Simulator.Tests {
 
             ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
 
-            Assert.AreEqual(1, game.TurnManager.TurnNumber);
-            Assert.AreEqual(m2, game.TurnManager.CurrentMob);
+            Assert.AreEqual(m2, game.CurrentMob);
 
             // Not the fire debuff should be applied
             ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
 
-            Assert.AreEqual(2, game.TurnManager.TurnNumber);
-            Assert.AreEqual(m1, game.TurnManager.CurrentMob);
+            Assert.AreEqual(m1, game.CurrentMob);
 
             var targetAfter = game.State.MobInstances[m2];
             Assert.AreEqual(8, targetAfter.Hp);
@@ -51,8 +49,7 @@ namespace HexMage.Simulator.Tests {
             ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
             ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
 
-            Assert.AreEqual(3, game.TurnManager.TurnNumber);
-            Assert.AreEqual(m1, game.TurnManager.CurrentMob);
+            Assert.AreEqual(m1, game.CurrentMob);
 
             Assert.AreEqual(7, game.State.MobInstances[m2].Hp);
 

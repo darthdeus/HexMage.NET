@@ -22,38 +22,30 @@ namespace HexMage.Simulator.Tests
 
             game.PrepareEverything();
 
-            Assert.AreEqual(game.TurnManager.CurrentMob, m1);
-            Assert.AreEqual(game.TurnManager.TurnNumber, 1);
+            Assert.AreEqual(game.CurrentMob, m1);
 
             ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
-            Assert.AreEqual(game.TurnManager.CurrentMob, m2);
-            Assert.AreEqual(game.TurnManager.TurnNumber, 1);
+            Assert.AreEqual(game.CurrentMob, m2);
 
             ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
-            Assert.AreEqual(game.TurnManager.CurrentMob, m3);
-            Assert.AreEqual(game.TurnManager.TurnNumber, 1);
+            Assert.AreEqual(game.CurrentMob, m3);
 
             ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
-            Assert.AreEqual(game.TurnManager.CurrentMob, m4);
-            Assert.AreEqual(game.TurnManager.TurnNumber, 1);
+            Assert.AreEqual(game.CurrentMob, m4);
 
             // At this point a new turn should start
 
             ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
-            Assert.AreEqual(game.TurnManager.CurrentMob, m1);
-            Assert.AreEqual(game.TurnManager.TurnNumber, 2);
+            Assert.AreEqual(game.CurrentMob, m1);
 
             ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
-            Assert.AreEqual(game.TurnManager.CurrentMob, m2);
-            Assert.AreEqual(game.TurnManager.TurnNumber, 2);
+            Assert.AreEqual(game.CurrentMob, m2);
 
             ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
-            Assert.AreEqual(game.TurnManager.CurrentMob, m3);
-            Assert.AreEqual(game.TurnManager.TurnNumber, 2);
+            Assert.AreEqual(game.CurrentMob, m3);
 
             ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
-            Assert.AreEqual(game.TurnManager.CurrentMob, m4);
-            Assert.AreEqual(game.TurnManager.TurnNumber, 2);
+            Assert.AreEqual(game.CurrentMob, m4);
         }
     }
 }

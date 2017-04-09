@@ -42,7 +42,7 @@ namespace HexMage.Simulator {
 
             var result = new List<UctAction>();
 
-            var currentMob = game.TurnManager.CurrentMob;
+            var currentMob = game.CurrentMob;
             if (!currentMob.HasValue) return UctAction.EndTurnAction();
 
             var mob = game.CachedMob(currentMob.Value);
@@ -60,7 +60,7 @@ namespace HexMage.Simulator {
         }
 
         public static UctAction DefaultPolicyAction(GameInstance state) {
-            var mobId = state.TurnManager.CurrentMob;
+            var mobId = state.CurrentMob;
 
             // TODO - shortcut pokud nemam zadny AP, tak rovnou end turn :)
             if (mobId == null)
@@ -263,7 +263,7 @@ namespace HexMage.Simulator {
             // TODO - zmerit poradne, jestli tohle vubec pomaha, a kolik to ma byt
             var result = new List<UctAction>(10);
 
-            var currentMob = state.TurnManager.CurrentMob;
+            var currentMob = state.CurrentMob;
             if (currentMob.HasValue) {
                 var mob = state.CachedMob(currentMob.Value);
 

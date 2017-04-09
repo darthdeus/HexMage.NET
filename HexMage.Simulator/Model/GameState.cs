@@ -8,17 +8,13 @@ using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
     public class GameState {
-        public struct MobPosition {
-            public int MobId;
-            public AxialCoord Coord;
-        }
-
         public List<AreaBuff> AreaBuffs = new List<AreaBuff>();
 
         public MobInstance[] MobInstances = new MobInstance[0];
         public readonly List<int> Cooldowns = new List<int>();
         public int? CurrentMobIndex;
         public TeamColor? LastTeamColor;
+        public List<int> TurnOrder = new List<int>();
 
         // This is optimized specifically for the smaller data sets on which
         // the evolution is being performed.
@@ -29,6 +25,7 @@ namespace HexMage.Simulator {
         public int BlueAlive = 0;
 
         public bool IsFinished => RedAlive <= 0 || BlueAlive <= 0;
+
 
         public bool IsAlive(int mobId) {
             return MobInstances[mobId].Hp > 0;
@@ -158,7 +155,8 @@ namespace HexMage.Simulator {
                 RedAlive = RedAlive,
                 BlueAlive = BlueAlive,
                 CurrentMobIndex = CurrentMobIndex,
-                LastTeamColor = LastTeamColor
+                LastTeamColor = LastTeamColor,
+                TurnOrder = TurnOrder.ToList()
             };
 
             for (int i = 0; i < Cooldowns.Count; i++) {
@@ -178,12 +176,21 @@ namespace HexMage.Simulator {
             Cooldowns.Clear();
             CurrentMobIndex = null;
             RedAlive = 0;
-            BlueAlive = 0;
+            BlueAlive = 0;            
+            TurnOrder.Clear();
         }
 
-        public void Reset(MobManager mobManager) {
-            foreach (var mobId in mobManager.Mobs) {
-                var mobInfo = mobManager.MobInfos[mobId];
+        private void CopyTurnOrderFromPresort(GameInstance game) {
+            TurnOrder = new List<int>(game.TurnManager.PresortedOrder.Count);
+
+            foreach (var id in game.TurnManager.PresortedOrder) {
+                TurnOrder.Add(id);
+            }
+        }
+
+        public void Reset(GameInstance game) {
+            foreach (var mobId in game.MobManager.Mobs) {
+                var mobInfo = game.MobManager.MobInfos[mobId];
                 MobInstances[mobId].Hp = mobInfo.MaxHp;
                 MobInstances[mobId].Ap = mobInfo.MaxAp;
                 SetMobPosition(mobId, mobInfo.OrigCoord);
@@ -193,7 +200,8 @@ namespace HexMage.Simulator {
                 Cooldowns[i] = 0;
             }
 
-            SlowUpdateIsFinished(mobManager);
+            CopyTurnOrderFromPresort(game);
+            SlowUpdateIsFinished(game.MobManager);
         }
     }
 }

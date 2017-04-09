@@ -122,7 +122,7 @@ namespace HexMage.GUI.Scenes {
 
 #warning TODO - this shouldn't be a func, but rater pass it directly
             Func<GameInstance> gameFunc = () => _gameInstance;
-            Func<int?> currentMobFunc = () => _gameInstance.TurnManager.CurrentMob;
+            Func<int?> currentMobFunc = () => _gameInstance.CurrentMob;
             Func<int?> hoverMobFunc = () => {
                 var mouseHex = Camera2D.Instance.MouseHex;
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {

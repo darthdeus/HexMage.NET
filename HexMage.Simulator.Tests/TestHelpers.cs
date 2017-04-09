@@ -7,7 +7,6 @@ namespace HexMage.Simulator.Tests {
             Assert.AreEqual(instance1.Size, instance2.Size);
             MapsEqual(instance1.Map, instance2.Map);
             MobManagersEqual(instance1.MobManager, instance2.MobManager);
-            TurnManagersEqual(instance1.TurnManager, instance2.TurnManager);
             GameStatesEqual(instance1.State, instance2.State);
         }
 
@@ -25,11 +24,7 @@ namespace HexMage.Simulator.Tests {
 
             Assert.AreEqual(state1.IsFinished, state2.IsFinished);
         }
-
-        public static void TurnManagersEqual(TurnManager turnManager1, TurnManager turnManager2) {
-            Assert.AreEqual(turnManager1.TurnNumber, turnManager2.TurnNumber);
-        }
-
+        
         public static void MapsEqual(Map map1, Map map2) {
             Assert.AreEqual(map1.Size, map2.Size);
         }

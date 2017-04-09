@@ -262,8 +262,7 @@ namespace HexMage.GUI.Scenes {
             //    _t2Preview.AddChild(BuildMobPreview(() => mobId));
             //}
 
-            _mobManager.InitializeState(_gameInstance.State);
-            _gameInstance.State.SlowUpdateIsFinished(_mobManager);
+            _gameInstance.PrepareEverything();
         }
 
         public Entity BuildMobPreview(Func<int> mobFunc) {

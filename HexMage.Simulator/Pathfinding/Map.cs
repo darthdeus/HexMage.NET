@@ -7,7 +7,7 @@ using HexMage.Simulator.PCG;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator.Pathfinding {
-    public class Map : IDeepCopyable<Map>, IResettable {
+    public class Map : IDeepCopyable<Map> {
         [JsonProperty] private readonly HexMap<HexType> _hexes;
 
         [JsonIgnore] private Dictionary<int, bool> _visibility = new Dictionary<int, bool>();
@@ -58,8 +58,6 @@ namespace HexMage.Simulator.Pathfinding {
             map._visibilityLines = _visibilityLines;
             return map;
         }
-
-        public void Reset() { }
 
         public AxialCoord RandomCoord() {
             for (int i = 0; i < 1000; i++) {

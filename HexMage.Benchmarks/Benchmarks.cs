@@ -124,7 +124,8 @@ namespace HexMage.Benchmarks {
                 Console.WriteLine();
             }
 
-            mobManager.InitializeState(gameInstance.State);
+            throw new NotImplementedException("Spatna inicializace, pouzit GameSetup");
+            //mobManager.InitializeState(gameInstance.State);
 
             //foreach (var coord in gameInstance.Map.AllCoords) {
             //    var count = gameInstance.State.MobInstances.Count(x => x.Coord == coord);
@@ -133,7 +134,8 @@ namespace HexMage.Benchmarks {
             //    }
             //}
 
-            gameInstance.State.Reset(gameInstance.MobManager);
+            gameInstance.State.Reset(gameInstance);
+            // TODO: fuj
             turnManager.PresortTurnOrder();
 
 #if COPY_BENCH

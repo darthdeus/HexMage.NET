@@ -41,7 +41,7 @@ namespace HexMage.Simulator.AI {
         }
 
         public static void ResetGameAndPositions(GameInstance game) {
-            game.State.Reset(game.MobManager);
+            game.Reset();
             ResetPositions(game);
         }
 

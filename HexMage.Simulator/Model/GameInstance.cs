@@ -19,9 +19,25 @@ namespace HexMage.Simulator {
         public GameState State { get; set; }
 
         public int Size { get; set; }
-        
+
         public bool AllDead => State.RedAlive == 0 && State.BlueAlive == 0;
         public bool IsFinished => State.IsFinished;
+
+        public IMobController CurrentController
+            => CurrentMob != null ? MobManager.Teams[MobManager.MobInfos[CurrentMob.Value].Team] : null;
+
+        public int? CurrentMob {
+            get {
+                if (!State.CurrentMobIndex.HasValue) {
+                    return null;
+                } else if (State.CurrentMobIndex.Value < State.TurnOrder.Count) {
+                    return State.TurnOrder[State.CurrentMobIndex.Value];
+                } else {
+                    return null;
+                }
+            }
+        }
+
 
         public GameInstance(Map map, MobManager mobManager) {
             Map = map;
@@ -56,23 +72,23 @@ namespace HexMage.Simulator {
         }
 
         public void PrepareEverything() {
+            MobManager.InitializeState(State);
             Map.PrecomputeCubeLinedraw();
             Pathfinder.PathfindDistanceAll();
-            State.Reset(MobManager);
             TurnManager.PresortTurnOrder();
+            State.Reset(this);
             State.LastTeamColor = CurrentTeam;
         }
 
         public void PrepareTurnOrder() {
             // TODO - je tohle potreba?
-            State.Reset(MobManager);
-
-            TurnManager.PresortTurnOrder();            
+            TurnManager.PresortTurnOrder();
+            State.Reset(this);
         }
 
         public TeamColor? CurrentTeam {
             get {
-                var currentMob = TurnManager.CurrentMob;
+                var currentMob = CurrentMob;
                 if (currentMob.HasValue) {
                     var mobInfo = MobManager.MobInfos[currentMob.Value];
                     return mobInfo.Team;
@@ -122,6 +138,7 @@ namespace HexMage.Simulator {
                 }
             }
         }
+
         public GameInstance CopyStateOnly() {
             var game = new GameInstance(Map.Size, Map, MobManager, null);
             game.Pathfinder = Pathfinder.ShallowCopy(game);
@@ -144,17 +161,6 @@ namespace HexMage.Simulator {
             game.State = State.DeepCopy();
 
             return game;
-        }
-
-#warning TODO - funguje tohle jeste?
-
-        public void Reset() {
-            Map.Reset();
-            State.Reset(MobManager);
-            TurnManager.Reset();
-            Pathfinder.Reset();
-
-            State.SlowUpdateIsFinished(MobManager);
         }
 
         public float PercentageHp(TeamColor team) {
@@ -210,6 +216,10 @@ namespace HexMage.Simulator {
             var info = MobManager.MobInfos[mobId];
             info.OrigCoord = coord;
             MobManager.MobInfos[mobId] = info;
+        }
+
+        public void Reset() {
+            State.Reset(this);
         }
     }
 }

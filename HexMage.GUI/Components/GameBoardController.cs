@@ -162,7 +162,7 @@ namespace HexMage.GUI.Components {
                 _eventHub.IsPaused = !_eventHub.IsPaused;
             }
 
-            var controller = _gameInstance.TurnManager.CurrentController as PlayerController;
+            var controller = _gameInstance.CurrentController as PlayerController;
             if (controller != null && inputManager.UserInputEnabled &&
                 _eventHub.State == GameEventState.TurnInProgress) {
                 HandleKeyboardAbilitySelect();
@@ -232,7 +232,7 @@ namespace HexMage.GUI.Components {
         }
 
         public void SelectAbility(int index) {
-            var currentMob = _gameInstance.TurnManager.CurrentMob;
+            var currentMob = _gameInstance.CurrentMob;
             if (currentMob == null) return;
 
             var mobInfo = _gameInstance.MobManager.MobInfos[currentMob.Value];
@@ -259,7 +259,7 @@ namespace HexMage.GUI.Components {
                          "_gameInstance.TurnManager.SelectedAbilityIndex != null");
 
             var abilityIndex = SelectedAbilityIndex.Value;
-            var mobId = _gameInstance.TurnManager.CurrentMob;
+            var mobId = _gameInstance.CurrentMob;
 
             Debug.Assert(mobId != null);
             var abilityId = _gameInstance.MobManager.MobInfos[mobId.Value].Abilities[abilityIndex];
@@ -294,7 +294,7 @@ namespace HexMage.GUI.Components {
             var abilitySelected = SelectedAbilityIndex.HasValue;
 
             var mouseHex = Camera2D.Instance.MouseHex;
-            var currentMob = _gameInstance.TurnManager.CurrentMob;
+            var currentMob = _gameInstance.CurrentMob;
 
             if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
                 var targetId = _gameInstance.State.AtCoord(mouseHex);
@@ -364,8 +364,8 @@ namespace HexMage.GUI.Components {
                     var labelText = new StringBuilder();
                     
                     // If there's no mob we can't calculate a distance from it
-                    if (_gameInstance.TurnManager.CurrentMob.HasValue) {
-                        var mobInstance = _gameInstance.State.MobInstances[_gameInstance.TurnManager.CurrentMob.Value];
+                    if (_gameInstance.CurrentMob.HasValue) {
+                        var mobInstance = _gameInstance.State.MobInstances[_gameInstance.CurrentMob.Value];
                         labelText.AppendLine(
                             $"Distance: {_gameInstance.Pathfinder.Distance(mobInstance.Coord, mouseHex)}");
                     }
@@ -500,7 +500,7 @@ namespace HexMage.GUI.Components {
         }
 
         private void UnselectAbilityIfNeeded() {
-            var mobId = _gameInstance.TurnManager.CurrentMob;
+            var mobId = _gameInstance.CurrentMob;
             if (mobId == null || !SelectedAbilityIndex.HasValue) return;
 
             var mobInfo = _gameInstance.MobManager.MobInfos[mobId.Value];

@@ -52,7 +52,7 @@ namespace HexMage.Simulator.Model {
                     break;
                 case UctActionType.EndTurn:
                     state.State.LastTeamColor = state.CurrentTeam;
-                    state.TurnManager.NextMobOrNewTurn(state.Pathfinder, state.State);
+                    state.TurnManager.NextMobOrNewTurn();
                     break;
                 case UctActionType.AbilityUse:
                     FastUse(state, action.AbilityId, action.MobId, action.TargetId);
