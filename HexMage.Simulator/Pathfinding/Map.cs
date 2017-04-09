@@ -15,8 +15,6 @@ namespace HexMage.Simulator.Pathfinding {
         [JsonIgnore] private Dictionary<int, List<AxialCoord>> _visibilityLines =
             new Dictionary<int, List<AxialCoord>>();
 
-        public List<AreaBuff> AreaBuffs = new List<AreaBuff>();
-
         public List<AxialCoord> BlueStartingPoints = new List<AxialCoord>();
         public List<AxialCoord> RedStartingPoints = new List<AxialCoord>();
 
@@ -33,10 +31,9 @@ namespace HexMage.Simulator.Pathfinding {
         [JsonConstructor]
         public Map() { }
 
-        public Map(int size, HexMap<HexType> hexes, List<AreaBuff> buffs) {
+        public Map(int size, HexMap<HexType> hexes) {
             Size = size;
             _hexes = hexes;
-            AreaBuffs = buffs;
         }
 
         public Map(int size) {
@@ -50,11 +47,7 @@ namespace HexMage.Simulator.Pathfinding {
         }
 
         public Map DeepCopy() {
-            var buffsCopy = new List<AreaBuff>();
-
-            foreach (var buff in AreaBuffs) buffsCopy.Add(buff);
-
-            var map = new Map(Size, _hexes, buffsCopy) {
+            var map = new Map(Size, _hexes) {
                 Guid = Guid
             };
 
@@ -66,9 +59,7 @@ namespace HexMage.Simulator.Pathfinding {
             return map;
         }
 
-        public void Reset() {
-            AreaBuffs.Clear();
-        }
+        public void Reset() { }
 
         public AxialCoord RandomCoord() {
             for (int i = 0; i < 1000; i++) {
@@ -86,7 +77,8 @@ namespace HexMage.Simulator.Pathfinding {
                 return coord;
             }
 
-            throw new InvalidOperationException("Something went wrong with the random number generator, unable to generate a valid coord under 1000 iterations.");
+            throw new InvalidOperationException(
+                "Something went wrong with the random number generator, unable to generate a valid coord under 1000 iterations.");
         }
 
         public void Toggle(AxialCoord coord) {
@@ -95,12 +87,6 @@ namespace HexMage.Simulator.Pathfinding {
             } else {
                 this[coord] = HexType.Empty;
             }
-        }
-
-        public List<Buff> BuffsAt(AxialCoord coord) {
-            return AreaBuffs.Where(b => AxialDistance(b.Coord, coord) <= b.Radius)
-                            .Select(b => b.Effect)
-                            .ToList();
         }
 
         public int AxialDistance(AxialCoord a, AxialCoord b) {
@@ -134,6 +120,7 @@ namespace HexMage.Simulator.Pathfinding {
         public void PrecomputeCubeLinedraw() {
             EmptyCoords.Clear();
             _visibility.Clear();
+            _visibilityLines.Clear();
 
             foreach (var a in AllCoords) {
                 if (this[a] == HexType.Empty) {

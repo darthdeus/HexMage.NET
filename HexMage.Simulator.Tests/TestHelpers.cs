@@ -14,6 +14,7 @@ namespace HexMage.Simulator.Tests {
         public static void GameStatesEqual(GameState state1, GameState state2) {
             CollectionAssert.AreEqual(state1.MobInstances, state2.MobInstances);
             CollectionAssert.AreEqual(state1.Cooldowns, state2.Cooldowns);
+            CollectionAssert.AreEqual(state1.AreaBuffs, state2.AreaBuffs);
             Assert.AreEqual(state1.CurrentMobIndex, state2.CurrentMobIndex);
 
             // TODO - tohle funguje?
@@ -31,7 +32,6 @@ namespace HexMage.Simulator.Tests {
 
         public static void MapsEqual(Map map1, Map map2) {
             Assert.AreEqual(map1.Size, map2.Size);
-            CollectionAssert.AreEqual(map1.AreaBuffs, map2.AreaBuffs);
         }
 
         public static void MobManagersEqual(MobManager mobManager1, MobManager mobManager2) {

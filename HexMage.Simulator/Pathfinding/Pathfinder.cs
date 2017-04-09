@@ -4,23 +4,9 @@ using System.Diagnostics;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
-    // TODO - extract this
-    public enum VertexState {
-        Unvisited,
-        Open,
-        Closed
-    }
-
-    // TODO - extract this
-    public struct Path {
-        public int Distance;
-        public AxialCoord? Source;
-        public bool Reachable;
-    }
-
     public class Pathfinder : IResettable {
         private readonly GameInstance _gameInstance;
-        private readonly List<AxialCoord> _diffs;
+        private readonly List<AxialCoord> _neighbourDiffs;
         public readonly HexMap<HexMap<Path>> AllPaths;
         private int Size => _gameInstance.Size;
 
@@ -31,7 +17,7 @@ namespace HexMage.Simulator {
             _gameInstance = gameInstance;
             AllPaths = new HexMap<HexMap<Path>>(_gameInstance.Size);
 
-            _diffs = new List<AxialCoord> {
+            _neighbourDiffs = new List<AxialCoord> {
                 new AxialCoord(-1, 0),
                 new AxialCoord(1, 0),
                 new AxialCoord(0, -1),
@@ -41,9 +27,9 @@ namespace HexMage.Simulator {
             };
         }
 
-        public Pathfinder(GameInstance gameInstance, List<AxialCoord> diffs, HexMap<HexMap<Path>> allPaths) {
+        private Pathfinder(GameInstance gameInstance, List<AxialCoord> neighbourDiffs, HexMap<HexMap<Path>> allPaths) {
             _gameInstance = gameInstance;
-            _diffs = diffs;
+            _neighbourDiffs = neighbourDiffs;
             AllPaths = allPaths;
         }
 
@@ -56,7 +42,7 @@ namespace HexMage.Simulator {
 
             if (path.Count == 0 && mob.Coord.Distance(target.Coord) == 1) {
                 return null;
-            }            
+            }
 
             AxialCoord? furthestPoint = null;
             foreach (var coord in path) {
@@ -69,30 +55,30 @@ namespace HexMage.Simulator {
                     }
                 } else {
                     break;
-                }                
+                }
             }
-            
+
             return furthestPoint;
 
-//            int iterations = 0;
+            //            int iterations = 0;
 
-//            AxialCoord coord = target.Coord;
-//            while (true) {
-//                if (iterations++ > 1000) {
-//#warning TODO - throw an exception instead
-//                    throw new InvalidOperationException("Pathfinding got stuck searching for a shorter path");
-//                    return null;
-//                }
-//                var closer = NearestEmpty(mob.Coord, coord);
-//                if (closer == null) return null;
+            //            AxialCoord coord = target.Coord;
+            //            while (true) {
+            //                if (iterations++ > 1000) {
+            //#warning TODO - throw an exception instead
+            //                    throw new InvalidOperationException("Pathfinding got stuck searching for a shorter path");
+            //                    return null;
+            //                }
+            //                var closer = NearestEmpty(mob.Coord, coord);
+            //                if (closer == null) return null;
 
 
-//                if (Distance(mob.Coord, closer.Value) <= mob.Ap) {
-//                    return closer;
-//                } else {
-//                    coord = closer.Value;
-//                }
-//            }
+            //                if (Distance(mob.Coord, closer.Value) <= mob.Ap) {
+            //                    return closer;
+            //                } else {
+            //                    coord = closer.Value;
+            //                }
+            //            }
         }
 
         public List<AxialCoord> PathTo(AxialCoord from, AxialCoord target) {
@@ -211,7 +197,7 @@ namespace HexMage.Simulator {
                 if (states[current] == VertexState.Closed) continue;
                 states[current] = VertexState.Closed;
 
-                foreach (var diff in _diffs) {
+                foreach (var diff in _neighbourDiffs) {
                     var neighbour = current + diff;
 
                     if (IsValidCoord(neighbour) && _gameInstance.Map[neighbour] != HexType.Wall) {
@@ -242,22 +228,9 @@ namespace HexMage.Simulator {
             return current[to].Distance;
         }
 
-        public void PathfindFromCurrentMob(TurnManager turnManager, Pathfinder pathfinder) {
-            throw new NotImplementedException();
-            //if (turnManager.CurrentMob != null)
-            //{
-            //    PathfindFrom(pathfinder, MobInstances[turnManager.CurrentMob.Value].Coord);
-            //}
-            //else
-            //{
-            //    Utils.Log(LogSeverity.Warning, nameof(Pathfinder), "CurrentMob is NULL, pathfind current failed");
-            //}
-        }
-
-
         private AxialCoord? NearestEmpty(AxialCoord from, AxialCoord to) {
             AxialCoord? result = null;
-            foreach (var diff in _diffs) {
+            foreach (var diff in _neighbourDiffs) {
                 var neighbour = to + diff;
                 if (IsWalkable(neighbour)) {
                     if (!result.HasValue) result = neighbour;
@@ -287,8 +260,7 @@ namespace HexMage.Simulator {
         }
 
         public Pathfinder ShallowCopy(GameInstance gameInstanceCopy) {
-            var copy = new Pathfinder(gameInstanceCopy,
-                                      _diffs, AllPaths);
+            var copy = new Pathfinder(gameInstanceCopy, _neighbourDiffs, AllPaths);
 
             copy._precomputedPaths = _precomputedPaths;
 

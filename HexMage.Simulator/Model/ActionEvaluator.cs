@@ -119,7 +119,9 @@ namespace HexMage.Simulator.Model {
             if (!ability.AreaBuff.IsZero) {
                 var copy = ability.AreaBuff;
                 copy.Coord = targetInstance.Coord;
-                game.Map.AreaBuffs.Add(copy);
+
+                // TODO: tohle je pomaly
+                game.State.AreaBuffs.Add(copy);
             }
 
             if (game.State.MobInstances[mobId].Ap < ability.Cost) {

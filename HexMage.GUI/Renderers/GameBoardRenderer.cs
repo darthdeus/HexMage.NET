@@ -102,7 +102,7 @@ namespace HexMage.GUI.Renderers {
                 if (hexType == HexType.Empty) DrawAt(hexGreen, coord);
                 if (hexType == HexType.Wall) DrawAt(hexWall, coord);
 
-                var hexBuffs = map.BuffsAt(coord);
+                var hexBuffs = _gameInstance.State.BuffsAt(coord);
 
                 if (hexBuffs.Count > 0 && hexType != HexType.Wall) {
                     foreach (var buff in hexBuffs) {

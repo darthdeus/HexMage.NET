@@ -384,7 +384,7 @@ namespace HexMage.GUI.Components {
                             break;
                     }
 
-                    var buffs = map.BuffsAt(mouseHex);
+                    var buffs = _gameInstance.State.BuffsAt(mouseHex);
                     Debug.Assert(buffs != null,
                                  "Buffs can't be null since we're only using valid map coords (and those are all initialized).");
 
@@ -414,7 +414,7 @@ namespace HexMage.GUI.Components {
                     mobTextBuilder.AppendLine();
                     mobTextBuilder.AppendLine("Area buffs:");
 
-                    foreach (var buff in _gameInstance.Map.BuffsAt(mobInstance.Coord)) {
+                    foreach (var buff in _gameInstance.State.BuffsAt(mobInstance.Coord)) {
                         mobTextBuilder.AppendLine(
                             $"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");
                     }

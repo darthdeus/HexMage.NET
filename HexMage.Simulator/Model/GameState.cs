@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.Pathfinding;
 using Newtonsoft.Json;
@@ -12,6 +13,8 @@ namespace HexMage.Simulator {
             public AxialCoord Coord;
         }
 
+        public List<AreaBuff> AreaBuffs = new List<AreaBuff>();
+
         public MobInstance[] MobInstances = new MobInstance[0];
         public readonly List<int> Cooldowns = new List<int>();
         public int? CurrentMobIndex;
@@ -22,12 +25,20 @@ namespace HexMage.Simulator {
         // TODO - pole lepsi?
         //[JsonIgnore] public Dictionary<int, AxialCoord> MobPositions = new Dictionary<int, AxialCoord>();
         public int RedAlive = 0;
+
         public int BlueAlive = 0;
 
         public bool IsFinished => RedAlive <= 0 || BlueAlive <= 0;
 
         public bool IsAlive(int mobId) {
             return MobInstances[mobId].Hp > 0;
+        }
+
+        public List<Buff> BuffsAt(AxialCoord coord) {
+            // TODO - pomale?
+            return AreaBuffs.Where(b => b.Coord.Distance(coord) <= b.Radius)
+                            .Select(b => b.Effect)
+                            .ToList();
         }
 
         public void LowerCooldowns() {
@@ -52,7 +63,7 @@ namespace HexMage.Simulator {
         }
 
         public void ChangeMobHp(GameInstance gameInstance, int mobId, int hpChange) {
-            MobInstances[mobId].Hp = Math.Max(0, MobInstances[mobId].Hp  + hpChange);
+            MobInstances[mobId].Hp = Math.Max(0, MobInstances[mobId].Hp + hpChange);
             MobHpChanged(MobInstances[mobId].Hp, gameInstance.MobManager.MobInfos[mobId].Team);
         }
 
@@ -75,6 +86,8 @@ namespace HexMage.Simulator {
         }
 
         public void ApplyDots(Map map, GameInstance gameInstance) {
+            // TODO: vycistit, fuj
+
             foreach (var mobId in gameInstance.MobManager.Mobs) {
                 var mobInstance = MobInstances[mobId];
                 if (mobInstance.Hp <= 0) continue;
@@ -85,13 +98,15 @@ namespace HexMage.Simulator {
 
                     ChangeMobHp(gameInstance, mobId, mobInstance.Buff.HpChange);
                     ChangeMobAp(mobId, mobInstance.Buff.ApChange);
-                    
+
                     Debug.Assert(mobInstance.Buff.Lifetime >= 0, "mobInstance.Buff.Lifetime >= 0");
                 }
             }
 
-            for (int i = 0; i < map.AreaBuffs.Count; i++) {
-                var areaBuff = map.AreaBuffs[i];
+            Debug.Assert(this == gameInstance.State, "this == gameInstance.State");
+
+            for (int i = 0; i < AreaBuffs.Count; i++) {
+                var areaBuff = AreaBuffs[i];
                 foreach (var mobId in gameInstance.MobManager.Mobs) {
                     if (!IsAlive(mobId)) continue;
 
@@ -102,24 +117,24 @@ namespace HexMage.Simulator {
                 }
 
                 areaBuff.DecreaseLifetime();
-                map.AreaBuffs[i] = areaBuff;
+                AreaBuffs[i] = areaBuff;
             }
 
-            for (int i = 0; i < map.AreaBuffs.Count; i++) {
-                var buff = map.AreaBuffs[i];
+            for (int i = 0; i < AreaBuffs.Count; i++) {
+                var buff = AreaBuffs[i];
                 buff.DecreaseLifetime();
-                map.AreaBuffs[i] = buff;
+                AreaBuffs[i] = buff;
             }
 
             var newBuffs = new List<AreaBuff>();
 
-            foreach (var buff in map.AreaBuffs) {
+            foreach (var buff in AreaBuffs) {
                 if (buff.Effect.Lifetime > 0) {
                     newBuffs.Add(buff);
                 }
             }
 
-            map.AreaBuffs = newBuffs;
+            AreaBuffs = newBuffs;
         }
 
         public void SlowUpdateIsFinished(MobManager mobManager) {
@@ -177,8 +192,8 @@ namespace HexMage.Simulator {
             for (int i = 0; i < Cooldowns.Count; i++) {
                 Cooldowns[i] = 0;
             }
-            
-            SlowUpdateIsFinished(mobManager);            
+
+            SlowUpdateIsFinished(mobManager);
         }
     }
 }

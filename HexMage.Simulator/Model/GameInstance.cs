@@ -16,9 +16,9 @@ namespace HexMage.Simulator {
         public MobManager MobManager { get; set; }
         public Pathfinder Pathfinder { get; set; }
         public TurnManager TurnManager { get; set; }
-        public int Size { get; set; }
-
         public GameState State { get; set; }
+
+        public int Size { get; set; }
         
         public bool AllDead => State.RedAlive == 0 && State.BlueAlive == 0;
         public bool IsFinished => State.IsFinished;
@@ -124,8 +124,9 @@ namespace HexMage.Simulator {
         }
         public GameInstance CopyStateOnly() {
             var game = new GameInstance(Map.Size, Map, MobManager, null);
-            game.TurnManager = TurnManager.DeepCopy(game);
             game.Pathfinder = Pathfinder.ShallowCopy(game);
+
+            game.TurnManager = TurnManager.DeepCopy(game);
             game.State = State.DeepCopy();
 
             return game;
@@ -137,8 +138,9 @@ namespace HexMage.Simulator {
 
             // TODO - should the MobManager be copied here?                                                           
             var game = new GameInstance(mapCopy, MobManager);
-            game.TurnManager = TurnManager.DeepCopy(game);
             game.Pathfinder = Pathfinder.ShallowCopy(game);
+
+            game.TurnManager = TurnManager.DeepCopy(game);
             game.State = State.DeepCopy();
 
             return game;

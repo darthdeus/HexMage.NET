@@ -87,6 +87,8 @@
     <Compile Include="Model\MobInstance.cs" />
     <Compile Include="Model\ReplayController.cs" />
     <Compile Include="Model\TemporarilySuspendReplayRecording.cs" />
+    <Compile Include="Pathfinding\Path.cs" />
+    <Compile Include="Pathfinding\VertexState.cs" />
     <Compile Include="Probability.cs" />
     <Compile Include="ReplayRecorder.cs" />
     <Compile Include="Serialization\MapItem.cs" />

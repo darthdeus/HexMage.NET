@@ -1,7 +1,5 @@
-﻿namespace HexMage.Simulator.Pathfinding
-{
-    public enum VertexState
-    {
+﻿namespace HexMage.Simulator {
+    public enum VertexState {
         Unvisited,
         Open,
         Closed
