@@ -87,7 +87,7 @@ namespace HexMage.Simulator.PCG {
 
             Predicate<AxialCoord> isCoordAvailable = c => {
                 bool isWall = map[c] == HexType.Wall;
-                var atCoord = state.AtCoord(c);
+                var atCoord = state.AtCoord(c, true);
 
                 return !isWall && (!atCoord.HasValue || atCoord.Value == mobId);
             };

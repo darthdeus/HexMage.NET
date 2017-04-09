@@ -61,7 +61,7 @@ namespace HexMage.Simulator.Model {
 
         [Conditional("DEBUG")]
         public static void AssertValidMoveAction(GameInstance game, UctAction action) {
-            var atCoord = game.State.AtCoord(action.Coord);
+            var atCoord = game.State.AtCoord(action.Coord, true);
             var mobInstance = game.State.MobInstances[action.MobId];
 
             var distance = game.Pathfinder.Distance(mobInstance.Coord, action.Coord);
@@ -112,7 +112,7 @@ namespace HexMage.Simulator.Model {
         }
 
         public static UctAction CanMoveTo(GameInstance game, CachedMob mob, AxialCoord coord) {
-            bool isEmpty = game.Map[coord] == HexType.Empty && game.State.AtCoord(coord) == null;
+            bool isEmpty = game.Map[coord] == HexType.Empty && game.State.AtCoord(coord, true) == null;
 
             int distance = game.Pathfinder.Distance(mob.MobInstance.Coord, coord);
             int remainingAp = mob.MobInstance.Ap - distance;

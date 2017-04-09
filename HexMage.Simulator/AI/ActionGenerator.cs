@@ -90,6 +90,7 @@ namespace HexMage.Simulator {
 
                 moveTargetId = possibleTargetId;
 
+                // TODO - remove corpse targetting
                 if (!Constants.AllowCorpseTargetting &&
                     !GameInvariants.IsTargetable(state, mob, possibleTarget)) continue;
                 if (!abilityId.HasValue) continue;
@@ -104,36 +105,45 @@ namespace HexMage.Simulator {
                 Debug.Assert(abilityId.HasValue);
                 return UctAction.AbilityUseAction(abilityId.Value, mobId.Value, spellTarget);
             } else if (moveTargetId != MobInstance.InvalidId) {
-                var action = FastMoveTowardsEnemy(state, mobId.Value, moveTargetId);
-
-                if (action.Type == UctActionType.Null) {
-                    return UctAction.EndTurnAction();
-                } else {
-                    return action;
-                }
+                return PickMoveTowardsEnemyAction(state, state.CachedMob(mobId.Value),
+                                                  state.CachedMob(moveTargetId));
             } else {
                 throw new InvalidOperationException("No targets, game should be over.");
             }
         }
 
-        public static UctAction FastMoveTowardsEnemy(GameInstance state, int mobId, int targetId) {
+        private static UctAction PickMoveTowardsEnemyAction(GameInstance game, CachedMob mob,
+                                                            CachedMob possibleTarget) {
+            foreach (var targetId in game.MobManager.Mobs) {
+                var target = game.CachedMob(targetId);
+
+                if (!GameInvariants.IsTargetableNoSource(game, mob, target)) continue;
+
+                var action = FastMoveTowardsEnemy(game, mob, target);
+
+                if (action.Type == UctActionType.Move) return action;
+            }
+
+            return UctAction.EndTurnAction();
+        }
+
+        public static UctAction FastMoveTowardsEnemy(GameInstance state, CachedMob mob, CachedMob target) {
             var pathfinder = state.Pathfinder;
-            var mobInstance = state.State.MobInstances[mobId];
-            var targetInstance = state.State.MobInstances[targetId];
 
-            var moveTarget = pathfinder.FurthestPointToTarget(mobInstance, targetInstance);
+            var moveTarget = pathfinder.FurthestPointToTarget(mob, target);
 
-            if (moveTarget != null && pathfinder.Distance(mobInstance.Coord, moveTarget.Value) <= mobInstance.Ap) {
-                return UctAction.MoveAction(mobId, moveTarget.Value);
+            if (moveTarget != null && pathfinder.Distance(mob.MobInstance.Coord, moveTarget.Value) <=
+                mob.MobInstance.Ap) {
+                return UctAction.MoveAction(mob.MobId, moveTarget.Value);
             } else if (moveTarget == null) {
                 //Console.WriteLine("Move target is null");
                 // TODO - intentionally doing nothing
                 return UctAction.EndTurnAction();
             } else {
-                Console.WriteLine("Move failed!");
+                //Console.WriteLine("Move failed!");
 
                 Utils.Log(LogSeverity.Debug, nameof(AiRuleBasedController),
-                          $"Move failed since target is too close, source {mobInstance.Coord}, target {targetInstance.Coord}");
+                          $"Move failed since target is too close, source {mob.MobInstance.Coord}, target {target.MobInstance.Coord}");
                 return UctAction.EndTurnAction();
             }
         }
@@ -148,7 +158,7 @@ namespace HexMage.Simulator {
             foreach (var coord in heatmap.Map.AllCoords) {
                 if (heatmap.Map[coord] != heatmap.MinValue) continue;
                 if (state.Map[coord] == HexType.Wall) continue;
-                if (state.State.AtCoord(coord).HasValue) continue;
+                if (state.State.AtCoord(coord, true).HasValue) continue;
 
                 bool canMoveTo = state.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap;
 
@@ -197,7 +207,6 @@ namespace HexMage.Simulator {
                         if (!GameInvariants.IsAbilityUsableFrom(state, mob, coord, target, abilityId)) continue;
 
                         int myDistance = state.Pathfinder.Distance(myCoord, coord);
-
 
                         if (!closestCoord.HasValue) {
                             chosenAbilityId = abilityId;

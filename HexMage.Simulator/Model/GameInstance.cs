@@ -209,7 +209,7 @@ namespace HexMage.Simulator {
         }
 
         public void PlaceMob(int mobId, AxialCoord coord) {
-            var atCoord = State.AtCoord(coord);
+            var atCoord = State.AtCoord(coord, true);
             Debug.Assert(atCoord == null || atCoord == mobId);
 
             State.SetMobPosition(mobId, coord);

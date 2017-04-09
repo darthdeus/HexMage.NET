@@ -29,9 +29,14 @@ namespace HexMage.Simulator {
         public static int Index = 0;
         public readonly List<UctAction> Actions = new List<UctAction>();
 
+        public void Clear() {
+            Actions.Clear();
+        }
+
         public void SaveAndClear(GameInstance game, int? index = null) {
             if (!Constants.RecordReplays) {
-                Utils.Log(LogSeverity.Info, nameof(ReplayRecorder), "Skipping replay save since replay recording is disabled. This is done mostly to prevent debug replays from being overwritten.");
+                Utils.Log(LogSeverity.Info, nameof(ReplayRecorder),
+                          "Skipping replay save since replay recording is disabled. This is done mostly to prevent debug replays from being overwritten.");
                 return;
             }
 
@@ -50,7 +55,7 @@ namespace HexMage.Simulator {
                 writer.Write(contents);
             }
 
-            Actions.Clear();
+            Clear();
 
             Utils.Log(LogSeverity.Info, nameof(ReplayRecorder), $"Replay saved to file 'replay{index}.json'");
         }

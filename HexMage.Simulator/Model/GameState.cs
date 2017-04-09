@@ -72,9 +72,11 @@ namespace HexMage.Simulator {
             MobInstances[mobId].Coord = coord;
         }
 
-        public int? AtCoord(AxialCoord c) {
+        public int? AtCoord(AxialCoord c, bool aliveOnly) {
             for (int i = 0; i < MobInstances.Length; i++) {
-                if (MobInstances[i].Coord == c) {
+                var instance = MobInstances[i];
+                bool aliveCheck = !aliveOnly || instance.Hp > 0;
+                if (instance.Coord == c && aliveCheck) {
                     return i;
                 }
             }

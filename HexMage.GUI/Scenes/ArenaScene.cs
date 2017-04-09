@@ -126,7 +126,7 @@ namespace HexMage.GUI.Scenes {
             Func<int?> hoverMobFunc = () => {
                 var mouseHex = Camera2D.Instance.MouseHex;
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                    return _gameInstance.State.AtCoord(mouseHex);
+                    return _gameInstance.State.AtCoord(mouseHex, true);
                 } else {
                     return null;
                 }

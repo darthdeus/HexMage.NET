@@ -33,23 +33,30 @@ namespace HexMage.Simulator {
             AllPaths = allPaths;
         }
 
-        public AxialCoord? FurthestPointToTarget(MobInstance mob, MobInstance target) {
-            List<AxialCoord> path = PrecomputedPathTo(mob.Coord, target.Coord);
+        public AxialCoord? FurthestPointToTarget(CachedMob mob, CachedMob target) {
+            List<AxialCoord> path = PrecomputedPathTo(mob.MobInstance.Coord, target.MobInstance.Coord);
 
-            if (path.Count == 0 && mob.Coord.Distance(target.Coord) == 1) {
+            if (path.Count == 0 && mob.MobInstance.Coord.Distance(target.MobInstance.Coord) == 1) {
                 return null;
             }
 
             AxialCoord? furthestPoint = null;
             foreach (var coord in path) {
-                int distance = Distance(mob.Coord, coord);
-                var mobAtCoord = _gameInstance.State.AtCoord(coord);
+                int distance = Distance(mob.MobInstance.Coord, coord);
+                var mobAtCoord = _gameInstance.State.AtCoord(coord, true);
 
-                if (distance <= mob.Ap) {
+                if (distance <= mob.MobInstance.Ap) {
                     if (mobAtCoord == null) {
                         furthestPoint = coord;
+                    } else {
+                        var coordMobId = mobAtCoord.Value;
+                        var coordInfo = _gameInstance.MobManager.MobInfos[coordMobId];
+                        var coordhp = _gameInstance.State.MobInstances[coordMobId].Hp;
+                        //Console.WriteLine($"NEKDO MI TAM STOJI, JA: {mob.MobInfo.Team}, AP: {mob.MobInstance.Ap}, PRD: {coordInfo.Team}, {coordhp}HP");
                     }
                 } else {
+                    // TODO: jakym smerem je cesta?
+                    //Console.WriteLine("Koncim, protoze nemam dost AP na to policko");
                     break;
                 }
             }
@@ -122,7 +129,7 @@ namespace HexMage.Simulator {
 
         private bool IsWalkable(AxialCoord coord) {
             return IsValidCoord(coord) && (_gameInstance.Map[coord] == HexType.Empty) &&
-                   (_gameInstance.State.AtCoord(coord) == null);
+                   (_gameInstance.State.AtCoord(coord, true) == null);
         }
 
         public void PathfindDistanceAll() {

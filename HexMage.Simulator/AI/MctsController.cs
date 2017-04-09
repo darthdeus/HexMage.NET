@@ -42,7 +42,7 @@ namespace HexMage.Simulator {
         }
 
         private void LogActions(UctSearchResult result) {
-            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
+#warning TODO - FUUUUUUUUUUUJ tohle sem nepatri
             // TODO - FUUUUUUUUUUUJ tohle sem nepatri
             // TODO - FUUUUUUUUUUUJ tohle sem nepatri
             // TODO - FUUUUUUUUUUUJ tohle sem nepatri

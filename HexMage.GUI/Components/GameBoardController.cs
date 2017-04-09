@@ -297,7 +297,7 @@ namespace HexMage.GUI.Components {
             var currentMob = _gameInstance.CurrentMob;
 
             if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                var targetId = _gameInstance.State.AtCoord(mouseHex);
+                var targetId = _gameInstance.State.AtCoord(mouseHex, true);
                 if (targetId != null) {
                     if (targetId == currentMob) {
                         ShowMessage("You can't target yourself.");
@@ -356,7 +356,7 @@ namespace HexMage.GUI.Components {
             _mobPopover.Active = false;
 
             if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                var mobId = _gameInstance.State.AtCoord(mouseHex);
+                var mobId = _gameInstance.State.AtCoord(mouseHex, true);
 
                 if (mobId == null) {
                     var map = _gameInstance.Map;

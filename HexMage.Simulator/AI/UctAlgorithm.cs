@@ -127,8 +127,10 @@ namespace HexMage.Simulator.AI {
             Debug.Assert(game.CurrentTeam.HasValue, "game.CurrentTeam.HasValue");
 
             var copy = game.CopyStateOnly();
-            const int maxDefaultPolicyIterations = 400;
+            const int maxDefaultPolicyIterations = 100;
             int iterations = maxDefaultPolicyIterations;
+
+            ReplayRecorder.Instance.Clear();
 
             while (!copy.IsFinished && iterations-- > 0) {
                 var action = ActionGenerator.DefaultPolicyAction(copy);
@@ -144,6 +146,8 @@ namespace HexMage.Simulator.AI {
             }
 
             if (iterations <= 0) {
+                ReplayRecorder.Instance.SaveAndClear(copy, 0);
+                throw new InvariantViolationException("MCTS playout timeout");
                 ReplayRecorder.Instance.SaveAndClear(game);
                 Utils.Log(LogSeverity.Error, nameof(UctAlgorithm),
                           $"DefaultPolicy ran out of time (over {maxDefaultPolicyIterations} iterations for playout), computed results are likely wrong.");

@@ -73,7 +73,7 @@ namespace HexMage.GUI.Renderers {
             var from = _gameInstance.State.MobInstances[currentMob].Coord;
 
             var mouseHex = Camera2D.Instance.MouseHex;
-            if (_gameInstance.State.AtCoord(mouseHex).HasValue) {
+            if (_gameInstance.State.AtCoord(mouseHex, true).HasValue) {
                 from = mouseHex;
             }
 
@@ -132,7 +132,7 @@ namespace HexMage.GUI.Renderers {
         private void DrawHoverHeatmap(int currentMob) {
             if (_gameInstance.Pathfinder.IsValidCoord(_camera.MouseHex)) {
                 var state = _gameInstance.State;
-                var mouseMob = state.AtCoord(_camera.MouseHex);
+                var mouseMob = state.AtCoord(_camera.MouseHex, true);
 
                 if (mouseMob.HasValue) {
                     var heatmap = Heatmap.BuildHeatmap(_gameInstance, mouseMob);
@@ -145,7 +145,7 @@ namespace HexMage.GUI.Renderers {
         private void DrawGlobalHeatmap() {
             var state = _gameInstance.State;
 
-            var mouseMob = state.AtCoord(_camera.MouseHex);
+            var mouseMob = state.AtCoord(_camera.MouseHex, true);
             var heatmap = Heatmap.BuildHeatmap(_gameInstance, mouseMob);
 
             DrawHeatmap(heatmap);
@@ -188,7 +188,7 @@ namespace HexMage.GUI.Renderers {
                     _gameInstance.Pathfinder.Distance(mobInstance.Coord, mouseHex) != int.MaxValue) {
                     IList<AxialCoord> path;
 
-                    var mouseMob = _gameInstance.State.AtCoord(mouseHex);
+                    var mouseMob = _gameInstance.State.AtCoord(mouseHex, true);
                     if (mouseMob != null) {
                         path = _gameInstance.Pathfinder.PathToMob(mobInstance.Coord,
                                                                   _gameInstance

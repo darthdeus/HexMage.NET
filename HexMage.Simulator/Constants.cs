@@ -6,7 +6,7 @@ namespace HexMage.Simulator {
 
         // MCTS benchmarks
         public static int MctsBenchIterations = 10000;
-        public static int MctsBenchType = 0;
+        public static int MctsBenchType = 5;
 
         public static bool GnuPlot = true;
 
