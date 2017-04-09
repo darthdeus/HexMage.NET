@@ -2,11 +2,11 @@
 
 namespace HexMage.Simulator {
     public static class Constants {
-        public static bool RecordReplays = true;
+        public static bool RecordReplays = false;
 
         // MCTS benchmarks
         public static int MctsBenchIterations = 1000;
-        public static int MctsBenchType = 0;
+        public static int MctsBenchType = 1;
 
         public static bool GnuPlot = true;
 
@@ -56,7 +56,7 @@ namespace HexMage.Simulator {
         /// Disabling this will only generate the respective MOVE action,
         /// instead of a combined ATTACK-MOVE.
         /// 
-        /// TODO - profile/benchmark both cases and create pretty graphs :)
+        /// TODO - profile/benchmark both cases and create pretty graphs
         /// </summary>
         public static bool AttackMoveEnabled = true;
 

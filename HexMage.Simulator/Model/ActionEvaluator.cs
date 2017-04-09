@@ -38,8 +38,6 @@ namespace HexMage.Simulator.Model {
             Actions++;
             ActionCounts[action.Type]++;
 
-            GameInvariants.AssertMobsNotStandingOnEachother(state);
-
             Constants.WriteLogLine(action);
 
             if (Constants.RecordReplays) {

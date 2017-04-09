@@ -75,8 +75,6 @@ namespace HexMage.Simulator.AI {
                     Generator.RandomPlaceMob(game, mobId);
                 }
             }
-
-            GameInvariants.AssertMobsNotStandingOnEachother(game, checkOrigCoord: true);
         }
 
         private static void UnpackTeamsIntoGame(GameInstance game, DNA team1, DNA team2) {
