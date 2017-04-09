@@ -51,7 +51,8 @@ namespace HexMage.Simulator.Model {
                     // do nothing
                     break;
                 case UctActionType.EndTurn:
-                    state.NextMobOrNewTurn();
+                    state.State.LastTeamColor = state.CurrentTeam;
+                    state.TurnManager.NextMobOrNewTurn(state.Pathfinder, state.State);
                     break;
                 case UctActionType.AbilityUse:
                     FastUse(state, action.AbilityId, action.MobId, action.TargetId);

@@ -58,8 +58,8 @@ namespace HexMage.Simulator.Tests {
             ActionEvaluator.FNoCopy(game, UctAction.AbilityUseAction(a1, m1, m2));
             Assert.IsFalse(game.IsFinished);
 
-            game.NextMobOrNewTurn();
-            game.NextMobOrNewTurn();
+            ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
+            ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
 
             Assert.AreEqual(0, game.State.MobInstances[m2].Hp);
             Assert.AreEqual(0, game.State.BlueAlive);

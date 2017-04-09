@@ -18,8 +18,8 @@ namespace HexMage.Benchmarks {
             dna.Randomize();
 
             const string mapFilename = @"C: \Users\darth\Documents\map.json";
-            //var map = JsonConvert.DeserializeObject<Map>(File.ReadAllText(mapFilename));
-            var map = new Map(5);
+            var map = JsonConvert.DeserializeObject<Map>(File.ReadAllText(mapFilename));
+            //var map = new Map(5);
 
             var game = GameSetup.GenerateFromDna(dna, dna, map);
 
@@ -188,7 +188,8 @@ namespace HexMage.Benchmarks {
                     iterations++;
 
                     // TODO - fuj
-                    turnManager.StartNextTurn(pathfinder, gameInstance.State);
+                    throw new NotImplementedException();
+                    //turnManager.StartNextTurn(pathfinder, gameInstance.State);
 
                     //Console.WriteLine($"Starting, actions: {UctAlgorithm.Actions}");
                     stopwatch.Start();

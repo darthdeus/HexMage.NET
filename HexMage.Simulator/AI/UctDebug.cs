@@ -1,5 +1,6 @@
 //#define XML
-//#define DOT
+
+#define DOT
 
 using System;
 using System.IO;
@@ -9,53 +10,6 @@ using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public class UctDebug {
-        public static void PrintDotgraph(UctNode root, Func<int> indexFunc = null) {
-            var builder = new StringBuilder();
-
-            builder.AppendLine("digraph G {");
-            int budget = 100;
-            PrintDotNode(builder, root, budget);
-            builder.AppendLine("}");
-
-            string str = builder.ToString();
-
-            string dirname = @"data\graphs";
-            if (!Directory.Exists(dirname)) {
-                Directory.CreateDirectory(dirname);
-            }
-
-            int index = indexFunc == null ? UctAlgorithm.SearchCount : indexFunc();
-
-            File.WriteAllText($@"data\graphs\graph{index}.dot", str);
-        }
-
-        private static void PrintDotNode(StringBuilder builder, UctNode node, int budget) {
-            if (budget == 0) return;
-
-            foreach (var child in node.Children) {
-                builder.AppendLine($"\"{node}\" -> \"{child}\"");
-
-                string color;
-                var teamColor = child.State.CurrentTeam;
-
-                if (teamColor.HasValue) {
-                    if (child.Action.Type == UctActionType.EndTurn) {
-                        // This is at a point when the currentTeam is already flipped
-                        color = teamColor.Value != TeamColor.Red ? "pink" : "lightblue";
-                    } else {
-                        color = teamColor.Value == TeamColor.Red ? "pink" : "lightblue";
-                    }
-                } else {
-                    color = "gray";
-                }
-                //builder.AppendLine($"\"{child}\" [fillcolor = {color}, style=filled]");
-            }
-
-            foreach (var child in node.Children) {
-                PrintDotNode(builder, child, budget - 1);
-            }
-        }
-
         public static void PrintTreeRepresentation(UctNode root) {
 #if XML
             var dirname = @"c:\dev\graphs\xml\";
@@ -72,6 +26,55 @@ namespace HexMage.Simulator {
 #if DOT
             PrintDotgraph(root);
 #endif
+        }
+
+        public static void PrintDotgraph(UctNode root, Func<int> indexFunc = null) {
+            var builder = new StringBuilder();
+
+            int budget = 100;
+
+            builder.AppendLine("digraph G {");
+            PrintDotNode(builder, null, root, budget);
+            builder.AppendLine("}");
+
+            string str = builder.ToString();
+
+            string dirname = @"data\graphs";
+            if (!Directory.Exists(dirname)) {
+                Directory.CreateDirectory(dirname);
+            }
+
+            int index = indexFunc == null ? UctAlgorithm.SearchCount : indexFunc();
+
+            File.WriteAllText($@"data\graphs\graph{index.ToString("00000")}.dot", str);
+        }
+
+        private static void PrintDotNode(StringBuilder builder, UctNode parent, UctNode node, int budget) {
+            if (budget == 0) return;
+
+            string color;
+            var teamColor = node.State.CurrentTeam;
+
+            if (teamColor.HasValue) {
+                if (node.Action.Type == UctActionType.EndTurn) {
+                    // This is at a point when the currentTeam is already flipped
+                    color = teamColor.Value == TeamColor.Red ? "lightblue" : "pink";
+                } else {
+                    color = teamColor.Value == TeamColor.Red ? "pink" : "lightblue";
+                }
+            } else {
+                color = "yellow";
+            }
+
+            builder.AppendLine($"\"{node}\" [fillcolor = {color}, style=filled]");
+
+            if (parent != null) {
+                builder.AppendLine($"\"{parent}\" -> \"{node}\"");
+            }
+
+            foreach (var child in node.Children) {
+                PrintDotNode(builder, node, child, budget - 1);
+            }
         }
     }
 }

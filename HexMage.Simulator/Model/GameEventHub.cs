@@ -45,11 +45,11 @@ namespace HexMage.Simulator.Model {
 
             var turnManager = _gameInstance.TurnManager;
             var state = _gameInstance.State;
-            turnManager.StartNextTurn(_gameInstance.Pathfinder, state);
+
+            _gameInstance.Reset();
 
             int totalTurns = 0;
             state.SlowUpdateIsFinished(_gameInstance.MobManager);
-
 
             while (!_gameInstance.IsFinished) {
                 totalTurns++;
@@ -104,7 +104,10 @@ namespace HexMage.Simulator.Model {
 
         public int FastMainLoop() {
             var turnManager = _gameInstance.TurnManager;
-            turnManager.StartNextTurn(_gameInstance.Pathfinder, _gameInstance.State);
+
+            throw new NotImplementedException();
+            _gameInstance.Reset();
+            //turnManager.StartNextTurn(_gameInstance.Pathfinder, _gameInstance.State);
 
             int totalTurns = 0;
             _gameInstance.State.SlowUpdateIsFinished(_gameInstance.MobManager);

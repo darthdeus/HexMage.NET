@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -24,33 +25,33 @@ namespace HexMage.Simulator.Tests
             Assert.AreEqual(game.TurnManager.CurrentMob, m1);
             Assert.AreEqual(game.TurnManager.TurnNumber, 1);
 
-            game.NextMobOrNewTurn();
+            ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
             Assert.AreEqual(game.TurnManager.CurrentMob, m2);
             Assert.AreEqual(game.TurnManager.TurnNumber, 1);
 
-            game.NextMobOrNewTurn();
+            ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
             Assert.AreEqual(game.TurnManager.CurrentMob, m3);
             Assert.AreEqual(game.TurnManager.TurnNumber, 1);
 
-            game.NextMobOrNewTurn();
+            ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
             Assert.AreEqual(game.TurnManager.CurrentMob, m4);
             Assert.AreEqual(game.TurnManager.TurnNumber, 1);
 
             // At this point a new turn should start
 
-            game.NextMobOrNewTurn();
+            ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
             Assert.AreEqual(game.TurnManager.CurrentMob, m1);
             Assert.AreEqual(game.TurnManager.TurnNumber, 2);
 
-            game.NextMobOrNewTurn();
+            ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
             Assert.AreEqual(game.TurnManager.CurrentMob, m2);
             Assert.AreEqual(game.TurnManager.TurnNumber, 2);
 
-            game.NextMobOrNewTurn();
+            ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
             Assert.AreEqual(game.TurnManager.CurrentMob, m3);
             Assert.AreEqual(game.TurnManager.TurnNumber, 2);
 
-            game.NextMobOrNewTurn();
+            ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
             Assert.AreEqual(game.TurnManager.CurrentMob, m4);
             Assert.AreEqual(game.TurnManager.TurnNumber, 2);
         }

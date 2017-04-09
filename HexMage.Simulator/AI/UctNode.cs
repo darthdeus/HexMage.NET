@@ -46,13 +46,15 @@ namespace HexMage.Simulator {
 
         public override string ToString() {
             string team;
-            if (State.CurrentTeam.HasValue) {
+            if (State.CurrentTeam.HasValue && State.State.LastTeamColor.HasValue) {
                 var currentTeam = State.CurrentTeam.Value;
+                var lastTeam = State.State.LastTeamColor.Value;
+
                 team = Action.Type == UctActionType.EndTurn
-                           ? $"{ShortTeam(OtherTeam(currentTeam))}->{ShortTeam(currentTeam)}"
+                           ? $"{ShortTeam(lastTeam)}->{ShortTeam(currentTeam)}"
                            : ShortTeam(currentTeam);
             } else {
-                team = "";
+                team = "NOTEAM";
             }
 
             string terminal = IsTerminal ? $"[T]" : "";

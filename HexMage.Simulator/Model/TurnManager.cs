@@ -50,52 +50,21 @@ namespace HexMage.Simulator {
             });
 
             CopyTurnOrderFromPresort();
+            State.CurrentMobIndex = 0;
         }
 
-        public void StartNextTurn(Pathfinder pathfinder, GameState state) {
-            TurnNumber++;
+        public void NextMobOrNewTurn(Pathfinder pathfinder, GameState state) {
+            var currentMobIndex = state.CurrentMobIndex;
+            if (!currentMobIndex.HasValue) throw new InvalidOperationException("CurrentMob has no value but trying to move to the next.");
 
-            for (int i = 0; i < state.MobInstances.Length; i++) {
-                state.MobInstances[i].Ap = MobManager.MobInfos[i].MaxAp;
-            }
-
-            state.ApplyDots(_gameInstance.Map, _gameInstance);
-
-            foreach (var mobInstance in state.MobInstances) {
-                Debug.Assert(mobInstance.Hp >= 0, "mobInstance.Hp >= 0");
-            }
-
-            _turnOrder.RemoveAll(x => state.MobInstances[x].Hp <= 0);
-
-            state.LowerCooldowns();
-
-            state.CurrentMobIndex = 0;
-
-            // TODO: wut, ma tu tohle vubec byt?
-            if (CurrentMob.HasValue) {
-                Debug.Assert(state.MobInstances[CurrentMob.Value].Hp > 0, "Current mob is dead");
-            }
-        }
-
-        public TurnEndResult NextMobOrNewTurn(Pathfinder pathfinder, GameState state) {
-            Debug.Assert(state.CurrentMobIndex.HasValue, "state.CurrentMobIndex.HasValue");
-            if (!state.CurrentMobIndex.HasValue) {
-                Utils.Log(LogSeverity.Error, nameof(TurnManager),
-                          "CurrentMob has no value but trying to move to the next.");
-                return TurnEndResult.NextMob;
-            }
-
-            if (state.CurrentMobIndex.Value >= _turnOrder.Count - 1) {
+            if (currentMobIndex.Value >= _turnOrder.Count - 1) {
                 StartNextTurn(pathfinder, state);
-                return TurnEndResult.NextTurn;
             } else {
-                state.CurrentMobIndex = state.CurrentMobIndex.Value + 1;
+                state.CurrentMobIndex = currentMobIndex.Value + 1;
 
                 Debug.Assert(CurrentMob.HasValue, "There's no current mob but still trying to move to one.");
                 var mobInstance = state.MobInstances[CurrentMob.Value];
-                if (mobInstance.Hp <= 0) return NextMobOrNewTurn(pathfinder, state);
-
-                return TurnEndResult.NextMob;
+                if (mobInstance.Hp <= 0) NextMobOrNewTurn(pathfinder, state);
             }
         }
 
@@ -105,7 +74,7 @@ namespace HexMage.Simulator {
         }
 
         private void CopyTurnOrderFromPresort() {
-            _turnOrder = new List<int>();
+            _turnOrder = new List<int>(_presortedOrder.Count);
 
             foreach (var id in _presortedOrder) {
                 _turnOrder.Add(id);
@@ -131,6 +100,31 @@ namespace HexMage.Simulator {
             copy.TurnNumber = TurnNumber;
 
             return copy;
+        }
+
+        private void StartNextTurn(Pathfinder pathfinder, GameState state) {
+            TurnNumber++;
+
+            for (int i = 0; i < state.MobInstances.Length; i++) {
+                state.MobInstances[i].Ap = MobManager.MobInfos[i].MaxAp;
+            }
+
+            state.ApplyDots(_gameInstance.Map, _gameInstance);
+
+            foreach (var mobInstance in state.MobInstances) {
+                Debug.Assert(mobInstance.Hp >= 0, "mobInstance.Hp >= 0");
+            }
+
+            _turnOrder.RemoveAll(x => state.MobInstances[x].Hp <= 0);
+
+            state.LowerCooldowns();
+
+            state.CurrentMobIndex = 0;
+
+            // TODO: wut, ma tu tohle vubec byt?
+            if (CurrentMob.HasValue) {
+                Debug.Assert(state.MobInstances[CurrentMob.Value].Hp > 0, "Current mob is dead");
+            }
         }
     }
 }

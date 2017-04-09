@@ -173,7 +173,7 @@ namespace HexMage.Simulator.Tests {
             var result = UctAlgorithm.DefaultPolicy(game, TeamColor.Red);
 
             Assert.AreEqual(-1, result);
-            game.NextMobOrNewTurn();
+            ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
 
             Assert.AreEqual(TeamColor.Blue, game.CurrentTeam);
 
@@ -220,7 +220,7 @@ namespace HexMage.Simulator.Tests {
                 Assert.AreEqual(UctActionType.Move, moveAction.Type);
             }
 
-            game.TurnManager.NextMobOrNewTurn(game.Pathfinder, game.State);
+            ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
 
             Assert.IsTrue(game.TurnManager.CurrentMob.HasValue);
             Assert.AreEqual(m2, game.TurnManager.CurrentMob.Value);

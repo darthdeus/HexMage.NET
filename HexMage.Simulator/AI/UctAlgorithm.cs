@@ -25,16 +25,22 @@ namespace HexMage.Simulator.AI {
             int totalIterations = _thinkTime;
             int iterations = totalIterations;
 
+            int it = 0;
             while (iterations-- > 0) {
+                //UctDebug.PrintDotgraph(root, () => it);
+                //it++;
+                //Console.WriteLine($"Written {it}");
                 OneIteration(root, initialState.CurrentTeam.Value);
             }
 
             stopwatch.Stop();
 
-            UctDebug.PrintTreeRepresentation(root);
+            //UctDebug.PrintTreeRepresentation(root);
             Interlocked.Increment(ref SearchCount);
 
             //Console.WriteLine($"Total Q: {root.Children.Sum(c => c.Q)}, N: {root.Children.Sum(c => c.N)}");
+
+            //throw new InvalidOperationException();
 
             var actions = SelectBestActions(root);
             return new UctSearchResult(actions, (double) stopwatch.ElapsedMilliseconds / (double) totalIterations);
@@ -184,7 +190,11 @@ namespace HexMage.Simulator.AI {
                 node = node.Parent;
 
                 if (node != null && node.Action.Type == UctActionType.EndTurn) {
-                    delta = -delta;
+                    bool teamColorChanged = node.State.CurrentTeam != node.State.State.LastTeamColor;
+
+                    if (teamColorChanged) {
+                        delta = -delta;
+                    }
                 }
             }
         }

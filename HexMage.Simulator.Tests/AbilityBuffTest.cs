@@ -31,13 +31,13 @@ namespace HexMage.Simulator.Tests {
             // No damage has been done yet by the AOE
             Assert.AreEqual(9, game.State.MobInstances[m2].Hp);
 
-            game.NextMobOrNewTurn();
+            ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
 
             Assert.AreEqual(1, game.TurnManager.TurnNumber);
             Assert.AreEqual(m2, game.TurnManager.CurrentMob);
 
             // Not the fire debuff should be applied
-            game.NextMobOrNewTurn();
+            ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
 
             Assert.AreEqual(2, game.TurnManager.TurnNumber);
             Assert.AreEqual(m1, game.TurnManager.CurrentMob);
@@ -48,8 +48,8 @@ namespace HexMage.Simulator.Tests {
             Assert.AreEqual(1, targetAfter.Buff.Lifetime);
             Assert.AreEqual(10, game.State.MobInstances[m1].Ap);
 
-            game.NextMobOrNewTurn();
-            game.NextMobOrNewTurn();
+            ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
+            ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
 
             Assert.AreEqual(3, game.TurnManager.TurnNumber);
             Assert.AreEqual(m1, game.TurnManager.CurrentMob);

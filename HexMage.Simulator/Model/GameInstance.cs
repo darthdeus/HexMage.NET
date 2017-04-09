@@ -19,7 +19,7 @@ namespace HexMage.Simulator {
         public int Size { get; set; }
 
         public GameState State { get; set; }
-
+        
         public bool AllDead => State.RedAlive == 0 && State.BlueAlive == 0;
         public bool IsFinished => State.IsFinished;
 
@@ -56,21 +56,18 @@ namespace HexMage.Simulator {
         }
 
         public void PrepareEverything() {
-            State.Reset(MobManager);
-            State.SlowUpdateIsFinished(MobManager);
             Map.PrecomputeCubeLinedraw();
             Pathfinder.PathfindDistanceAll();
+            State.Reset(MobManager);
             TurnManager.PresortTurnOrder();
-            TurnManager.StartNextTurn(Pathfinder, State);
+            State.LastTeamColor = CurrentTeam;
         }
 
         public void PrepareTurnOrder() {
             // TODO - je tohle potreba?
             State.Reset(MobManager);
-            State.SlowUpdateIsFinished(MobManager);
 
-            TurnManager.PresortTurnOrder();
-            TurnManager.StartNextTurn(Pathfinder, State);
+            TurnManager.PresortTurnOrder();            
         }
 
         public TeamColor? CurrentTeam {
@@ -145,10 +142,6 @@ namespace HexMage.Simulator {
             game.State = State.DeepCopy();
 
             return game;
-        }
-
-        public TurnEndResult NextMobOrNewTurn() {
-            return TurnManager.NextMobOrNewTurn(Pathfinder, State);
         }
 
 #warning TODO - funguje tohle jeste?

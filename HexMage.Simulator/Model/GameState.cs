@@ -15,6 +15,7 @@ namespace HexMage.Simulator {
         public MobInstance[] MobInstances = new MobInstance[0];
         public readonly List<int> Cooldowns = new List<int>();
         public int? CurrentMobIndex;
+        public TeamColor? LastTeamColor;
 
         // This is optimized specifically for the smaller data sets on which
         // the evolution is being performed.
@@ -142,6 +143,7 @@ namespace HexMage.Simulator {
                 RedAlive = RedAlive,
                 BlueAlive = BlueAlive,
                 CurrentMobIndex = CurrentMobIndex,
+                LastTeamColor = LastTeamColor
             };
 
             for (int i = 0; i < Cooldowns.Count; i++) {
@@ -170,6 +172,10 @@ namespace HexMage.Simulator {
                 MobInstances[mobId].Hp = mobInfo.MaxHp;
                 MobInstances[mobId].Ap = mobInfo.MaxAp;
                 SetMobPosition(mobId, mobInfo.OrigCoord);
+            }
+
+            for (int i = 0; i < Cooldowns.Count; i++) {
+                Cooldowns[i] = 0;
             }
             
             SlowUpdateIsFinished(mobManager);            

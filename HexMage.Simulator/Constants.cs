@@ -2,11 +2,11 @@
 
 namespace HexMage.Simulator {
     public static class Constants {
-        public static bool RecordReplays = false;
+        public static bool RecordReplays = true;
 
         // MCTS benchmarks
-        public static int MctsBenchIterations = 1000;
-        public static int MctsBenchType = 1;
+        public static int MctsBenchIterations = 10000;
+        public static int MctsBenchType = 0;
 
         public static bool GnuPlot = true;
 
