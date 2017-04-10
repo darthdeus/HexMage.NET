@@ -131,27 +131,10 @@ namespace HexMage.Simulator.Model {
 
             ActionEvaluator.FNoCopy(_gameInstance, UctAction.MoveAction(mob, pos));
         }
-
-        public void FastBroadcastMobMoved(int mob, AxialCoord pos) {
-            foreach (var subscriber in _subscribers) {
-                subscriber.EventMobMoved(mob, pos);
-            }
-
-            ActionEvaluator.FNoCopy(_gameInstance, UctAction.MoveAction(mob, pos));
-        }
-
+        
         public async Task SlowBroadcastAbilityUsed(int mobId, int targetId, int abilityId) {
             var ability = _gameInstance.MobManager.AbilityForId(abilityId);
             await Task.WhenAll(_subscribers.Select(x => x.SlowEventAbilityUsed(mobId, targetId, ability)));
-
-            ActionEvaluator.FNoCopy(_gameInstance, UctAction.AbilityUseAction(abilityId, mobId, targetId));
-        }
-
-        public void FastBroadcastAbilityUsed(int mobId, int targetId, int abilityId) {
-            var ability = _gameInstance.MobManager.AbilityForId(abilityId);
-            foreach (var subscriber in _subscribers) {
-                subscriber.EventAbilityUsed(mobId, targetId, ability);
-            }
 
             ActionEvaluator.FNoCopy(_gameInstance, UctAction.AbilityUseAction(abilityId, mobId, targetId));
         }

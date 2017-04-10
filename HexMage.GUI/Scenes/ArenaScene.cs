@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading.Tasks;
 using HexMage.GUI.Components;
 using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
@@ -168,7 +166,6 @@ namespace HexMage.GUI.Scenes {
 
             var buffsLabel = new Label(_assetManager.Font);
             abilityDetail.AddChild(buffsLabel);
-
 
             const float speed = 1;
             const float horizontalOffset = 6;

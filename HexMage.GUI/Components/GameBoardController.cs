@@ -48,14 +48,6 @@ namespace HexMage.GUI.Components {
             _replay = replay;
         }
 
-        public void EventAbilityUsed(int mobId, int targetId, AbilityInfo abilityInfo) {
-            SlowEventAbilityUsed(mobId, targetId, abilityInfo).Wait();
-        }
-
-        public void EventMobMoved(int mobId, AxialCoord pos) {
-            SlowEventMobMoved(mobId, pos).Wait();
-        }
-
         public async Task SlowEventMobMoved(int mobId, AxialCoord pos) {
             var mobEntity = _arenaScene.MobEntities[mobId];
             Debug.Assert(mobEntity != null, "Trying to move a mob without an associated entity.");
@@ -70,8 +62,6 @@ namespace HexMage.GUI.Components {
         }
 
         public async Task SlowEventAbilityUsed(int mobId, int targetId, AbilityInfo abilityInfo) {
-            //Utils.Log(LogSeverity.Info, nameof(GameBoardController), "EventAbilityUsed");
-
             var sound = abilityInfo.Dmg > 18
                                ? AssetManager.SoundEffectFireballLarge
                                : AssetManager.SoundEffectFireballSmall;

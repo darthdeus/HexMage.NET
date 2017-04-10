@@ -15,6 +15,13 @@ namespace HexMage.Simulator.AI {
         public static int ExpandCount = 0;
         public static int BestChildCount = 0;
 
+        private readonly int _thinkTime;
+
+        public UctAlgorithm(int thinkTime) {
+            _thinkTime = thinkTime;
+        }
+
+
         public UctSearchResult UctSearch(GameInstance initialState) {
             var root = new UctNode(0, 0, UctAction.NullAction(), initialState.DeepCopy());
 
@@ -42,7 +49,7 @@ namespace HexMage.Simulator.AI {
 
             //throw new InvalidOperationException();
 
-            var actions = SelectBestActions(root);            
+            var actions = SelectBestActions(root);
 
             var millisecondsPerIteration = (double) stopwatch.ElapsedMilliseconds / (double) totalIterations;
             return new UctSearchResult(actions, millisecondsPerIteration);
@@ -55,7 +62,6 @@ namespace HexMage.Simulator.AI {
             Backup(v, delta);
             return delta;
         }
-
 
         public static UctNode TreePolicy(UctNode node) {
             while (!node.IsTerminal) {
@@ -107,14 +113,6 @@ namespace HexMage.Simulator.AI {
                 throw;
             }
         }
-
-        private readonly int _thinkTime;
-
-
-        public UctAlgorithm(int thinkTime) {
-            _thinkTime = thinkTime;
-        }
-
 
         public static float PlayoutAction(GameInstance game, UctAction action, TeamColor startingTeam) {
             return DefaultPolicy(ActionEvaluator.F(game, action), startingTeam);
@@ -217,16 +215,6 @@ namespace HexMage.Simulator.AI {
         }
 
         private List<UctAction> SelectBestActions(UctNode root) {
-            //UctNode result = root.Children[0];
-
-            //foreach (var child in root.Children) {
-            //    if (child.Q > result.Q) {
-            //        result = child;
-            //    }
-            //}
-
-            //return result;
-
             var result = new List<UctAction>();
             UctNode current = root;
 
@@ -250,7 +238,7 @@ namespace HexMage.Simulator.AI {
                 }
 
                 current = max;
-            } while (current.Action.Type != UctActionType.EndTurn);            
+            } while (current.Action.Type != UctActionType.EndTurn);
 
             return result;
         }

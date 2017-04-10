@@ -81,11 +81,6 @@ namespace HexMage.Simulator {
             }
         }
 
-        public float UcbValue() {
-            float parentN = Parent?.N ?? 0;
-            return (float)(Q / N + Math.Sqrt(2 * Math.Log(parentN) / N));
-        }
-
         public void Print(int indentation) {
             Console.WriteLine(new string('\t', indentation) + this);
             foreach (var child in Children) {

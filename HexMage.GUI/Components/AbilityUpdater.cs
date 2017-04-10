@@ -68,13 +68,6 @@ namespace HexMage.GUI.Components {
                 _rangeLabel.Text = $"Range {_abilityInfo.Range}";
                 _elementLabel.Text = _abilityInfo.Element.ToString();
 
-                var cooldown = gameInstance.State.Cooldowns[abilityId];
-                if (cooldown == 0) {
-                    _cooldownLabel.Text = $"Cooldown: {_abilityInfo.Cooldown} turns";
-                } else {
-                    _cooldownLabel.Text = $"Again in {cooldown} turns";
-                }
-
                 var buffTextBuilder = new StringBuilder();
 
                 if (!_abilityInfo.Buff.IsZero) {
