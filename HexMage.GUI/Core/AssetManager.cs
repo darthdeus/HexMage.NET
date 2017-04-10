@@ -14,7 +14,8 @@ namespace HexMage.GUI {
 
         public const string SoundEffectFireballSmall = "sound_effects/fireball_small";
         public const string SoundEffectFireballLarge = "sound_effects/fireball_large";
-        public const string SpellHit = "sound_effects/spell_hit";
+        public const string SoundEffectSpellHit = "sound_effects/spell_hit";
+        public const string SoundEffectDying = "sound_effects/dying";
 
         public const string SolidGrayColor = "color/gray";
 

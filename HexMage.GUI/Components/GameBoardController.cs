@@ -72,7 +72,7 @@ namespace HexMage.GUI.Components {
         public async Task SlowEventAbilityUsed(int mobId, int targetId, AbilityInfo abilityInfo) {
             //Utils.Log(LogSeverity.Info, nameof(GameBoardController), "EventAbilityUsed");
 
-            var sound = abilityInfo.Dmg > 12
+            var sound = abilityInfo.Dmg > 18
                                ? AssetManager.SoundEffectFireballLarge
                                : AssetManager.SoundEffectFireballSmall;
             _assetManager.LoadSoundEffect(sound).Play();
@@ -106,7 +106,7 @@ namespace HexMage.GUI.Components {
 
             await projectile.Task;
 
-            _assetManager.LoadSoundEffect(AssetManager.SpellHit).Play();
+            _assetManager.LoadSoundEffect(AssetManager.SoundEffectSpellHit).Play();
 
             var explosion = new Entity {
                 Transform = () => Camera2D.Instance.Transform,

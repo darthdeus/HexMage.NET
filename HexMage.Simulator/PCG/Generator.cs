@@ -126,7 +126,7 @@ namespace HexMage.Simulator.PCG {
             int maxAp = RandomAp();
             int maxHp = RandomHp();
 
-            for (int i = 0; i < 1; i++) {
+            for (int i = 0; i < 2; i++) {
                 var element = elements[Random.Next(0, 4)];
                 var buff = RandomBuff(element);
 
