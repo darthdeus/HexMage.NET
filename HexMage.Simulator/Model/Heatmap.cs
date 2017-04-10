@@ -27,6 +27,7 @@ namespace HexMage.Simulator {
             TeamColor playerTeam = game.CurrentTeam.Value;
 
             foreach (var coord in heatmap.Map.AllCoords) {
+                int coordValue = 0;
                 foreach (var mobId in game.MobManager.Mobs) {
                     var enemyInfo = game.MobManager.MobInfos[mobId];
                     var enemyInstance = game.State.MobInstances[mobId];
@@ -56,12 +57,13 @@ namespace HexMage.Simulator {
                         }
                     }
 
-                    heatmap.Map[coord] += maxAbilityDmg;
+                    coordValue += maxAbilityDmg;
 
-                    int coordValue = heatmap.Map[coord];
                     if (coordValue < minDmg) minDmg = coordValue;
                     if (coordValue > maxDmg) maxDmg = coordValue;
                 }
+
+                heatmap.Map[coord] = coordValue;
             }
 
             heatmap.MinValue = minDmg;

@@ -64,13 +64,15 @@ namespace HexMage.Benchmarks {
 
             var iterationStopwatch = new Stopwatch();
 
-            for (int i = 0; i < 1000; i++) {
+            for (int i = 0; i < 20; i++) {
                 dna.Randomize();
 
                 GameSetup.OverrideGameDna(game, dna, dna);
                 iterationStopwatch.Restart();
                 GameInstanceEvaluator.PlayoutSingleGame(game, c1, c2);
                 iterationStopwatch.Stop();
+                Console.WriteLine($"Iteration: {iterationStopwatch.ElapsedMilliseconds}ms");
+                Console.WriteLine(Accounting.GetStats());
 
                 GameSetup.OverrideGameDna(game, dna, dna);
                 iterationStopwatch.Restart();

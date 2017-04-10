@@ -129,7 +129,7 @@ namespace HexMage.Simulator.AI {
             Debug.Assert(game.CurrentTeam.HasValue, "game.CurrentTeam.HasValue");
 
             var copy = game.CopyStateOnly();
-            const int maxDefaultPolicyIterations = 100;
+            const int maxDefaultPolicyIterations = 200;
             int iterations = maxDefaultPolicyIterations;
 
             ReplayRecorder.Instance.Clear();
