@@ -12,7 +12,6 @@ using Color = Microsoft.Xna.Framework.Color;
 namespace HexMage.GUI.Scenes {    
     public class ArenaScene : GameScene {
         private readonly GameInstance _gameInstance;
-        private readonly Entity _defenseModal;
         private readonly GameEventHub _gameEventHub;
         public readonly Dictionary<int, MobEntity> MobEntities = new Dictionary<int, MobEntity>();
 
@@ -33,15 +32,6 @@ namespace HexMage.GUI.Scenes {
 
         public ArenaScene(GameManager gameManager, GameInstance gameInstance) : base(gameManager) {
             _gameInstance = gameInstance;
-
-            _defenseModal = new VerticalLayout {
-                SortOrder = Camera2D.SortUI + 1000,
-                Padding = new Vector4(20),
-                Renderer = new ColorRenderer(Color.LightGray),
-                Position = new Vector2(500, 250),
-                Active = false
-            };
-
             _gameEventHub = new GameEventHub(_gameInstance);
         }
 

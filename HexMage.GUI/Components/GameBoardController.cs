@@ -89,7 +89,7 @@ namespace HexMage.GUI.Components {
             var mobInstance = _gameInstance.State.MobInstances[mobId];
             var targetInstance = _gameInstance.State.MobInstances[targetId];
 
-            BuildUsedAbilityPopover(mobId, abilityInfo).LogContinuation();
+            //BuildUsedAbilityPopover(mobId, abilityInfo).LogContinuation();
 
             var projectileSprite = AssetManager.ProjectileSpriteForElement(abilityInfo.Element);
 
