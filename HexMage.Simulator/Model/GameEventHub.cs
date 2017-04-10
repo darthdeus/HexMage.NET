@@ -71,6 +71,10 @@ namespace HexMage.Simulator.Model {
             // TODDO - game vs _gameInstance?
             Debug.Assert(game == _gameInstance, "instance == _gameInstance");
 
+            foreach (var subscriber in _subscribers) {
+                subscriber.ActionApplied(action);
+            }
+
             switch (action.Type) {
                 case UctActionType.AbilityUse:
                     await SlowBroadcastAbilityUsed(action.MobId, action.TargetId, action.AbilityId);
@@ -131,7 +135,7 @@ namespace HexMage.Simulator.Model {
 
             ActionEvaluator.FNoCopy(_gameInstance, UctAction.MoveAction(mob, pos));
         }
-        
+
         public async Task SlowBroadcastAbilityUsed(int mobId, int targetId, int abilityId) {
             var ability = _gameInstance.MobManager.AbilityForId(abilityId);
             await Task.WhenAll(_subscribers.Select(x => x.SlowEventAbilityUsed(mobId, targetId, ability)));

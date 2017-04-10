@@ -2,13 +2,15 @@
     // TODO - start using this everywhere
     // TODO - class or struct? benchmark both
     public class CachedMob {
-        public int MobId;
+        public readonly int MobId;
         public MobInfo MobInfo;
         public MobInstance MobInstance;
 
         public CachedMob(GameInstance gameInstance, int mobId) {
             MobId = mobId;
 
+            // TODO: zkontrolovat, jestli to funguje
+            if (mobId == -1) return;
             MobInfo = gameInstance.MobManager.MobInfos[mobId];
             MobInstance = gameInstance.State.MobInstances[mobId];
         }

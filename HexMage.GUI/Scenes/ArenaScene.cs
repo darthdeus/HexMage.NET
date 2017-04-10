@@ -9,7 +9,7 @@ using HexMage.Simulator.Model;
 using Microsoft.Xna.Framework;
 using Color = Microsoft.Xna.Framework.Color;
 
-namespace HexMage.GUI.Scenes {
+namespace HexMage.GUI.Scenes {    
     public class ArenaScene : GameScene {
         private readonly GameInstance _gameInstance;
         private readonly Entity _defenseModal;
@@ -46,6 +46,12 @@ namespace HexMage.GUI.Scenes {
         }
 
         public override void Initialize() {
+            HistoryLog.Initialize(_assetManager.Font, 400, _assetManager);
+
+            HistoryLog.Instance.SortOrder = Camera2D.SortUI + 100;
+            HistoryLog.Instance.Hidden = false;
+            AddAndInitializeRootEntity(HistoryLog.Instance, _assetManager);
+
             //_gameInstance.MobManager.Reset();
             //_gameInstance.Map.PrecomputeCubeLinedraw();
             //_gameInstance.Pathfinder.PathfindDistanceAll();

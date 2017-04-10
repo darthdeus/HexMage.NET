@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
 using HexMage.GUI.Scenes;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
+using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -46,6 +45,26 @@ namespace HexMage.GUI.Components {
             _eventHub = eventHub;
             _arenaScene = arenaScene;
             _replay = replay;
+        }
+
+        public void ActionApplied(UctAction action) {
+            Debug.Assert(_gameInstance.CurrentTeam.HasValue, "_gameInstance.CurrentTeam.HasValue");
+            var mob = _gameInstance.CachedMob(action.MobId);
+            var target = _gameInstance.CachedMob(action.TargetId);
+
+            AbilityInfo abilityInfo = null;
+            if (action.Type == UctActionType.AttackMove || action.Type == UctActionType.AbilityUse) {
+                abilityInfo = _gameInstance.MobManager.Abilities[action.AbilityId];
+            }
+
+            int? moveCost = null;
+
+            if (action.Type == UctActionType.AttackMove || action.Type == UctActionType.DefensiveMove
+                || action.Type == UctActionType.Move) {
+                moveCost = _gameInstance.Pathfinder.Distance(mob.MobInstance.Coord, action.Coord);
+            }
+
+            HistoryLog.Instance.Log(_gameInstance.CurrentTeam.Value, action, mob, target, abilityInfo, moveCost);
         }
 
         public async Task SlowEventMobMoved(int mobId, AxialCoord pos) {

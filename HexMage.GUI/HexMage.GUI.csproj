@@ -110,6 +110,8 @@
     <Compile Include="TextureGenerator.cs" />
     <Compile Include="Renderers\ColorRenderer.cs" />
     <Compile Include="UI\ElementMouseState.cs" />
+    <Compile Include="UI\HistoryLog.cs" />
+    <Compile Include="UI\HistoryLogEntry.cs" />
     <Compile Include="UI\HorizontalLayout.cs" />
     <Compile Include="UI\Label.cs" />
     <Compile Include="UI\Panel.cs" />
