@@ -72,7 +72,7 @@ namespace HexMage.GUI.Scenes {
             foreach (var mobId in _gameInstance.MobManager.Mobs) {
                 var mobAnimationController = new MobAnimationController(_gameInstance);
                 var mobEntity = new MobEntity(mobId, _gameInstance) {
-                    SortOrder = Camera2D.SortUI,
+                    SortOrder = Camera2D.SortMobs,
                     // TODO - fetch the animation controller via GetComponent<T>
                     Renderer = new MobRenderer(_gameInstance, mobId, mobAnimationController),
                     Transform = () => Camera2D.Instance.Transform

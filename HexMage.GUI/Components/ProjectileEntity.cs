@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Timers;
 using HexMage.GUI.Core;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI.Components {
     public class ProjectileEntity : Entity {
@@ -46,8 +44,9 @@ namespace HexMage.GUI.Components {
                 TargetHit?.Invoke();
             }
 
-            _sourceWorld = Camera2D.Instance.HexToPixel(_source);
-            _dstWorld = Camera2D.Instance.HexToPixel(_destination);
+            var offset = new Vector2(16, 16);
+            _sourceWorld = Camera2D.Instance.HexToPixel(_source) + offset;
+            _dstWorld = Camera2D.Instance.HexToPixel(_destination) + offset;
             _directionWorld = _dstWorld - _sourceWorld;
 
             Vector2 normDir = _directionWorld;
@@ -59,8 +58,7 @@ namespace HexMage.GUI.Components {
 
             Rotation = (float) (flip * Math.Acos(acos));
 
-            var originOffset = new Vector2(16, 16);
-            Position = _sourceWorld + _directionWorld*percent + originOffset;
+            Position = _sourceWorld + _directionWorld*percent + offset;
 
             _elapsedTime = time.TotalGameTime - _startTime;
         }
