@@ -19,7 +19,7 @@ namespace HexMage.GUI.Scenes {
         public readonly Dictionary<int, MobEntity> MobEntities = new Dictionary<int, MobEntity>();
 
         private GameBoardController _gameBoardController;
-        private Replay _replay;
+        private readonly Replay _replay;
 
         public ArenaScene(GameManager gameManager, Replay replay) : base(gameManager) {
             _replay = replay;
@@ -226,7 +226,6 @@ namespace HexMage.GUI.Scenes {
 
             return abilityDetailWrapper;
         }
-
 
         private Color ElementColor(AbilityElement element) {
             switch (element) {

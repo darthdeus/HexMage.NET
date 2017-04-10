@@ -433,3 +433,27 @@
 /processorParam:TextureFormat=Color
 /build:mobs/dark-mage-death.png
 
+#begin sound_effects/fireball_large.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sound_effects/fireball_large.wav
+
+#begin sound_effects/fireball_small.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sound_effects/fireball_small.wav
+
+#begin sound_effects/spell_hit.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sound_effects/spell_hit.wav
+
+#begin sound_effects/dying.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sound_effects/dying.wav
+

@@ -72,6 +72,11 @@ namespace HexMage.GUI.Components {
         public async Task SlowEventAbilityUsed(int mobId, int targetId, AbilityInfo abilityInfo) {
             //Utils.Log(LogSeverity.Info, nameof(GameBoardController), "EventAbilityUsed");
 
+            var sound = abilityInfo.Dmg > 12
+                               ? AssetManager.SoundEffectFireballLarge
+                               : AssetManager.SoundEffectFireballSmall;
+            _assetManager.LoadSoundEffect(sound).Play();
+
             var mobInstance = _gameInstance.State.MobInstances[mobId];
             var targetInstance = _gameInstance.State.MobInstances[targetId];
 
@@ -100,6 +105,8 @@ namespace HexMage.GUI.Components {
             Entity.Scene.AddAndInitializeNextFrame(projectile);
 
             await projectile.Task;
+
+            _assetManager.LoadSoundEffect(AssetManager.SpellHit).Play();
 
             var explosion = new Entity {
                 Transform = () => Camera2D.Instance.Transform,
@@ -362,7 +369,7 @@ namespace HexMage.GUI.Components {
                     var map = _gameInstance.Map;
 
                     var labelText = new StringBuilder();
-                    
+
                     // If there's no mob we can't calculate a distance from it
                     if (_gameInstance.CurrentMob.HasValue) {
                         var mobInstance = _gameInstance.State.MobInstances[_gameInstance.CurrentMob.Value];

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using HexMage.Simulator;
 using HexMage.Simulator.Model;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
@@ -10,6 +11,10 @@ using Color = Microsoft.Xna.Framework.Color;
 namespace HexMage.GUI {
     public class AssetManager {
         public const int TileSize = 64;
+
+        public const string SoundEffectFireballSmall = "sound_effects/fireball_small";
+        public const string SoundEffectFireballLarge = "sound_effects/fireball_large";
+        public const string SpellHit = "sound_effects/spell_hit";
 
         public const string SolidGrayColor = "color/gray";
 
@@ -56,6 +61,7 @@ namespace HexMage.GUI {
         private readonly Dictionary<string, Texture2D> _textures = new Dictionary<string, Texture2D>();
         private readonly Dictionary<Color, Texture2D> _colors = new Dictionary<Color, Texture2D>();
         private readonly Dictionary<string, Effect> _effects = new Dictionary<string, Effect>();
+        private readonly Dictionary<string, SoundEffect> _soundEffects = new Dictionary<string, SoundEffect>();
         private SpriteFont _font;
 
         public AssetManager(ContentManager contentManager, GraphicsDevice graphicsDevice) {
@@ -65,22 +71,25 @@ namespace HexMage.GUI {
 
         public Texture2D this[string name] {
             get {
-                if (_textures.ContainsKey(name)) {
-                    return _textures[name];
-                } else {
+                if (!_textures.ContainsKey(name)) {
                     _textures[name] = _contentManager.Load<Texture2D>(name);
-                    return _textures[name];
                 }
+                return _textures[name];
             }
         }
 
         public Effect LoadEffect(string name) {
-            if (_effects.ContainsKey(name)) {
-                return _effects[name];
-            } else {
+            if (!_effects.ContainsKey(name)) {
                 _effects[name] = _contentManager.Load<Effect>(name);
-                return _effects[name];
             }
+            return _effects[name];
+        }
+
+        public SoundEffect LoadSoundEffect(string name) {
+            if (!_soundEffects.ContainsKey(name)) {
+                _soundEffects[name] = _contentManager.Load<SoundEffect>(name);
+            }
+            return _soundEffects[name];
         }
 
         public SpriteFont Font {
