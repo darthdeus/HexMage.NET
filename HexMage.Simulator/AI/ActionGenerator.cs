@@ -202,7 +202,6 @@ namespace HexMage.Simulator {
                     if (possibleMoveAction.Type == UctActionType.Null) continue;
                     Debug.Assert(possibleMoveAction.Type == UctActionType.Move);
 
-
                     foreach (var abilityId in mobInfo.Abilities) {
                         if (!GameInvariants.IsAbilityUsableFrom(state, mob, coord, target, abilityId)) continue;
 
