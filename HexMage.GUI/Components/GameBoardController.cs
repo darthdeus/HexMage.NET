@@ -492,33 +492,6 @@ namespace HexMage.GUI.Components {
 
         private readonly TimeSpan _abilityPopoverDisplayTime = TimeSpan.FromSeconds(3);
 
-        private async Task BuildUsedAbilityPopover(int mobId, AbilityInfo abilityInfo) {
-            var result = new VerticalLayout {
-                Renderer = new ColorRenderer(Color.LightGray),
-                Padding = _popoverPadding,
-                SortOrder = Camera2D.SortUI + 1000,
-                Hidden = false
-            };
-
-            var camera = Camera2D.Instance;
-
-            result.AddComponent(
-                () => {
-                    result.Position =
-                        camera.HexToPixelWorld(_gameInstance.State.MobInstances[mobId].Coord) +
-                        _usedAbilityOffset;
-                });
-
-            string labelText = $"{abilityInfo.Dmg}DMG cost {abilityInfo.Cost}";
-            result.AddChild(new Label(labelText, _assetManager.Font));
-
-            Entity.Scene.AddAndInitializeRootEntity(result, _assetManager);
-
-            await Task.Delay(_abilityPopoverDisplayTime);
-
-            Entity.Scene.DestroyEntity(result);
-        }
-
         private void UnselectAbilityIfNeeded() {
             var mobId = _gameInstance.CurrentMob;
             if (mobId == null || !SelectedAbilityIndex.HasValue) return;

@@ -98,6 +98,7 @@
     <Compile Include="Scenes\MapEditor.cs" />
     <Compile Include="Scenes\MapEditorRenderer.cs" />
     <Compile Include="Scenes\MapEditorScene.cs" />
+    <Compile Include="Scenes\ParticleEffectSettings.cs" />
     <Compile Include="Scenes\SceneSynchronizationContext.cs" />
     <Compile Include="Renderers\SpellRenderer.cs" />
     <Compile Include="Components\ColorChanger.cs" />

@@ -42,28 +42,20 @@ namespace HexMage.GUI.Scenes {
             HistoryLog.Instance.Hidden = false;
             AddAndInitializeRootEntity(HistoryLog.Instance, _assetManager);
 
-
             var crosshairCursor = CreateRootEntity(Camera2D.SortUI);
             var cursorSprite = _assetManager[AssetManager.CrosshairCursor];
             crosshairCursor.Renderer = new SpriteRenderer(cursorSprite);
             crosshairCursor.AddComponent(() => {
                 crosshairCursor.Position = InputManager.Instance.MousePosition.ToVector2() -
-                                  cursorSprite.Bounds.Size.ToVector2() / 2;
+                                           cursorSprite.Bounds.Size.ToVector2() / 2;
             });
-
-            //_gameInstance.MobManager.Reset();
-            //_gameInstance.Map.PrecomputeCubeLinedraw();
-            //_gameInstance.Pathfinder.PathfindDistanceAll();
-
-            //// TODO - vyresit kdy presne volat presort (mozna nejaky unifikovany initialize?)
-            //_gameInstance.TurnManager.PresortTurnOrder();
-            //_gameInstance.TurnManager.StartNextTurn(_gameInstance.Pathfinder);
 
             Camera2D.Instance.Translate = new Vector3(600, 500, 0);
 
             var gameBoardEntity = CreateRootEntity(Camera2D.SortBackground);
 
-            _gameBoardController = new GameBoardController(_gameInstance, _gameEventHub, crosshairCursor, this, _replay);
+            _gameBoardController = new GameBoardController(_gameInstance, _gameEventHub, crosshairCursor, this,
+                                                           _replay);
 
             gameBoardEntity.AddComponent(_gameBoardController);
             gameBoardEntity.Renderer =
@@ -87,11 +79,6 @@ namespace HexMage.GUI.Scenes {
                 AddAndInitializeRootEntity(mobEntity, _assetManager);
                 MobEntities[mobId] = mobEntity;
             }
-        }
-
-        private enum ParticleEffectSettings {
-            HighlightParticles,
-            NoParticles
         }
 
         public override void Cleanup() { }
@@ -224,7 +211,11 @@ namespace HexMage.GUI.Scenes {
                                                     buffsLabel);
             abilityDetail.AddComponent(abilityUpdater);
 
-            abilityUpdater.OnClick += index => { _gameBoardController.SelectAbility(index); };
+            abilityUpdater.OnClick += index => {
+                if (_gameInstance.CurrentController is PlayerController) {
+                    _gameBoardController.SelectAbility(index);
+                }
+            };
 
             return abilityDetailWrapper;
         }
