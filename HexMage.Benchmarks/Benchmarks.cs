@@ -65,7 +65,7 @@ namespace HexMage.Benchmarks {
 
             var iterationStopwatch = new Stopwatch();
 
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i < 100; i++) {
                 dna.Randomize();
 
                 GameSetup.OverrideGameDna(game, dna, dna);

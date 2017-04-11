@@ -51,14 +51,20 @@ namespace HexMage.Simulator {
 
         private static void PrintDotNode(StringBuilder builder, UctNode parent, UctNode node, int budget) {
             if (budget == 0) return;
+            if (node.N < 5) return;
 
             string color;
             var teamColor = node.State.CurrentTeam;
 
             if (teamColor.HasValue) {
                 if (node.Action.Type == UctActionType.EndTurn) {
-                    // This is at a point when the currentTeam is already flipped
-                    color = teamColor.Value == TeamColor.Red ? "lightblue" : "pink";
+                    var lastTeamColor = node.State.State.LastTeamColor;
+
+                    if (lastTeamColor == teamColor) {
+                        color = teamColor.Value == TeamColor.Red ? "pink" : "lightblue";
+                    } else {
+                        color = teamColor.Value == TeamColor.Red ? "lightblue" : "pink";
+                    }
                 } else {
                     color = teamColor.Value == TeamColor.Red ? "pink" : "lightblue";
                 }

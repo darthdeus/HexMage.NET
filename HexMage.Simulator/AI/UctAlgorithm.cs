@@ -50,7 +50,7 @@ namespace HexMage.Simulator.AI {
 
             stopwatch.Stop();
 
-            //UctDebug.PrintTreeRepresentation(root);
+            UctDebug.PrintTreeRepresentation(root);
             Interlocked.Increment(ref SearchCount);
 
             var actions = SelectBestActions(root);
@@ -80,19 +80,6 @@ namespace HexMage.Simulator.AI {
             }
 
             return node;
-        }
-
-        public static UctNode BestChild(UctNode node, double k = 2) {
-            if (node.Children.Count == 0) return null;
-
-            UctNode best = node.Children[0];
-            foreach (var child in node.Children) {
-                if (UcbValue(node, child, k) > UcbValue(node, best, k)) {
-                    best = child;
-                }
-            }
-
-            return best;
         }
 
         public static float UcbValue(UctNode parent, UctNode node, double k) {
@@ -219,6 +206,19 @@ namespace HexMage.Simulator.AI {
             }
         }
 
+        public static UctNode BestChild(UctNode node, double k = 2) {
+            if (node.Children.Count == 0) return null;
+
+            UctNode best = node.Children[0];
+            foreach (var child in node.Children) {
+                if (UcbValue(node, child, k) > UcbValue(node, best, k)) {
+                    best = child;
+                }
+            }
+
+            return best;
+        }
+
         private List<UctAction> SelectBestActions(UctNode root) {
             var result = new List<UctAction>();
             UctNode current = root;
@@ -234,11 +234,24 @@ namespace HexMage.Simulator.AI {
                     }
                 }
 
-                if (max.Q / max.N < 0.1) {
-                    Console.WriteLine($"Chooosing bad action {max.Q} / {max.N}");
+                if (max.Q / max.N < 0.2) {
+                    //Console.WriteLine($"Bad action {max.Q} / {max.N}, generating via rules");
+                    var state = current.State.DeepCopy();
+                    do {
+                        var action = ActionGenerator.RuleBasedAction(state);
+                        state = ActionEvaluator.F(state, action);
+                        if (action.Type == UctActionType.EndTurn) {
+                            return result;
+                        } else {
+                            result.Add(action);
+                        }
+                    } while (true);
                 }
 
                 if (max.Action.Type != UctActionType.EndTurn) {
+                    if (max.IsTerminal) {
+                        Console.WriteLine("Found terminal");
+                    }
                     result.Add(max.Action);
                 }
 

@@ -13,9 +13,9 @@ namespace HexMage.Benchmarks {
 
             if (!ProcessArguments(args)) return;
 
-            //Constants.MctsBenchmark = true;
-            //Benchmarks.CompareAi();
-            //return;
+            Constants.MctsBenchmark = true;
+            Benchmarks.CompareAi();
+            return;
 
             new Benchmarks().Run();
 
