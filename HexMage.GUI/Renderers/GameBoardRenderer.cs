@@ -176,14 +176,6 @@ namespace HexMage.GUI.Renderers {
                 var mobInfo = _gameInstance.MobManager.MobInfos[currentMob.Value];
                 var mobInstance = _gameInstance.State.MobInstances[currentMob.Value];
 
-                // TODO - tohle smazat, az se prestanou placovat mobove mimo mapu
-                if (mouseHex.Distance(AxialCoord.Zero) >= _gameInstance.Size) {
-                    // TODO - pouzit util log
-                    //Console.WriteLine("Hovering outside of the map, not drawing path");
-                    _spriteBatch.End();
-                    return;
-                }
-
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex) &&
                     _gameInstance.Pathfinder.Distance(mobInstance.Coord, mouseHex) != int.MaxValue) {
                     IList<AxialCoord> path;

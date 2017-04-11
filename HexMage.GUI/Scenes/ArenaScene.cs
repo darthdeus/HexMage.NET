@@ -9,7 +9,7 @@ using HexMage.Simulator.Model;
 using Microsoft.Xna.Framework;
 using Color = Microsoft.Xna.Framework.Color;
 
-namespace HexMage.GUI.Scenes {    
+namespace HexMage.GUI.Scenes {
     public class ArenaScene : GameScene {
         private readonly GameInstance _gameInstance;
         private readonly GameEventHub _gameEventHub;
@@ -42,6 +42,15 @@ namespace HexMage.GUI.Scenes {
             HistoryLog.Instance.Hidden = false;
             AddAndInitializeRootEntity(HistoryLog.Instance, _assetManager);
 
+
+            var crosshairCursor = CreateRootEntity(Camera2D.SortUI);
+            var cursorSprite = _assetManager[AssetManager.CrosshairCursor];
+            crosshairCursor.Renderer = new SpriteRenderer(cursorSprite);
+            crosshairCursor.AddComponent(() => {
+                crosshairCursor.Position = InputManager.Instance.MousePosition.ToVector2() -
+                                  cursorSprite.Bounds.Size.ToVector2() / 2;
+            });
+
             //_gameInstance.MobManager.Reset();
             //_gameInstance.Map.PrecomputeCubeLinedraw();
             //_gameInstance.Pathfinder.PathfindDistanceAll();
@@ -54,7 +63,7 @@ namespace HexMage.GUI.Scenes {
 
             var gameBoardEntity = CreateRootEntity(Camera2D.SortBackground);
 
-            _gameBoardController = new GameBoardController(_gameInstance, _gameEventHub, this, _replay);
+            _gameBoardController = new GameBoardController(_gameInstance, _gameEventHub, crosshairCursor, this, _replay);
 
             gameBoardEntity.AddComponent(_gameBoardController);
             gameBoardEntity.Renderer =

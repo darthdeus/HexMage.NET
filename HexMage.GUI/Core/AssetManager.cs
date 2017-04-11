@@ -54,6 +54,7 @@ namespace HexMage.GUI {
         public const string ShaderAbility = "shaders/ability_shader";
 
         public const string HistoryLogBg = "ability_ui/history_log_bg";
+        public const string CrosshairCursor = "ability_ui/crosshair";
 
         public const string ParticleSprite = "particle";
 

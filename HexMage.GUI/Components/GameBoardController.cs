@@ -19,6 +19,7 @@ namespace HexMage.GUI.Components {
     public class GameBoardController : Component, IGameEventSubscriber {
         private readonly GameEventHub _eventHub;
         private readonly ArenaScene _arenaScene;
+        private readonly Entity _crosshairCursor;
         private readonly GameInstance _gameInstance;
 
         private readonly Vector2 _mouseHoverPopoverOffset = new Vector2(
@@ -39,11 +40,11 @@ namespace HexMage.GUI.Components {
 
         public int? SelectedAbilityIndex;
 
-        public GameBoardController(GameInstance gameInstance, GameEventHub eventHub, ArenaScene arenaScene,
-                                   Replay replay = null) {
+        public GameBoardController(GameInstance gameInstance, GameEventHub eventHub, Entity crosshairCursor, ArenaScene arenaScene, Replay replay = null) {
             _gameInstance = gameInstance;
             _eventHub = eventHub;
             _arenaScene = arenaScene;
+            _crosshairCursor = crosshairCursor;
             _replay = replay;
         }
 
@@ -82,8 +83,8 @@ namespace HexMage.GUI.Components {
 
         public async Task SlowEventAbilityUsed(int mobId, int targetId, AbilityInfo abilityInfo) {
             var sound = abilityInfo.Dmg > 18
-                               ? AssetManager.SoundEffectFireballLarge
-                               : AssetManager.SoundEffectFireballSmall;
+                            ? AssetManager.SoundEffectFireballLarge
+                            : AssetManager.SoundEffectFireballSmall;
             _assetManager.LoadSoundEffect(sound).Play();
 
             var mobInstance = _gameInstance.State.MobInstances[mobId];
@@ -159,6 +160,9 @@ namespace HexMage.GUI.Components {
 
         public override void Update(GameTime time) {
             UnselectAbilityIfNeeded();
+
+            _crosshairCursor.Hidden = !SelectedAbilityIndex.HasValue;
+            HexMageGame.Instance.IsMouseVisible = _crosshairCursor.Hidden;
 
             var inputManager = InputManager.Instance;
             var mouseHex = Camera2D.Instance.MouseHex;
