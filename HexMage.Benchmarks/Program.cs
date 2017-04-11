@@ -13,11 +13,11 @@ namespace HexMage.Benchmarks {
 
             if (!ProcessArguments(args)) return;
 
-            Constants.MctsBenchmark = true;
-            Benchmarks.CompareAi();
-            return;
+            //Constants.MctsBenchmark = true;
+            //Benchmarks.CompareAi();
+            //return;
 
-            //new Benchmarks().Run();
+            new Benchmarks().Run();
 
             if ((args.Length > 0 && args[0] == "mcts-benchmark") || Constants.MctsBenchmark) {
                 MctsBenchmark();

@@ -17,9 +17,7 @@
         public bool IsZero => Radius == 0;
 
         public void DecreaseLifetime() {
-            var copy = Effect;
-            copy.Lifetime--;
-            Effect = copy;
+            Effect.Lifetime--;
         }
 
         public override string ToString() {

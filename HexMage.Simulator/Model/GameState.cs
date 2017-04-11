@@ -21,6 +21,7 @@ namespace HexMage.Simulator {
         // TODO - pole lepsi?
         //[JsonIgnore] public Dictionary<int, AxialCoord> MobPositions = new Dictionary<int, AxialCoord>();
         public int RedAlive = 0;
+
         public int BlueAlive = 0;
 
         [JsonIgnore]
@@ -118,12 +119,6 @@ namespace HexMage.Simulator {
                 AreaBuffs[i] = areaBuff;
             }
 
-            for (int i = 0; i < AreaBuffs.Count; i++) {
-                var buff = AreaBuffs[i];
-                buff.DecreaseLifetime();
-                AreaBuffs[i] = buff;
-            }
-
             var newBuffs = new List<AreaBuff>();
 
             foreach (var buff in AreaBuffs) {
@@ -177,7 +172,7 @@ namespace HexMage.Simulator {
             Cooldowns.Clear();
             CurrentMobIndex = null;
             RedAlive = 0;
-            BlueAlive = 0;            
+            BlueAlive = 0;
             TurnOrder.Clear();
         }
 

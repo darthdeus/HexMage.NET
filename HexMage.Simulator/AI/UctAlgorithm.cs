@@ -15,43 +15,48 @@ namespace HexMage.Simulator.AI {
         public static int ExpandCount = 0;
         public static int BestChildCount = 0;
 
+        public static int TotalIterationCount = 0;
+
+        public static readonly RollingAverage MillisecondsPerIterationAverage = new RollingAverage();
+
         private readonly int _thinkTime;
 
         public UctAlgorithm(int thinkTime) {
             _thinkTime = thinkTime;
         }
 
-
         public UctSearchResult UctSearch(GameInstance initialState) {
             var root = new UctNode(0, 0, UctAction.NullAction(), initialState.DeepCopy());
+
+            if (!initialState.CurrentTeam.HasValue)
+                throw new ArgumentException("Trying to do UCT search on a finished game.");
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            // TODO - for loop? lul
-            int totalIterations = _thinkTime;
-            int iterations = totalIterations;
+            var iterationStopwatch = new Stopwatch();
+            var startingTeam = initialState.CurrentTeam.Value;
+            int iterations = 0;
+            do {
+                iterations++;
+                TotalIterationCount++;
 
-            int it = 0;
-            while (iterations-- > 0) {
-                //UctDebug.PrintDotgraph(root, () => it);
-                //it++;
-                //Console.WriteLine($"Written {it}");
-                OneIteration(root, initialState.CurrentTeam.Value);
-            }
+                iterationStopwatch.Restart();
+                OneIteration(root, startingTeam);
+                iterationStopwatch.Stop();
+
+                MillisecondsPerIterationAverage.Add(iterationStopwatch.Elapsed.TotalMilliseconds);
+            } while (stopwatch.ElapsedMilliseconds < _thinkTime);
 
             stopwatch.Stop();
 
             //UctDebug.PrintTreeRepresentation(root);
             Interlocked.Increment(ref SearchCount);
 
-            //Console.WriteLine($"Total Q: {root.Children.Sum(c => c.Q)}, N: {root.Children.Sum(c => c.N)}");
-
-            //throw new InvalidOperationException();
-
             var actions = SelectBestActions(root);
 
-            var millisecondsPerIteration = (double) stopwatch.ElapsedMilliseconds / (double) totalIterations;
+            var millisecondsPerIteration = (double) stopwatch.ElapsedMilliseconds / (double) iterations;
+
             return new UctSearchResult(actions, millisecondsPerIteration);
         }
 

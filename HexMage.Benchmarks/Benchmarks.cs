@@ -1,4 +1,5 @@
 //#define COPY_BENCH
+
 #define FAST
 using System;
 using System.Diagnostics;
@@ -91,54 +92,11 @@ namespace HexMage.Benchmarks {
             CoordRadiusCache.Instance.PrecomputeUpto(50);
             Console.WriteLine($"Cache precomputed in {s.Elapsed.TotalMilliseconds}ms");
 
-            var gameInstance = new GameInstance(size);
+            var game = GameSetup.GenerateForDnaSettings(2, 2);
+            var c = new MctsController(game, 500);
 
-            var hub = new GameEventHub(gameInstance);
-            //var replayRecorder = new ReplayRecorder();
-            //hub.AddSubscriber(replayRecorder);
-
-            Utils.RegisterLogger(new StdoutLogger());
-            Utils.MainThreadId = Thread.CurrentThread.ManagedThreadId;
-
-            var t1 = TeamColor.Red;
-            var t2 = TeamColor.Blue;
-
-            var turnManager = gameInstance.TurnManager;
-            var mobManager = gameInstance.MobManager;
-            var pathfinder = gameInstance.Pathfinder;
-
-            for (int i = 0; i < 5; i++) {
-                MobInfo mi1 = Generator.RandomMob(mobManager, t1, gameInstance.State);
-                MobInfo mi2 = Generator.RandomMob(mobManager, t2, gameInstance.State);
-
-                int m1 = gameInstance.AddMobWithInfo(mi1);
-                int m2 = gameInstance.AddMobWithInfo(mi2);
-
-                Generator.RandomPlaceMob(gameInstance, m1);
-                Generator.RandomPlaceMob(gameInstance, m2);
-            }
-
-            mobManager.Teams[t1] = new MctsController(gameInstance);
-            mobManager.Teams[t2] = new MctsController(gameInstance);
-
-            for (int i = 0; i < 5; i++) {
-                pathfinder.PathfindDistanceAll();
-                Console.WriteLine();
-            }
-
-            throw new NotImplementedException("Spatna inicializace, pouzit GameSetup");
-            //mobManager.InitializeState(gameInstance.State);
-
-            //foreach (var coord in gameInstance.Map.AllCoords) {
-            //    var count = gameInstance.State.MobInstances.Count(x => x.Coord == coord);
-            //    if (count > 1) {
-            //        throw new InvalidOperationException($"There are duplicate mobs on the same coord ({coord}), total {count}.");
-            //    }
-            //}
-
-            gameInstance.State.Reset(gameInstance);
-            // TODO: fuj
-            turnManager.PresortTurnOrder();
+            //Utils.RegisterLogger(new StdoutLogger());
+            //Utils.MainThreadId = Thread.CurrentThread.ManagedThreadId;
 
 #if COPY_BENCH
             {
@@ -175,7 +133,7 @@ namespace HexMage.Benchmarks {
 #endif
 
             Console.WriteLine("Precomputing cubes");
-            gameInstance.Map.PrecomputeCubeLinedraw();
+            game.Map.PrecomputeCubeLinedraw();
             Console.WriteLine("Cubes precomputed");
 
             {
@@ -183,25 +141,23 @@ namespace HexMage.Benchmarks {
                 var stopwatch = new Stopwatch();
                 var iterations = 0;
                 int roundsPerThousand = 0;
-                int dumpIterations = 1;
-
-                int totalIterations = 500000;
-                double ratio = 1000000 / totalIterations;
+                const int dumpIterations = 1;
+                const int totalIterations = 500000;
 
                 while (iterations < totalIterations) {
                     iterations++;
 
                     // TODO - fuj
-                    throw new NotImplementedException();
                     //turnManager.StartNextTurn(pathfinder, gameInstance.State);
 
                     //Console.WriteLine($"Starting, actions: {UctAlgorithm.Actions}");
                     stopwatch.Start();
 #if FAST
-                    var rounds = hub.FastMainLoop();
+                    var result = new EvaluationResult();
+                    GameInstanceEvaluator.Playout(game, c, c, ref result);
                     stopwatch.Stop();
 
-                    roundsPerThousand += rounds;
+                    roundsPerThousand += result.TotalTurns;
 #else
                 var rounds = hub.MainLoop(TimeSpan.Zero);
                 stopwatch.Stop();
@@ -212,18 +168,22 @@ namespace HexMage.Benchmarks {
 
                     if (iterations % dumpIterations == 0) {
                         double perThousandMs = Math.Round(stopwatch.Elapsed.TotalMilliseconds, 2);
-
-                        double estimateSecondsPerMil =
-                            Math.Round(totalStopwatch.Elapsed.TotalSeconds / iterations * totalIterations, 2);
-                        double perGame = Math.Round(perThousandMs / dumpIterations * 1000, 2);
+                        double perGame = Math.Round(perThousandMs / dumpIterations, 2);
 
                         Console.WriteLine(
-                            $"Starting a new game {iterations:00000}, {roundsPerThousand / dumpIterations} average rounds, {perThousandMs:00.00}ms\trunning average per 1M: {estimateSecondsPerMil * ratio:00.00}s, per game: {perGame:00.00}us");
+                            $"TOTAL: {UctAlgorithm.TotalIterationCount}, " +
+                            $"Actions: {ActionEvaluator.Actions}, " +
+                            $"IterAVG: {UctAlgorithm.MillisecondsPerIterationAverage.Average:0.000000}ms\t" +
+                            $"IPS: {1/UctAlgorithm.MillisecondsPerIterationAverage.Average * 1000}\t" +
+                            $"per game: {perGame:00.00}ms");
                         roundsPerThousand = 0;
+
+                        Console.WriteLine(ActionEvaluator.ActionCountString());
+
                         stopwatch.Reset();
                     }
 
-                    gameInstance.Reset();
+                    game.Reset();
                 }
 
                 Console.WriteLine("Took {0}ms", totalStopwatch.ElapsedMilliseconds);
