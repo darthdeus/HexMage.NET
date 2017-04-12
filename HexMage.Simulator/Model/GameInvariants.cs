@@ -90,6 +90,10 @@ namespace HexMage.Simulator.Model {
                 var mobInstance = game.State.MobInstances[mobId];
                 var mobInfo = game.MobManager.MobInfos[mobId];
 
+                if (mobInstance.Hp < 0 || mobInstance.Ap < 0) {
+                    throw new InvariantViolationException($"Mob {mobId} has {mobInstance.Hp} HP and {mobInstance.Ap}");
+                }
+
                 var coord = checkOrigCoord ? mobInfo.OrigCoord : mobInstance.Coord;
 
                 if (taken.Contains(coord)) {
