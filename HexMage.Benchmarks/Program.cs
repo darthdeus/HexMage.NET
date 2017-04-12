@@ -14,6 +14,10 @@ namespace HexMage.Benchmarks {
             if (!ProcessArguments(args)) return;
 
             Constants.MctsBenchmark = true;
+            Benchmarks.BenchmarkAllAisAgainstMcts();
+            return;
+
+            Constants.MctsBenchmark = true;
             Benchmarks.CompareAi();
             return;
 
@@ -113,17 +117,17 @@ namespace HexMage.Benchmarks {
 
             foreach (var arg in args) {
                 if (arg == "--factory=Rule") {
-                    GameInstanceEvaluator.GlobalFactories.Add(new RuleBasedFactory());
+                    GameEvaluator.GlobalFactories.Add(new RuleBasedFactory());
                     continue;
                 } else if (arg == "--factory=Random") {
-                    GameInstanceEvaluator.GlobalFactories.Add(new RandomFactory());
+                    GameEvaluator.GlobalFactories.Add(new RandomFactory());
                     continue;
                 } else if (arg.StartsWith(mctsFactoryPrefix)) {
                     string mctsIterationsStr = arg.Replace(mctsFactoryPrefix, "");
 
                     int mctsIterations;
                     if (int.TryParse(mctsIterationsStr, out mctsIterations)) {
-                        GameInstanceEvaluator.GlobalFactories.Add(new MctsFactory(mctsIterations));
+                        GameEvaluator.GlobalFactories.Add(new MctsFactory(mctsIterations));
                     } else {
                         Console.WriteLine(
                             $"Invalid format of {arg}, use --factory=MctsN instead (N can be multiple digits).");
@@ -179,7 +183,7 @@ namespace HexMage.Benchmarks {
 
                 //controller = new AiRuleBasedController(game);
 
-                int iterations = GameInstanceEvaluator.Playout(game, d1, d1, controller, controller);
+                int iterations = GameEvaluator.Playout(game, d1, d1, controller, controller);
 
                 stopwatch.Stop();
 

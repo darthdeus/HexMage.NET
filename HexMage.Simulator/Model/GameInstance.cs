@@ -232,5 +232,10 @@ namespace HexMage.Simulator {
         public void Reset() {
             State.Reset(this);
         }
+
+        public void AssignAiControllers(IMobController c1, IMobController c2) {
+            MobManager.Teams[TeamColor.Red] = c1;
+            MobManager.Teams[TeamColor.Blue] = c2;
+        }
     }
 }

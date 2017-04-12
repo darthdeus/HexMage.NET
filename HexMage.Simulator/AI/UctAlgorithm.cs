@@ -46,11 +46,12 @@ namespace HexMage.Simulator.AI {
                 iterationStopwatch.Stop();
 
                 MillisecondsPerIterationAverage.Add(iterationStopwatch.Elapsed.TotalMilliseconds);
+                //} while (iterations < 2000);
             } while (stopwatch.ElapsedMilliseconds < _thinkTime);
 
             stopwatch.Stop();
 
-            UctDebug.PrintTreeRepresentation(root);
+            //UctDebug.PrintTreeRepresentation(root);
             Interlocked.Increment(ref SearchCount);
 
             var actions = SelectBestActions(root);
@@ -61,29 +62,34 @@ namespace HexMage.Simulator.AI {
         }
 
         public static float OneIteration(UctNode root, TeamColor startingTeam) {
-            UctNode v = TreePolicy(root);
+            UctNode v = TreePolicy(root, startingTeam);
             // TODO: ma tu byt root node team, nebo aktualni?
             float delta = DefaultPolicy(v.State, startingTeam);
             Backup(v, delta);
             return delta;
         }
 
-        public static UctNode TreePolicy(UctNode node) {
+        public static UctNode TreePolicy(UctNode node, TeamColor startingTeam) {
             while (!node.IsTerminal) {
                 if (!node.IsFullyExpanded) {
                     Interlocked.Increment(ref ExpandCount);
                     return Expand(node);
                 } else {
                     Interlocked.Increment(ref BestChildCount);
-                    node = BestChild(node);
+                    node = BestChild(node, startingTeam);
                 }
             }
 
             return node;
         }
 
-        public static float UcbValue(UctNode parent, UctNode node, double k) {
-            return (float) (node.Q / node.N + Math.Sqrt(k * Math.Log(parent.N) / node.N));
+        public static float UcbValue(UctNode parent, UctNode node, double k, TeamColor startingTeam) {
+            float value = node.Q / node.N;
+            if (node.State.CurrentTeam != startingTeam) {
+                value = 1 - value;
+            }
+
+            return (float) (value + Math.Sqrt(k * Math.Log(parent.N) / node.N));
         }
 
         public static UctNode Expand(UctNode node) {
@@ -206,12 +212,12 @@ namespace HexMage.Simulator.AI {
             }
         }
 
-        public static UctNode BestChild(UctNode node, double k = 2) {
+        public static UctNode BestChild(UctNode node, TeamColor startingTeam, double k = 2) {
             if (node.Children.Count == 0) return null;
 
             UctNode best = node.Children[0];
             foreach (var child in node.Children) {
-                if (UcbValue(node, child, k) > UcbValue(node, best, k)) {
+                if (UcbValue(node, child, k, startingTeam) > UcbValue(node, best, k, startingTeam)) {
                     best = child;
                 }
             }
@@ -250,7 +256,7 @@ namespace HexMage.Simulator.AI {
 
                 if (max.Action.Type != UctActionType.EndTurn) {
                     if (max.IsTerminal) {
-                        Console.WriteLine("Found terminal");
+                        //Console.WriteLine("Found terminal");
                     }
                     result.Add(max.Action);
                 }

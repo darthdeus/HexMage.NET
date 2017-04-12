@@ -2,9 +2,12 @@
 
 #define FAST
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using HexMage.Simulator;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
@@ -14,12 +17,36 @@ using Newtonsoft.Json;
 
 namespace HexMage.Benchmarks {
     public class Benchmarks {
+        public static void BenchmarkAllAisAgainstMcts() {
+            var map = Map.Load(@"data/map.json");
+
+            var opponentAis = new Func<GameInstance, IMobController>[] {
+                AiRandomController.Build,
+                AiRuleBasedController.Build,
+                FlatMonteCarloController.Build
+            };
+
+            var dna = new DNA(2, 2);
+            var game = GameSetup.GenerateFromDna(dna, dna, map);
+
+            using (var writer = new StreamWriter($@"data/results-rule-200.txt")) {
+                for (int i = 10; i < 10000; i += 20) {
+                    double result = GameEvaluator.CompareAiControllers(game,
+                                                                       dna,
+                                                                       new MctsController(game, i),
+                                                                       new AiRuleBasedController(game));
+
+                    Console.WriteLine($"{i} {result}");
+                    writer.WriteLine($"{i} {result}");
+                }
+            }
+        }
+
         public static void CompareAi() {
             var dna = new DNA(2, 2);
             dna.Randomize();
 
-            const string mapFilename = @"data/map.json";
-            var map = JsonConvert.DeserializeObject<Map>(File.ReadAllText(mapFilename));
+            var map = Map.Load(@"data/map.json");
             //var map = new Map(5);
 
             var game = GameSetup.GenerateFromDna(dna, dna, map);
@@ -70,14 +97,14 @@ namespace HexMage.Benchmarks {
 
                 GameSetup.OverrideGameDna(game, dna, dna);
                 iterationStopwatch.Restart();
-                GameInstanceEvaluator.PlayoutSingleGame(game, c1, c2);
+                GameEvaluator.PlayoutSingleGame(game, c1, c2);
                 iterationStopwatch.Stop();
                 Console.WriteLine($"Iteration: {iterationStopwatch.ElapsedMilliseconds}ms");
                 Console.WriteLine(Accounting.GetStats());
 
                 GameSetup.OverrideGameDna(game, dna, dna);
                 iterationStopwatch.Restart();
-                GameInstanceEvaluator.PlayoutSingleGame(game, c2, c1);
+                GameEvaluator.PlayoutSingleGame(game, c2, c1);
                 iterationStopwatch.Stop();
 
                 Console.WriteLine($"Iteration: {iterationStopwatch.ElapsedMilliseconds}ms");
@@ -154,7 +181,7 @@ namespace HexMage.Benchmarks {
                     stopwatch.Start();
 #if FAST
                     var result = new EvaluationResult();
-                    GameInstanceEvaluator.Playout(game, c, c, ref result);
+                    GameEvaluator.Playout(game, c, c, ref result);
                     stopwatch.Stop();
 
                     roundsPerThousand += result.TotalTurns;
@@ -174,7 +201,7 @@ namespace HexMage.Benchmarks {
                             $"TOTAL: {UctAlgorithm.TotalIterationCount}, " +
                             $"Actions: {ActionEvaluator.Actions}, " +
                             $"IterAVG: {UctAlgorithm.MillisecondsPerIterationAverage.Average:0.000000}ms\t" +
-                            $"IPS: {1/UctAlgorithm.MillisecondsPerIterationAverage.Average * 1000}\t" +
+                            $"IPS: {1 / UctAlgorithm.MillisecondsPerIterationAverage.Average * 1000}\t" +
                             $"per game: {perGame:00.00}ms");
                         roundsPerThousand = 0;
 

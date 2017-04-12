@@ -41,5 +41,9 @@ namespace HexMage.Simulator.AI {
         public override string ToString() {
             return "RND";
         }
+
+        public static IMobController Build(GameInstance game) {
+            return new AiRandomController(game);
+        }
     }
 }

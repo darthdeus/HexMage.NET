@@ -40,5 +40,10 @@ namespace HexMage.Simulator.AI {
         public override string ToString() {
             return "Rule";
         }
+
+        public static IMobController Build(GameInstance game) {
+            return new AiRuleBasedController(game);
+        }
+
     }
 }

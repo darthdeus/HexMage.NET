@@ -51,7 +51,7 @@ namespace HexMage.Simulator {
 
         private static void PrintDotNode(StringBuilder builder, UctNode parent, UctNode node, int budget) {
             if (budget == 0) return;
-            if (node.N < 5) return;
+            if (node.N < 8) return;
 
             string color;
             var teamColor = node.State.CurrentTeam;

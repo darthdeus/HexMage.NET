@@ -81,5 +81,9 @@ namespace HexMage.Simulator {
         public override string ToString() {
             return $"MCTS#{_thinkTime}";
         }
+
+        public static IMobController Build(GameInstance game, int thinkTime) {
+            return new MctsController(game, thinkTime);
+        }
     }
 }

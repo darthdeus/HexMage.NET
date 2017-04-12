@@ -7,17 +7,18 @@ using System.Threading;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator.AI {
-    public class GameInstanceEvaluator {
+    public class GameEvaluator {
         private readonly GameInstance _gameInstance;
         private readonly TextWriter _writer;
 
-        public GameInstanceEvaluator(GameInstance gameInstance, TextWriter writer) {
+        public GameEvaluator(GameInstance gameInstance, TextWriter writer) {
             _gameInstance = gameInstance;
             _writer = writer;
         }
 
         public static List<IAiFactory> GlobalFactories = new List<IAiFactory>();
 
+        // TODO: wat, tohle dat pryc a pouzivat obecnejsi
         public EvaluationResult Evaluate() {
             if (GlobalFactories.Count == 0) {
                 GlobalFactories.Add(new RuleBasedFactory());
@@ -105,12 +106,42 @@ namespace HexMage.Simulator.AI {
             EvaluationResultBookkeeping(game, ref result);
         }
 
+        /// <summary>
+        /// Returns the win percentage of the first controller
+        /// </summary>
+        public static double CompareAiControllers(GameInstance game, DNA dna, IMobController c1, IMobController c2) {
+            game.AssignAiControllers(c1, c2);
+            int redWins = 0;
+            int totalGames = 0;
+
+            for (int i = 0; i < 20; i++) {
+                dna.Randomize();
+
+                GameSetup.OverrideGameDna(game, dna, dna);
+
+                GameSetup.ResetGameAndPositions(game);
+                var r1 = PlayoutSingleGame(game, c1, c2);
+
+                GameSetup.ResetGameAndPositions(game);
+                var r2 = PlayoutSingleGame(game, c2, c1);
+
+                redWins += r1.RedWins;
+                redWins += r2.BlueWins;
+
+                Debug.Assert(r1.RedWins + r1.BlueWins <= 1);
+                Debug.Assert(r2.RedWins + r2.BlueWins <= 1);
+
+                totalGames += 2;
+            }
+
+            return (double) redWins / (double) totalGames;
+        }
+
         // TODO - na co tohle vlastne je?
         public static int Playout(GameInstance game, DNA d1, DNA d2, IMobController c1, IMobController c2) {
             GameSetup.OverrideGameDna(game, d1, d2);
 
-            game.MobManager.Teams[TeamColor.Red] = c1;
-            game.MobManager.Teams[TeamColor.Blue] = c2;
+            game.AssignAiControllers(c1, c2);
 
             int iterations = Constants.MaxPlayoutEvaluationIterations;
 

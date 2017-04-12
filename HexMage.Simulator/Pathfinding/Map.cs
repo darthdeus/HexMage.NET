@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.PCG;
@@ -178,6 +179,10 @@ namespace HexMage.Simulator.Pathfinding {
 
             //return _map.AxialDistance(c, new AxialCoord(0, 0)) <= _map.Size;
             //return _map.CubeDistance(new CubeCoord(0, 0, 0), c) <= _map.Size;
+        }
+
+        public static Map Load(string filename) {
+            return JsonConvert.DeserializeObject<Map>(File.ReadAllText(filename));
         }
     }
 }

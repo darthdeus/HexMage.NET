@@ -35,5 +35,9 @@ namespace HexMage.Simulator.AI {
         public override string ToString() {
             return "FlatMC";
         }
+
+        public static IMobController Build(GameInstance game) {
+            return new FlatMonteCarloController(game);
+        }
     }
 }

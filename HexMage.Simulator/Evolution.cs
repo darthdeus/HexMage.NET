@@ -214,7 +214,7 @@ namespace HexMage.Benchmarks {
             Constants.ResetLogBuffer();
             GameSetup.OverrideGameDna(game, initialDna, dna);
 
-            var result = new GameInstanceEvaluator(game, Console.Out).Evaluate();
+            var result = new GameEvaluator(game, Console.Out).Evaluate();
 
             return result;
         }
