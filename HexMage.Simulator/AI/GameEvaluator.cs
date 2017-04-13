@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using HexMage.Simulator.Model;
+using Newtonsoft.Json.Serialization;
 
 namespace HexMage.Simulator.AI {
     public class GameEvaluator {
@@ -109,14 +110,13 @@ namespace HexMage.Simulator.AI {
         /// <summary>
         /// Returns the win percentage of the first controller
         /// </summary>
-        public static double CompareAiControllers(GameInstance game, DNA dna, IMobController c1, IMobController c2) {
+        public static double CompareAiControllers(GameInstance game, List<DNA> dnas, IMobController c1,
+                                                  IMobController c2) {
             game.AssignAiControllers(c1, c2);
             int redWins = 0;
             int totalGames = 0;
 
-            for (int i = 0; i < 20; i++) {
-                dna.Randomize();
-
+            foreach (var dna in dnas) {
                 GameSetup.OverrideGameDna(game, dna, dna);
 
                 GameSetup.ResetGameAndPositions(game);

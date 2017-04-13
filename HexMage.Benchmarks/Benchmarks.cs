@@ -26,17 +26,33 @@ namespace HexMage.Benchmarks {
                 FlatMonteCarloController.Build
             };
 
-            var dna = new DNA(2, 2);
+            var dna = new DNA(3, 2);
             var game = GameSetup.GenerateFromDna(dna, dna, map);
 
-            using (var writer = new StreamWriter($@"data/results-rule-200.txt")) {
-                for (int i = 10; i < 10000; i += 20) {
-                    double result = GameEvaluator.CompareAiControllers(game,
-                                                                       dna,
-                                                                       new MctsController(game, i),
-                                                                       new AiRuleBasedController(game));
+            var dnas = new List<DNA>();
 
+            for (int i = 0; i < 20; i++) {
+                var copy = dna.Clone();
+                copy.Randomize();
+                dnas.Add(copy);
+            }
+
+            const int step = 1;
+            using (var writer = new StreamWriter($@"data/results-rule.txt")) {
+                for (int i = step; i < 100; i += step) {
+                    var c1 = new MctsController(game, i);
+                    var c2 = new FlatMonteCarloController(game);
+
+                    double result = GameEvaluator.CompareAiControllers(game,
+                                                                       dnas,
+                                                                       c1,
+                                                                       c2);
+
+                    Console.WriteLine(Accounting.GetStats());
                     Console.WriteLine($"{i} {result}");
+                    Console.WriteLine();
+                    Accounting.Reset();
+
                     writer.WriteLine($"{i} {result}");
                 }
             }

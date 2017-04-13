@@ -10,6 +10,13 @@ namespace HexMage.Simulator.Model {
         public static int RuleBasedAiWins = 0;
         public static int FlatMonteCarloWins = 0;
 
+        public static void Reset() {
+            MctsWins = 0;
+            RandomAiWins = 0;
+            RuleBasedAiWins = 0;
+            FlatMonteCarloWins = 0;
+        }
+
         public static void IncrementWinner(IMobController controller) {
             var type = controller.GetType();
             if (type == typeof(MctsController)) {
