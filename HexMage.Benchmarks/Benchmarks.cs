@@ -221,7 +221,7 @@ namespace HexMage.Benchmarks {
                             $"per game: {perGame:00.00}ms");
                         roundsPerThousand = 0;
 
-                        Console.WriteLine(ActionEvaluator.ActionCountString());
+                        //Console.WriteLine(ActionEvaluator.ActionCountString());
 
                         stopwatch.Reset();
                     }

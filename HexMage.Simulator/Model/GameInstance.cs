@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.Pathfinding;
 using Newtonsoft.Json;
@@ -96,7 +97,8 @@ namespace HexMage.Simulator {
 
         [JsonIgnore]
         public TeamColor? CurrentTeam {
-            get {
+            get
+            {
                 var currentMob = CurrentMob;
                 if (currentMob.HasValue) {
                     var mobInfo = MobManager.MobInfos[currentMob.Value];

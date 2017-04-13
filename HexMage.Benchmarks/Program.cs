@@ -9,9 +9,12 @@ namespace HexMage.Benchmarks {
     internal class Program {
         private static void Main(string[] args) {
             // TODO - proc to ale s timhle nekonverguje?!?!?!?!??!
-            //Generator.Random = new Random(3);
+            Generator.Random = new Random(3);
 
             if (!ProcessArguments(args)) return;
+
+            new Benchmarks().Run();
+            return;
 
             Constants.MctsBenchmark = true;
             Benchmarks.BenchmarkAllAisAgainstMcts();
@@ -21,7 +24,6 @@ namespace HexMage.Benchmarks {
             Benchmarks.CompareAi();
             return;
 
-            new Benchmarks().Run();
 
             if ((args.Length > 0 && args[0] == "mcts-benchmark") || Constants.MctsBenchmark) {
                 MctsBenchmark();

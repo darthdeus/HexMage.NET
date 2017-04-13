@@ -4,23 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
-using HexMage.Simulator.PCG;
 
 namespace HexMage.Simulator {
     public static class ActionGenerator {
-        public static void Shuffle<T>(IList<T> list) {
-            // TODO - rewrite this to be better
-            int n = list.Count;
-            while (n > 1) {
-                n--;
-                int k = Generator.Random.Next(n + 1);
-                T value = list[k];
-                list[k] = list[n];
-                list[n] = value;
-            }
-        }
-
-
         public static UctAction MaxAbilityRatio(GameInstance game, List<UctAction> actions) {
             UctAction max = actions[0];
             var maxAbilityInfo = game.MobManager.Abilities[max.AbilityId];
@@ -168,7 +154,7 @@ namespace HexMage.Simulator {
                 coords.Add(coord);
             }
 
-            Shuffle(coords);
+            coords.Shuffle();
 
             int maximumMoveActions = Math.Max(0, 3 - result.Count);
             for (int i = 0; i < Math.Min(coords.Count, maximumMoveActions); i++) {

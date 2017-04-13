@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using HexMage.Simulator.Model;
 
@@ -81,15 +83,6 @@ namespace HexMage.Simulator.AI {
             }
 
             return node;
-        }
-
-        public static float UcbValue(UctNode parent, UctNode node, double k, TeamColor startingTeam) {
-            float value = node.Q / node.N;
-            if (node.State.CurrentTeam != startingTeam) {
-                value = 1 - value;
-            }
-
-            return (float) (value + Math.Sqrt(k * Math.Log(parent.N) / node.N));
         }
 
         public static UctNode Expand(UctNode node) {
@@ -202,27 +195,32 @@ namespace HexMage.Simulator.AI {
                 node.Q += delta;
                 node = node.Parent;
 
-                if (node != null && node.Action.Type == UctActionType.EndTurn) {
-                    bool teamColorChanged = node.State.CurrentTeam != node.State.State.LastTeamColor;
+                // TODO: Nepouziva se, protoze odmeny jsou 0 nebo 1
+                //if (node != null && node.Action.Type == UctActionType.EndTurn) {
+                //    bool teamColorChanged = node.State.CurrentTeam != node.State.State.LastTeamColor;
 
-                    if (teamColorChanged) {
-                        //delta = -delta;
-                    }
-                }
+                //    if (teamColorChanged) {
+                //        //delta = -delta;
+                //    }
+                //}
             }
         }
 
         public static UctNode BestChild(UctNode node, TeamColor startingTeam, double k = 2) {
             if (node.Children.Count == 0) return null;
 
-            UctNode best = node.Children[0];
-            foreach (var child in node.Children) {
-                if (UcbValue(node, child, k, startingTeam) > UcbValue(node, best, k, startingTeam)) {
-                    best = child;
-                }
+            return node.Children.FastMax(c => UcbValue(node, c, k, startingTeam));
+        }
+
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float UcbValue(UctNode parent, UctNode node, double k, TeamColor startingTeam) {
+            float value = node.Q / node.N;
+
+            if (node.State.CurrentTeam != startingTeam) {
+                value = 1 - value;
             }
 
-            return best;
+            return (float) (value + Math.Sqrt(k * Math.Log(parent.N) / node.N));
         }
 
         private List<UctAction> SelectBestActions(UctNode root) {
@@ -232,13 +230,15 @@ namespace HexMage.Simulator.AI {
             do {
                 if (current.Children.Count == 0) break;
 
-                UctNode max = current.Children[0];
+                UctNode max = current.Children.FastMax(c => c.Q / c.N);
 
-                foreach (var child in current.Children) {
-                    if (child.Q / child.N > max.Q / max.N) {
-                        max = child;
-                    }
-                }
+                //UctNode max = current.Children[0];
+
+                //foreach (var child in current.Children) {
+                //    if (child.Q / child.N > max.Q / max.N) {
+                //        max = child;
+                //    }
+                //}
 
                 if (max.Q / max.N < 0.2) {
                     //Console.WriteLine($"Bad action {max.Q} / {max.N}, generating via rules");
