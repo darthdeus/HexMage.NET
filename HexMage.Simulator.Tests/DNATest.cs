@@ -33,13 +33,19 @@ namespace HexMage.Simulator.Tests {
         public void DnaSerializationTest() {
             for (int i = 0; i < 50; i++) {
                 var dna = new DNA(1, 1);
-                dna.Randomize();
+                //dna.Randomize();
+                dna.Data = new List<float> {0.17f, 0.74f, .26f, .51f, .23f, .25f};
 
-                var converted = dna.ToTeam().ToDna();
+                var team = dna.ToTeam();
+                var converted = team.ToDna();
+
                 for (int j = 0; j < dna.Data.Count; j++) {
                     float a = dna.Data[j];
                     float b = converted.Data[j];
                     double delta = 0.06;
+                    if (Math.Abs(a - b) > delta) {
+                        Debugger.Break();
+                    }
                     Assert.AreEqual(a, b, delta, $"Expected {a} and {b} to be within {delta} at index {j}");
                 }
             }

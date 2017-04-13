@@ -6,6 +6,9 @@ using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public static class GenomeLoader {
+#warning TODO: pridat do Constants
+        const int minDmg = 5;
+
         public static Team FromDna(DNA dna) {
             var team = new Team();
 
@@ -19,7 +22,6 @@ namespace HexMage.Simulator {
                 for (int j = 0; j < dna.AbilityCount; j++) {
                     int offset = mobOffset + DNA.MobAttributeCount + j * DNA.AbilityAttributeCount;
 
-                    const int minDmg = 5;
                     int dmg = (int) Math.Round(dna.Data[offset + 0] * (Constants.DmgMax - minDmg) + minDmg);
                     var ability = new JsonAbility(dmg,
                                                   (int) Math.Round(dna.Data[offset + 1] * Constants.CostMax),
@@ -50,7 +52,7 @@ namespace HexMage.Simulator {
                 dna.Data.Add(mob.ap / (float) Constants.ApMax);
 
                 foreach (var ability in mob.abilities) {
-                    dna.Data.Add(ability.dmg / (float) Constants.DmgMax);
+                    dna.Data.Add((ability.dmg - minDmg) / (float) Constants.DmgMax);
                     dna.Data.Add(ability.ap / (float) Constants.CostMax);
                     dna.Data.Add(ability.range / (float) Constants.RangeMax);
                     dna.Data.Add(NumberFromElement(ability.element));
