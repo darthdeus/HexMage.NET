@@ -42,7 +42,6 @@ namespace HexMage.Simulator.Tests {
             Assert.IsTrue(game.IsFinished);
         }
 
-
         [TestMethod]
         public void IsFinishedFastAutoUpdateWithDotsTest() {
             var game = new GameInstance(3);
@@ -53,6 +52,8 @@ namespace HexMage.Simulator.Tests {
             var m2 = game.AddMobWithInfo(new MobInfo(TeamColor.Blue, 2, 10, 0, new[] {a1}));
 
             game.PrepareEverything();
+            Assert.AreEqual(1, game.State.RedTotalHp);
+            Assert.AreEqual(2, game.State.BlueTotalHp);
             Assert.IsFalse(game.IsFinished);
 
             ActionEvaluator.FNoCopy(game, UctAction.AbilityUseAction(a1, m1, m2));
@@ -62,7 +63,8 @@ namespace HexMage.Simulator.Tests {
             ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
 
             Assert.AreEqual(0, game.State.MobInstances[m2].Hp);
-            Assert.AreEqual(0, game.State.BlueAlive);
+            Assert.AreEqual(1, game.State.RedTotalHp);
+            Assert.AreEqual(0, game.State.BlueTotalHp);
             Assert.IsTrue(game.IsFinished);
         }
     }

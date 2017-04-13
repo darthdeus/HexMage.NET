@@ -20,12 +20,22 @@ namespace HexMage.Simulator {
         // the evolution is being performed.
         // TODO - pole lepsi?
         //[JsonIgnore] public Dictionary<int, AxialCoord> MobPositions = new Dictionary<int, AxialCoord>();
-        public int RedAlive = 0;
+        public int RedTotalHp = 0;
 
-        public int BlueAlive = 0;
+        public int BlueTotalHp = 0;
 
         [JsonIgnore]
-        public bool IsFinished => RedAlive <= 0 || BlueAlive <= 0;
+        public bool IsFinished {
+            get {
+                if (RedTotalHp < 0) {
+                    throw new InvariantViolationException($"RedTotalHp is {RedTotalHp} but should never be below 0.");
+                }
+                if (BlueTotalHp < 0) {
+                    throw new InvariantViolationException($"RedTotalHp is {BlueTotalHp} but should never be below 0.");
+                }
+                return RedTotalHp == 0 || BlueTotalHp == 0;
+            }
+        }
 
         public bool IsAlive(int mobId) {
             return MobInstances[mobId].Hp > 0;
@@ -46,22 +56,21 @@ namespace HexMage.Simulator {
             }
         }
 
-        public void MobHpChanged(int hp, TeamColor team) {
-            if (hp <= 0) {
-                switch (team) {
-                    case TeamColor.Red:
-                        RedAlive--;
-                        break;
-                    case TeamColor.Blue:
-                        BlueAlive--;
-                        break;
-                }
-            }
-        }
+        public void ChangeMobHp(GameInstance game, int mobId, int hpChange) {
+            var mobInfo = game.MobManager.MobInfos[mobId];
+            int before = MobInstances[mobId].Hp;
 
-        public void ChangeMobHp(GameInstance gameInstance, int mobId, int hpChange) {
-            MobInstances[mobId].Hp = Math.Max(0, MobInstances[mobId].Hp + hpChange);
-            MobHpChanged(MobInstances[mobId].Hp, gameInstance.MobManager.MobInfos[mobId].Team);
+            MobInstances[mobId].Hp = Math.Max(0, before + hpChange);
+
+            int change = MobInstances[mobId].Hp - before;
+
+            if (mobInfo.Team == TeamColor.Red) {
+                RedTotalHp += change;
+            } else if (mobInfo.Team == TeamColor.Blue) {
+                BlueTotalHp += change;
+            } else {
+                throw new InvalidOperationException($"Invalid mob team ${mobInfo.Team}");
+            }
         }
 
         public void ChangeMobAp(int mobId, int apChange) {
@@ -131,25 +140,25 @@ namespace HexMage.Simulator {
         }
 
         public void SlowUpdateIsFinished(MobManager mobManager) {
-            RedAlive = 0;
-            BlueAlive = 0;
+            RedTotalHp = 0;
+            BlueTotalHp = 0;
             foreach (var mobId in mobManager.Mobs) {
                 var mobInfo = mobManager.MobInfos[mobId];
-                var mobInstance = MobInstances[mobId];
 
-                if (mobInstance.Hp > 0 && mobInfo.Team == TeamColor.Red) {
-                    RedAlive++;
-                }
-                if (mobInstance.Hp > 0 && mobInfo.Team == TeamColor.Blue) {
-                    BlueAlive++;
+                int currentHp = MobInstances[mobId].Hp;
+
+                if (mobInfo.Team == TeamColor.Red) {
+                    RedTotalHp += currentHp;
+                } else {
+                    BlueTotalHp += currentHp;
                 }
             }
         }
 
         public GameState DeepCopy() {
             var gameStateCopy = new GameState {
-                RedAlive = RedAlive,
-                BlueAlive = BlueAlive,
+                RedTotalHp = RedTotalHp,
+                BlueTotalHp = BlueTotalHp,
                 CurrentMobIndex = CurrentMobIndex,
                 LastTeamColor = LastTeamColor,
                 TurnOrder = TurnOrder.ToList()
@@ -171,8 +180,8 @@ namespace HexMage.Simulator {
             MobInstances = new MobInstance[0];
             Cooldowns.Clear();
             CurrentMobIndex = null;
-            RedAlive = 0;
-            BlueAlive = 0;
+            RedTotalHp = 0;
+            BlueTotalHp = 0;
             TurnOrder.Clear();
         }
 

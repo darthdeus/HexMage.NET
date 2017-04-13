@@ -21,7 +21,8 @@ namespace HexMage.Simulator {
         public int Size { get; set; }
 
         [JsonIgnore]
-        public bool AllDead => State.RedAlive == 0 && State.BlueAlive == 0;
+        [Obsolete]
+        public bool AllDead => State.RedTotalHp == 0 && State.BlueTotalHp == 0;
         [JsonIgnore]
         public bool IsFinished => State.IsFinished;
 
@@ -109,12 +110,23 @@ namespace HexMage.Simulator {
         [JsonIgnore]
         public TeamColor? VictoryTeam {
             get {
-#warning TODO - RedAlive/BlueAlive je obcas i zaporne!
-                if (State.RedAlive > 0 && State.BlueAlive <= 0) {
+                int redAlive = 0;
+                int blueAlive = 0;
+                foreach (var mobId in MobManager.Mobs) {
+                    var mob = CachedMob(mobId);
+
+                    if (mob.MobInfo.Team == TeamColor.Red && mob.MobInstance.Hp > 0) {
+                        redAlive++;
+                    } else if (mob.MobInfo.Team == TeamColor.Blue && mob.MobInstance.Hp > 0) {
+                        blueAlive++;
+                    }
+                }
+
+                if (redAlive > 0 && blueAlive <= 0) {
                     return TeamColor.Red;
-                } else if (State.RedAlive <= 0 && State.BlueAlive > 0) {
+                } else if (redAlive <= 0 && blueAlive > 0) {
                     return TeamColor.Blue;
-                } else if (State.RedAlive <= 0 && State.BlueAlive <= 0) {
+                } else if (redAlive <= 0 && blueAlive <= 0) {
                     return null;
                 } else {
                     Debug.Assert(!IsFinished);
