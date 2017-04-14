@@ -17,6 +17,7 @@ namespace HexMage.Simulator {
             }
         }
 
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T FastMax<T>(this List<T> t, Func<T, float> valFunc) {
             float maxVal = valFunc(t[0]);
             T max = t[0];

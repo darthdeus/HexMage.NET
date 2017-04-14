@@ -7,12 +7,12 @@ using HexMage.Simulator.AI;
 using HexMage.Simulator.PCG;
 
 namespace HexMage.Benchmarks {
-    public class Evolution {
+    public class EvolutionBenchmark {
         private readonly GameInstance game;
         private readonly DNA initialDna;
         private int _restartCount = 0;
 
-        public Evolution() {
+        public EvolutionBenchmark() {
             if (!Directory.Exists(Constants.SaveDir)) {
                 Directory.CreateDirectory(Constants.SaveDir);
             }

@@ -15,6 +15,7 @@ namespace HexMage.Simulator.Tests {
             CollectionAssert.AreEqual(state1.Cooldowns, state2.Cooldowns);
             CollectionAssert.AreEqual(state1.AreaBuffs, state2.AreaBuffs);
             Assert.AreEqual(state1.CurrentMobIndex, state2.CurrentMobIndex);
+            Assert.AreEqual(state1.CurrentTeamColor, state2.CurrentTeamColor);
 
             // TODO - tohle funguje?
             //CollectionAssert.AreEqual(state1.MobPositions, state2.MobPositions);

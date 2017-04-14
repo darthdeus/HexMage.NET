@@ -12,8 +12,9 @@ namespace HexMage.Simulator {
 
         public MobInstance[] MobInstances = new MobInstance[0];
         public readonly List<int> Cooldowns = new List<int>();
-        public int? CurrentMobIndex;
+        public int? CurrentMobIndex { get; private set; }
         public TeamColor? LastTeamColor;
+        public TeamColor? CurrentTeamColor;
         public List<int> TurnOrder = new List<int>();
 
         // This is optimized specifically for the smaller data sets on which
@@ -35,6 +36,33 @@ namespace HexMage.Simulator {
                 }
                 return RedTotalHp == 0 || BlueTotalHp == 0;
             }
+        }
+
+        [JsonIgnore]
+        public int? CurrentMob {
+            get {
+                if (!CurrentMobIndex.HasValue) {
+                    return null;
+                } else if (CurrentMobIndex.Value < TurnOrder.Count) {
+                    return TurnOrder[CurrentMobIndex.Value];
+                } else {
+                    return null;
+                }
+            }
+        }
+
+        public void UpdateCurrentTeam(GameInstance game) {
+            var cm = CurrentMob;
+            if (cm.HasValue) {
+                CurrentTeamColor = game.MobManager.MobInfos[cm.Value].Team;
+            } else {
+                CurrentTeamColor = null;
+            }
+        }
+
+        public void SetCurrentMobIndex(GameInstance game, int? index) {
+            CurrentMobIndex = index;
+            UpdateCurrentTeam(game);
         }
 
         public bool IsAlive(int mobId) {
@@ -161,6 +189,7 @@ namespace HexMage.Simulator {
                 BlueTotalHp = BlueTotalHp,
                 CurrentMobIndex = CurrentMobIndex,
                 LastTeamColor = LastTeamColor,
+                CurrentTeamColor = CurrentTeamColor,
                 TurnOrder = TurnOrder.ToList()
             };
 
@@ -180,6 +209,8 @@ namespace HexMage.Simulator {
             MobInstances = new MobInstance[0];
             Cooldowns.Clear();
             CurrentMobIndex = null;
+            CurrentTeamColor = null;
+            LastTeamColor = null;
             RedTotalHp = 0;
             BlueTotalHp = 0;
             TurnOrder.Clear();
@@ -206,6 +237,7 @@ namespace HexMage.Simulator {
             }
 
             CopyTurnOrderFromPresort(game);
+            SetCurrentMobIndex(game, 0);
             SlowUpdateIsFinished(game.MobManager);
         }
     }

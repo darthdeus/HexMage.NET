@@ -24,6 +24,7 @@ namespace HexMage.Simulator {
         [JsonIgnore]
         [Obsolete]
         public bool AllDead => State.RedTotalHp == 0 && State.BlueTotalHp == 0;
+
         [JsonIgnore]
         public bool IsFinished => State.IsFinished;
 
@@ -32,21 +33,10 @@ namespace HexMage.Simulator {
             => CurrentMob != null ? MobManager.Teams[MobManager.MobInfos[CurrentMob.Value].Team] : null;
 
         [JsonIgnore]
-        public int? CurrentMob
-        {
-            get {
-                if (!State.CurrentMobIndex.HasValue) {
-                    return null;
-                } else if (State.CurrentMobIndex.Value < State.TurnOrder.Count) {
-                    return State.TurnOrder[State.CurrentMobIndex.Value];
-                } else {
-                    return null;
-                }
-            }
-        }
+        public int? CurrentMob => State.CurrentMob;
 
         [JsonConstructor]
-        public GameInstance() {}
+        public GameInstance() { }
 
         public GameInstance(Map map, MobManager mobManager) {
             Map = map;
@@ -96,18 +86,18 @@ namespace HexMage.Simulator {
         }
 
         [JsonIgnore]
-        public TeamColor? CurrentTeam {
-            get
-            {
-                var currentMob = CurrentMob;
-                if (currentMob.HasValue) {
-                    var mobInfo = MobManager.MobInfos[currentMob.Value];
-                    return mobInfo.Team;
-                } else {
-                    return null;
-                }
-            }
-        }
+        public TeamColor? CurrentTeam => State.CurrentTeamColor;
+        //{
+        //    get {
+        //        var currentMob = CurrentMob;
+        //        if (currentMob.HasValue) {
+        //            var mobInfo = MobManager.MobInfos[currentMob.Value];
+        //            return mobInfo.Team;
+        //        } else {
+        //            return null;
+        //        }
+        //    }
+        //}
 
         [JsonIgnore]
         public TeamColor? VictoryTeam {

@@ -39,7 +39,7 @@ namespace HexMage.Benchmarks {
             } else {
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
-                new Evolution().Run();
+                new EvolutionBenchmark().Run();
                 stopwatch.Stop();
 
                 Console.WriteLine(
@@ -57,7 +57,7 @@ namespace HexMage.Benchmarks {
                 //RunEvaluator();
             } else if (key.Key == ConsoleKey.D3) {
                 Constants.MctsLogging = false;
-                new Evolution().Run();
+                new EvolutionBenchmark().Run();
             } else {
                 for (int i = 0; i < 10; i++) {
                     new Benchmarks().Run();
@@ -90,14 +90,14 @@ namespace HexMage.Benchmarks {
                 d1.Randomize();
                 d2.Randomize();
 
-                var fitness = Evolution.CalculateFitness(game, d1, d2);
+                var fitness = EvolutionBenchmark.CalculateFitness(game, d1, d2);
 
                 for (int j = 0; j < Constants.MeasureNeighboursPerSample; j++) {
                     iterations++;
                     if (iterations % 1000 == 0) printStats();
-                    var neighbour = Evolution.Mutate(d2, 0);
+                    var neighbour = EvolutionBenchmark.Mutate(d2, 0);
 
-                    var neighbourFitness = Evolution.CalculateFitness(game, d1, neighbour);
+                    var neighbourFitness = EvolutionBenchmark.CalculateFitness(game, d1, neighbour);
 
                     float delta = neighbourFitness.Fitness - fitness.Fitness;
 

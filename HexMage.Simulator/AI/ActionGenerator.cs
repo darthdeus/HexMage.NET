@@ -8,13 +8,18 @@ using HexMage.Simulator.Model;
 namespace HexMage.Simulator {
     public static class ActionGenerator {
         public static UctAction MaxAbilityRatio(GameInstance game, List<UctAction> actions) {
+#warning TODO: vyzkouset tohle s i bez methodimpl aggressiveinlining
+            //return actions.FastMax(action => game.MobManager.Abilities[action.AbilityId].DmgCostRatio);
+
             UctAction max = actions[0];
             var maxAbilityInfo = game.MobManager.Abilities[max.AbilityId];
 
-            for (int i = 1; i < actions.Count; i++) {
+            for (int i = 1; i < actions.Count; i++)
+            {
                 var abilityInfo = game.MobManager.Abilities[actions[i].AbilityId];
 
-                if (abilityInfo.DmgCostRatio > maxAbilityInfo.DmgCostRatio) {
+                if (abilityInfo.DmgCostRatio > maxAbilityInfo.DmgCostRatio)
+                {
                     max = actions[i];
                     maxAbilityInfo = abilityInfo;
                 }

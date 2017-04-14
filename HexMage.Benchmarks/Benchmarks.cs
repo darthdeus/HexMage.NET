@@ -175,10 +175,6 @@ namespace HexMage.Benchmarks {
 
 #endif
 
-            Console.WriteLine("Precomputing cubes");
-            game.Map.PrecomputeCubeLinedraw();
-            Console.WriteLine("Cubes precomputed");
-
             {
                 var totalStopwatch = Stopwatch.StartNew();
                 var stopwatch = new Stopwatch();

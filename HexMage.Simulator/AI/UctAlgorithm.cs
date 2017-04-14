@@ -10,6 +10,12 @@ using System.Threading;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator.AI {
+    public class Evolution<T> {
+        public Evolution(Func<T, float> fitnessFunc) {
+            
+        }
+    }
+
     public class UctAlgorithm {
         // TODO - extrahovat do args nebo configuraku
         public static int SearchCount = 0;
@@ -99,6 +105,7 @@ namespace HexMage.Simulator.AI {
                 node.Children.Add(child);
 
                 return child;
+                // TODO: fuj
             } catch (ArgumentOutOfRangeException e) {
                 Debugger.Break();
                 throw;
@@ -142,9 +149,6 @@ namespace HexMage.Simulator.AI {
                 }
 
                 ActionEvaluator.FNoCopy(copy, action);
-
-                // TODO - odebrat az se opravi
-                copy.State.SlowUpdateIsFinished(copy.MobManager);
             }
 
             if (iterations <= 0) {

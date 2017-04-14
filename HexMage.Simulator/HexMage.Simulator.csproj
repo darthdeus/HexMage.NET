@@ -69,7 +69,7 @@
     <Compile Include="AI\XmlTreePrinter.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DNA.cs" />
-    <Compile Include="Evolution.cs" />
+    <Compile Include="EvolutionBenchmark.cs" />
     <Compile Include="GenerationMember.cs" />
     <Compile Include="GenomeLoader.cs" />
     <Compile Include="GnuPlot.cs" />

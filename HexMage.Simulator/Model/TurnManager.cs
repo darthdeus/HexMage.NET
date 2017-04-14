@@ -28,7 +28,7 @@ namespace HexMage.Simulator {
                 return aInfo.Iniciative.CompareTo(bInfo.Iniciative);
             });
 
-            Game.State.CurrentMobIndex = 0;
+            Game.State.SetCurrentMobIndex(Game, 0);
         }
 
         public void NextMobOrNewTurn() {
@@ -37,9 +37,9 @@ namespace HexMage.Simulator {
                 throw new InvalidOperationException("CurrentMob has no value but trying to move to the next.");
 
             if (currentMobIndex.Value >= Game.State.TurnOrder.Count - 1) {
-                StartNextTurn(Game.State);
+                StartNextTurn(Game);
             } else {
-                Game.State.CurrentMobIndex = currentMobIndex.Value + 1;
+                Game.State.SetCurrentMobIndex(Game, currentMobIndex.Value + 1);
 
                 Debug.Assert(Game.CurrentMob.HasValue, "There's no current mob but still trying to move to one.");
                 var mobInstance = Game.State.MobInstances[Game.CurrentMob.Value];
@@ -62,7 +62,8 @@ namespace HexMage.Simulator {
             return copy;
         }
 
-        private void StartNextTurn(GameState state) {
+        private void StartNextTurn(GameInstance game) {
+            var state = game.State;
             for (int i = 0; i < state.MobInstances.Length; i++) {
                 state.MobInstances[i].Ap = Game.MobManager.MobInfos[i].MaxAp;
             }
@@ -74,10 +75,8 @@ namespace HexMage.Simulator {
             }
 
             state.TurnOrder.RemoveAll(x => state.MobInstances[x].Hp <= 0);
-
             state.LowerCooldowns();
-
-            state.CurrentMobIndex = 0;
+            state.SetCurrentMobIndex(game, 0);
 
             // TODO: wut, ma tu tohle vubec byt?
             if (Game.CurrentMob.HasValue) {
