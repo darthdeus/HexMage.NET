@@ -8,14 +8,16 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI.Renderers {
     public class SpellRenderer : IRenderer {
-        private readonly GameInstance _gameInstance;
+        private readonly GameInstance _game;
         private readonly GameBoardController _gameBoardController;
         private readonly Func<int?> _mobFunc;
         private readonly int _abilityIndex;
 
-        public SpellRenderer(GameInstance gameInstance, GameBoardController gameBoardController, Func<int?> mobFunc,
+        public SpellRenderer(GameInstance game,
+                             GameBoardController gameBoardController,
+                             Func<int?> mobFunc,
                              int abilityIndex) {
-            _gameInstance = gameInstance;
+            _game = game;
             _gameBoardController = gameBoardController;
             _mobFunc = mobFunc;
             _abilityIndex = abilityIndex;
@@ -31,16 +33,16 @@ namespace HexMage.GUI.Renderers {
 
             var mobId = _mobFunc();
             if (mobId != null) {
-                var mobInfo = _gameInstance.MobManager.MobInfos[mobId.Value];
+                var mobInfo = _game.MobManager.MobInfos[mobId.Value];
                 var abilityId = mobInfo.Abilities[_abilityIndex];
 
                 var isActive = _gameBoardController.SelectedAbilityIndex == _abilityIndex;
 
-                if (GameInvariants.IsAbilityUsableNoTarget(_gameInstance, mobId.Value, abilityId)) {
+                if (GameInvariants.IsAbilityUsableNoTarget(_game, mobId.Value, abilityId)) {
                     isActive = true;
                 }
 
-                var ability = _gameInstance.MobManager.AbilityForId(abilityId);
+                var ability = _game.MobManager.AbilityForId(abilityId);
                 batch.Draw(assetManager[ElementBg(ability, isActive)], entity.RenderPosition);
 
                 if (entity.AABB.Contains(InputManager.Instance.MousePosition)) {

@@ -40,7 +40,8 @@ namespace HexMage.GUI.Components {
 
         public int? SelectedAbilityIndex;
 
-        public GameBoardController(GameInstance gameInstance, GameEventHub eventHub, Entity crosshairCursor, ArenaScene arenaScene, Replay replay = null) {
+        public GameBoardController(GameInstance gameInstance, GameEventHub eventHub, Entity crosshairCursor,
+                                   ArenaScene arenaScene, Replay replay = null) {
             _gameInstance = gameInstance;
             _eventHub = eventHub;
             _arenaScene = arenaScene;
@@ -49,7 +50,6 @@ namespace HexMage.GUI.Components {
         }
 
         public void ActionApplied(UctAction action) {
-            Debug.Assert(_gameInstance.CurrentTeam.HasValue, "_gameInstance.CurrentTeam.HasValue");
             var mob = _gameInstance.CachedMob(action.MobId);
             var target = _gameInstance.CachedMob(action.TargetId);
 
@@ -64,6 +64,8 @@ namespace HexMage.GUI.Components {
                 || action.Type == UctActionType.Move) {
                 moveCost = _gameInstance.Pathfinder.Distance(mob.MobInstance.Coord, action.Coord);
             }
+
+            Debug.Assert(_gameInstance.CurrentTeam != null, "_gameInstance.CurrentTeam != null");
 
             HistoryLog.Instance.Log(_gameInstance.CurrentTeam.Value, action, mob, target, abilityInfo, moveCost);
         }
@@ -123,7 +125,7 @@ namespace HexMage.GUI.Components {
                 SortOrder = Camera2D.SortProjectiles
             };
 
-            explosion.AddComponent(new PositionAtMob(_gameInstance.MobManager, targetId, _gameInstance));
+            explosion.AddComponent(new PositionAtMob(targetId, _gameInstance));
 
             var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(abilityInfo.Element);
 

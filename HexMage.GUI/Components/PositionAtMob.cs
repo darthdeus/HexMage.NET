@@ -1,15 +1,13 @@
-﻿using HexMage.Simulator;
-using HexMage.Simulator.Model;
+﻿using HexMage.GUI.Core;
+using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.Components {
     public class PositionAtMob : Component {
-        private readonly MobManager _mobManager;
         private readonly int _mobId;
         private readonly GameInstance _gameInstance;
 
-        public PositionAtMob(MobManager mobManager, int mobId, GameInstance gameInstance) {
-            _mobManager = mobManager;
+        public PositionAtMob(int mobId, GameInstance gameInstance) {
             _mobId = mobId;
             _gameInstance = gameInstance;
         }

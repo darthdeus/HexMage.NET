@@ -1,10 +1,7 @@
-using System;
 using System.Diagnostics;
-using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using HexMage.GUI.Core;
 using HexMage.Simulator;
-using HexMage.Simulator.Model;
 using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.Components {
@@ -31,18 +28,16 @@ namespace HexMage.GUI.Components {
                 var sourcePos = camera.HexToPixel(_source);
                 var destinationPos = camera.HexToPixel(_destination);
 
-                // TODO - do this using proper fixed timestep, rather than per-frame percentage
                 _moveProgress += 0.06f;
 
                 if (_moveProgress >= 1.0f) {
                     _moveProgress = 1.0f;
                     _animateMovement = false;
-                    //Utils.Log(LogSeverity.Debug, nameof(MobEntity), "Move finished");
                     _tcs.SetResult(true);
                     _tcs = null;
                 }
 
-                Position = sourcePos + _moveProgress*(destinationPos - sourcePos);
+                Position = sourcePos + _moveProgress * (destinationPos - sourcePos);
             } else {
                 var posBefore = Position;
 
@@ -59,7 +54,6 @@ namespace HexMage.GUI.Components {
 
             _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             _moveProgress = 0.0f;
-            //Utils.Log(LogSeverity.Info, nameof(MobEntity), $"Moving from {source} to {destination}");
             _destination = destination;
             _source = source;
             _animateMovement = true;

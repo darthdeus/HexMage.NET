@@ -39,7 +39,7 @@ namespace HexMage.Simulator {
                 if (Action.Type == UctActionType.DefensiveMove) {
                     PossibleActions = new List<UctAction> {UctAction.EndTurnAction()};
                 } else {
-                    PossibleActions = ActionGenerator.PossibleActions(State, allowMove, allowEndTurn);
+                    PossibleActions = ActionGenerator.PossibleActions(State, this, allowMove, allowEndTurn);
                 }
             }
         }

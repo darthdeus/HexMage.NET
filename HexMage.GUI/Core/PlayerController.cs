@@ -8,12 +8,10 @@ using HexMage.Simulator.Model;
 namespace HexMage.GUI.Core {
     internal class PlayerController : IMobController {
         private readonly ArenaScene _arenaScene;
-        private readonly GameInstance _gameInstance;
 
-        public PlayerController(ArenaScene arenaScene, GameInstance gameInstance) {
+        public PlayerController(ArenaScene arenaScene, GameInstance game) {
             _arenaScene = arenaScene;
-            _gameInstance = gameInstance;
-            _aiRuleBasedController = new AiRuleBasedController(_gameInstance);
+            _aiRuleBasedController = new AiRuleBasedController(game);
         }
 
         private TaskCompletionSource<bool> _tcs;

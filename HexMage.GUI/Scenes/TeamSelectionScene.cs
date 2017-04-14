@@ -28,11 +28,11 @@ namespace HexMage.GUI.Scenes {
         private HorizontalLayout _t1Preview;
         private HorizontalLayout _t2Preview;
 
-        public TeamSelectionScene(GameManager gameManager, Map map) : base(gameManager) {
+        public TeamSelectionScene(GameManager game, Map map) : base(game) {
             _map = map;
             _gameInstance = new GameInstance(_map, _mobManager);
             // TODO - tohle je fuj, inicializovat to poradne
-            _arenaScene = new ArenaScene(_gameManager, _gameInstance);
+            _arenaScene = new ArenaScene(_game, _gameInstance);
 
             _controllerList = new List<IMobController> {
                 new AiRuleBasedController(_gameInstance),

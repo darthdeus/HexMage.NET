@@ -1,4 +1,5 @@
-﻿using HexMage.Simulator.Pathfinding;
+﻿using HexMage.GUI.Core;
+using HexMage.Simulator.Pathfinding;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Label = HexMage.GUI.UI.Label;
@@ -7,7 +8,7 @@ namespace HexMage.GUI.Scenes {
     public class MapEditorScene : GameScene {
         private Map _map;
 
-        public MapEditorScene(GameManager gameManager) : base(gameManager) {
+        public MapEditorScene(GameManager game) : base(game) {
             _map = new Map(5);
         }
 
@@ -33,7 +34,7 @@ namespace HexMage.GUI.Scenes {
 
             root.AddComponent(() => {
                 if (InputManager.Instance.IsKeyJustPressed(Keys.Space)) {
-                    LoadNewScene(new TeamSelectionScene(_gameManager, _map.DeepCopy()));
+                    LoadNewScene(new TeamSelectionScene(_game, _map.DeepCopy()));
                 }
             });
         }

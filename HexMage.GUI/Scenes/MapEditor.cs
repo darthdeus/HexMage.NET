@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using HexMage.GUI.Components;
+using HexMage.GUI.Core;
 using HexMage.Simulator;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.Pathfinding;
@@ -35,7 +36,6 @@ namespace HexMage.GUI.Scenes {
                 SceneManager.RollbackToFirst = true;
                 return;
             }
-
 
             if (inputManager.IsKeyJustPressed(Keys.L)) {
                 var fileDialog = new OpenFileDialog {CheckFileExists = true};

@@ -39,10 +39,9 @@ namespace HexMage.GUI.Components {
                 var gameInstance = _gameFunc();
                 var mobManager = gameInstance.MobManager;
 
-                var mobInstance = gameInstance.State.MobInstances[mobId.Value];
                 var mobInfo = mobManager.MobInfos[mobId.Value];
 
-                // Update and rendering ale skipped if the ability isn't present
+                // Update and rendering are skipped if the ability isn't present
                 if (_abilityIndex < mobInfo.Abilities.Count) {
                     Entity.Hidden = false;
                 } else {
@@ -59,7 +58,6 @@ namespace HexMage.GUI.Components {
 
                 if (inputManager.JustLeftClickReleased()) {
                     if (aabb.Contains(inputManager.MousePosition)) {
-                        //OnClick?.Invoke(_abilityIndex);
                         EnqueueClickEvent(() => OnClick?.Invoke(_abilityIndex));
                     }
                 }

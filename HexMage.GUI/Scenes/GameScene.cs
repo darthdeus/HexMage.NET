@@ -25,13 +25,13 @@ namespace HexMage.GUI.Scenes {
     }
 
     public abstract class GameScene {
-        protected readonly GameManager _gameManager;
+        protected readonly GameManager _game;
         private readonly List<Entity> _rootEntities = new List<Entity>();
 
-        protected Camera2D _camera => _gameManager.Camera;
-        protected InputManager _inputManager => _gameManager.InputManager;
-        protected AssetManager _assetManager => _gameManager.AssetManager;
-        protected SpriteBatch _spriteBatch => _gameManager.SpriteBatch;
+        protected Camera2D _camera => _game.Camera;
+        protected InputManager _inputManager => _game.InputManager;
+        protected AssetManager _assetManager => _game.AssetManager;
+        protected SpriteBatch _spriteBatch => _game.SpriteBatch;
 
         private readonly List<Action> _afterUpdateActions = new List<Action>();
         // Root entities to be initialized on the next frame
@@ -43,8 +43,8 @@ namespace HexMage.GUI.Scenes {
 
         private readonly SortedList<DateTime, Action> _delayedActions = new SortedList<DateTime, Action>();
 
-        protected GameScene(GameManager gameManager) {
-            _gameManager = gameManager;
+        protected GameScene(GameManager game) {
+            _game = game;
         }
 
         public abstract void Initialize();
@@ -90,7 +90,7 @@ namespace HexMage.GUI.Scenes {
             }
 
             // Continuations from await expressions are processed synchronously as well
-            _gameManager.ProcessSynchronizationContextQueue();
+            _game.ProcessSynchronizationContextQueue();
 
             // Layout of all root entities is always done before Update() is called
             foreach (var entity in _rootEntities) {

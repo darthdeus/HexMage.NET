@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using HexMage.GUI.Core;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI {

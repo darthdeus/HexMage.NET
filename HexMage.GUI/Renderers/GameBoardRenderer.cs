@@ -195,6 +195,11 @@ namespace HexMage.GUI.Renderers {
                     if (abilityIndex.HasValue) {
                         var cubepath = _gameInstance.Map.AxialLinedraw(mobInstance.Coord, mouseHex);
 
+                        var offset = new Vector2(AssetManager.TileSize / 2, AssetManager.TileSize / 2);
+                        DrawLine(_spriteBatch,
+                                 Camera2D.Instance.HexToPixel(mouseHex) + offset,
+                                 Camera2D.Instance.HexToPixel(mobInstance.Coord) + offset);
+
                         int distance = 0;
                         bool walled = false;
                         foreach (var cubeCoord in cubepath) {
@@ -242,6 +247,23 @@ namespace HexMage.GUI.Renderers {
 
         private void DrawAt(Texture2D texture, AxialCoord coord, Color color) {
             _spriteBatch.Draw(texture, _camera.HexToPixel(coord), color);
+        }
+
+        void DrawLine(SpriteBatch batch, Vector2 start, Vector2 end) {
+            Vector2 edge = end - start;
+
+            float angle = (float) Math.Atan2(edge.Y, edge.X);
+
+
+            var aabb = new Rectangle((int) start.X, (int) start.Y, (int) edge.Length(), 5);
+            batch.Draw(_assetManager[AssetManager.SolidGrayColor],
+                       aabb,
+                       null,
+                       Color.Pink,
+                       angle,
+                       Vector2.Zero,
+                       SpriteEffects.None,
+                       0);
         }
     }
 

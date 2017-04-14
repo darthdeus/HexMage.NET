@@ -9,18 +9,18 @@ using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Renderers {
     public class MobRenderer : IRenderer {
-        private readonly GameInstance _gameInstance;
+        private readonly GameInstance _game;
         private readonly int _mobId;
         private readonly MobAnimationController _animationController;
 
-        private readonly int _healthbarWidth = (int) (1.0/6*AssetManager.TileSize);
-        private readonly int _healthbarHeight = (int) (5.0/8*AssetManager.TileSize);
+        private const int _healthbarWidth = (int) (1.0 / 6 * AssetManager.TileSize);
+        private const int _healthbarHeight = (int) (5.0 / 8 * AssetManager.TileSize);
 
         private readonly Point _healthbarOffset = new Point((int) (9.0/10*AssetManager.TileSize),
                                                             (int) (1.0/7*AssetManager.TileSize));
 
-        public MobRenderer(GameInstance gameInstance, int mobId, MobAnimationController animationController) {
-            _gameInstance = gameInstance;
+        public MobRenderer(GameInstance game, int mobId, MobAnimationController animationController) {
+            _game = game;
             _mobId = mobId;
             _animationController = animationController;
         }
@@ -28,12 +28,12 @@ namespace HexMage.GUI.Renderers {
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
             var pos = entity.RenderPosition;
 
-            if (_gameInstance.CurrentMob == _mobId) {
+            if (_game.CurrentMob == _mobId) {
                 batch.Draw(assetManager[AssetManager.HexHoverSprite], pos, Color.White);
             }
 
-            var mobInfo = _gameInstance.MobManager.MobInfos[_mobId];
-            var mobInstance = _gameInstance.State.MobInstances[_mobId];
+            var mobInfo = _game.MobManager.MobInfos[_mobId];
+            var mobInstance = _game.State.MobInstances[_mobId];
 
             var color = mobInfo.Team == TeamColor.Red ? Color.OrangeRed : Color.Blue;
             if (mobInstance.Hp > 0) {

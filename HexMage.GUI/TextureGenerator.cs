@@ -1,15 +1,13 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace HexMage.GUI
-{
-    public static class TextureGenerator
-    {
+namespace HexMage.GUI {
+    public static class TextureGenerator {
         public static Texture2D SolidColor(GraphicsDevice device, int width, int height, Color color) {
             var texture2D = new Texture2D(device, width, height);
 
-            var colors = new Color[width*height];
-            for (int i = 0; i < width*height; i++) {
+            var colors = new Color[width * height];
+            for (int i = 0; i < width * height; i++) {
                 colors[i] = color;
             }
 

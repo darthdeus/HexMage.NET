@@ -49,7 +49,6 @@ namespace HexMage.Simulator {
         }
 
         public void Randomize() {
-#error TODO: generovat spravne randomizovane rozsahy atributu
             do
             {
                 for (int i = 0; i < Data.Count; i++) {

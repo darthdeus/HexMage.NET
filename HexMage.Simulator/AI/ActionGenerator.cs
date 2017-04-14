@@ -14,12 +14,10 @@ namespace HexMage.Simulator {
             UctAction max = actions[0];
             var maxAbilityInfo = game.MobManager.Abilities[max.AbilityId];
 
-            for (int i = 1; i < actions.Count; i++)
-            {
+            for (int i = 1; i < actions.Count; i++) {
                 var abilityInfo = game.MobManager.Abilities[actions[i].AbilityId];
 
-                if (abilityInfo.DmgCostRatio > maxAbilityInfo.DmgCostRatio)
-                {
+                if (abilityInfo.DmgCostRatio > maxAbilityInfo.DmgCostRatio) {
                     max = actions[i];
                     maxAbilityInfo = abilityInfo;
                 }
@@ -258,7 +256,8 @@ namespace HexMage.Simulator {
             return foundAbilityUse;
         }
 
-        public static List<UctAction> PossibleActions(GameInstance state, bool allowMove, bool allowEndTurn) {
+        public static List<UctAction> PossibleActions(GameInstance state, UctNode parent, bool allowMove,
+                                                      bool allowEndTurn) {
             // TODO - zmerit poradne, jestli tohle vubec pomaha, a kolik to ma byt
             var result = new List<UctAction>(10);
 
@@ -275,7 +274,9 @@ namespace HexMage.Simulator {
                 }
 
                 if (allowMove) {
-                    GenerateDefensiveMoveActions(state, mob, result);
+                    if (parent == null || parent.Action.Type != UctActionType.DefensiveMove) {
+                        GenerateDefensiveMoveActions(state, mob, result);
+                    }
                 }
             } else {
                 throw new InvalidOperationException();

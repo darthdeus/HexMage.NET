@@ -27,7 +27,7 @@ namespace HexMage.GUI.Components {
         public float AgeSpeed { get; set; }
         public readonly List<Particle> Particles = new List<Particle>();
 
-        private float _millisecondTimeout;
+        private readonly float _millisecondTimeout;
         private float _elapsedSinceLastEmit = 0;
         private readonly Func<Random, Vector2> _offsetFunc;
         private readonly Func<Random, Vector2> _velocityFunc;

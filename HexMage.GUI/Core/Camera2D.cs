@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace HexMage.GUI {
+namespace HexMage.GUI.Core {
     public class Camera2D {
         public static SamplerState SamplerState = null;
 
@@ -95,8 +95,8 @@ namespace HexMage.GUI {
             int row = coord.Y;
             int col = coord.X;
 
-            var x = (int) (Config.GridSize * scale * (col + row / 2.0));
-            var y = (int) (row * Config.HeightOffset * scale);
+            var x = (int) (GuiConfig.GridSize * scale * (col + row / 2.0));
+            var y = (int) (row * GuiConfig.HeightOffset * scale);
 
             return new Vector2(x, y);
         }
@@ -110,10 +110,10 @@ namespace HexMage.GUI {
         public Vector2 MouseWorldPixelPos => Vector2.Transform(MousePixelPos, Matrix.Invert(Transform));
 
         public AxialCoord PixelToHex(Vector2 pos) {
-            pos = Vector2.Transform(pos, Matrix.Invert(Transform)) - new Vector2(Config.GridSize / 2);
+            pos = Vector2.Transform(pos, Matrix.Invert(Transform)) - new Vector2(GuiConfig.GridSize / 2);
 
-            var row = (int) Math.Round(pos.Y / Config.HeightOffset);
-            var col = (int) Math.Round(pos.X / Config.GridSize - row / 2.0);
+            var row = (int) Math.Round(pos.Y / GuiConfig.HeightOffset);
+            var col = (int) Math.Round(pos.X / GuiConfig.GridSize - row / 2.0);
 
             return new AxialCoord(col, row);
         }

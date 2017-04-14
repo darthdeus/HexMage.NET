@@ -94,7 +94,7 @@ namespace HexMage.Simulator {
 
         public static int NumGenerations = 10000;
         public static int EvolutionPrintModulo = 100;
-        public static int TeamsPerGeneration = 1;
+        public static int TeamsPerGeneration = 10;
         public static double MutationDelta = 0.15;
 
         /// <summary>
@@ -144,8 +144,8 @@ namespace HexMage.Simulator {
         public static int ElementCount = 4;
 
         public static int BuffDmgMax = 10;
-        public static int BuffApDmgMax = 4;
-        public static int BuffLifetimeMax = 4;
+        public static int BuffApDmgMax = 10;
+        public static int BuffLifetimeMax = 5;
         public static int BuffMaxRadius = 6;
 
         public static readonly string SaveFile = @"evo-save.txt";

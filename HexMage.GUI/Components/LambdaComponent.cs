@@ -1,8 +1,7 @@
 using System;
-using HexMage.GUI.Components;
 using Microsoft.Xna.Framework;
 
-namespace HexMage.GUI {
+namespace HexMage.GUI.Components {
     public class LambdaComponent : Component {
         private readonly Action<GameTime> _updateFunc;
         public LambdaComponent(Action<GameTime> updateFunc) {

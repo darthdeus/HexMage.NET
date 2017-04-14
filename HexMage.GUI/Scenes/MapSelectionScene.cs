@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using HexMage.GUI.Components;
 using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
 using HexMage.GUI.UI;
@@ -21,13 +19,13 @@ namespace HexMage.GUI.Scenes {
         private const int MaxSize = 12;
         private int? _selectedSize;
 
-        private MapGenerator _mapGenerator = new MapGenerator();
+        private readonly MapGenerator _mapGenerator = new MapGenerator();
         private MapSeed _currentSeed = MapSeed.CreateRandom();
 
         private Map _currentMap;
         private VerticalLayout _seedHistory;
 
-        public MapSelectionScene(GameManager gameManager) : base(gameManager) {
+        public MapSelectionScene(GameManager game) : base(game) {
             _currentMap = _mapGenerator.Generate(DefaultMapSize, _currentSeed);
         }
 
@@ -128,13 +126,13 @@ namespace HexMage.GUI.Scenes {
                     game.MobManager.Teams[TeamColor.Red] = new AiRuleBasedController(game);
                     game.MobManager.Teams[TeamColor.Blue] = new AiRuleBasedController(game);
 
-                    LoadNewScene(new ArenaScene(_gameManager, game));
+                    LoadNewScene(new ArenaScene(_game, game));
                 }
 
                 if (InputManager.Instance.IsKeyJustPressed(Keys.R)) {
                     var replay = ReplayRecorder.Instance.Load(0);
 
-                    LoadNewScene(new ArenaScene(_gameManager, replay));
+                    LoadNewScene(new ArenaScene(_game, replay));
                 }
             });
 
@@ -142,7 +140,7 @@ namespace HexMage.GUI.Scenes {
         }
 
         private void DoContinue() {
-            LoadNewScene(new TeamSelectionScene(_gameManager, _currentMap.DeepCopy()));
+            LoadNewScene(new TeamSelectionScene(_game, _currentMap.DeepCopy()));
         }
 
         private void BtnGenerateMapOnOnClick(TextButton btn) {
@@ -189,7 +187,7 @@ namespace HexMage.GUI.Scenes {
                 game.PrepareEverything();
                 game.Reset();
 
-                var arenaScene = new ArenaScene(_gameManager, game);
+                var arenaScene = new ArenaScene(_game, game);
 
                 game.MobManager.Teams[TeamColor.Red] = new PlayerController(arenaScene, game);
                 game.MobManager.Teams[TeamColor.Blue] = new PlayerController(arenaScene, game);
@@ -211,13 +209,13 @@ namespace HexMage.GUI.Scenes {
             game.MobManager.Teams[TeamColor.Red] = new AiRuleBasedController(game);
             game.MobManager.Teams[TeamColor.Blue] = new AiRuleBasedController(game);
 
-            var arenaScene = new ArenaScene(_gameManager, game);
+            var arenaScene = new ArenaScene(_game, game);
 
             LoadNewScene(arenaScene);
         }
 
         public void LoadMapEditor() {
-            LoadNewScene(new MapEditorScene(_gameManager));
+            LoadNewScene(new MapEditorScene(_game));
         }
     }
 }

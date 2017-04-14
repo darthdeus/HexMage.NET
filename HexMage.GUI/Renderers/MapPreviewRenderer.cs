@@ -5,13 +5,12 @@ using HexMage.Simulator.Model;
 using HexMage.Simulator.Pathfinding;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Renderers {
     public class MapPreviewRenderer : IRenderer {
-        private Func<Map> _mapFunc;
+        private readonly Func<Map> _mapFunc;
         private readonly float _scale;
-        private Camera2D _camera;
+        private readonly Camera2D _camera;
 
         public MapPreviewRenderer(Func<Map> mapFunc, float scale) {
             _mapFunc = mapFunc;

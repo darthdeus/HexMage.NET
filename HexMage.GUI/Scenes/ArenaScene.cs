@@ -18,7 +18,7 @@ namespace HexMage.GUI.Scenes {
         private GameBoardController _gameBoardController;
         private readonly Replay _replay;
 
-        public ArenaScene(GameManager gameManager, Replay replay) : base(gameManager) {
+        public ArenaScene(GameManager game, Replay replay) : base(game) {
             _replay = replay;
 
             _gameInstance = replay.Game;
@@ -30,7 +30,7 @@ namespace HexMage.GUI.Scenes {
             _gameEventHub = new GameEventHub(_gameInstance);
         }
 
-        public ArenaScene(GameManager gameManager, GameInstance gameInstance) : base(gameManager) {
+        public ArenaScene(GameManager game, GameInstance gameInstance) : base(game) {
             _gameInstance = gameInstance;
             _gameEventHub = new GameEventHub(_gameInstance);
         }

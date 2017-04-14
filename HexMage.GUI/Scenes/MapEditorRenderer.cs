@@ -36,10 +36,6 @@ namespace HexMage.GUI.Scenes {
                        redStartingPoint,
                        Color.Red * 0.5f);
 
-            var maxCount = Math.Max(map.RedStartingPoints.Count,
-                                    map.BlueStartingPoints.Count);
-
-
             for (var i = 0; i < map.RedStartingPoints.Count; i++) {
                 var point = map.RedStartingPoints[i];
                 DrawAt(batch,

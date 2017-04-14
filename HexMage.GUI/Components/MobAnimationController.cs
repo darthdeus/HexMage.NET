@@ -1,4 +1,5 @@
 ﻿using System;
+using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
 using HexMage.Simulator;
 using HexMage.Simulator.Model;

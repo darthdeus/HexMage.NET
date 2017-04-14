@@ -1,4 +1,5 @@
-﻿using HexMage.GUI.Scenes;
+﻿using HexMage.GUI.Core;
+using HexMage.GUI.Scenes;
 using HexMage.GUI.UI;
 using HexMage.Simulator;
 using Microsoft.Xna.Framework;

@@ -69,11 +69,9 @@
     <Compile Include="Components\GameBoardController.cs" />
     <Compile Include="Components\MobAnimationController.cs" />
     <Compile Include="Components\MobEntity.cs" />
-    <Compile Include="Components\MobStateUpdater.cs" />
     <Compile Include="Components\PositionAtMob.cs" />
     <Compile Include="Components\ProjectileEntity.cs" />
-    <Compile Include="NetworkLoggerClient.cs" />
-    <Compile Include="NetworkLoggerServer.cs" />
+    <Compile Include="Components\SpriteChanger.cs" />
     <Compile Include="Renderers\IRenderer.cs" />
     <Compile Include="Components\LambdaComponent.cs" />
     <Compile Include="Renderers\AnimationRenderer.cs" />
@@ -85,8 +83,7 @@
     <Compile Include="Scenes\ArenaScene.cs" />
     <Compile Include="Core\AssetManager.cs" />
     <Compile Include="Core\Camera2D.cs" />
-    <Compile Include="Core\Config.cs" />
-    <Compile Include="Either.cs" />
+    <Compile Include="Core\GuiConfig.cs" />
     <Compile Include="Core\FrameCounter.cs" />
     <Compile Include="Core\GameManager.cs" />
     <Compile Include="HexMageGame.cs" />
