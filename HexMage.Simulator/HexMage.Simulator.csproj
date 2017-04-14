@@ -105,7 +105,6 @@
     <Compile Include="Pathfinding\CoordRadiusCache.cs" />
     <Compile Include="Pathfinding\Map.cs" />
     <Compile Include="AI\UctAlgorithm.cs" />
-    <Compile Include="Threadpool.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Utils\Color.cs" />
     <Compile Include="Model\AbilityInfo.cs" />
