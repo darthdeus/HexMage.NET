@@ -16,18 +16,46 @@ namespace HexMage.Simulator {
                 int mobOffset = i * dna.MobSize;
 
                 var mob = new JsonMob();
-                mob.hp = (int) Math.Ceiling(dna.Data[mobOffset] * Constants.HpMax);
-                mob.ap = (int) Math.Ceiling(dna.Data[mobOffset + 1] * Constants.ApMax);
+                mob.hp = (int) Math.Round(dna.Data[mobOffset] * Constants.HpMax);
+                mob.ap = (int) Math.Round(dna.Data[mobOffset + 1] * Constants.ApMax);
 
                 for (int j = 0; j < dna.AbilityCount; j++) {
                     int offset = mobOffset + DNA.MobAttributeCount + j * DNA.AbilityAttributeCount;
 
                     int dmg = (int) Math.Round(dna.Data[offset + 0] * (Constants.DmgMax - minDmg) + minDmg);
+                    int cost = (int) Math.Round(dna.Data[offset + 1] * Constants.CostMax);
+                    int range = (int) Math.Round(dna.Data[offset + 2] * Constants.RangeMax);
+
+                    var element = ElementFromNumber(dna.Data[offset + 3]);
+
+                    int buffDmg = (int) Math.Round(dna.Data[offset + 4] * Constants.BuffDmgMax);
+                    int buffApDmg = (int) Math.Round(dna.Data[offset + 5] * Constants.BuffApDmgMax);
+                    int buffLifetime = (int) Math.Round(dna.Data[offset + 6] * Constants.BuffLifetimeMax);
+
+                    int radius = (int) Math.Round(dna.Data[offset + 7] * Constants.BuffMaxRadius);
+                    int areaBuffDmg = (int) Math.Round(dna.Data[offset + 8] * Constants.BuffDmgMax);
+                    int areaBuffApDmg = (int) Math.Round(dna.Data[offset + 9] * Constants.BuffApDmgMax);
+                    int areaBuffLifetime = (int) Math.Round(dna.Data[offset + 10] * Constants.BuffLifetimeMax);
+
+                    var buff = new Buff(element,
+                                        -buffDmg,
+                                        -buffApDmg,
+                                        buffLifetime);
+
+                    var areaEffect = new Buff(element,
+                                              -areaBuffDmg,
+                                              -areaBuffApDmg,
+                                              areaBuffLifetime);
+
+                    var areaBuff = new AreaBuff(AxialCoord.Zero, radius, areaEffect);
+
                     var ability = new JsonAbility(dmg,
-                                                  (int) Math.Round(dna.Data[offset + 1] * Constants.CostMax),
-                                                  (int) Math.Round(dna.Data[offset + 2] * Constants.RangeMax),
+                                                  cost,
+                                                  range,
                                                   0,
-                                                  ElementFromNumber(dna.Data[offset + 3]));
+                                                  element,
+                                                  buff,
+                                                  areaBuff);
                     mob.abilities.Add(ability);
                 }
 
@@ -52,10 +80,22 @@ namespace HexMage.Simulator {
                 dna.Data.Add(mob.ap / (float) Constants.ApMax);
 
                 foreach (var ability in mob.abilities) {
-                    dna.Data.Add((ability.dmg - minDmg) / (float) Constants.DmgMax);
+                    dna.Data.Add((ability.dmg - minDmg) / (float) (Constants.DmgMax - minDmg));
                     dna.Data.Add(ability.ap / (float) Constants.CostMax);
                     dna.Data.Add(ability.range / (float) Constants.RangeMax);
                     dna.Data.Add(NumberFromElement(ability.element));
+
+                    var buff = ability.buff;
+                    dna.Data.Add(-buff.HpChange / (float) Constants.BuffDmgMax);
+                    dna.Data.Add(-buff.ApChange / (float) Constants.BuffApDmgMax);
+                    dna.Data.Add(buff.Lifetime / (float) Constants.BuffLifetimeMax);
+
+                    var areaBuff = ability.areaBuff;
+
+                    dna.Data.Add(areaBuff.Radius / (float) Constants.BuffMaxRadius);
+                    dna.Data.Add(-areaBuff.Effect.HpChange / (float) Constants.BuffDmgMax);
+                    dna.Data.Add(-areaBuff.Effect.ApChange / (float) Constants.BuffApDmgMax);
+                    dna.Data.Add(areaBuff.Effect.Lifetime / (float) Constants.BuffLifetimeMax);
                 }
             }
 

@@ -143,6 +143,11 @@ namespace HexMage.Simulator {
         public static int EvolutionMapSize = 5;
         public static int ElementCount = 4;
 
+        public static int BuffDmgMax = 10;
+        public static int BuffApDmgMax = 4;
+        public static int BuffLifetimeMax = 4;
+        public static int BuffMaxRadius = 6;
+
         public static readonly string SaveFile = @"evo-save.txt";
         public static readonly string SaveDir = "save-files/";
 

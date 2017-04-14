@@ -16,8 +16,8 @@ namespace HexMage.Simulator.Tests {
             var dna = new DNA(2, 2);
 
             var indices = new int[] {
-                0, 0, 0, 0, 0, 1, 0, 0, 0, 1,
-                0, 0, 0, 0, 0, 1, 0, 0, 0, 1
+                0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
             };
 
             for (int i = 0; i < dna.Data.Count; i++) {
@@ -33,8 +33,8 @@ namespace HexMage.Simulator.Tests {
         public void DnaSerializationTest() {
             for (int i = 0; i < 50; i++) {
                 var dna = new DNA(1, 1);
-                //dna.Randomize();
-                dna.Data = new List<float> {0.17f, 0.74f, .26f, .51f, .23f, .25f};
+                dna.Randomize();
+                //dna.Data = new List<float> {0.17f, 0.74f, .26f, .51f, .23f, .25f, 0, 0, 0, 0, 0, 0, 0};
 
                 var team = dna.ToTeam();
                 var converted = team.ToDna();
@@ -42,7 +42,7 @@ namespace HexMage.Simulator.Tests {
                 for (int j = 0; j < dna.Data.Count; j++) {
                     float a = dna.Data[j];
                     float b = converted.Data[j];
-                    double delta = 0.06;
+                    double delta = 0.10;
                     if (Math.Abs(a - b) > delta) {
                         Debugger.Break();
                     }

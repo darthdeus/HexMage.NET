@@ -11,10 +11,9 @@ namespace HexMage.Simulator {
         public int MobCount;
 
         public const int MobAttributeCount = 2;
-        public const int AbilityAttributeCount = 4;
+        public const int AbilityAttributeCount = 11;
         public int MobSize => MobAttributeCount + AbilityCount * AbilityAttributeCount;
 
-        // TODO - buff
         // TODO - area buff
 
         public DNA() {
@@ -46,11 +45,13 @@ namespace HexMage.Simulator {
         }
 
         public bool IsElementIndex(int index) {
-            return ((index % MobSize) - MobAttributeCount) % AbilityAttributeCount == AbilityAttributeCount - 1;
+            return ((index % MobSize) - MobAttributeCount) % AbilityAttributeCount == 3;
         }
 
         public void Randomize() {
-            do {
+#error TODO: generovat spravne randomizovane rozsahy atributu
+            do
+            {
                 for (int i = 0; i < Data.Count; i++) {
                     if (IsElementIndex(i)) {
                         Data[i] = Generator.Random.Next(0, 4) / (float)4;
@@ -61,7 +62,7 @@ namespace HexMage.Simulator {
             } while (!ToTeam().IsValid());
         }
 
-        public string ToDNAString() {
+        public string ToDnaString() {
             var dnaString = new StringBuilder();
             foreach (var num in Data) {
                 dnaString.Append(num.ToString(".00"));
@@ -87,7 +88,7 @@ namespace HexMage.Simulator {
         }
 
         public override string ToString() {
-            return ToDNAString();
+            return ToDnaString();
         }
 
         public Team ToTeam() {

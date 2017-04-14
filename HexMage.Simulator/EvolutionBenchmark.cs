@@ -26,7 +26,7 @@ namespace HexMage.Benchmarks {
                 initialDna.Randomize();
             }
 
-            Console.WriteLine($"Initial: {initialDna.ToDNAString()}\n\n");
+            Console.WriteLine($"Initial: {initialDna.ToDnaString()}\n\n");
 
             game = GameSetup.GenerateFromDna(initialDna, initialDna);
         }

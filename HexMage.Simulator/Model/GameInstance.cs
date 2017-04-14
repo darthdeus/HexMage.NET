@@ -87,38 +87,15 @@ namespace HexMage.Simulator {
 
         [JsonIgnore]
         public TeamColor? CurrentTeam => State.CurrentTeamColor;
-        //{
-        //    get {
-        //        var currentMob = CurrentMob;
-        //        if (currentMob.HasValue) {
-        //            var mobInfo = MobManager.MobInfos[currentMob.Value];
-        //            return mobInfo.Team;
-        //        } else {
-        //            return null;
-        //        }
-        //    }
-        //}
 
         [JsonIgnore]
         public TeamColor? VictoryTeam {
             get {
-                int redAlive = 0;
-                int blueAlive = 0;
-                foreach (var mobId in MobManager.Mobs) {
-                    var mob = CachedMob(mobId);
-
-                    if (mob.MobInfo.Team == TeamColor.Red && mob.MobInstance.Hp > 0) {
-                        redAlive++;
-                    } else if (mob.MobInfo.Team == TeamColor.Blue && mob.MobInstance.Hp > 0) {
-                        blueAlive++;
-                    }
-                }
-
-                if (redAlive > 0 && blueAlive <= 0) {
+                if (State.RedTotalHp > 0 && State.BlueTotalHp <= 0) {
                     return TeamColor.Red;
-                } else if (redAlive <= 0 && blueAlive > 0) {
+                } else if (State.RedTotalHp <= 0 && State.BlueTotalHp > 0) {
                     return TeamColor.Blue;
-                } else if (redAlive <= 0 && blueAlive <= 0) {
+                } else if (State.RedTotalHp <= 0 && State.BlueTotalHp <= 0) {
                     return null;
                 } else {
                     Debug.Assert(!IsFinished);

@@ -11,21 +11,25 @@ namespace HexMage.Simulator {
         public int range;
         public int cooldown;
         public AbilityElement element;
+        public Buff buff;
+        public AreaBuff areaBuff;
 
         public JsonAbility() {
             element = AbilityElement.Fire;
         }
 
-        public JsonAbility(int dmg, int ap, int range, int cooldown, AbilityElement element = AbilityElement.Fire) {
+        public JsonAbility(int dmg, int ap, int range, int cooldown, AbilityElement element, Buff buff, AreaBuff areaBuff) {
             this.dmg = dmg;
             this.ap = ap;
             this.range = range;
             this.cooldown = cooldown;
             this.element = element;
+            this.buff = buff;
+            this.areaBuff = areaBuff;
         }
 
         public AbilityInfo ToAbility() {
-            return new AbilityInfo(dmg, ap, range, cooldown, element);
+            return new AbilityInfo(dmg, ap, range, cooldown, element, buff, areaBuff);
         }
     }
 
@@ -50,7 +54,7 @@ namespace HexMage.Simulator {
             foreach (var mob in mobs) {
                 foreach (var ability in mob.abilities) {
                     if (ability.ap > mob.ap) return false;
-                    if (ability.dmg == 0) return false;
+                    if (ability.dmg <= 0) return false;
                     if (ability.ap == 0) return false;
                     if (ability.range == 0) return false;
                 }

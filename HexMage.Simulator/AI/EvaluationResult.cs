@@ -43,7 +43,7 @@ namespace HexMage.Simulator.AI {
             string fstr = Fitness.ToString("0.000000");
             string wstr = WinPercentage.ToString("0.0");
 
-            return $"F:{fstr}  W:{wstr}   {dna.ToDNAString()}";
+            return $"F:{fstr}  W:{wstr}   {dna.ToDnaString()}";
         }
     }
 }
