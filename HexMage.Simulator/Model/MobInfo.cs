@@ -2,10 +2,7 @@
 using System.Linq;
 
 namespace HexMage.Simulator.Model {
-    public struct MobInfo {
-        // TODO - this is no longer needed
-        public static readonly int NumberOfAbilities = 6;
-
+    public struct MobInfo : IDeepCopyable<MobInfo> {
         public int MaxHp { get; set; }
         public int MaxAp { get; set; }
         public int Iniciative { get; set; }
@@ -13,9 +10,6 @@ namespace HexMage.Simulator.Model {
         public List<int> Abilities { get; set; }
         public TeamColor Team { get; set; }
         public AxialCoord OrigCoord;
-
-        // TODO - this is no longer needed
-        public static int AbilityCount => 6;
 
         public MobInfo(TeamColor team, int maxHp, int maxAp, int iniciative, IEnumerable<int> abilities) {
             Team = team;
@@ -30,6 +24,11 @@ namespace HexMage.Simulator.Model {
             bool abilitiesEqual = Abilities.SequenceEqual(other.Abilities);
             return OrigCoord.Equals(other.OrigCoord) && MaxHp == other.MaxHp && MaxAp == other.MaxAp &&
                    Iniciative == other.Iniciative && abilitiesEqual && Team == other.Team;
+        }
+
+        public MobInfo DeepCopy() {
+            var copy = new MobInfo(Team, MaxHp, MaxAp, Iniciative, Abilities.ToList());
+            return copy;
         }
 
         public override bool Equals(object obj) {

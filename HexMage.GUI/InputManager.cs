@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using HexMage.Simulator;
+using HexMage.Simulator.Pathfinding;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 

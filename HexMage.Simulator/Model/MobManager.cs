@@ -1,21 +1,24 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using HexMage.Simulator.Model;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
-    public class MobManager {
+    public class MobManager : IDeepCopyable<MobManager> {
+        public List<int> Mobs = new List<int>();
         public readonly List<AbilityInfo> Abilities = new List<AbilityInfo>();
-        public readonly List<int> Mobs = new List<int>();
         public readonly List<MobInfo> MobInfos = new List<MobInfo>();
 
-        [JsonIgnore]
-        public readonly Dictionary<TeamColor, IMobController> Teams =
+        [JsonIgnore] public readonly Dictionary<TeamColor, IMobController> Teams =
             new Dictionary<TeamColor, IMobController>();
 
+        [Obsolete]
         public AbilityInfo AbilityForId(int id) {
             return Abilities[id];
         }
 
+        [Obsolete]
         public void InitializeState(GameState state) {
 #warning DEPRECATED: InitializeState by se asi nemelo pouzivat vubec? K cemu to vlastne je?
             state.Cooldowns.Clear();
@@ -35,6 +38,22 @@ namespace HexMage.Simulator {
             Abilities.Clear();
             MobInfos.Clear();
             Mobs.Clear();
+        }
+
+        public MobManager DeepCopy() {
+            var copy = new MobManager {
+                Mobs = Mobs.ToList()
+            };
+
+            foreach (var mobInfo in MobInfos) {
+                copy.MobInfos.Add(mobInfo.DeepCopy());
+            }
+
+            foreach (var abilityInfo in Abilities) {
+                copy.Abilities.Add(abilityInfo.DeepCopy());
+            }
+
+            return copy;
         }
     }
 }

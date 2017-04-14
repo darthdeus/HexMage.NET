@@ -120,7 +120,8 @@ namespace HexMage.GUI.Scenes {
                 }
             };
 
-            for (int i = 0; i < MobInfo.NumberOfAbilities; i++) {
+#warning TODO: 6 je fuj
+            for (int i = 0; i < 6; i++) {
                 currentLayout.AddChild(AbilityDetail(gameFunc, currentMobFunc, i,
                                                      ParticleEffectSettings.HighlightParticles));
                 hoverLayout.AddChild(AbilityDetail(gameFunc, hoverMobFunc, i, ParticleEffectSettings.NoParticles));
@@ -174,7 +175,8 @@ namespace HexMage.GUI.Scenes {
             const int particlesPerSecond = 20;
 
             if (particleEffectSettings == ParticleEffectSettings.HighlightParticles) {
-                var particles = new ParticleSystem(maximumNumberOfParticles, particlesPerSecond,
+                var particles = new ParticleSystem(maximumNumberOfParticles,
+                                                   particlesPerSecond,
                                                    new Vector2(0, -1), speed,
                                                    _assetManager[AssetManager.ParticleSprite],
                                                    0.01f, offsetFunc, velocityFunc);

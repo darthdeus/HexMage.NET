@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace HexMage.Simulator.AI {
     public class FlatMonteCarlo {
         public static UctNode Search(GameInstance initial) {
-            var root = new UctNode(0, 0, UctAction.NullAction(), initial.DeepCopy());
+            var root = new UctNode(0, 0, UctAction.NullAction(), initial.CopyStateOnly());
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();

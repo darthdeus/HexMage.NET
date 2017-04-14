@@ -9,20 +9,20 @@ namespace HexMage.Benchmarks {
     internal class Program {
         private static void Main(string[] args) {
             // TODO - proc to ale s timhle nekonverguje?!?!?!?!??!
-            Generator.Random = new Random(3);
+            //Generator.Random = new Random(3);
 
             if (!ProcessArguments(args)) return;
 
-            new Benchmarks().Run();
-            return;
+            //new Benchmarks().Run();
+            //return;
 
-            Constants.MctsBenchmark = true;
-            Benchmarks.BenchmarkAllAisAgainstMcts();
-            return;
+            //Constants.MctsBenchmark = true;
+            //Benchmarks.BenchmarkAllAisAgainstMcts();
+            //return;
 
-            Constants.MctsBenchmark = true;
-            Benchmarks.CompareAi();
-            return;
+            //Constants.MctsBenchmark = true;
+            //Benchmarks.CompareAi();
+            //return;
 
 
             if ((args.Length > 0 && args[0] == "mcts-benchmark") || Constants.MctsBenchmark) {
@@ -39,7 +39,7 @@ namespace HexMage.Benchmarks {
             } else {
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
-                new EvolutionBenchmark().Run();
+                new EvolutionBenchmark().RunSimulatedAnnealing();
                 stopwatch.Stop();
 
                 Console.WriteLine(
@@ -57,7 +57,7 @@ namespace HexMage.Benchmarks {
                 //RunEvaluator();
             } else if (key.Key == ConsoleKey.D3) {
                 Constants.MctsLogging = false;
-                new EvolutionBenchmark().Run();
+                new EvolutionBenchmark().RunSimulatedAnnealing();
             } else {
                 for (int i = 0; i < 10; i++) {
                     new Benchmarks().Run();
@@ -169,8 +169,6 @@ namespace HexMage.Benchmarks {
         }
 
         public static void MctsBenchmark() {
-            Generator.Random = new Random(3);
-
             var d1 = new DNA(3, 2);
             var game = GameSetup.GenerateFromDna(d1, d1);
 

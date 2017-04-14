@@ -1,13 +1,20 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using HexMage.Simulator.Model;
 using Newtonsoft.Json;
 
-namespace HexMage.Simulator {
+namespace HexMage.Simulator.Pathfinding {
     public class Pathfinder {
+        private static readonly List<AxialCoord> NeighbourDiffs = new List<AxialCoord> {
+            new AxialCoord(-1, 0),
+            new AxialCoord(1, 0),
+            new AxialCoord(0, -1),
+            new AxialCoord(0, 1),
+            new AxialCoord(1, -1),
+            new AxialCoord(-1, 1)
+        };
+
         public HexMap<HexMap<Path>> AllPaths;
-        private readonly List<AxialCoord> _neighbourDiffs;
 
         private Dictionary<int, List<AxialCoord>> _precomputedPaths =
             new Dictionary<int, List<AxialCoord>>();
@@ -18,26 +25,25 @@ namespace HexMage.Simulator {
         [JsonIgnore]
         private int Size => Game.Size;
 
-        [JsonConstructor]
-        public Pathfinder() {
-            _neighbourDiffs = new List<AxialCoord> {
-                new AxialCoord(-1, 0),
-                new AxialCoord(1, 0),
-                new AxialCoord(0, -1),
-                new AxialCoord(0, 1),
-                new AxialCoord(1, -1),
-                new AxialCoord(-1, 1)
-            };
+        public Pathfinder DeepCopy(GameInstance gameCopy) {
+            var copy = new Pathfinder(gameCopy);
+
+            copy.PathfindDistanceAll();
+
+            return copy;
         }
+
+
+        [JsonConstructor]
+        public Pathfinder() { }
 
         public Pathfinder(GameInstance game) : this() {
             Game = game;
             AllPaths = new HexMap<HexMap<Path>>(Game.Size);
         }
 
-        private Pathfinder(GameInstance game, List<AxialCoord> neighbourDiffs, HexMap<HexMap<Path>> allPaths) {
+        private Pathfinder(GameInstance game, HexMap<HexMap<Path>> allPaths) {
             Game = game;
-            _neighbourDiffs = neighbourDiffs;
             AllPaths = allPaths;
         }
 
@@ -56,40 +62,13 @@ namespace HexMage.Simulator {
                 if (distance <= mob.MobInstance.Ap) {
                     if (mobAtCoord == null) {
                         furthestPoint = coord;
-                    } else {
-                        var coordMobId = mobAtCoord.Value;
-                        var coordInfo = Game.MobManager.MobInfos[coordMobId];
-                        var coordhp = Game.State.MobInstances[coordMobId].Hp;
-                        //Console.WriteLine($"NEKDO MI TAM STOJI, JA: {mob.MobInfo.Team}, AP: {mob.MobInstance.Ap}, PRD: {coordInfo.Team}, {coordhp}HP");
                     }
                 } else {
-                    // TODO: jakym smerem je cesta?
-                    //Console.WriteLine("Koncim, protoze nemam dost AP na to policko");
                     break;
                 }
             }
 
             return furthestPoint;
-
-            //            int iterations = 0;
-
-            //            AxialCoord coord = target.Coord;
-            //            while (true) {
-            //                if (iterations++ > 1000) {
-            //#warning TODO - throw an exception instead
-            //                    throw new InvalidOperationException("Pathfinding got stuck searching for a shorter path");
-            //                    return null;
-            //                }
-            //                var closer = NearestEmpty(mob.Coord, coord);
-            //                if (closer == null) return null;
-
-
-            //                if (Distance(mob.Coord, closer.Value) <= mob.Ap) {
-            //                    return closer;
-            //                } else {
-            //                    coord = closer.Value;
-            //                }
-            //            }
         }
 
         public List<AxialCoord> PathTo(AxialCoord from, AxialCoord target) {
@@ -210,7 +189,7 @@ namespace HexMage.Simulator {
                 if (states[current] == VertexState.Closed) continue;
                 states[current] = VertexState.Closed;
 
-                foreach (var diff in _neighbourDiffs) {
+                foreach (var diff in NeighbourDiffs) {
                     var neighbour = current + diff;
 
                     if (IsValidCoord(neighbour) && Game.Map[neighbour] != HexType.Wall) {
@@ -243,7 +222,7 @@ namespace HexMage.Simulator {
 
         private AxialCoord? NearestEmpty(AxialCoord from, AxialCoord to) {
             AxialCoord? result = null;
-            foreach (var diff in _neighbourDiffs) {
+            foreach (var diff in NeighbourDiffs) {
                 var neighbour = to + diff;
                 if (IsWalkable(neighbour)) {
                     if (!result.HasValue) result = neighbour;
@@ -273,9 +252,9 @@ namespace HexMage.Simulator {
         }
 
         public Pathfinder ShallowCopy(GameInstance gameInstanceCopy) {
-            var copy = new Pathfinder(gameInstanceCopy, _neighbourDiffs, AllPaths);
-
-            copy._precomputedPaths = _precomputedPaths;
+            var copy = new Pathfinder(gameInstanceCopy, AllPaths) {
+                _precomputedPaths = _precomputedPaths
+            };
 
             return copy;
         }

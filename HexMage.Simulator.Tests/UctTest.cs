@@ -41,8 +41,6 @@ namespace HexMage.Simulator.Tests {
 
         [TestMethod]
         public void BasicUctTest() {
-            Generator.Random = new Random(123);
-
             var dna = new DNA(1, 1);
             dna.Randomize();
 
@@ -59,8 +57,6 @@ namespace HexMage.Simulator.Tests {
 
         [TestMethod]
         public void FlatMonteCarloTest() {
-            Generator.Random = new Random(123);
-
             var dna = new DNA(1, 1);
             dna.Randomize();
 
@@ -127,11 +123,11 @@ namespace HexMage.Simulator.Tests {
             var m2 = game.AddMobWithInfo(info2);
             game.PrepareEverything();
 
-            var copy = game.DeepCopy();
+            var copy = game.CopyStateOnly();
 
             TestHelpers.GameInstancesEqual(game, copy);
 
-            var copy2 = copy.DeepCopy();
+            var copy2 = copy.CopyStateOnly();
             ActionEvaluator.F(copy2, UctAction.AbilityUseAction(abilityId, m1, m2));
 
             TestHelpers.GameInstancesEqual(game, copy);

@@ -19,6 +19,8 @@ namespace HexMage.GUI.Components {
     }
 
     public class ParticleSystem : Entity {
+        private Random _rnd = new Random();
+
         public int ParticleCount { get; set; }
         public int PerSecond { get; set; }
         public Vector2 Direction { get; set; }
@@ -72,9 +74,9 @@ namespace HexMage.GUI.Components {
         }
 
         private void EmitParticle() {
-            var offset = _offsetFunc.Invoke(Generator.Random);
+            var offset = _offsetFunc.Invoke(_rnd);
 
-            var velocity = Direction*Speed + _velocityFunc.Invoke(Generator.Random);
+            var velocity = Direction*Speed + _velocityFunc.Invoke(_rnd);
             var particle = new Particle(velocity) {
                 Position = offset*10
             };

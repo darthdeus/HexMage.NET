@@ -6,7 +6,7 @@ namespace HexMage.Simulator.Model {
 
 #warning TODO - this should be a struct
 
-    public class AbilityInfo {
+    public class AbilityInfo : IDeepCopyable<AbilityInfo> {
         public int Dmg { get; set; }
         public int Cost { get; set; }
         public int Range { get; set; }
@@ -17,6 +17,9 @@ namespace HexMage.Simulator.Model {
 
         public float DmgCostRatio => (float) Dmg / (float) Cost;
 
+        [JsonConstructor]
+        [Obsolete]
+#warning TODO: is this still needed?
         public AbilityInfo() { }
 
         public AbilityInfo(int dmg, int cost, int range, int cooldown, AbilityElement element)
@@ -31,6 +34,12 @@ namespace HexMage.Simulator.Model {
             Element = element;
             Buff = buff;
             AreaBuff = areaBuff;
+        }
+
+        public AbilityInfo DeepCopy() {
+            // Buff and AreaBuff are strucs, so they're copied automatically.
+            var copy = new AbilityInfo(Dmg, Cost, Range, Cooldown, Element, Buff, AreaBuff);
+            return copy;
         }
 
 #warning TODO - ulozit je do nejaky tabulky a jenom referencovat

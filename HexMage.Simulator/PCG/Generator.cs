@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.Pathfinding;
 
@@ -48,15 +49,51 @@ namespace HexMage.Simulator.PCG {
     }
 
     public static class Generator {
-        public static Random Random;
+        public class SafeGen {
+            private static Random _srng = new Random();
+            private ThreadLocal<Random> _rng = new ThreadLocal<Random>(() => new Random(_srng.Next(int.MaxValue)));
+            private const bool useLocks = false;
 
-        static Generator() {
-            if (Constants.UseGlobalSeed) {
-                Random = new Random(Constants.RandomSeed);
-            } else {
-                Random = new Random();
+            public int Next(int min, int max) {
+                if (useLocks) {
+                    lock (this) {
+                        return _srng.Next(min, max);
+                    }
+                } else {
+                    return _rng.Value.Next(min, max);
+                }
+            }
+
+            public int Next(int max) {
+                if (useLocks) {
+                    lock (this) {
+                        return _srng.Next(max);
+                    }
+                } else {
+                    return _rng.Value.Next(max);
+                }
+            }
+
+            public double NextDouble() {
+                if (useLocks) {
+                    lock (this) {
+                        return _srng.NextDouble();
+                    }
+                } else {
+                    return _rng.Value.NextDouble();
+                }
             }
         }
+
+        public static SafeGen Random = new SafeGen();
+
+        //static Generator() {
+        //    if (Constants.UseGlobalSeed) {
+        //        Random = new Random(Constants.RandomSeed);
+        //    } else {
+        //        Random = new Random();
+        //    }
+        //}
 
         //public static GameInstance RandomGame(int size, MapSeed seed, int teamSize, Func<GameInstance, IMobController> controllerFunc) {
         //    var map = new MapGenerator().Generate(size, seed);

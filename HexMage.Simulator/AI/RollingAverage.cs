@@ -1,14 +1,19 @@
 namespace HexMage.Simulator.AI {
-    // TODO: make threadsafe
     public class RollingAverage {
-        public double Total = 0;
-        public int Count = 0;
+        private double _total = 0;
+        private int _count = 0;
 
-        public double Average => Total / Count;
+        public double Average {
+            get {
+                lock (this) return _total / _count;
+            }
+        }
 
         public void Add(double value) {
-            Total += value;
-            Count++;
+            lock (this) {
+                _total += value;
+                _count++;
+            }
         }
     }
 }

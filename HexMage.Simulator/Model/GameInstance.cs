@@ -61,8 +61,8 @@ namespace HexMage.Simulator {
 
         public GameInstance(Map map) : this(map, new MobManager()) { }
 
-        private GameInstance(int size, Map map, MobManager mobManager, Pathfinder pathfinder) {
-            Size = size;
+        private GameInstance(Map map, MobManager mobManager, Pathfinder pathfinder) {
+            Size = map.Size;
             MobManager = mobManager;
             Map = map;
             Pathfinder = pathfinder;
@@ -132,22 +132,20 @@ namespace HexMage.Simulator {
         }
 
         public GameInstance CopyStateOnly() {
-            var game = new GameInstance(Map.Size, Map, MobManager, null);
+            var game = new GameInstance(Map, MobManager, null);
             game.Pathfinder = Pathfinder.ShallowCopy(game);
-
-            game.TurnManager = TurnManager.DeepCopy(game);
+            game.TurnManager = TurnManager.ShallowCopy(game);
             game.State = State.DeepCopy();
 
             return game;
         }
 
         public GameInstance DeepCopy() {
-#warning TODO - tohle prepsat poradne!
             var mapCopy = Map.DeepCopy();
+            var mobManagerCopy = MobManager.DeepCopy();
 
-            // TODO - should the MobManager be copied here?                                                           
-            var game = new GameInstance(mapCopy, MobManager);
-            game.Pathfinder = Pathfinder.ShallowCopy(game);
+            var game = new GameInstance(mapCopy, mobManagerCopy);
+            game.Pathfinder = Pathfinder.DeepCopy(game);
 
             game.TurnManager = TurnManager.DeepCopy(game);
             game.State = State.DeepCopy();

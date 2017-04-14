@@ -50,6 +50,7 @@
     <Compile Include="AI\AiRandomController.cs" />
     <Compile Include="AI\AiRuleBasedController.cs" />
     <Compile Include="AI\EvaluationResult.cs" />
+    <Compile Include="AI\Evolution.cs" />
     <Compile Include="AI\ExponentialMovingAverage.cs" />
     <Compile Include="AI\FlatMonteCarlo.cs" />
     <Compile Include="AI\FlatMonteCarloController.cs" />
@@ -104,6 +105,7 @@
     <Compile Include="Pathfinding\CoordRadiusCache.cs" />
     <Compile Include="Pathfinding\Map.cs" />
     <Compile Include="AI\UctAlgorithm.cs" />
+    <Compile Include="Threadpool.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Utils\Color.cs" />
     <Compile Include="Model\AbilityInfo.cs" />

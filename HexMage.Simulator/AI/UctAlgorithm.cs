@@ -10,12 +10,6 @@ using System.Threading;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator.AI {
-    public class Evolution<T> {
-        public Evolution(Func<T, float> fitnessFunc) {
-            
-        }
-    }
-
     public class UctAlgorithm {
         // TODO - extrahovat do args nebo configuraku
         public static int SearchCount = 0;
@@ -34,7 +28,7 @@ namespace HexMage.Simulator.AI {
         }
 
         public UctSearchResult UctSearch(GameInstance initialState) {
-            var root = new UctNode(0, 0, UctAction.NullAction(), initialState.DeepCopy());
+            var root = new UctNode(0, 0, UctAction.NullAction(), initialState.CopyStateOnly());
 
             if (!initialState.CurrentTeam.HasValue)
                 throw new ArgumentException("Trying to do UCT search on a finished game.");
@@ -246,7 +240,7 @@ namespace HexMage.Simulator.AI {
 
                 if (max.Q / max.N < 0.2) {
                     //Console.WriteLine($"Bad action {max.Q} / {max.N}, generating via rules");
-                    var state = current.State.DeepCopy();
+                    var state = current.State.CopyStateOnly();
                     do {
                         var action = ActionGenerator.RuleBasedAction(state);
                         state = ActionEvaluator.F(state, action);

@@ -8,7 +8,7 @@ namespace HexMage.Simulator {
         public static int MctsBenchIterations = 200;
         public static int MctsBenchType = 1;
 
-        public static bool GnuPlot = true;
+        public static bool GnuPlot = false;
 
         public static bool MeasureSearchSpaceStats = false;
         public static int MeasureSamples = 1000000;
@@ -83,8 +83,7 @@ namespace HexMage.Simulator {
 
         public static bool AverageHpTotals = true;
         public static bool SaveGoodOnes = true;
-        public static double InitialT = 1;
-        public static int ExtraIterations = 0;
+        public static float InitialT = 1;
         public static bool Logging = false;
 
         // TODO - check if disabling this helps
@@ -92,9 +91,9 @@ namespace HexMage.Simulator {
 
         public static bool HillClimbing = false;
 
-        public static int NumGenerations = 10000;
-        public static int EvolutionPrintModulo = 100;
-        public static int TeamsPerGeneration = 10;
+        public static int NumGenerations = 1000;
+        public static int EvolutionPrintModulo = 10;
+        public static int TeamsPerGeneration = 100;
         public static double MutationDelta = 0.15;
 
         /// <summary>

@@ -9,19 +9,16 @@ using Newtonsoft.Json;
 
 namespace HexMage.Simulator.Pathfinding {
     public class Map : IDeepCopyable<Map> {
-        [JsonProperty]
-        private readonly HexMap<HexType> _hexes;
+        [JsonProperty] private readonly HexMap<HexType> _hexes;
 
-        [JsonProperty]
-        private Dictionary<int, bool> _visibility = new Dictionary<int, bool>();
+        [JsonProperty] private Dictionary<int, bool> _visibility = new Dictionary<int, bool>();
 
-        [JsonProperty]
-        private Dictionary<int, List<AxialCoord>> _visibilityLines =
+        [JsonProperty] private Dictionary<int, List<AxialCoord>> _visibilityLines =
             new Dictionary<int, List<AxialCoord>>();
 
         public List<AxialCoord> BlueStartingPoints = new List<AxialCoord>();
         public List<AxialCoord> RedStartingPoints = new List<AxialCoord>();
-        
+
         public List<AxialCoord> EmptyCoords = new List<AxialCoord>();
 
         public int Size { get; set; }
@@ -51,15 +48,23 @@ namespace HexMage.Simulator.Pathfinding {
         }
 
         public Map DeepCopy() {
-            var map = new Map(Size, _hexes) {
+            var map = new Map(Size, _hexes.DeepCopy()) {
                 Guid = Guid
             };
 
-            map.EmptyCoords = EmptyCoords;
-            map.RedStartingPoints = RedStartingPoints;
-            map.BlueStartingPoints = BlueStartingPoints;
-            map._visibility = _visibility;
-            map._visibilityLines = _visibilityLines;
+            map.EmptyCoords = EmptyCoords.ToList();
+            map.RedStartingPoints = RedStartingPoints.ToList();
+            map.BlueStartingPoints = BlueStartingPoints.ToList();
+
+            map._visibility = new Dictionary<int, bool>();
+            foreach (var v in _visibility) {
+                map._visibility[v.Key] = v.Value;
+            }
+
+            map._visibilityLines = new Dictionary<int, List<AxialCoord>>();
+            foreach (var v in _visibilityLines) {
+                map._visibilityLines[v.Key] = v.Value.ToList();
+            }
             return map;
         }
 
@@ -69,7 +74,9 @@ namespace HexMage.Simulator.Pathfinding {
                 var x = Generator.Random.Next(-Size + 1, Size);
                 var y = Generator.Random.Next(-Size + 1, Size);
 
-                if (Math.Abs(x) + Math.Abs(y) >= Size) continue;
+                if (Math.Abs(x) + Math.Abs(y) >= Size) {
+                    continue;
+                }
 
                 Debug.Assert(Math.Abs(x) < Size);
                 Debug.Assert(Math.Abs(y) < Size);

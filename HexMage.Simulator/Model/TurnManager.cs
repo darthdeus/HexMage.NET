@@ -11,7 +11,7 @@ namespace HexMage.Simulator {
         [JsonIgnore] public GameInstance Game;
 
         [JsonConstructor]
-        public TurnManager() {}
+        public TurnManager() { }
 
         public TurnManager(GameInstance game) {
             Game = game;
@@ -47,8 +47,15 @@ namespace HexMage.Simulator {
             }
         }
 
-        public TurnManager DeepCopy(GameInstance gameInstanceCopy) {
-            var copy = new TurnManager(gameInstanceCopy);
+        public TurnManager ShallowCopy(GameInstance gameCopy) {
+            return new TurnManager(gameCopy) {
+                PresortedOrder = PresortedOrder.ToList()
+            };
+        }
+
+
+        public TurnManager DeepCopy(GameInstance gameCopy) {
+            var copy = new TurnManager(gameCopy);
 
             // TODO - this is certainly the wrong place to do it, but at some point the game instance needs to be initialized
             if (PresortedOrder == null) {
