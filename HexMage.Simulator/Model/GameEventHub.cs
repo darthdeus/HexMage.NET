@@ -113,38 +113,17 @@ namespace HexMage.Simulator.Model {
             }
         }
 
-        public int FastMainLoop() {
-            var turnManager = _gameInstance.TurnManager;
-
-            throw new NotImplementedException();
-            _gameInstance.Reset();
-            //turnManager.StartNextTurn(_gameInstance.Pathfinder, _gameInstance.State);
-
-            int totalTurns = 0;
-            _gameInstance.State.SlowUpdateIsFinished(_gameInstance.MobManager);
-
-            while (!_gameInstance.IsFinished) {
-                totalTurns++;
-
-                _gameInstance.CurrentController.FastPlayTurn(this);
-                ActionEvaluator.FNoCopy(_gameInstance, UctAction.EndTurnAction());
-            }
-
-            return totalTurns;
-        }
-
-
         public void AddSubscriber(IGameEventSubscriber subscriber) {
             _subscribers.Add(subscriber);
         }
 
-        public async Task SlowBroadcastMobMoved(int mob, AxialCoord pos) {
+        private async Task SlowBroadcastMobMoved(int mob, AxialCoord pos) {
             await Task.WhenAll(_subscribers.Select(x => x.SlowEventMobMoved(mob, pos)));
 
             ActionEvaluator.FNoCopy(_gameInstance, UctAction.MoveAction(mob, pos));
         }
 
-        public async Task SlowBroadcastAbilityUsed(int mobId, int targetId, int abilityId) {
+        private async Task SlowBroadcastAbilityUsed(int mobId, int targetId, int abilityId) {
             var ability = _gameInstance.MobManager.AbilityForId(abilityId);
             await Task.WhenAll(_subscribers.Select(x => x.SlowEventAbilityUsed(mobId, targetId, ability)));
 
