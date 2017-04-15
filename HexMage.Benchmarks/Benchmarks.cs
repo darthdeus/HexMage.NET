@@ -107,25 +107,33 @@ namespace HexMage.Benchmarks {
             //c2 = new FlatMonteCarloController(game);
             //c2 = new MctsController(game, 100000);
 
+            //c1 = new MctsController(game, 10, 2);
+            //c2 = new MctsController(game, 10, 5);
+
             var iterationStopwatch = new Stopwatch();
+
+            int c1Wins = 0;
+            int c2Wins = 0;
 
             for (int i = 0; i < 100; i++) {
                 dna.Randomize();
+                iterationStopwatch.Restart();
 
                 GameSetup.OverrideGameDna(game, dna, dna);
-                iterationStopwatch.Restart();
-                GameEvaluator.Playout(game, c1, c2);
-                iterationStopwatch.Stop();
-                Console.WriteLine($"Iteration: {iterationStopwatch.ElapsedMilliseconds}ms");
-                Console.WriteLine(Accounting.GetStats());
+                var r1 = GameEvaluator.Playout(game, c1, c2);
 
                 GameSetup.OverrideGameDna(game, dna, dna);
-                iterationStopwatch.Restart();
-                GameEvaluator.Playout(game, c2, c1);
+                var r2 = GameEvaluator.Playout(game, c2, c1);
+
                 iterationStopwatch.Stop();
 
                 Console.WriteLine($"Iteration: {iterationStopwatch.ElapsedMilliseconds}ms");
                 Console.WriteLine(Accounting.GetStats());
+
+                c1Wins += r1.RedWins + r2.BlueWins;
+                c2Wins += r1.BlueWins + r2.RedWins;
+
+                Console.WriteLine($"STATS: M2: {c1Wins}, M5: {c2Wins}");
             }
         }
 

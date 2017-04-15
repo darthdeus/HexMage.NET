@@ -7,14 +7,16 @@ namespace HexMage.Simulator.AI {
     public class MctsController : IMobController {
         private readonly GameInstance _gameInstance;
         private readonly int _thinkTime;
+        private readonly double _expoExplo;
 
-        public MctsController(GameInstance gameInstance, int thinkTime = 100) {
+        public MctsController(GameInstance gameInstance, int thinkTime = 100, double expoExplo = 2) {
             _gameInstance = gameInstance;
             _thinkTime = thinkTime;
+            _expoExplo = expoExplo;
         }
 
         public void FastPlayTurn(GameEventHub eventHub) {
-            var uct = new UctAlgorithm(_thinkTime);
+            var uct = new UctAlgorithm(_thinkTime, _expoExplo);
             var result = uct.UctSearch(_gameInstance);
 
             foreach (var action in result.Actions) {
@@ -23,6 +25,7 @@ namespace HexMage.Simulator.AI {
                 ActionEvaluator.FNoCopy(_gameInstance, action);
             }
 
+#warning TODO: not threadsafe
             ExponentialMovingAverage.Instance.Average(result.MillisecondsPerIteration);
 
             LogActions(result);

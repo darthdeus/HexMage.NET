@@ -22,9 +22,11 @@ namespace HexMage.Simulator.AI {
         public static readonly RollingAverage MillisecondsPerIterationAverage = new RollingAverage();
 
         private readonly int _thinkTime;
+        private readonly double _exploExplo;
 
-        public UctAlgorithm(int thinkTime) {
+        public UctAlgorithm(int thinkTime, double exploExplo = 2) {
             _thinkTime = thinkTime;
+            _exploExplo = exploExplo;
         }
 
         public UctSearchResult UctSearch(GameInstance initialState) {
@@ -63,7 +65,7 @@ namespace HexMage.Simulator.AI {
             return new UctSearchResult(actions, millisecondsPerIteration);
         }
 
-        public static float OneIteration(UctNode root, TeamColor startingTeam) {
+        public float OneIteration(UctNode root, TeamColor startingTeam) {
             UctNode v = TreePolicy(root, startingTeam);
             // TODO: ma tu byt root node team, nebo aktualni?
             float delta = DefaultPolicy(v.State, startingTeam);
@@ -71,7 +73,7 @@ namespace HexMage.Simulator.AI {
             return delta;
         }
 
-        public static UctNode TreePolicy(UctNode node, TeamColor startingTeam) {
+        public UctNode TreePolicy(UctNode node, TeamColor startingTeam) {
             while (!node.IsTerminal) {
                 if (!node.IsFullyExpanded) {
                     Interlocked.Increment(ref ExpandCount);

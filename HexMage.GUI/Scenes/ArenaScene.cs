@@ -43,6 +43,11 @@ namespace HexMage.GUI.Scenes {
             HistoryLog.Instance.Hidden = false;
             AddAndInitializeRootEntity(HistoryLog.Instance, _assetManager);
 
+            var detail = CreateRootEntity(Camera2D.SortUI + 100);
+            var bg = _assetManager[AssetManager.HistoryLogBg];
+            detail.Renderer = new SpriteRenderer(bg);
+            detail.AddComponent(() => detail.Position = new Vector2(bg.Width, 1024 - bg.Height));
+
             var cursorSprite = _assetManager[AssetManager.CrosshairCursor];
 
             var crosshairCursor = CreateRootEntity(Camera2D.SortUI);
@@ -52,7 +57,7 @@ namespace HexMage.GUI.Scenes {
                                            cursorSprite.Bounds.Size.ToVector2() / 2;
             });
 
-            Camera2D.Instance.Translate = new Vector3(600, 500, 0);
+            Camera2D.Instance.Translate = new Vector3(600, 400, 0);
 
             var gameBoardEntity = CreateRootEntity(Camera2D.SortBackground);
 
@@ -92,15 +97,13 @@ namespace HexMage.GUI.Scenes {
         public override void Cleanup() { }
 
         private void BuildUi() {
-            Func<string> gameStateTextFunc = () =>
-                _gameInstance.IsFinished ? "Game finished" : "Game in progress";
+            var leftBg = CreateRootEntity(Camera2D.SortUI - 10);
+            leftBg.Position = Vector2.Zero;
+            leftBg.Renderer = new SpriteRenderer(_assetManager[AssetManager.UiLeftBg]);
 
-            var gameStateLabel = new Label(gameStateTextFunc, _assetManager.Font) {
-                SortOrder = Camera2D.SortUI,
-                Position = new Vector2(400, 50)
-            };
-
-            AddAndInitializeRootEntity(gameStateLabel, _assetManager);
+            var rightBg = CreateRootEntity(Camera2D.SortUI - 10);
+            rightBg.Position = new Vector2(1280 - 150, 0);
+            rightBg.Renderer = new SpriteRenderer(_assetManager[AssetManager.UiRightBg]);
 
             const int abilitySpacing = 70;
             var currentLayout = new VerticalLayout {
@@ -136,15 +139,34 @@ namespace HexMage.GUI.Scenes {
                                                      ParticleEffectSettings.HighlightParticles));
                 hoverLayout.AddChild(AbilityDetail(gameFunc, hoverMobFunc, i, ParticleEffectSettings.NoParticles));
             }
+
+            var topBar = CreateRootEntity(Camera2D.SortUI - 10);
+            topBar.Renderer = new SpriteRenderer(_assetManager[AssetManager.TitleBg]);
+            topBar.Position = new Vector2(150, 0);
+
+            var teamLabel = CreateRootEntity(Camera2D.SortUI - 10);
+            teamLabel.Renderer = new SpriteRenderer(() => {
+                var team = _gameInstance.CurrentTeam;
+                if (team.HasValue) {
+                    if (team.Value == TeamColor.Red) {
+                        return _assetManager[AssetManager.TitleRedTeam];
+                    } else {
+                        return _assetManager[AssetManager.TitleBlueTeam];
+                    }
+                } else {
+                    return _assetManager[AssetManager.TitleGameFinished];
+                }
+            });
+            teamLabel.Position = new Vector2(1280 / 2 - 40, 5);
         }
 
         private Entity AbilityDetail(Func<GameInstance> gameFunc, Func<int?> mobFunc, int abilityIndex,
                                      ParticleEffectSettings particleEffectSettings) {
             var abilityDetailWrapper = new Entity {
-                SizeFunc = () => new Vector2(120, 80)
+                SizeFunc = () => new Vector2(120, 80),
+                Hidden = true
             };
 
-            abilityDetailWrapper.Hidden = true;
             abilityDetailWrapper.AddComponent(_ => { abilityDetailWrapper.Hidden = mobFunc() == null; });
 
             var abilityDetail = new VerticalLayout {

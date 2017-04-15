@@ -25,7 +25,7 @@ namespace HexMage.Simulator.AI {
             //    UctAlgorithm.Backup(child, reward);
             //}
 
-            var bestChild = UctAlgorithm.BestChild(root, 0);
+            var bestChild = UctAlgorithm.BestChild(root, initial.CurrentTeam.Value, 0);
 
             UctDebug.PrintDotgraph(root, () => 0);
 

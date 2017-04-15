@@ -59,6 +59,14 @@ namespace HexMage.GUI.Core {
 
         private const string FontName = "Arial";
 
+        public const string TitleRedTeam = "ui/title-red-team";
+        public const string TitleBlueTeam = "ui/title-blue-team";
+        public const string TitleGameFinished = "ui/title-game-finished";
+        public const string TitleBg = "ui/title-bg";
+
+        public const string UiLeftBg = "ui/left-bg";
+        public const string UiRightBg = "ui/right-bg";
+
         private readonly ContentManager _contentManager;
         private readonly GraphicsDevice _graphicsDevice;
         private readonly Dictionary<string, Texture2D> _textures = new Dictionary<string, Texture2D>();

@@ -67,14 +67,16 @@ namespace HexMage.Simulator.Tests {
 
             var root = new UctNode(UctAction.NullAction(), game);
 
+            var uct = new UctAlgorithm(100);
+
             for (int i = 0; i < 30; i++) {
-                UctAlgorithm.OneIteration(root, startingTeam);
-                UctAlgorithm.OneIteration(root, startingTeam);
-                UctAlgorithm.OneIteration(root, startingTeam);
-                UctAlgorithm.OneIteration(root, startingTeam);
-                UctAlgorithm.OneIteration(root, startingTeam);
-                UctAlgorithm.OneIteration(root, startingTeam);
-                UctAlgorithm.OneIteration(root, startingTeam);
+                uct.OneIteration(root, startingTeam);
+                uct.OneIteration(root, startingTeam);
+                uct.OneIteration(root, startingTeam);
+                uct.OneIteration(root, startingTeam);
+                uct.OneIteration(root, startingTeam);
+                uct.OneIteration(root, startingTeam);
+                uct.OneIteration(root, startingTeam);
             }
 
             UctDebug.PrintDotgraph(root, () => 0);

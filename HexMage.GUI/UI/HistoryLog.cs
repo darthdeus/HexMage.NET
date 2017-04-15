@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
 using HexMage.GUI.Core;
-using HexMage.GUI.Renderers;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 using Microsoft.Xna.Framework;
