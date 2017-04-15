@@ -7,7 +7,8 @@ using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public static class ActionGenerator {
-        public static UctAction MaxAbilityRatio(GameInstance game, List<UctAction> actions, bool deterministic = false) {
+        public static UctAction MaxAbilityRatio(GameInstance game, List<UctAction> actions,
+                                                bool deterministic = false) {
 #warning TODO: vyzkouset tohle s i bez methodimpl aggressiveinlining
             //return actions.FastMax(action => game.MobManager.Abilities[action.AbilityId].DmgCostRatio);
 
@@ -15,14 +16,15 @@ namespace HexMage.Simulator {
                 return DeterministicMaxAbilityRatio(game, actions);
             } else {
                 var pairs = actions.Select(action => {
-                    return Tuple.Create(action, game.MobManager.Abilities[action.AbilityId]);
-                }).ToList();
+                                       return Tuple.Create(action, game.MobManager.Abilities[action.AbilityId]);
+                                   })
+                                   .ToList();
 
                 pairs.Sort((a, b) => b.Item2.DmgCostRatio.CompareTo(a.Item2.DmgCostRatio));
 
                 var totalRatio = pairs.Sum(p => p.Item2.DmgCostRatio);
 
-                var probabilities = pairs.Select(p => (double)p.Item2.DmgCostRatio / totalRatio);
+                var probabilities = pairs.Select(p => (double) p.Item2.DmgCostRatio / totalRatio);
 
                 var pick = Probability.UniformPick(pairs, probabilities.ToList());
                 return pick.Item1;
@@ -95,11 +97,10 @@ namespace HexMage.Simulator {
             foreach (var possibleTargetId in state.MobManager.Mobs) {
                 var possibleTarget = state.CachedMob(possibleTargetId);
 
-                // TODO - remove corpse targetting
-                if (!Constants.AllowCorpseTargetting &&
-                    !GameInvariants.IsTargetable(state, mob, possibleTarget)) continue;
-
                 moveTargetId = possibleTargetId;
+
+                // TODO - remove corpse targetting
+                if (!GameInvariants.IsTargetable(state, mob, possibleTarget)) continue;
 
                 if (abilityIds.Count == 0) continue;
 
@@ -118,6 +119,8 @@ namespace HexMage.Simulator {
                 return PickMoveTowardsEnemyAction(state, state.CachedMob(mobId.Value),
                                                   state.CachedMob(moveTargetId));
             } else {
+                Utils.Log(LogSeverity.Error, nameof(ActionGenerator), "No targets, game should be over");
+
                 throw new InvalidOperationException("No targets, game should be over.");
             }
         }

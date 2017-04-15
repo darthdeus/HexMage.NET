@@ -49,8 +49,6 @@ namespace HexMage.Simulator {
 
         // Rule based AI
         public static bool FastActionGeneration = false;
-        // TODO - porovnat, co kdyz dovolim utocit na dead cile
-        public static bool AllowCorpseTargetting = false;
 
         /// <summary>
         /// Disabling this will only generate the respective MOVE action,

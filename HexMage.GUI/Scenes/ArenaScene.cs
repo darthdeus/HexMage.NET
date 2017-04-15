@@ -43,8 +43,9 @@ namespace HexMage.GUI.Scenes {
             HistoryLog.Instance.Hidden = false;
             AddAndInitializeRootEntity(HistoryLog.Instance, _assetManager);
 
-            var crosshairCursor = CreateRootEntity(Camera2D.SortUI);
             var cursorSprite = _assetManager[AssetManager.CrosshairCursor];
+
+            var crosshairCursor = CreateRootEntity(Camera2D.SortUI);
             crosshairCursor.Renderer = new SpriteRenderer(cursorSprite);
             crosshairCursor.AddComponent(() => {
                 crosshairCursor.Position = InputManager.Instance.MousePosition.ToVector2() -
@@ -91,7 +92,9 @@ namespace HexMage.GUI.Scenes {
         public override void Cleanup() { }
 
         private void BuildUi() {
-            Func<string> gameStateTextFunc = () => _gameInstance.IsFinished ? "Game finished" : "Game in progress";
+            Func<string> gameStateTextFunc = () =>
+                _gameInstance.IsFinished ? "Game finished" : "Game in progress";
+
             var gameStateLabel = new Label(gameStateTextFunc, _assetManager.Font) {
                 SortOrder = Camera2D.SortUI,
                 Position = new Vector2(400, 50)

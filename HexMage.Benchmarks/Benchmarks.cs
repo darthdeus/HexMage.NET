@@ -41,7 +41,7 @@ namespace HexMage.Benchmarks {
             using (var writer = new StreamWriter($@"data/results-rule.txt")) {
                 for (int i = step; i < 1000; i += step) {
                     var c1 = new MctsController(game, i);
-                    var c2 = new FlatMonteCarloController(game);
+                    var c2 = new AiRuleBasedController(game);
 
                     double result = GameEvaluator.CompareAiControllers(game,
                                                                        dnas,

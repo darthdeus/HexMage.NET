@@ -83,7 +83,10 @@ namespace HexMage.Simulator.AI {
                 } else {
                     blue++;
                 }
+
+                Accounting.IncrementWinner(game.VictoryController);
             }
+
 
             var gamePercentage = totalCurrentHp / totalMaxHp;
             Debug.Assert(gamePercentage >= 0);

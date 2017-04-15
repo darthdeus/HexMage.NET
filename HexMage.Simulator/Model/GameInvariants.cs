@@ -137,8 +137,7 @@ namespace HexMage.Simulator.Model {
                                                int abilityId) {
             var ability = game.MobManager.Abilities[abilityId];
 
-            int remainingAp = mob.MobInstance.Ap - game.Pathfinder.Distance(mob.MobInstance.Coord,
-                                                                            from);
+            int remainingAp = mob.MobInstance.Ap - game.Pathfinder.Distance(mob.MobInstance.Coord, from);
 
             // TODO - kontrolovat i ze na to policko dojdu?
             bool withinRange = ability.Range >= from.Distance(target.MobInstance.Coord);
@@ -148,7 +147,7 @@ namespace HexMage.Simulator.Model {
         }
 
         public static bool IsTargetableNoSource(GameInstance game, CachedMob mob, CachedMob target) {
-            bool isTargetAlive = Constants.AllowCorpseTargetting || target.MobInstance.Hp > 0;
+            bool isTargetAlive = target.MobInstance.Hp > 0;
             bool isEnemy = mob.MobInfo.Team != target.MobInfo.Team;
 
             return isTargetAlive && isEnemy;
