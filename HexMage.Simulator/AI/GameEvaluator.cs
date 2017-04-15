@@ -20,54 +20,39 @@ namespace HexMage.Simulator.AI {
         public static List<IAiFactory> GlobalFactories = new List<IAiFactory>();
 
         // TODO: wat, tohle dat pryc a pouzivat obecnejsi
-        public EvaluationResult Evaluate() {
+        public PlayoutResult Evaluate() {
             if (GlobalFactories.Count == 0) {
-                GlobalFactories.Add(new RuleBasedFactory());
+                GlobalFactories.Add(new MctsFactory(1));
             }
-
-            // TODO - defaulty uz jsou takovyhle ne?
-            var result = new EvaluationResult {
-                TotalHp = 0,
-                Timeouted = false,
-                Tainted = false
-            };
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            foreach (var factory1 in GlobalFactories) {
-                foreach (var factory2 in GlobalFactories) {
-                    var game = _gameInstance.CopyStateOnly();
-
-                    var ai1 = factory1.Build(game);
-                    var ai2 = factory2.Build(game);
-
-                    Playout(game, ai1, ai2, ref result);
-                }
-            }
+            var playoutResults = GlobalFactories.Select(factory => {
+                                                    var game = _gameInstance.CopyStateOnly();
+                                                    var ai = factory.Build(game);
+                                                    return Playout(game, ai, ai);
+                                                })
+                                                .ToList();
 
             stopwatch.Stop();
 
-            result.TotalHpPercentage /= result.TotalGames;
-            result.TotalElapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+            var result = playoutResults.Skip(1)
+                                       .Aggregate(playoutResults.First(), (total, curr) => {
+                                           return new PlayoutResult(total.TotalTurns + curr.TotalTurns,
+                                                                    total.Fitness + curr.Fitness,
+                                                                    total.Timeout || curr.Timeout,
+                                                                    total.RedWins + curr.RedWins,
+                                                                    total.BlueWins + curr.BlueWins);
+                                       });
 
-            Debug.Assert(result.TotalHpPercentage >= 0);
-            Debug.Assert(result.TotalHpPercentage <= 1);
+            result.Fitness /= playoutResults.Count;
 
             return result;
         }
 
-        public static EvaluationResult PlayoutSingleGame(GameInstance game, IMobController ai1, IMobController ai2) {
-            var result = new EvaluationResult();
-            Playout(game, ai1, ai2, ref result);
-            result.TotalHpPercentage /= result.TotalGames;
-            return result;
-        }
 
-        public static void Playout(GameInstance game, IMobController ai1, IMobController ai2,
-                                   ref EvaluationResult result) {
-            result.TotalGames++;
-
+        public static PlayoutResult Playout(GameInstance game, IMobController ai1, IMobController ai2) {
             var hub = new GameEventHub(game);
 
             game.MobManager.Teams[TeamColor.Red] = ai1;
@@ -79,12 +64,7 @@ namespace HexMage.Simulator.AI {
             for (; i < maxIterations && !game.IsFinished; i++) {
                 game.CurrentController.FastPlayTurn(hub);
                 ActionEvaluator.FNoCopy(game, UctAction.EndTurnAction());
-
-                result.TotalTurns++;
             }
-
-            // TODO - jak se to lisi od TotalGames?
-            result.TotalIterations += i;
 
             float totalMaxHp = 0;
             float totalCurrentHp = 0;
@@ -94,17 +74,21 @@ namespace HexMage.Simulator.AI {
                 totalCurrentHp += Math.Max(0, game.State.MobInstances[mobId].Hp);
             }
 
+            int red = 0;
+            int blue = 0;
+
+            if (game.VictoryTeam.HasValue) {
+                if (game.VictoryTeam.Value == TeamColor.Red) {
+                    red++;
+                } else {
+                    blue++;
+                }
+            }
+
             var gamePercentage = totalCurrentHp / totalMaxHp;
-
-
-            result.TotalHp = game.State.MobInstances.Sum(mobInstance => mobInstance.Hp);
             Debug.Assert(gamePercentage >= 0);
 
-            result.TotalHpPercentage += gamePercentage;
-
-            Debug.Assert(result.TotalHpPercentage / result.TotalGames <= 1);
-
-            EvaluationResultBookkeeping(game, ref result);
+            return new PlayoutResult(i, 1 - gamePercentage, i == maxIterations, red, blue);
         }
 
         /// <summary>
@@ -120,10 +104,10 @@ namespace HexMage.Simulator.AI {
                 GameSetup.OverrideGameDna(game, dna, dna);
 
                 GameSetup.ResetGameAndPositions(game);
-                var r1 = PlayoutSingleGame(game, c1, c2);
+                var r1 = Playout(game, c1, c2);
 
                 GameSetup.ResetGameAndPositions(game);
-                var r2 = PlayoutSingleGame(game, c2, c1);
+                var r2 = Playout(game, c2, c1);
 
                 redWins += r1.RedWins;
                 redWins += r2.BlueWins;
@@ -159,44 +143,5 @@ namespace HexMage.Simulator.AI {
 
             return Constants.MaxPlayoutEvaluationIterations - iterations;
         }
-
-        public static void EvaluationResultBookkeeping(GameInstance game, ref EvaluationResult result) {
-            // TODO !!!!!!!!!!!!!!!! muze nastat remiza
-            if (game.IsFinished && game.VictoryTeam.HasValue) {
-                Debug.Assert(game.VictoryTeam.HasValue);
-                Debug.Assert(game.VictoryController != null);
-
-                //_writer.Write($"{game.VictoryController}:{game.LoserController}: {maxIterations - iterations}({game.VictoryTeam.ToString()[0]}), ");
-                if (game.VictoryTeam == TeamColor.Red) {
-                    result.RedWins++;
-                } else {
-                    result.BlueWins++;
-                }
-
-                Accounting.IncrementWinner(game.VictoryController);
-            } else {
-                result.Timeouts++;
-                result.Timeouted = true;
-                //_writer.Write("Timeout\t");
-            }
-        }
-
-
-        //public static EvaluationResult EvaluateSetup(Setup setup, TextWriter writer) {
-        //    const int mapSize = 4;
-
-        //    var game = new GameInstance(new Map(mapSize));
-
-        //    setup.UnpackIntoGame(game);
-
-        //        PreparePositions(game, game.MobManager.Mobs, 0, mapSize);
-
-
-        //        results.Add(result);
-
-        //    //writer.WriteLine($"\n***MCTS avg: {ExponentialMovingAverage.Instance.CurrentValue}ms/iter\n\n");
-
-        //    return results;
-        //}
     }
 }

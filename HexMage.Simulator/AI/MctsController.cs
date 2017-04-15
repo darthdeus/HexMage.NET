@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 
-namespace HexMage.Simulator {
+namespace HexMage.Simulator.AI {
     public class MctsController : IMobController {
         private readonly GameInstance _gameInstance;
         private readonly int _thinkTime;

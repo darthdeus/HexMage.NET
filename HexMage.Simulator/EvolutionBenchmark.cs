@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using HexMage.Benchmarks;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.PCG;
+using MathNet.Numerics;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace HexMage.Simulator {
     public class EvolutionBenchmark {
@@ -90,17 +92,12 @@ namespace HexMage.Simulator {
                                            .ToList();
 
 
-                var newMax = PickBestMember(generation);
+                var newMax = PickBestMember(_game, _initialDna, generation);
 
                 HandleGoodEnough(ref goodEnough, newMax.result, current, ref goodCount);
 
                 // TODO: tohle pak budu mozna chtit vratit
                 //if (goodEnough) break;
-
-                if (newMax.result.Tainted) {
-                    SaveTainted(newMax.dna);
-                    i = Constants.NumGenerations;
-                }
 
                 //if (Constants.ForbidTimeouts && newMax.result.Timeouted) continue;
 
@@ -148,19 +145,41 @@ namespace HexMage.Simulator {
             }
         }
 
-        private static GenerationMember PickBestMember(List<GenerationMember> generation) {
-            generation.Sort((a, b) => a.result.Fitness.CompareTo(b.result.Fitness));
+        private static GenerationMember PickBestMember(GameInstance game, DNA initialDna, List<GenerationMember> generation) {
+            float totalFitness = generation.Sum(g => g.result.Fitness);
 
-            GenerationMember newMax = generation[0];
+            var first = generation[0];
+            Vector<float> sum = first.dna.Data * (first.result.Fitness / totalFitness);
 
-            for (int j = 1; j < Constants.TeamsPerGeneration; j++) {
-                var potentialMax = generation[j];
+            for (int i = 1; i < generation.Count; i++) {
+                sum += generation[i].dna.Data * (generation[i].result.Fitness / totalFitness);
+            }
 
-                if (potentialMax.result.Fitness > newMax.result.Fitness) {
-                    newMax = potentialMax;
+            var dna = new DNA(first.dna.MobCount, first.dna.AbilityCount);
+            dna.Data = sum;
+
+            for (int i = 0; i < sum.Count; i++) {
+                if (dna.IsElementIndex(i)) {
+                    sum[i] = (float) (Math.Round(sum[i] * 4) / 4);
                 }
             }
-            return newMax;
+
+            var resultFitness = CalculateFitness(game, initialDna, dna);
+
+            return new GenerationMember(dna, resultFitness);
+
+            //generation.Sort((a, b) => a.result.Fitness.CompareTo(b.result.Fitness));
+
+            //GenerationMember newMax = generation[0];
+
+            //for (int j = 1; j < Constants.TeamsPerGeneration; j++) {
+            //    var potentialMax = generation[j];
+
+            //    if (potentialMax.result.Fitness > newMax.result.Fitness) {
+            //        newMax = potentialMax;
+            //    }
+            //}
+            //return newMax;
         }
 
         private static void PrintEvaluationResult(int i, float e, float ep, double probability, double T,
@@ -181,7 +200,7 @@ namespace HexMage.Simulator {
             }
         }
 
-        private void HandleGoodEnough(ref bool goodEnough, EvaluationResult newFitness, GenerationMember member,
+        private void HandleGoodEnough(ref bool goodEnough, PlayoutResult newFitness, GenerationMember member,
                                       ref int goodCount) {
             if (Constants.SaveGoodOnes && !goodEnough && newFitness.Fitness > 0.995) {
                 goodCount++;
@@ -192,7 +211,7 @@ namespace HexMage.Simulator {
             }
         }
 
-        public static EvaluationResult CalculateFitness(GameInstance game, DNA initialDna, DNA dna) {
+        public static PlayoutResult CalculateFitness(GameInstance game, DNA initialDna, DNA dna) {
             Constants.ResetLogBuffer();
             GameSetup.OverrideGameDna(game, initialDna, dna);
 

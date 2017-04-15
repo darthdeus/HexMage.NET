@@ -3,10 +3,13 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using HexMage.Simulator.PCG;
+using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.LinearAlgebra.Single;
 
 namespace HexMage.Simulator {
     public class DNA {
-        public List<float> Data = new List<float>();
+        public Vector<float> Data;
+        //public List<float> Data = new List<float>();
         public int AbilityCount;
         public int MobCount;
 
@@ -16,32 +19,32 @@ namespace HexMage.Simulator {
 
         // TODO - area buff
 
-        public DNA() {
+        public DNA() {            
+        }
+
+        public DNA(DNA dna) {
+            MobCount = dna.MobCount;
+            AbilityCount = dna.AbilityCount;
+            Data = (DenseVector)dna.Data.Clone();
         }
 
         public DNA(int mobCount, int abilityCount) {
             MobCount = mobCount;
             AbilityCount = abilityCount;
-            Data = new List<float>(mobCount * MobSize);
-            for (int i = 0; i < Data.Capacity; i++) {
-                Data.Add(0.5f);
+            Data = new DenseVector(mobCount * MobSize);
+            for (int i = 0; i < Data.Count; i++) {
+                Data[i] = .5f;
             }
         }
 
         public DNA(int mobCount, int abilityCount, List<float> data) {
             AbilityCount = abilityCount;
             MobCount = mobCount;
-            Data = data;
+            Data = DenseVector.OfEnumerable(data);
         }
 
         public DNA Clone() {
-            var dna = new DNA(MobCount, AbilityCount, new List<float>(Data.Count));
-
-            for (int i = 0; i < Data.Count; i++) {
-                dna.Data.Add(Data[i]);
-            }
-
-            return dna;
+            return new DNA(this);
         }
 
         public bool IsElementIndex(int index) {
@@ -80,8 +83,8 @@ namespace HexMage.Simulator {
             var dna = new DNA();
             dna.MobCount = int.Parse(split[0]);
             dna.AbilityCount = int.Parse(split[1]);
-
-            dna.Data = split.Skip(2).Select(float.Parse).ToList();
+            
+            dna.Data = DenseVector.OfEnumerable(split.Skip(2).Select(float.Parse));
 
             return dna;
         }

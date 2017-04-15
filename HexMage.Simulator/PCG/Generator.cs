@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.Pathfinding;
+using MathNet.Numerics.Random;
 
 namespace HexMage.Simulator.PCG {
     // TODO - remove map seeds altogether
@@ -49,7 +50,10 @@ namespace HexMage.Simulator.PCG {
     }
 
     public static class Generator {
-        public class SafeGen {
+        public static ThreadLocalGenerator Random = new ThreadLocalGenerator();
+        //public static Random Random = new SystemRandomSource();
+
+        public class ThreadLocalGenerator {
             private static Random _srng = new Random();
             private ThreadLocal<Random> _rng = new ThreadLocal<Random>(() => new Random(_srng.Next(int.MaxValue)));
             private const bool useLocks = false;
@@ -85,7 +89,6 @@ namespace HexMage.Simulator.PCG {
             }
         }
 
-        public static SafeGen Random = new SafeGen();
 
         //static Generator() {
         //    if (Constants.UseGlobalSeed) {

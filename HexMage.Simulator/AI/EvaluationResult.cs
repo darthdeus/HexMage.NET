@@ -1,14 +1,34 @@
 ﻿using System;
 
 namespace HexMage.Simulator.AI {
+    public struct PlayoutResult {
+        public readonly int TotalTurns;
+        public float Fitness;
+        public readonly bool Timeout;
+        public int RedWins;
+        public int BlueWins;
+
+        public PlayoutResult(int totalTurns, float fitness, bool timeout, int redWins, int blueWins) {
+            TotalTurns = totalTurns;
+            Fitness = fitness;
+            Timeout = timeout;
+            RedWins = redWins;
+            BlueWins = blueWins;
+        }
+
+        public string ToFitnessString(DNA dna) {
+            string fstr = Fitness.ToString("0.000000");
+
+            return $"F:{fstr}\t{dna.ToDnaString()}";
+        }
+    }
+
     public struct EvaluationResult {
         public int RedWins;
         public int BlueWins;
         public int Timeouts;
         public int TotalGames;
         public int TotalTurns;
-        public long TotalElapsedMilliseconds;
-        public int TotalIterations;
         public float TotalHpPercentage;
         public int TotalHp;
         public bool Timeouted;
@@ -31,8 +51,6 @@ namespace HexMage.Simulator.AI {
             }
         }
 
-        public double MillisecondsPerIteration => (double) TotalElapsedMilliseconds / (double) TotalIterations;
-        public double MillisecondsPerTurn => (double) TotalElapsedMilliseconds / (double) TotalGames;
         public double WinPercentage => ((double) RedWins) / (double) TotalGames;
 
         public override string ToString() {

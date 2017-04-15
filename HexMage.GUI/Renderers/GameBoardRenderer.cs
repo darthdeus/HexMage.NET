@@ -178,6 +178,8 @@ namespace HexMage.GUI.Renderers {
 
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex) &&
                     _gameInstance.Pathfinder.Distance(mobInstance.Coord, mouseHex) != int.MaxValue) {
+
+                    // TODO: fuj
                     IList<AxialCoord> path;
 
                     var mouseMob = _gameInstance.State.AtCoord(mouseHex, true);

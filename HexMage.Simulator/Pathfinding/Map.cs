@@ -62,7 +62,7 @@ namespace HexMage.Simulator.Pathfinding {
             }
 
             map._visibilityLines = new Dictionary<int, List<AxialCoord>>();
-            foreach (var v in _visibilityLines) {
+            foreach (var v in _visibilityLines) {                
                 map._visibilityLines[v.Key] = v.Value.ToList();
             }
             return map;

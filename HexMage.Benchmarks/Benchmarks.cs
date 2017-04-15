@@ -37,9 +37,9 @@ namespace HexMage.Benchmarks {
                 dnas.Add(copy);
             }
 
-            const int step = 1;
+            const int step = 20;
             using (var writer = new StreamWriter($@"data/results-rule.txt")) {
-                for (int i = step; i < 100; i += step) {
+                for (int i = step; i < 1000; i += step) {
                     var c1 = new MctsController(game, i);
                     var c2 = new FlatMonteCarloController(game);
 
@@ -48,6 +48,7 @@ namespace HexMage.Benchmarks {
                                                                        c1,
                                                                        c2);
 
+#warning TODO: tohle je hodne fuj !!!!!!!!!!!!!!!!!!!!!!!!!! XXXXXXXXXXXX
                     Console.WriteLine(Accounting.GetStats());
                     Console.WriteLine($"{i} {result}");
                     Console.WriteLine();
@@ -113,14 +114,14 @@ namespace HexMage.Benchmarks {
 
                 GameSetup.OverrideGameDna(game, dna, dna);
                 iterationStopwatch.Restart();
-                GameEvaluator.PlayoutSingleGame(game, c1, c2);
+                GameEvaluator.Playout(game, c1, c2);
                 iterationStopwatch.Stop();
                 Console.WriteLine($"Iteration: {iterationStopwatch.ElapsedMilliseconds}ms");
                 Console.WriteLine(Accounting.GetStats());
 
                 GameSetup.OverrideGameDna(game, dna, dna);
                 iterationStopwatch.Restart();
-                GameEvaluator.PlayoutSingleGame(game, c2, c1);
+                GameEvaluator.Playout(game, c2, c1);
                 iterationStopwatch.Stop();
 
                 Console.WriteLine($"Iteration: {iterationStopwatch.ElapsedMilliseconds}ms");
@@ -140,29 +141,30 @@ namespace HexMage.Benchmarks {
 
             //Utils.RegisterLogger(new StdoutLogger());
             //Utils.MainThreadId = Thread.CurrentThread.ManagedThreadId;
-
 #if COPY_BENCH
             {
                 Console.WriteLine("---- STATE COPY BENCHMARK ----");
 
                 int totalIterations = 1000000;
                 int iterations = 0;
-                const int dumpIterations = 1000;
+                const int dumpIterations = 10;
 
                 var copyStopwatch = Stopwatch.StartNew();
                 var totalCopyStopwatch = Stopwatch.StartNew();
 
+                var avgMsPerCopy = new RollingAverage();
+
                 while (iterations < totalIterations) {
                     iterations++;
 
-                    copyStopwatch.Start();
-                    gameInstance.DeepCopy();
+                    copyStopwatch.Restart();
+                    game.DeepCopy();
                     copyStopwatch.Stop();
 
+                    avgMsPerCopy.Add(copyStopwatch.Elapsed.TotalMilliseconds);
+
                     if (iterations % dumpIterations == 0) {
-                        double secondsPerThousand = (double) copyStopwatch.ElapsedTicks / Stopwatch.Frequency;
-                        double msPerCopy = secondsPerThousand;
-                        Console.WriteLine($"Copy {msPerCopy:0.00}ms, 1M in: {secondsPerThousand * 1000}s");
+                        Console.WriteLine($"Copy {avgMsPerCopy.Average:0.00}ms");
                         copyStopwatch.Reset();
                     }
                 }
@@ -172,7 +174,6 @@ namespace HexMage.Benchmarks {
 
             Console.WriteLine("Press any key to continue.");
             Console.ReadKey();
-
 #endif
 
             {
@@ -192,8 +193,7 @@ namespace HexMage.Benchmarks {
                     //Console.WriteLine($"Starting, actions: {UctAlgorithm.Actions}");
                     stopwatch.Start();
 #if FAST
-                    var result = new EvaluationResult();
-                    GameEvaluator.Playout(game, c, c, ref result);
+                    var result = GameEvaluator.Playout(game, c, c);
                     stopwatch.Stop();
 
                     roundsPerThousand += result.TotalTurns;

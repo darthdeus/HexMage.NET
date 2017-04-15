@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using HexMage.Simulator.Model;
+using MathNet.Numerics.LinearAlgebra.Single;
 
 namespace HexMage.Simulator {
     public static class GenomeLoader {
@@ -71,33 +73,34 @@ namespace HexMage.Simulator {
 
             Debug.Assert(team.mobs.All(m => m.abilities.Count == abilityCount));
 
-            var dna = new DNA();
-            dna.MobCount = mobCount;
-            dna.AbilityCount = abilityCount;
+            var dna = new DNA(mobCount, abilityCount);
+            var data = new List<float>();
 
             foreach (var mob in team.mobs) {
-                dna.Data.Add(mob.hp / (float) Constants.HpMax);
-                dna.Data.Add(mob.ap / (float) Constants.ApMax);
+                data.Add(mob.hp / (float) Constants.HpMax);
+                data.Add(mob.ap / (float) Constants.ApMax);
 
                 foreach (var ability in mob.abilities) {
-                    dna.Data.Add((ability.dmg - minDmg) / (float) (Constants.DmgMax - minDmg));
-                    dna.Data.Add(ability.ap / (float) Constants.CostMax);
-                    dna.Data.Add(ability.range / (float) Constants.RangeMax);
-                    dna.Data.Add(NumberFromElement(ability.element));
+                    data.Add((ability.dmg - minDmg) / (float) (Constants.DmgMax - minDmg));
+                    data.Add(ability.ap / (float) Constants.CostMax);
+                    data.Add(ability.range / (float) Constants.RangeMax);
+                    data.Add(NumberFromElement(ability.element));
 
                     var buff = ability.buff;
-                    dna.Data.Add(-buff.HpChange / (float) Constants.BuffDmgMax);
-                    dna.Data.Add(-buff.ApChange / (float) Constants.BuffApDmgMax);
-                    dna.Data.Add(buff.Lifetime / (float) Constants.BuffLifetimeMax);
+                    data.Add(-buff.HpChange / (float) Constants.BuffDmgMax);
+                    data.Add(-buff.ApChange / (float) Constants.BuffApDmgMax);
+                    data.Add(buff.Lifetime / (float) Constants.BuffLifetimeMax);
 
                     var areaBuff = ability.areaBuff;
 
-                    dna.Data.Add(areaBuff.Radius / (float) Constants.BuffMaxRadius);
-                    dna.Data.Add(-areaBuff.Effect.HpChange / (float) Constants.BuffDmgMax);
-                    dna.Data.Add(-areaBuff.Effect.ApChange / (float) Constants.BuffApDmgMax);
-                    dna.Data.Add(areaBuff.Effect.Lifetime / (float) Constants.BuffLifetimeMax);
+                    data.Add(areaBuff.Radius / (float) Constants.BuffMaxRadius);
+                    data.Add(-areaBuff.Effect.HpChange / (float) Constants.BuffDmgMax);
+                    data.Add(-areaBuff.Effect.ApChange / (float) Constants.BuffApDmgMax);
+                    data.Add(areaBuff.Effect.Lifetime / (float) Constants.BuffLifetimeMax);
                 }
             }
+
+            dna.Data = DenseVector.OfEnumerable(data);
 
             return dna;
         }

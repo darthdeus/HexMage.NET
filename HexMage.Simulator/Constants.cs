@@ -148,7 +148,7 @@ namespace HexMage.Simulator {
         public static int BuffMaxRadius = 6;
 
         public static readonly string SaveFile = @"evo-save.txt";
-        public static readonly string SaveDir = "save-files/";
+        public static readonly string SaveDir = "data/save-files/";
 
         public static string BuildEvoSavePath(int index) {
             return SaveDir + index.ToString() + SaveFile;

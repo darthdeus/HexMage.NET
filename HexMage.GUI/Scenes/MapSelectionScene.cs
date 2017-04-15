@@ -189,8 +189,10 @@ namespace HexMage.GUI.Scenes {
 
                 var arenaScene = new ArenaScene(_game, game);
 
-                game.MobManager.Teams[TeamColor.Red] = new PlayerController(arenaScene, game);
-                game.MobManager.Teams[TeamColor.Blue] = new PlayerController(arenaScene, game);
+                //game.MobManager.Teams[TeamColor.Red] = new PlayerController(arenaScene, game);
+                //game.MobManager.Teams[TeamColor.Blue] = new PlayerController(arenaScene, game);
+                game.MobManager.Teams[TeamColor.Red] = new MctsController(game, 10);
+                game.MobManager.Teams[TeamColor.Blue] = new MctsController(game, 10);
 
                 game.PrepareEverything();
 

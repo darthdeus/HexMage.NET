@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using HexMage.Simulator.Model;
 using Newtonsoft.Json;
 
@@ -16,8 +18,8 @@ namespace HexMage.Simulator.Pathfinding {
 
         public HexMap<HexMap<Path>> AllPaths;
 
-        private Dictionary<int, List<AxialCoord>> _precomputedPaths =
-            new Dictionary<int, List<AxialCoord>>();
+        private Dictionary<int, IList<AxialCoord>> _precomputedPaths =
+            new Dictionary<int, IList<AxialCoord>>();
 
 
         [JsonIgnore] public GameInstance Game;
@@ -28,7 +30,15 @@ namespace HexMage.Simulator.Pathfinding {
         public Pathfinder DeepCopy(GameInstance gameCopy) {
             var copy = new Pathfinder(gameCopy);
 
-            copy.PathfindDistanceAll();
+            foreach (var pair in _precomputedPaths) {
+                copy._precomputedPaths[pair.Key] = pair.Value.ToList();
+            }
+
+            foreach (var coord in AllPaths.AllCoords) {
+                copy.AllPaths[coord] = AllPaths[coord].DeepCopy();
+            }
+
+            //copy.PathfindDistanceAll();
 
             return copy;
         }
@@ -48,7 +58,7 @@ namespace HexMage.Simulator.Pathfinding {
         }
 
         public AxialCoord? FurthestPointToTarget(CachedMob mob, CachedMob target) {
-            List<AxialCoord> path = PrecomputedPathTo(mob.MobInstance.Coord, target.MobInstance.Coord);
+            var path = PrecomputedPathTo(mob.MobInstance.Coord, target.MobInstance.Coord);
 
             if (path.Count == 0 && mob.MobInstance.Coord.Distance(target.MobInstance.Coord) == 1) {
                 return null;
@@ -71,13 +81,40 @@ namespace HexMage.Simulator.Pathfinding {
             return furthestPoint;
         }
 
-        public List<AxialCoord> PathTo(AxialCoord from, AxialCoord target) {
+        /// <summary>
+        /// Returns a path (from; to]
+        /// </summary>
+        public IList<AxialCoord> PathFromSourceToTarget(AxialCoord from, AxialCoord to) {
+            if (!IsValidCoord(from) || !IsValidCoord(to)) return new AxialCoord[0];
+
+            int distance = Distance(from, to);
+            if (distance == 0 || distance == int.MaxValue) return new AxialCoord[] { to };            
+            
+            var result = new AxialCoord[distance];
+            result[distance - 1] = to;
+
+            AxialCoord current = to;
+            var paths = AllPaths[from];
+            var path = paths[current];
+
+            while (path.Distance > 0 && distance-- >= 0) {
+                if (path.Source != null) {
+                    result[distance] = path.Source.Value;
+                    path = paths[result[distance]];
+                } else {
+                    return new AxialCoord[0];
+                }
+            }
+
+            return result;
+        }
+
+        public List<AxialCoord> PathTo(AxialCoord from, AxialCoord to) {
             var result = new List<AxialCoord>();
 
-            // Return an empty path if the coord is invalid
-            if (!IsValidCoord(target)) return result;
+            if (!IsValidCoord(from) || !IsValidCoord(to)) return result;
 
-            var current = target;
+            var current = to;
             result.Add(current);
 
             var paths = AllPaths[from];
@@ -120,22 +157,9 @@ namespace HexMage.Simulator.Pathfinding {
         }
 
         public void PathfindDistanceAll() {
-            int done = 0;
-            int loops = 0;
-            long total = 0;
-            var sw = Stopwatch.StartNew();
-
             foreach (var source in AllPaths.AllCoords) {
                 AllPaths[source] = new HexMap<Path>(Game.Size);
                 PathfindDistanceOnlyFrom(AllPaths[source], source);
-                done++;
-                if (done == 100) {
-                    loops++;
-                    done = 0;
-                    long elapsed = sw.ElapsedMilliseconds;
-                    total += elapsed;
-                    sw.Restart();
-                }
             }
 
             _precomputedPaths.Clear();
@@ -146,17 +170,17 @@ namespace HexMage.Simulator.Pathfinding {
                     if (_precomputedPaths.ContainsKey(key)) continue;
 
                     // TODO - path returns a reversed path including the starting point
-                    var path = PathTo(source, destination);
-                    if (path.Count > 0) {
-                        path.RemoveAt(0);
-                    }
-                    path.Reverse();
+                    var path = PathFromSourceToTarget(source, destination);
+                    //if (path.Count > 0) {
+                    //    path.RemoveAt(0);
+                    //}
+                    //path.Reverse();
                     _precomputedPaths.Add(key, path);
                 }
             }
         }
 
-        public List<AxialCoord> PrecomputedPathTo(AxialCoord from, AxialCoord to) {
+        public IList<AxialCoord> PrecomputedPathTo(AxialCoord from, AxialCoord to) {
             return _precomputedPaths[CoordPair.Build(from, to)];
         }
 
