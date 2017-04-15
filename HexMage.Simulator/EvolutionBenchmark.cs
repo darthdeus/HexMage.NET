@@ -52,6 +52,7 @@ namespace HexMage.Simulator {
             bool goodEnough = false;
 
             var gameCopies = Enumerable.Range(0, Constants.TeamsPerGeneration)
+                                       .AsParallel()
                                        .Select(_ => _game.DeepCopy())
                                        .ToList();
 
@@ -81,7 +82,8 @@ namespace HexMage.Simulator {
                                            .AsParallel()
                                            .Select(j => {
                                                var newDna = Mutate(current1.dna, (float) tmp);
-                                               var newFitness = CalculateFitness(gameCopies[j], initialDnaCopies[j], newDna);
+                                               var newFitness =
+                                                   CalculateFitness(gameCopies[j], initialDnaCopies[j], newDna);
 
                                                return new GenerationMember(newDna, newFitness);
                                            })
