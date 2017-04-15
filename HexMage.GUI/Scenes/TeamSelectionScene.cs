@@ -17,13 +17,17 @@ namespace HexMage.GUI.Scenes {
     public class TeamSelectionScene : GameScene {
         // TODO - fuj, referencovat primo game instance
         private readonly Map _map;
+
         private readonly GameInstance _gameInstance;
         private IMobController _leftController;
         private IMobController _rightController;
-        private readonly ArenaScene _arenaScene;
-        private readonly List<IMobController> _controllerList;
+        private ArenaScene _arenaScene;
+
+        private List<IMobController> _controllerList;
+
         // TODO - fuj, referencovat primo game instance
         private readonly MobManager _mobManager = new MobManager();
+
         private VerticalLayout _teamPreviewLayout;
         private HorizontalLayout _t1Preview;
         private HorizontalLayout _t2Preview;
@@ -32,6 +36,10 @@ namespace HexMage.GUI.Scenes {
             _map = map;
             _gameInstance = new GameInstance(_map, _mobManager);
             // TODO - tohle je fuj, inicializovat to poradne
+            InitializeArenaScene();
+        }
+
+        public void InitializeArenaScene() {
             _arenaScene = new ArenaScene(_game, _gameInstance);
 
             _controllerList = new List<IMobController> {
@@ -214,6 +222,7 @@ namespace HexMage.GUI.Scenes {
         private void DoContinue() {
             if (_leftController != null && _rightController != null) {
                 _gameInstance.PrepareEverything();
+                InitializeArenaScene();
                 LoadNewScene(_arenaScene);
             } else {
                 Utils.Log(LogSeverity.Warning, nameof(TeamSelectionScene),

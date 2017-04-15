@@ -7,6 +7,7 @@ using HexMage.GUI.UI;
 using HexMage.Simulator;
 using HexMage.Simulator.Model;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Scenes {
@@ -53,6 +54,12 @@ namespace HexMage.GUI.Scenes {
             Camera2D.Instance.Translate = new Vector3(600, 500, 0);
 
             var gameBoardEntity = CreateRootEntity(Camera2D.SortBackground);
+
+            gameBoardEntity.AddComponent(() => {
+                if (InputManager.Instance.IsKeyJustPressed(Keys.P)) {
+                    Terminate();
+                }
+            });
 
             _gameBoardController = new GameBoardController(_gameInstance, _gameEventHub, crosshairCursor, this,
                                                            _replay);

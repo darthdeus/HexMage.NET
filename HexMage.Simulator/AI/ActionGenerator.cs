@@ -7,10 +7,29 @@ using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
     public static class ActionGenerator {
-        public static UctAction MaxAbilityRatio(GameInstance game, List<UctAction> actions) {
+        public static UctAction MaxAbilityRatio(GameInstance game, List<UctAction> actions, bool deterministic = false) {
 #warning TODO: vyzkouset tohle s i bez methodimpl aggressiveinlining
             //return actions.FastMax(action => game.MobManager.Abilities[action.AbilityId].DmgCostRatio);
 
+            if (deterministic) {
+                return DeterministicMaxAbilityRatio(game, actions);
+            } else {
+                var pairs = actions.Select(action => {
+                    return Tuple.Create(action, game.MobManager.Abilities[action.AbilityId]);
+                }).ToList();
+
+                pairs.Sort((a, b) => b.Item2.DmgCostRatio.CompareTo(a.Item2.DmgCostRatio));
+
+                var totalRatio = pairs.Sum(p => p.Item2.DmgCostRatio);
+
+                var probabilities = pairs.Select(p => (double)p.Item2.DmgCostRatio / totalRatio);
+
+                var pick = Probability.UniformPick(pairs, probabilities.ToList());
+                return pick.Item1;
+            }
+        }
+
+        private static UctAction DeterministicMaxAbilityRatio(GameInstance game, List<UctAction> actions) {
             UctAction max = actions[0];
             var maxAbilityInfo = game.MobManager.Abilities[max.AbilityId];
 
@@ -27,7 +46,7 @@ namespace HexMage.Simulator {
         }
 
         public static UctAction RuleBasedAction(GameInstance game) {
-            if (Constants.FastActionGeneration) return ActionGenerator.DefaultPolicyAction(game);
+            if (Constants.FastActionGeneration) return DefaultPolicyAction(game);
 
             var result = new List<UctAction>();
 
@@ -61,39 +80,41 @@ namespace HexMage.Simulator {
 
             if (mob.MobInstance.Ap == 0) return UctAction.EndTurnAction();
 
-            var mobInfo = mob.MobInfo;
+            var abilityIds = new List<int>();
 
-            int? abilityId = null;
-            AbilityInfo abilityInfo = null;
-            foreach (var possibleAbilityId in mobInfo.Abilities) {
+            foreach (var possibleAbilityId in mob.MobInfo.Abilities) {
                 if (GameInvariants.IsAbilityUsableNoTarget(state, mobId.Value, possibleAbilityId)) {
-                    abilityId = possibleAbilityId;
+                    abilityIds.Add(possibleAbilityId);
                 }
             }
 
-            int spellTarget = MobInstance.InvalidId;
             int moveTargetId = MobInstance.InvalidId;
+
+            var actions = new List<UctAction>();
 
             foreach (var possibleTargetId in state.MobManager.Mobs) {
                 var possibleTarget = state.CachedMob(possibleTargetId);
 
-                moveTargetId = possibleTargetId;
-
                 // TODO - remove corpse targetting
                 if (!Constants.AllowCorpseTargetting &&
                     !GameInvariants.IsTargetable(state, mob, possibleTarget)) continue;
-                if (!abilityId.HasValue) continue;
 
-                if (GameInvariants.IsAbilityUsableApRangeCheck(state, mob, possibleTarget, abilityId.Value)) {
-                    spellTarget = possibleTargetId;
-                    break;
+                moveTargetId = possibleTargetId;
+
+                if (abilityIds.Count == 0) continue;
+
+                foreach (var abilityId in abilityIds) {
+                    if (GameInvariants.IsAbilityUsableApRangeCheck(state, mob, possibleTarget, abilityId)) {
+                        actions.Add(UctAction.AbilityUseAction(abilityId, mob.MobId, possibleTargetId));
+                    }
                 }
             }
 
-            if (spellTarget != MobInstance.InvalidId) {
-                Debug.Assert(abilityId.HasValue);
-                return UctAction.AbilityUseAction(abilityId.Value, mobId.Value, spellTarget);
-            } else if (moveTargetId != MobInstance.InvalidId) {
+            if (actions.Count > 0) {
+                return MaxAbilityRatio(state, actions);
+            }
+
+            if (moveTargetId != MobInstance.InvalidId) {
                 return PickMoveTowardsEnemyAction(state, state.CachedMob(mobId.Value),
                                                   state.CachedMob(moveTargetId));
             } else {
