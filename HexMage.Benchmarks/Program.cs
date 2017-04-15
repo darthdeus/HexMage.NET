@@ -4,10 +4,17 @@ using System.Diagnostics;
 using HexMage.Simulator;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.PCG;
+using MathNet.Numerics.Random;
 
 namespace HexMage.Benchmarks {
     internal class Program {
         private static void Main(string[] args) {
+            var r = new SystemRandomSource();
+            var nextDoubles = r.NextDoubles(20);
+            foreach (var nextDouble in nextDoubles) {
+                Console.WriteLine(nextDouble);
+            }
+
             // TODO - proc to ale s timhle nekonverguje?!?!?!?!??!
             //Generator.Random = new Random(3);
 
