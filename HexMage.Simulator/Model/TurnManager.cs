@@ -33,10 +33,22 @@ namespace HexMage.Simulator {
 
         public void NextMobOrNewTurn() {
             var currentMobIndex = Game.State.CurrentMobIndex;
-            if (!currentMobIndex.HasValue)
+            if (!currentMobIndex.HasValue) {
                 throw new InvalidOperationException("CurrentMob has no value but trying to move to the next.");
+            }
+
+            if (!Game.State.AllPlayed) {
+                var currentMobId = Game.CurrentMob.Value;
+                var mobInstance = Game.State.MobInstances[Game.CurrentMob.Value];
+                if (mobInstance.Hp > 0) {
+                    Game.State.PlayersPlayed.Add(currentMobId);
+                }
+            }
 
             if (currentMobIndex.Value >= Game.State.TurnOrder.Count - 1) {
+                if (!Game.State.AllPlayed) {
+                    Game.State.AllPlayed = Game.MobManager.Mobs.All(mobId => Game.State.PlayersPlayed.Contains(mobId));
+                }
                 StartNextTurn(Game);
             } else {
                 Game.State.SetCurrentMobIndex(Game, currentMobIndex.Value + 1);
@@ -52,7 +64,6 @@ namespace HexMage.Simulator {
                 PresortedOrder = PresortedOrder.ToList()
             };
         }
-
 
         public TurnManager DeepCopy(GameInstance gameCopy) {
             var copy = new TurnManager(gameCopy);

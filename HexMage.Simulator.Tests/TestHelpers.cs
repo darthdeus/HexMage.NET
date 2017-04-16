@@ -1,4 +1,5 @@
-﻿using HexMage.Simulator.Pathfinding;
+﻿using HexMage.Simulator.Model;
+using HexMage.Simulator.Pathfinding;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HexMage.Simulator.Tests {

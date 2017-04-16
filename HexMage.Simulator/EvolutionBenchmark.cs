@@ -27,15 +27,20 @@ namespace HexMage.Simulator {
             var team = JsonLoader.LoadTeam(content);
             team.mobs.RemoveAt(0);
 
+
             _initialDna = GenomeLoader.FromTeam(team);
             if (Constants.RandomizeInitialTeam) {
                 _initialDna.Randomize();
             }
 
+            _initialDna = new DNA(3, 2);
+            _initialDna.Randomize();
+
             Console.WriteLine($"Initial: {_initialDna.ToDnaString()}\n\n");
 
             var map = Map.Load("data/map.json");
-            _game = GameSetup.GenerateFromDna(_initialDna, _initialDna, map);
+
+            _game = GameSetup.GenerateFromDna(_initialDna, _initialDna.Clone(), map);
         }
 
         public void RunSimulatedAnnealing() {
@@ -145,7 +150,7 @@ namespace HexMage.Simulator {
                 GnuPlot.Set($"xrange [{Constants.InitialT}:{T}] reverse",
                             $"title '{Constants.NumGenerations} generations, T_s = {Constants.InitialT}",
                             //"yrange [0:1]",
-                            "style data lines",
+                            //"style data lines",
                             "key tmargin center horizontal");
                 GnuPlot.Plot(plotT.ToArray(), plotFit.ToArray(), $"title 'Fitness {Constants.NumGenerations}gen'");
                 GnuPlot.Plot(plotT.ToArray(), plotHpPercentage.ToArray(), $"title 'HP percentage'");

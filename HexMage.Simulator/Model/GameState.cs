@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using HexMage.Simulator.Model;
 using HexMage.Simulator.Pathfinding;
 using Newtonsoft.Json;
 
-namespace HexMage.Simulator {
+namespace HexMage.Simulator.Model {
     public class GameState {
         public List<AreaBuff> AreaBuffs = new List<AreaBuff>();
 
@@ -16,6 +15,8 @@ namespace HexMage.Simulator {
         public TeamColor? LastTeamColor;
         public TeamColor? CurrentTeamColor;
         public List<int> TurnOrder = new List<int>();
+        public bool AllPlayed = false;
+        public List<int> PlayersPlayed = new List<int>();
 
         // This is optimized specifically for the smaller data sets on which
         // the evolution is being performed.
@@ -190,7 +191,9 @@ namespace HexMage.Simulator {
                 CurrentMobIndex = CurrentMobIndex,
                 LastTeamColor = LastTeamColor,
                 CurrentTeamColor = CurrentTeamColor,
-                TurnOrder = TurnOrder.ToList()
+                TurnOrder = TurnOrder.ToList(),
+                AllPlayed = AllPlayed,
+                PlayersPlayed = PlayersPlayed?.ToList()
             };
 
             for (int i = 0; i < Cooldowns.Count; i++) {
@@ -214,6 +217,7 @@ namespace HexMage.Simulator {
             RedTotalHp = 0;
             BlueTotalHp = 0;
             TurnOrder.Clear();
+            PlayersPlayed.Clear();
         }
 
         private void CopyTurnOrderFromPresort(GameInstance game) {
@@ -236,6 +240,7 @@ namespace HexMage.Simulator {
                 Cooldowns[i] = 0;
             }
 
+            PlayersPlayed.Clear();
             CopyTurnOrderFromPresort(game);
             SetCurrentMobIndex(game, 0);
             SlowUpdateIsFinished(game.MobManager);

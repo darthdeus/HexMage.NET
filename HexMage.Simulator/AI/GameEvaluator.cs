@@ -24,7 +24,7 @@ namespace HexMage.Simulator.AI {
         public PlayoutResult Evaluate() {
             if (GlobalFactories.Count == 0) {
                 GlobalFactories.Add(new MctsFactory(1));
-                //GlobalFactories.Add(new RuleBasedFactory());
+                GlobalFactories.Add(new MctsFactory(2));
             }
 
             var stopwatch = new Stopwatch();
@@ -107,6 +107,10 @@ namespace HexMage.Simulator.AI {
             float fit_a = 1 - gamePercentage;
             float fit_b = (float) LengthSample(i);
             float fitness = (fit_a + fit_b) / 2;
+
+            if (!game.State.AllPlayed) {
+                fitness = 0.0001f;
+            }
 
             return new PlayoutResult(i, gamePercentage, fitness, i == maxIterations, red, blue);
         }
