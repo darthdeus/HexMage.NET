@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace HexMage.GUI.UI {
     public class HistoryLog : Entity {
-        private const int MaxHistorySize = 11;
+        private const int MaxHistorySize = 10;
         private readonly List<HistoryLogEntry> _log = new List<HistoryLogEntry>();
         private readonly SpriteFont _font;
         private readonly int _width;
@@ -40,7 +40,7 @@ namespace HexMage.GUI.UI {
             _childrenPlaceholder.Position = _textOffset;
             //_childrenPlaceholder.Renderer = new ColorRenderer(Color.Black);
             _childrenPlaceholder.Renderer = new SpriteRenderer(_assetManager[AssetManager.HistoryLogBg]);
-            _childrenPlaceholder.Padding = new Vector4(20, 20, 20, 20);
+            _childrenPlaceholder.Padding = new Vector4(35, 20, 20, 20);
 
             for (int i = 0; i < MaxHistorySize; i++) {
                 var entry = new HistoryLogEntry(-1, TeamColor.Red, UctAction.NullAction(), null, null, null, null,

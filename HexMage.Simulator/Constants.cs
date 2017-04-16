@@ -8,7 +8,7 @@ namespace HexMage.Simulator {
         public static int MctsBenchIterations = 200;
         public static int MctsBenchType = 1;
 
-        public static bool GnuPlot = false;
+        public static bool GnuPlot = true;
 
         public static bool MeasureSearchSpaceStats = false;
         public static int MeasureSamples = 1000000;
@@ -89,9 +89,9 @@ namespace HexMage.Simulator {
 
         public static bool HillClimbing = false;
 
-        public static int NumGenerations = 5000;
+        public static int NumGenerations = 500;
         public static int EvolutionPrintModulo = 10;
-        public static int TeamsPerGeneration = 100;
+        public static int TeamsPerGeneration = 40;
         public static double MutationDelta = 0.15;
 
         /// <summary>

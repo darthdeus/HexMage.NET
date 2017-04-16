@@ -5,6 +5,7 @@ using HexMage.Simulator;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.PCG;
 using MathNet.Numerics;
+using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Random;
 using Constants = HexMage.Simulator.Constants;
 
@@ -14,7 +15,26 @@ namespace HexMage.Benchmarks {
             // TODO - proc to ale s timhle nekonverguje?!?!?!?!??!
             //Generator.Random = new Random(3);
 
-            //if (!ProcessArguments(args)) return;
+            if (!ProcessArguments(args)) return;
+
+            {
+                //var dis = new Normal(10, 3);
+
+                //var px = new List<double>();
+                //var py = new List<double>();
+
+                //for (double i = 0; i < 30; i += 0.001) {
+                //    px.Add(i);
+                //    py.Add(GameEvaluator.LengthSample(i));
+                //}
+
+                //GnuPlot.Plot(px.ToArray(), py.ToArray());
+                //Console.ReadKey();
+
+                //Console.WriteLine($"{1 - dis.CumulativeDistribution(7)}, {dis.CumulativeDistribution(13)}");
+                //return;
+            }
+
 
             //new Benchmarks().Run();
             //return;
@@ -23,9 +43,9 @@ namespace HexMage.Benchmarks {
             //Benchmarks.BenchmarkAllAisAgainstMcts();
             //return;
 
-            Constants.MctsBenchmark = true;
-            Benchmarks.CompareAi();
-            return;
+            //Constants.MctsBenchmark = true;
+            //Benchmarks.CompareAi();
+            //return;
 
 
             if ((args.Length > 0 && args[0] == "mcts-benchmark") || Constants.MctsBenchmark) {

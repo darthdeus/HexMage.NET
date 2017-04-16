@@ -44,7 +44,7 @@ namespace HexMage.GUI.Scenes {
             AddAndInitializeRootEntity(HistoryLog.Instance, _assetManager);
 
             var detail = CreateRootEntity(Camera2D.SortUI + 100);
-            var bg = _assetManager[AssetManager.HistoryLogBg];
+            var bg = _assetManager[AssetManager.MobDetailBg];
             detail.Renderer = new SpriteRenderer(bg);
             detail.AddComponent(() => detail.Position = new Vector2(bg.Width, 1024 - bg.Height));
 

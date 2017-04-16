@@ -371,8 +371,7 @@ namespace HexMage.GUI.Components {
         }
 
         private void UpdatePopovers(GameTime time, AxialCoord mouseHex) {
-            _emptyHexPopover.Position = new Vector2(900, 800);
-            _mobPopover.Position = new Vector2(900, 800);
+            _mobPopover.Position = _emptyHexPopover.Position = new Vector2(660, 880);
 
             _emptyHexPopover.Active = false;
             _mobPopover.Active = false;
@@ -461,7 +460,7 @@ namespace HexMage.GUI.Components {
                 _messageBox = new VerticalLayout {
                     Renderer = new ColorRenderer(Color.White),
                     Padding = _popoverPadding,
-                    SortOrder = Camera2D.SortUI,
+                    SortOrder = Camera2D.SortUI + 1000,
                     Position = new Vector2(500, 50)
                 };
 
@@ -473,7 +472,7 @@ namespace HexMage.GUI.Components {
                 _emptyHexPopover = new VerticalLayout {
                     Renderer = new ColorRenderer(Color.LightGray),
                     Padding = _popoverPadding,
-                    SortOrder = Camera2D.SortUI
+                    SortOrder = Camera2D.SortUI + 200
                 };
 
                 _emptyHexLabel = _emptyHexPopover.AddChild(new Label("Just an empty hex", _assetManager.Font));
@@ -484,7 +483,7 @@ namespace HexMage.GUI.Components {
                 _mobPopover = new VerticalLayout {
                     Renderer = new ColorRenderer(Color.LightGray),
                     Padding = _popoverPadding,
-                    SortOrder = Camera2D.SortUI
+                    SortOrder = Camera2D.SortUI + 200
                 };
 
                 _mobHealthLabel = _mobPopover.AddChild(new Label("Mob health", _assetManager.Font));

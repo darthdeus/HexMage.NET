@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using HexMage.Simulator.Model;
+using MathNet.Numerics.Distributions;
 using Newtonsoft.Json.Serialization;
 
 namespace HexMage.Simulator.AI {
@@ -23,6 +24,7 @@ namespace HexMage.Simulator.AI {
         public PlayoutResult Evaluate() {
             if (GlobalFactories.Count == 0) {
                 GlobalFactories.Add(new MctsFactory(1));
+                GlobalFactories.Add(new RuleBasedFactory());
             }
 
             var stopwatch = new Stopwatch();
@@ -77,7 +79,10 @@ namespace HexMage.Simulator.AI {
             int red = 0;
             int blue = 0;
 
-            if (game.VictoryTeam.HasValue) {
+            Utils.Log(LogSeverity.Error, nameof(GameEvaluator),
+                      $"Playout time limit reached at {maxIterations} rounds");
+
+            if (i < maxIterations && game.VictoryTeam.HasValue) {
                 if (game.VictoryTeam.Value == TeamColor.Red) {
                     red++;
                 } else {
@@ -91,8 +96,27 @@ namespace HexMage.Simulator.AI {
             var gamePercentage = totalCurrentHp / totalMaxHp;
             Debug.Assert(gamePercentage >= 0);
 
-            return new PlayoutResult(i, 1 - gamePercentage, i == maxIterations, red, blue);
+            var mobsCount = game.MobManager.Mobs.Count;
+
+            var dis = new Normal(mobsCount * 2, mobsCount);
+            dis.Density(mobsCount * 2);
+
+            float fit_a = 1 - gamePercentage;
+            float fit_b = (float) LengthSample(i);
+            float fitness = (fit_a + fit_b) / 2;
+            return new PlayoutResult(i, fitness, i == maxIterations, red, blue);
         }
+
+        public static double LengthSample(double x) {
+            const double ev = 10;
+
+            if (x < 2 * ev) {
+                return new Normal(ev, 3).CumulativeDistribution(x);
+            } else {
+                return new Normal(ev, 2).CumulativeDistribution(4 * ev - x);
+            }
+        }
+
 
         /// <summary>
         /// Returns the win percentage of the first controller

@@ -104,7 +104,7 @@ namespace HexMage.Simulator {
                 float e = current.result.Fitness;
                 float ep = newMax.result.Fitness;
 
-                double probability;
+                double probability = 1;
 
                 float delta = ep - e;
 
@@ -145,7 +145,8 @@ namespace HexMage.Simulator {
             }
         }
 
-        private static GenerationMember PickBestMember(GameInstance game, DNA initialDna, List<GenerationMember> generation) {
+        private static GenerationMember PickBestMember(GameInstance game, DNA initialDna,
+                                                       List<GenerationMember> generation) {
             float totalFitness = generation.Sum(g => g.result.Fitness);
 
             var first = generation[0];
@@ -202,7 +203,7 @@ namespace HexMage.Simulator {
 
         private void HandleGoodEnough(ref bool goodEnough, PlayoutResult newFitness, GenerationMember member,
                                       ref int goodCount) {
-            if (Constants.SaveGoodOnes && !goodEnough && newFitness.Fitness > 0.995) {
+            if (Constants.SaveGoodOnes && !goodEnough && newFitness.Fitness > 0.99) {
                 goodCount++;
                 if (goodCount > 50) goodEnough = true;
                 Console.WriteLine($"Found extra good {newFitness.Fitness}");
