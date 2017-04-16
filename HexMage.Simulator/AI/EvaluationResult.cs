@@ -2,13 +2,15 @@
 
 namespace HexMage.Simulator.AI {
     public struct PlayoutResult {
-        public readonly int TotalTurns;
+        public float HpPercentage;
+        public int TotalTurns;
         public float Fitness;
         public readonly bool Timeout;
         public int RedWins;
         public int BlueWins;
 
-        public PlayoutResult(int totalTurns, float fitness, bool timeout, int redWins, int blueWins) {
+        public PlayoutResult(int totalTurns, float hpPercentage, float fitness, bool timeout, int redWins, int blueWins) {
+            HpPercentage = hpPercentage;
             TotalTurns = totalTurns;
             Fitness = fitness;
             Timeout = timeout;

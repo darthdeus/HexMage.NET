@@ -69,8 +69,8 @@ namespace HexMage.GUI.Scenes {
             var t1SliderLayout = left.AddChild(new VerticalLayout());
             var t2SliderLayout = right.AddChild(new VerticalLayout());
 
-            var t1SizeLabel = t1SliderLayout.AddChild(new Label("Team 1 size:", _assetManager.Font));
-            var t2SizeLabel = t2SliderLayout.AddChild(new Label("Team 2 size:", _assetManager.Font));
+            var t1SizeLabel = t1SliderLayout.AddChild(new Label("Team 1 size:", _assetManager.Font, Color.White));
+            var t2SizeLabel = t2SliderLayout.AddChild(new Label("Team 2 size:", _assetManager.Font, Color.White));
 
             var t1Slider = t1SliderLayout.AddChild(new Slider(MinTeamSize, MaxTeamSize, new Point(100, 10)));
             var t2Slider = t2SliderLayout.AddChild(new Slider(MinTeamSize, MaxTeamSize, new Point(100, 10)));

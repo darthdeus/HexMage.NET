@@ -89,10 +89,10 @@ namespace HexMage.Simulator {
 
         public static bool HillClimbing = false;
 
-        public static int NumGenerations = 500;
+        public static int NumGenerations = 10000;
         public static int EvolutionPrintModulo = 10;
         public static int TeamsPerGeneration = 40;
-        public static double MutationDelta = 0.15;
+        public static double MutationDelta = 0.25;
 
         /// <summary>
         /// Take game length into account when evaluating the fitness function
@@ -140,10 +140,10 @@ namespace HexMage.Simulator {
         public static int EvolutionMapSize = 5;
         public static int ElementCount = 4;
 
-        public static int BuffDmgMax = 10;
-        public static int BuffApDmgMax = 10;
-        public static int BuffLifetimeMax = 5;
-        public static int BuffMaxRadius = 6;
+        public static int BuffDmgMax = 5;
+        public static int BuffApDmgMax = 5;
+        public static int BuffLifetimeMax = 3;
+        public static int BuffMaxRadius = 5;
 
         public static readonly string SaveFile = @"evo-save.txt";
         public static readonly string SaveDir = "data/save-files/";

@@ -10,11 +10,11 @@ using Newtonsoft.Json.Serialization;
 
 namespace HexMage.Simulator.AI {
     public class GameEvaluator {
-        private readonly GameInstance _gameInstance;
+        private readonly GameInstance _game;
         private readonly TextWriter _writer;
 
-        public GameEvaluator(GameInstance gameInstance, TextWriter writer) {
-            _gameInstance = gameInstance;
+        public GameEvaluator(GameInstance game, TextWriter writer) {
+            _game = game;
             _writer = writer;
         }
 
@@ -24,14 +24,14 @@ namespace HexMage.Simulator.AI {
         public PlayoutResult Evaluate() {
             if (GlobalFactories.Count == 0) {
                 GlobalFactories.Add(new MctsFactory(1));
-                GlobalFactories.Add(new RuleBasedFactory());
+                //GlobalFactories.Add(new RuleBasedFactory());
             }
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
             var playoutResults = GlobalFactories.Select(factory => {
-                                                    var game = _gameInstance.CopyStateOnly();
+                                                    var game = _game.CopyStateOnly();
                                                     var ai = factory.Build(game);
                                                     return Playout(game, ai, ai);
                                                 })
@@ -42,17 +42,20 @@ namespace HexMage.Simulator.AI {
             var result = playoutResults.Skip(1)
                                        .Aggregate(playoutResults.First(), (total, curr) => {
                                            return new PlayoutResult(total.TotalTurns + curr.TotalTurns,
+                                                                    total.HpPercentage + curr.HpPercentage,
                                                                     total.Fitness + curr.Fitness,
                                                                     total.Timeout || curr.Timeout,
                                                                     total.RedWins + curr.RedWins,
                                                                     total.BlueWins + curr.BlueWins);
                                        });
 
+#warning TODO: nema tu byt spis min/max nez prumer?
+            result.HpPercentage /= playoutResults.Count;
+            result.TotalTurns /= playoutResults.Count;
             result.Fitness /= playoutResults.Count;
 
             return result;
         }
-
 
         public static PlayoutResult Playout(GameInstance game, IMobController ai1, IMobController ai2) {
             var hub = new GameEventHub(game);
@@ -104,7 +107,8 @@ namespace HexMage.Simulator.AI {
             float fit_a = 1 - gamePercentage;
             float fit_b = (float) LengthSample(i);
             float fitness = (fit_a + fit_b) / 2;
-            return new PlayoutResult(i, fitness, i == maxIterations, red, blue);
+
+            return new PlayoutResult(i, gamePercentage, fitness, i == maxIterations, red, blue);
         }
 
         public static double LengthSample(double x) {

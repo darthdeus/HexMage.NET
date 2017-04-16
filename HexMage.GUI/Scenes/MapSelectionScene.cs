@@ -11,6 +11,7 @@ using HexMage.Simulator.PCG;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Scenes {
     public class MapSelectionScene : GameScene {
@@ -38,7 +39,7 @@ namespace HexMage.GUI.Scenes {
 
             leftColumn.Position = new Vector2(40, 40);
 
-            var seedLabel = new Label("Map seed:", _assetManager.Font);
+            var seedLabel = new Label("Map seed:", _assetManager.Font, Color.White);
             seedLabel.AddComponent(_ => seedLabel.Text = $"Map seed: {_currentSeed.ToString()}");
             leftColumn.AddChild(seedLabel);
 
@@ -46,7 +47,7 @@ namespace HexMage.GUI.Scenes {
             btnGenerateMap.OnClick += BtnGenerateMapOnOnClick;
             leftColumn.AddChild(btnGenerateMap);
 
-            leftColumn.AddChild(new Label("Seed history:", _assetManager.Font));
+            leftColumn.AddChild(new Label("Seed history:", _assetManager.Font, Color.White));
 
             _seedHistory = new VerticalLayout {
                 Spacing = 3
@@ -69,7 +70,7 @@ namespace HexMage.GUI.Scenes {
                 Position = new Vector2(300, 0)
             };
 
-            sizeSliderLayout.AddChild(new Label("Change map size:", _assetManager.Font));
+            sizeSliderLayout.AddChild(new Label("Change map size:", _assetManager.Font, Color.White));
             sizeSliderLayout.AddChild(sizeSlider);
 
             middleColumn.AddChild(sizeSliderLayout);
@@ -191,8 +192,8 @@ namespace HexMage.GUI.Scenes {
 
                 //game.MobManager.Teams[TeamColor.Red] = new PlayerController(arenaScene, game);
                 //game.MobManager.Teams[TeamColor.Blue] = new PlayerController(arenaScene, game);
-                game.MobManager.Teams[TeamColor.Red] = new MctsController(game, 10);
-                game.MobManager.Teams[TeamColor.Blue] = new MctsController(game, 10);
+                game.MobManager.Teams[TeamColor.Red] = new MctsController(game, 1);
+                game.MobManager.Teams[TeamColor.Blue] = new MctsController(game, 1);
 
                 game.PrepareEverything();
 
@@ -206,10 +207,11 @@ namespace HexMage.GUI.Scenes {
             var d1 = DNA.FromSerializableString(lines[0]);
             var d2 = DNA.FromSerializableString(lines[1]);
 
-            var game = GameSetup.GenerateFromDna(d1, d2);
+            var map = Map.Load("data/map.json");
+            var game = GameSetup.GenerateFromDna(d1, d2, map);
 
-            game.MobManager.Teams[TeamColor.Red] = new AiRuleBasedController(game);
-            game.MobManager.Teams[TeamColor.Blue] = new AiRuleBasedController(game);
+            game.MobManager.Teams[TeamColor.Red] = new MctsController(game, 1000);
+            game.MobManager.Teams[TeamColor.Blue] = new MctsController(game, 1000);
 
             var arenaScene = new ArenaScene(_game, game);
 

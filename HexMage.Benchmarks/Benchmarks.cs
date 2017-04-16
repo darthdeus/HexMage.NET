@@ -188,7 +188,6 @@ namespace HexMage.Benchmarks {
                 var totalStopwatch = Stopwatch.StartNew();
                 var stopwatch = new Stopwatch();
                 var iterations = 0;
-                int roundsPerThousand = 0;
                 const int dumpIterations = 1;
                 const int totalIterations = 500000;
 
@@ -201,10 +200,9 @@ namespace HexMage.Benchmarks {
                     //Console.WriteLine($"Starting, actions: {UctAlgorithm.Actions}");
                     stopwatch.Start();
 #if FAST
-                    var result = GameEvaluator.Playout(game, c, c);
+                    GameEvaluator.Playout(game, c, c);
                     stopwatch.Stop();
 
-                    roundsPerThousand += result.TotalTurns;
 #else
                 var rounds = hub.MainLoop(TimeSpan.Zero);
                 stopwatch.Stop();
@@ -223,7 +221,6 @@ namespace HexMage.Benchmarks {
                             $"IterAVG: {UctAlgorithm.MillisecondsPerIterationAverage.Average:0.000000}ms\t" +
                             $"IPS: {1 / UctAlgorithm.MillisecondsPerIterationAverage.Average * 1000}\t" +
                             $"per game: {perGame:00.00}ms");
-                        roundsPerThousand = 0;
 
                         //Console.WriteLine(ActionEvaluator.ActionCountString());
 

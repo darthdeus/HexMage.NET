@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HexMage.Benchmarks;
 using HexMage.Simulator.AI;
+using HexMage.Simulator.Pathfinding;
 using HexMage.Simulator.PCG;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
@@ -14,7 +15,7 @@ using MathNet.Numerics.LinearAlgebra;
 namespace HexMage.Simulator {
     public class EvolutionBenchmark {
         private readonly GameInstance _game;
-        private readonly DNA _initialDna;
+        private DNA _initialDna;
         private int _restartCount = 0;
 
         public EvolutionBenchmark() {
@@ -33,7 +34,8 @@ namespace HexMage.Simulator {
 
             Console.WriteLine($"Initial: {_initialDna.ToDnaString()}\n\n");
 
-            _game = GameSetup.GenerateFromDna(_initialDna, _initialDna);
+            var map = Map.Load("data/map.json");
+            _game = GameSetup.GenerateFromDna(_initialDna, _initialDna, map);
         }
 
         public void RunSimulatedAnnealing() {
@@ -49,6 +51,8 @@ namespace HexMage.Simulator {
 
             List<double> plotT = new List<double>();
             List<double> plotFit = new List<double>();
+            List<double> plotHpPercentage = new List<double>();
+            List<double> plotLength = new List<double>();
 
             int goodCount = 0;
             bool goodEnough = false;
@@ -77,6 +81,8 @@ namespace HexMage.Simulator {
                     current.dna.Randomize();
                     _restartCount++;
                 }
+
+                //_initialDna = Mutate(_initialDna, T);
 
                 var tmp = T;
                 var current1 = current;
@@ -122,6 +128,9 @@ namespace HexMage.Simulator {
 
                 plotT.Add(T);
                 plotFit.Add(current.result.Fitness);
+                plotHpPercentage.Add(1 - current.result.HpPercentage);
+                //plotLength.Add(current.result.TotalTurns);
+                plotLength.Add(GameEvaluator.LengthSample(current.result.TotalTurns));
 
                 PrintEvaluationResult(i, e, ep, probability, T, current);
             }
@@ -134,12 +143,13 @@ namespace HexMage.Simulator {
 
                 GnuPlot.HoldOn();
                 GnuPlot.Set($"xrange [{Constants.InitialT}:{T}] reverse",
-                            "yrange [0:1]",
+                            $"title '{Constants.NumGenerations} generations, T_s = {Constants.InitialT}",
+                            //"yrange [0:1]",
                             "style data lines",
                             "key tmargin center horizontal");
-                //GnuPlot.Set($"yrange [0:1] ");
-                //GnuPlot.Set($"style data lines");
-                GnuPlot.Plot(plotT.ToArray(), plotFit.ToArray(), gnuplotConfigString);
+                GnuPlot.Plot(plotT.ToArray(), plotFit.ToArray(), $"title 'Fitness {Constants.NumGenerations}gen'");
+                GnuPlot.Plot(plotT.ToArray(), plotHpPercentage.ToArray(), $"title 'HP percentage'");
+                GnuPlot.Plot(plotT.ToArray(), plotLength.ToArray(), "title 'Game length'");
                 //GnuPlot.Plot(plotT.ToArray(), plotProb.ToArray(), gnuplotConfigString);
                 Console.ReadKey();
             }

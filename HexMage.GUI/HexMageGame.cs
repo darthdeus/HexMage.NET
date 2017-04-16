@@ -70,7 +70,7 @@ namespace HexMage.GUI {
         }
 
         protected override void Draw(GameTime gameTime) {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(new Color(new Vector3(0.2f, 0.2f, 0.2f)));
 
             _sceneManager.Render(gameTime);
 
