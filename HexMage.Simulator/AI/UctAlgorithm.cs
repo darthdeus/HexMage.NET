@@ -255,7 +255,7 @@ namespace HexMage.Simulator.AI {
                         var action = ActionGenerator.RuleBasedAction(state);
                         state = ActionEvaluator.F(state, action);
                         if (action.Type == UctActionType.EndTurn) {
-                            return result;
+                            goto done;
                         } else {
                             result.Add(action);
                         }
@@ -272,6 +272,7 @@ namespace HexMage.Simulator.AI {
                 current = max;
             } while (current.Action.Type != UctActionType.EndTurn);
 
+            done:
             return result;
         }
     }
