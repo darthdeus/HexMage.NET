@@ -19,8 +19,7 @@ namespace HexMage.Simulator {
         public bool IsTerminal => State.State.IsFinished;
         public bool IsFullyExpanded => PossibleActions != null && PossibleActions.Count == Children.Count;
 
-        public UctNode(UctAction action, GameInstance state) : this(0, 0, action, state) {
-        }
+        public UctNode(UctAction action, GameInstance state) : this(0, 0, action, state) { }
 
         public UctNode(float q, int n, UctAction action, GameInstance state) {
             Id = _id++;
@@ -53,6 +52,8 @@ namespace HexMage.Simulator {
                 team = Action.Type == UctActionType.EndTurn
                            ? $"{ShortTeam(lastTeam)}->{ShortTeam(currentTeam)}"
                            : ShortTeam(currentTeam);
+            } else if (State.CurrentTeam.HasValue && !State.State.LastTeamColor.HasValue) {
+                team = ShortTeam(State.CurrentTeam.Value);
             } else {
                 team = "NOTEAM";
             }

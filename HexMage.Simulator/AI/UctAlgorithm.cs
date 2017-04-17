@@ -49,6 +49,7 @@ namespace HexMage.Simulator.AI {
                 OneIteration(root, startingTeam);
                 iterationStopwatch.Stop();
 
+                //UctDebug.PrintDotgraph(root, () => iterations);
                 MillisecondsPerIterationAverage.Add(iterationStopwatch.Elapsed.TotalMilliseconds);
             } while (iterations < 25);
             //} while (stopwatch.ElapsedMilliseconds < _thinkTime);
@@ -79,10 +80,21 @@ namespace HexMage.Simulator.AI {
             while (!node.IsTerminal) {
                 if (!node.IsFullyExpanded) {
                     Interlocked.Increment(ref ExpandCount);
-                    return Expand(node);
+                    var expanded = Expand(node);
+
+                    var type = expanded.Action.Type;
+                    var allowMove = type != UctActionType.Move && type != UctActionType.DefensiveMove;
+
+                    expanded.PrecomputePossibleActions(allowMove, true);
+                    if (expanded.PossibleActions.Count == 1 && !expanded.IsTerminal) {
+                        expanded = Expand(expanded);
+                    }
+
+                    return expanded;
                 } else {
                     Interlocked.Increment(ref BestChildCount);
                     node = BestChild(node, startingTeam);
+
                     if (node.Action.Type == UctActionType.DefensiveMove) {
                         if (wasDefense) {
                             throw new InvalidOperationException();
@@ -157,8 +169,7 @@ namespace HexMage.Simulator.AI {
 
             if (iterations <= 0) {
                 ReplayRecorder.Instance.SaveAndClear(game, 0);
-                throw new InvariantViolationException("MCTS playout timeout");
-                ReplayRecorder.Instance.SaveAndClear(game);
+                //throw new InvariantViolationException("MCTS playout timeout");
                 Utils.Log(LogSeverity.Error, nameof(UctAlgorithm),
                           $"DefaultPolicy ran out of time (over {maxDefaultPolicyIterations} iterations for playout), computed results are likely wrong.");
                 return 0;
@@ -258,6 +269,10 @@ namespace HexMage.Simulator.AI {
                             goto done;
                         } else {
                             result.Add(action);
+
+                            if (action.Type == UctActionType.DefensiveMove) {
+                                goto done;
+                            }
                         }
                     } while (true);
                 }
@@ -273,6 +288,21 @@ namespace HexMage.Simulator.AI {
             } while (current.Action.Type != UctActionType.EndTurn);
 
             done:
+
+            //bool wasDefense = false;
+            //foreach (var action in result) {
+            //    if (action.Type == UctActionType.DefensiveMove) {
+            //        if (wasDefense) {
+            //            UctDebug.PrintDotgraph(root, () => 1);
+            //            Debugger.Break();
+            //            throw new InvalidOperationException($"Double defensive move");
+            //        }
+            //        wasDefense = true;
+            //    } else {
+            //        wasDefense = false;
+            //    }
+            //}
+
             return result;
         }
     }

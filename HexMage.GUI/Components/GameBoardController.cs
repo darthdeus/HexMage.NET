@@ -288,7 +288,7 @@ namespace HexMage.GUI.Components {
 
             var visibilityPath =
                 _game.Map.AxialLinedraw(_game.State.MobInstances[mobId.Value].Coord,
-                                                _game.State.MobInstances[targetId].Coord);
+                                        _game.State.MobInstances[targetId].Coord);
 
             bool isVisible = true;
             foreach (var coord in visibilityPath) {
