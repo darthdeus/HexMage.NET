@@ -282,6 +282,13 @@ namespace HexMage.Simulator {
             }
         }
 
+        public static void SaveDna(int fileIndex, DNA d1, DNA d2) {
+            using (var writer = new StreamWriter(Constants.BuildEvoSavePath(fileIndex))) {
+                writer.WriteLine(d1.ToSerializableString());
+                writer.WriteLine(d2.ToSerializableString());
+            }
+        }
+
         private static void LogStats() {
             //writer.WriteLine(
             //    $"Total:\t\t{teamWatch.ElapsedMilliseconds}ms\nPer turn:\t{mpt}ms\nPer iteration:\t{mpi}ms");

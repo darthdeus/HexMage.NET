@@ -72,7 +72,8 @@ namespace HexMage.Benchmarks {
             } else {
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
-                new EvolutionBenchmark().RunSimulatedAnnealing();
+                new Evolution<int>(_ => 3).RunEvolutionStrategies();
+                //new EvolutionBenchmark().RunSimulatedAnnealing();
                 stopwatch.Stop();
 
                 Console.WriteLine(

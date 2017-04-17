@@ -89,9 +89,9 @@ namespace HexMage.Simulator {
 
         public static bool HillClimbing = false;
 
-        public static int NumGenerations = 2000;
+        public static int NumGenerations = 5000;
         public static int EvolutionPrintModulo = 10;
-        public static int TeamsPerGeneration = 100;
+        public static int TeamsPerGeneration = 50;
         public static double MutationDelta = 0.25;
 
         /// <summary>

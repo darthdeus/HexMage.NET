@@ -17,6 +17,8 @@ namespace HexMage.Benchmarks {
             this.result = result;
         }
 
+#warning Switch from GenerationMember to Individual
+        [Obsolete]
         public float CombinedFitness(DNA initialDna) {
             float fitA = 1 - result.HpPercentage;
             float fitB = (float) PlayoutResult.LengthSample(result.TotalTurns);

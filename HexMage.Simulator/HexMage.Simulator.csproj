@@ -60,6 +60,7 @@
     <Compile Include="AI\FlatMonteCarloController.cs" />
     <Compile Include="AI\GameSetup.cs" />
     <Compile Include="AI\IAiFactory.cs" />
+    <Compile Include="AI\Individual.cs" />
     <Compile Include="AI\ListHelpers.cs" />
     <Compile Include="AI\MctsController.cs" />
     <Compile Include="AI\GameEvaluator.cs" />

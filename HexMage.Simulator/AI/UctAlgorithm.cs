@@ -50,8 +50,8 @@ namespace HexMage.Simulator.AI {
                 iterationStopwatch.Stop();
 
                 MillisecondsPerIterationAverage.Add(iterationStopwatch.Elapsed.TotalMilliseconds);
-                //} while (iterations < 2000);
-            } while (stopwatch.ElapsedMilliseconds < _thinkTime);
+            } while (iterations < 25);
+            //} while (stopwatch.ElapsedMilliseconds < _thinkTime);
 
             stopwatch.Stop();
 
@@ -74,6 +74,8 @@ namespace HexMage.Simulator.AI {
         }
 
         public UctNode TreePolicy(UctNode node, TeamColor startingTeam) {
+            bool wasDefense = node.Action.Type == UctActionType.DefensiveMove;
+
             while (!node.IsTerminal) {
                 if (!node.IsFullyExpanded) {
                     Interlocked.Increment(ref ExpandCount);
@@ -81,6 +83,12 @@ namespace HexMage.Simulator.AI {
                 } else {
                     Interlocked.Increment(ref BestChildCount);
                     node = BestChild(node, startingTeam);
+                    if (node.Action.Type == UctActionType.DefensiveMove) {
+                        if (wasDefense) {
+                            throw new InvalidOperationException();
+                        }
+                    }
+                    wasDefense = node.Action.Type == UctActionType.DefensiveMove;
                 }
             }
 

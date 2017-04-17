@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using HexMage.Simulator.PCG;
+using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Single;
 
@@ -95,6 +97,20 @@ namespace HexMage.Simulator {
 
         public Team ToTeam() {
             return GenomeLoader.FromDna(this);
+        }
+
+        public float DistanceFitness(DNA team2) {
+            var low = DenseVector.Build.Dense(Data.Count, 0);
+            var high = DenseVector.Build.Dense(Data.Count, 1);
+
+            double maxDistance = Distance.Euclidean(low, high);
+
+            double distance = Distance.Euclidean(Data, team2.Data);
+            double relativeDistance = distance / maxDistance;
+
+            double distanceFitness = 1 / (1 + Math.Exp(-20 * relativeDistance + 3));
+
+            return (float) distanceFitness;
         }
     }
 }
