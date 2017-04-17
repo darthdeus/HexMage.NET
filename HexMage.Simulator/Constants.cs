@@ -91,7 +91,7 @@ namespace HexMage.Simulator {
 
         public static int NumGenerations = 2000;
         public static int EvolutionPrintModulo = 10;
-        public static int TeamsPerGeneration = 20;
+        public static int TeamsPerGeneration = 100;
         public static double MutationDelta = 0.25;
 
         /// <summary>
@@ -136,6 +136,7 @@ namespace HexMage.Simulator {
         public static int ApMax = 25;
         public static int DmgMax = 30;
         public static int CostMax = 20;
+        public static int CooldownMax = 2;
         public static int RangeMax = 10;
         public static int EvolutionMapSize = 5;
         public static int ElementCount = 4;

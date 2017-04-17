@@ -14,7 +14,7 @@ namespace HexMage.Simulator {
         public int MobCount;
 
         public const int MobAttributeCount = 2;
-        public const int AbilityAttributeCount = 11;
+        public const int AbilityAttributeCount = 12;
         public int MobSize => MobAttributeCount + AbilityCount * AbilityAttributeCount;
 
         // TODO - area buff
@@ -48,7 +48,7 @@ namespace HexMage.Simulator {
         }
 
         public bool IsElementIndex(int index) {
-            return ((index % MobSize) - MobAttributeCount) % AbilityAttributeCount == 3;
+            return ((index % MobSize) - MobAttributeCount) % AbilityAttributeCount == 4;
         }
 
         public void Randomize() {

@@ -27,7 +27,7 @@ namespace HexMage.GUI.Scenes {
                                     "Space ... CONTINUE";
 
 
-            root.AddChild(new Label(helpText, _assetManager.Font));
+            root.AddChild(new Label(helpText, _assetManager.Font, Color.White));
 
             root.AddComponent(new MapEditor(() => _map, map => _map = map));
             root.Renderer = new MapEditorRenderer(() => _map);

@@ -31,7 +31,7 @@ namespace HexMage.Simulator.AI {
                 float tpercentage = Math.Max(0, 1 - (float) i / Constants.NumGenerations);
                 float T = Constants.InitialT * tpercentage;
 
-                if (Constants.RestartFailures && current.result.Fitness < Constants.FitnessThreshold) {
+                if (Constants.RestartFailures && current.result.SimpleFitness() < Constants.FitnessThreshold) {
                     current.dna.Randomize();
                     restartCount++;
                 }

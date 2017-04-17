@@ -27,16 +27,16 @@ namespace HexMage.Simulator {
             var team = JsonLoader.LoadTeam(content);
             team.mobs.RemoveAt(0);
 
-
             _initialDna = GenomeLoader.FromTeam(team);
-            if (Constants.RandomizeInitialTeam) {
-                _initialDna.Randomize();
-            }
+            //if (Constants.RandomizeInitialTeam) {
+            //    _initialDna.Randomize();
+            //}
 
-            _initialDna = new DNA(3, 2);
+            _initialDna = new DNA(2, 2);
             _initialDna.Randomize();
 
-            Console.WriteLine($"Initial: {_initialDna.ToDnaString()}\n\n");
+            string initialDnaString = _initialDna.ToDnaString();
+            Console.WriteLine($"Initial ({_initialDna.Data.Count}): {initialDnaString}\n\n");
 
             var map = Map.Load("data/map.json");
 
@@ -82,7 +82,7 @@ namespace HexMage.Simulator {
                 var teamWatch = new Stopwatch();
                 teamWatch.Start();
 
-                if (Constants.RestartFailures && current.result.Fitness < Constants.FitnessThreshold) {
+                if (Constants.RestartFailures && current.result.SimpleFitness() < Constants.FitnessThreshold) {
                     current.dna.Randomize();
                     _restartCount++;
                 }
@@ -112,8 +112,8 @@ namespace HexMage.Simulator {
 
                 //if (Constants.ForbidTimeouts && newMax.result.Timeouted) continue;
 
-                float e = current.result.Fitness;
-                float ep = newMax.result.Fitness;
+                float e = current.result.SimpleFitness();
+                float ep = newMax.result.SimpleFitness();
 
                 double probability = 1;
 
@@ -132,10 +132,10 @@ namespace HexMage.Simulator {
                 }
 
                 plotT.Add(T);
-                plotFit.Add(current.result.Fitness);
+                plotFit.Add(current.result.SimpleFitness());
                 plotHpPercentage.Add(1 - current.result.HpPercentage);
                 //plotLength.Add(current.result.TotalTurns);
-                plotLength.Add(GameEvaluator.LengthSample(current.result.TotalTurns));
+                plotLength.Add(PlayoutResult.LengthSample(current.result.TotalTurns));
 
                 PrintEvaluationResult(i, e, ep, probability, T, current);
             }
@@ -162,13 +162,13 @@ namespace HexMage.Simulator {
 
         private static GenerationMember PickBestMember(GameInstance game, DNA initialDna,
                                                        List<GenerationMember> generation) {
-            float totalFitness = generation.Sum(g => g.result.Fitness);
+            float totalFitness = generation.Sum(g => g.CombinedFitness(initialDna));
 
             var first = generation[0];
-            Vector<float> sum = first.dna.Data * (first.result.Fitness / totalFitness);
+            Vector<float> sum = first.dna.Data * (first.CombinedFitness(initialDna) / totalFitness);
 
             for (int i = 1; i < generation.Count; i++) {
-                sum += generation[i].dna.Data * (generation[i].result.Fitness / totalFitness);
+                sum += generation[i].dna.Data * (generation[i].CombinedFitness(initialDna) / totalFitness);
             }
 
             var dna = new DNA(first.dna.MobCount, first.dna.AbilityCount);
@@ -218,10 +218,10 @@ namespace HexMage.Simulator {
 
         private void HandleGoodEnough(ref bool goodEnough, PlayoutResult newFitness, GenerationMember member,
                                       ref int goodCount) {
-            if (Constants.SaveGoodOnes && !goodEnough && newFitness.Fitness > 0.99) {
+            if (Constants.SaveGoodOnes && !goodEnough && newFitness.SimpleFitness() > 0.99) {
                 goodCount++;
                 if (goodCount > 50) goodEnough = true;
-                Console.WriteLine($"Found extra good {newFitness.Fitness}");
+                Console.WriteLine($"Found extra good {newFitness.SimpleFitness()}");
 
                 SaveDna(goodCount, member.dna);
             }

@@ -27,17 +27,18 @@ namespace HexMage.Simulator {
                     int dmg = (int) Math.Round(dna.Data[offset + 0] * (Constants.DmgMax - minDmg) + minDmg);
                     int cost = (int) Math.Round(dna.Data[offset + 1] * Constants.CostMax);
                     int range = (int) Math.Round(dna.Data[offset + 2] * Constants.RangeMax);
+                    int cooldown = (int) Math.Round(dna.Data[offset + 3] * Constants.CooldownMax);
 
-                    var element = ElementFromNumber(dna.Data[offset + 3]);
+                    var element = ElementFromNumber(dna.Data[offset + 4]);
 
-                    int buffDmg = (int) Math.Round(dna.Data[offset + 4] * Constants.BuffDmgMax);
-                    int buffApDmg = (int) Math.Round(dna.Data[offset + 5] * Constants.BuffApDmgMax);
-                    int buffLifetime = (int) Math.Round(dna.Data[offset + 6] * Constants.BuffLifetimeMax);
+                    int buffDmg = (int) Math.Round(dna.Data[offset + 5] * Constants.BuffDmgMax);
+                    int buffApDmg = (int) Math.Round(dna.Data[offset + 6] * Constants.BuffApDmgMax);
+                    int buffLifetime = (int) Math.Round(dna.Data[offset + 7] * Constants.BuffLifetimeMax);
 
-                    int radius = (int) Math.Round(dna.Data[offset + 7] * Constants.BuffMaxRadius);
-                    int areaBuffDmg = (int) Math.Round(dna.Data[offset + 8] * Constants.BuffDmgMax);
-                    int areaBuffApDmg = (int) Math.Round(dna.Data[offset + 9] * Constants.BuffApDmgMax);
-                    int areaBuffLifetime = (int) Math.Round(dna.Data[offset + 10] * Constants.BuffLifetimeMax);
+                    int radius = (int) Math.Round(dna.Data[offset + 8] * Constants.BuffMaxRadius);
+                    int areaBuffDmg = (int) Math.Round(dna.Data[offset + 9] * Constants.BuffDmgMax);
+                    int areaBuffApDmg = (int) Math.Round(dna.Data[offset + 10] * Constants.BuffApDmgMax);
+                    int areaBuffLifetime = (int) Math.Round(dna.Data[offset + 11] * Constants.BuffLifetimeMax);
 
                     var buff = new Buff(element,
                                         -buffDmg,
@@ -54,7 +55,7 @@ namespace HexMage.Simulator {
                     var ability = new JsonAbility(dmg,
                                                   cost,
                                                   range,
-                                                  0,
+                                                  cooldown,
                                                   element,
                                                   buff,
                                                   areaBuff);
@@ -84,6 +85,7 @@ namespace HexMage.Simulator {
                     data.Add((ability.dmg - minDmg) / (float) (Constants.DmgMax - minDmg));
                     data.Add(ability.ap / (float) Constants.CostMax);
                     data.Add(ability.range / (float) Constants.RangeMax);
+                    data.Add(ability.cooldown/ (float) Constants.CooldownMax);
                     data.Add(NumberFromElement(ability.element));
 
                     var buff = ability.buff;

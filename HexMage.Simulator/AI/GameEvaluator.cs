@@ -23,8 +23,9 @@ namespace HexMage.Simulator.AI {
         // TODO: wat, tohle dat pryc a pouzivat obecnejsi
         public PlayoutResult Evaluate() {
             if (GlobalFactories.Count == 0) {
+                GlobalFactories.Add(new RuleBasedFactory());
                 GlobalFactories.Add(new MctsFactory(1));
-                GlobalFactories.Add(new MctsFactory(2));
+                //GlobalFactories.Add(new MctsFactory(2));
             }
 
             var stopwatch = new Stopwatch();
@@ -43,7 +44,7 @@ namespace HexMage.Simulator.AI {
                                        .Aggregate(playoutResults.First(), (total, curr) => {
                                            return new PlayoutResult(total.TotalTurns + curr.TotalTurns,
                                                                     total.HpPercentage + curr.HpPercentage,
-                                                                    total.Fitness + curr.Fitness,
+                                                                    total.AllPlayed && curr.AllPlayed,
                                                                     total.Timeout || curr.Timeout,
                                                                     total.RedWins + curr.RedWins,
                                                                     total.BlueWins + curr.BlueWins);
@@ -52,7 +53,6 @@ namespace HexMage.Simulator.AI {
 #warning TODO: nema tu byt spis min/max nez prumer?
             result.HpPercentage /= playoutResults.Count;
             result.TotalTurns /= playoutResults.Count;
-            result.Fitness /= playoutResults.Count;
 
             return result;
         }
@@ -104,27 +104,8 @@ namespace HexMage.Simulator.AI {
             var dis = new Normal(mobsCount * 2, mobsCount);
             dis.Density(mobsCount * 2);
 
-            float fit_a = 1 - gamePercentage;
-            float fit_b = (float) LengthSample(i);
-            float fitness = (fit_a + fit_b) / 2;
-
-            if (!game.State.AllPlayed) {
-                fitness = 0.0001f;
-            }
-
-            return new PlayoutResult(i, gamePercentage, fitness, i == maxIterations, red, blue);
+            return new PlayoutResult(i, gamePercentage, game.State.AllPlayed, i == maxIterations, red, blue);
         }
-
-        public static double LengthSample(double x) {
-            const double ev = 10;
-
-            if (x < 2 * ev) {
-                return new Normal(ev, 3).CumulativeDistribution(x);
-            } else {
-                return new Normal(ev, 2).CumulativeDistribution(4 * ev - x);
-            }
-        }
-
 
         /// <summary>
         /// Returns the win percentage of the first controller

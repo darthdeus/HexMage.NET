@@ -6,12 +6,22 @@ using HexMage.Simulator.AI;
 using HexMage.Simulator.PCG;
 using MathNet.Numerics;
 using MathNet.Numerics.Distributions;
+using MathNet.Numerics.LinearAlgebra.Single;
 using MathNet.Numerics.Random;
 using Constants = HexMage.Simulator.Constants;
 
 namespace HexMage.Benchmarks {
     internal class Program {
         private static void Main(string[] args) {
+            //var v1 = DenseVector.Build.Dense(78, 0);
+            //var v2 = DenseVector.Build.Dense(78, 1);
+
+            //Console.WriteLine($"Euclidean: {Distance.Euclidean(v1, v2)}");
+            //Console.WriteLine($"V1 ... L1: {v1.L1Norm()}, L2: {v1.L2Norm()}");
+            //Console.WriteLine($"V2 ... L1: {v2.L1Norm()}, L2: {v2.L2Norm()}");
+
+            //return;
+
             // TODO - proc to ale s timhle nekonverguje?!?!?!?!??!
             //Generator.Random = new Random(3);
 
@@ -122,7 +132,7 @@ namespace HexMage.Benchmarks {
 
                     var neighbourFitness = EvolutionBenchmark.CalculateFitness(game, d1, neighbour);
 
-                    float delta = neighbourFitness.Fitness - fitness.Fitness;
+                    float delta = neighbourFitness.SimpleFitness() - fitness.SimpleFitness();
 
                     if (delta > 0) {
                         down++;

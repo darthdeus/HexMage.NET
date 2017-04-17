@@ -40,8 +40,8 @@ namespace HexMage.Simulator.Model {
             var targetInstance = game.State.MobInstances[action.TargetId];
             var abilityInfo = game.MobManager.Abilities[action.AbilityId];
 
-            AssertAndRecord(game, action, abilityInfo.Cooldown == 0,
-                            "Accidentaly created an ability with non-zero cooldown. Those are currently not supported.");
+            //AssertAndRecord(game, action, abilityInfo.Cooldown == 0,
+            //                "Accidentaly created an ability with non-zero cooldown. Those are currently not supported.");
             AssertAndRecord(game, action, game.State.Cooldowns[action.AbilityId] == 0,
                             "game.State.Cooldowns[action.AbilityId] == 0");
 

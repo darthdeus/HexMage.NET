@@ -1,30 +1,6 @@
 ﻿using System;
 
 namespace HexMage.Simulator.AI {
-    public struct PlayoutResult {
-        public float HpPercentage;
-        public int TotalTurns;
-        public float Fitness;
-        public readonly bool Timeout;
-        public int RedWins;
-        public int BlueWins;
-
-        public PlayoutResult(int totalTurns, float hpPercentage, float fitness, bool timeout, int redWins, int blueWins) {
-            HpPercentage = hpPercentage;
-            TotalTurns = totalTurns;
-            Fitness = fitness;
-            Timeout = timeout;
-            RedWins = redWins;
-            BlueWins = blueWins;
-        }
-
-        public string ToFitnessString(DNA dna) {
-            string fstr = Fitness.ToString("0.000000");
-
-            return $"F:{fstr}\t{dna.ToDnaString()}";
-        }
-    }
-
     public struct EvaluationResult {
         public int RedWins;
         public int BlueWins;

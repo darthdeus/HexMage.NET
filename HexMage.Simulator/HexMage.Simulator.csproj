@@ -64,6 +64,7 @@
     <Compile Include="AI\MctsController.cs" />
     <Compile Include="AI\GameEvaluator.cs" />
     <Compile Include="AI\MctsFactory.cs" />
+    <Compile Include="AI\PlayoutResult.cs" />
     <Compile Include="AI\RollingAverage.cs" />
     <Compile Include="AI\RuleBasedFactory.cs" />
     <Compile Include="AI\UctAction.cs" />

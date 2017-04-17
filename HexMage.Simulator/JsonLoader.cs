@@ -68,8 +68,7 @@ namespace HexMage.Simulator {
         public List<JsonMob> red = new List<JsonMob>();
         public List<JsonMob> blue = new List<JsonMob>();
 
-        public Setup() {
-        }
+        public Setup() {}
 
         public Setup(List<JsonMob> red, List<JsonMob> blue) {
             this.red = red;
