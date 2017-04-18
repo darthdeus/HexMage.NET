@@ -251,10 +251,11 @@ namespace HexMage.GUI.Scenes {
             _t2Preview.ClearChildren();
 
             for (int i = 0; i < t1size; i++) {
-                var mobInfo = Generator.RandomMob(_mobManager, t1, _gameInstance.State);
+                var mobInfo1 = Generator.RandomMob(_mobManager, t1, _gameInstance.State);
+                var mobInfo2 = mobInfo1.DeepCopy();
 
-                var m1 = _gameInstance.AddMobWithInfo(mobInfo);
-                var m2 = _gameInstance.AddMobWithInfo(mobInfo);
+                var m1 = _gameInstance.AddMobWithInfo(mobInfo1);
+                var m2 = _gameInstance.AddMobWithInfo(mobInfo2);
 
                 // Change team of m2
                 var mi2 = _gameInstance.MobManager.MobInfos[m2];

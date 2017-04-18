@@ -47,6 +47,14 @@ namespace HexMage.GUI.Renderers {
                 if (entity.AABB.Contains(InputManager.Instance.MousePosition)) {
                     batch.Draw(assetManager[AssetManager.SpellHighlight], entity.RenderPosition);
                 }
+
+                //if (mob.MobInstance.Ap < ability.Cost) {
+                //    batch.Draw(assetManager[AssetManager.SpellBgNotEnoughAp], entity.RenderPosition);
+                //}
+
+                //if (ability.Cooldown > 0) {
+                //    batch.Draw(assetManager[AssetManager.SpellBgCooldown], entity.RenderPosition);
+                //}
             } else {
                 Debug.WriteLine("ERROR - Rendering abilities, but no mob is currently active.");
                 batch.Draw(assetManager[AssetManager.NoTexture], entity.RenderPosition);

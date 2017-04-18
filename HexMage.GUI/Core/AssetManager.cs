@@ -10,6 +10,7 @@ using Color = Microsoft.Xna.Framework.Color;
 namespace HexMage.GUI.Core {
     public class AssetManager {
         public const int TileSize = 64;
+        public const int HalfTileSize = TileSize / 2;
 
         public const string SoundEffectFireballSmall = "sound_effects/fireball_small";
         public const string SoundEffectFireballLarge = "sound_effects/fireball_large";

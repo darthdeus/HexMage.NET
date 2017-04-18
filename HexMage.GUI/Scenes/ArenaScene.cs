@@ -172,7 +172,7 @@ namespace HexMage.GUI.Scenes {
             detail.AddComponent(() => detail.Position = new Vector2(bg.Width, 1024 - bg.Height));
 
             var labelHp = detail.AddChild(new Label(() => {
-                var mob = _gameInstance.CurrentCachedMob;
+                var mob = Camera2D.Instance.CachedMouseMob(_gameInstance);
                 if (mob != null) {
                     return $"{mob.MobInstance.Hp}/{mob.MobInfo.MaxHp}";
                 } else {
@@ -183,7 +183,7 @@ namespace HexMage.GUI.Scenes {
             labelHp.Position = new Vector2(95, 60);
 
             var labelAp = detail.AddChild(new Label(() => {
-                var mob = _gameInstance.CurrentCachedMob;
+                var mob = Camera2D.Instance.CachedMouseMob(_gameInstance);
                 if (mob != null) {
                     return $"{mob.MobInstance.Ap}/{mob.MobInfo.MaxAp}";
                 } else {
@@ -194,7 +194,7 @@ namespace HexMage.GUI.Scenes {
             labelAp.Position = new Vector2(95, 138);
 
             var labelBuff = detail.AddChild(new Label(() => {
-                var mob = _gameInstance.CurrentCachedMob;
+                var mob = Camera2D.Instance.CachedMouseMob(_gameInstance);
                 if (mob != null) {
                     return
                         $"{mob.MobInstance.Buff.HpChange}/{mob.MobInstance.Buff.ApChange} ({mob.MobInstance.Buff.Lifetime} turns)";
@@ -206,7 +206,7 @@ namespace HexMage.GUI.Scenes {
             labelBuff.Position = new Vector2(300, 95);
 
             var labelAreaBuff = detail.AddChild(new Label(() => {
-                var mob = _gameInstance.CurrentCachedMob;
+                var mob = Camera2D.Instance.CachedMouseMob(_gameInstance);
                 if (mob != null) {
                     var areaBuffs = _gameInstance.State.BuffsAt(mob.MobInstance.Coord);
                     var areaBuff = areaBuffs.Aggregate(Buff.ZeroBuff(), Buff.Combine);
@@ -302,23 +302,54 @@ namespace HexMage.GUI.Scenes {
 
             abilityDetailWrapper.AddComponent(_ => { abilityDetailWrapper.Hidden = mobFunc() == null; });
 
-            //var abilityDetail = new VerticalLayout {
-            //    Padding = new Vector4(10, 10, 10, 10),
-            //    Renderer = new SpellRenderer(_gameInstance, _gameBoardController, mobFunc, abilityIndex),
-            //    CustomBatch = true,
-            //};
-
             var abilityDetail = new Entity() {
                 Renderer = new SpellRenderer(_gameInstance, _gameBoardController, mobFunc, abilityIndex),
                 CustomBatch = true,
                 SizeFunc = () => new Vector2(150, 150)
             };
+            abilityDetail.AddComponent(() => { abilityDetail.LayoutEntity(); });
+            abilityDetailWrapper.AddChild(abilityDetail);
 
-            abilityDetail.AddComponent(() => {
-                abilityDetail.LayoutEntity();
+            var abilityDetailNotEnoughAp = new Entity() {
+                Renderer = new SpriteRenderer(_assetManager[AssetManager.SpellBgNotEnoughAp]),
+                SortOrder = Camera2D.SortUI + 10000
+            };
+
+            abilityDetailNotEnoughAp.AddComponent(() => {
+                var mob = mobFunc();
+                if (mob != null) {
+                    if (abilityIndex < mob.MobInfo.Abilities.Count) {
+                        var abilityId = mob.MobInfo.Abilities[abilityIndex];
+                        var ability = _gameInstance.MobManager.Abilities[abilityId];
+
+                        abilityDetailNotEnoughAp.Hidden = ability.Cost <= mob.MobInstance.Ap;
+                    } else {
+                        abilityDetailNotEnoughAp.Hidden = true;
+                    }
+                } else {
+                    abilityDetailNotEnoughAp.Hidden = true;
+                }
             });
 
-            abilityDetailWrapper.AddChild(abilityDetail);
+            var abilityDetailCooldown = new Entity() {
+                Renderer = new SpriteRenderer(_assetManager[AssetManager.SpellBgCooldown]),
+                SortOrder = Camera2D.SortUI + 10000
+            };
+
+            abilityDetailCooldown.AddComponent(() => {
+                var mob = mobFunc();
+                if (mob != null) {
+                    if (abilityIndex < mob.MobInfo.Abilities.Count) {
+                        var abilityId = mob.MobInfo.Abilities[abilityIndex];
+
+                        abilityDetailCooldown.Hidden = _gameInstance.State.Cooldowns[abilityId] == 0;
+                    } else {
+                        abilityDetailCooldown.Hidden = true;
+                    }
+                } else {
+                    abilityDetailCooldown.Hidden = true;
+                }
+            });
 
             var dmgLabel = new Label(_assetManager.AbilityFont) {
                 Position = new Vector2(53, 12)
@@ -347,6 +378,9 @@ namespace HexMage.GUI.Scenes {
 
             var cooldownLabel = new Label(_assetManager.Font);
             abilityDetail.AddChild(cooldownLabel);
+
+            abilityDetailWrapper.AddChild(abilityDetailNotEnoughAp);
+            abilityDetailWrapper.AddChild(abilityDetailCooldown);
 
             const float speed = 1;
             const float horizontalOffset = 6;

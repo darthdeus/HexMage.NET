@@ -178,7 +178,6 @@ namespace HexMage.GUI.Renderers {
 
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex) &&
                     _gameInstance.Pathfinder.Distance(mobInstance.Coord, mouseHex) != int.MaxValue) {
-
                     // TODO: fuj
                     IList<AxialCoord> path;
 
@@ -197,10 +196,13 @@ namespace HexMage.GUI.Renderers {
                     if (abilityIndex.HasValue) {
                         var cubepath = _gameInstance.Map.AxialLinedraw(mobInstance.Coord, mouseHex);
 
-                        var offset = new Vector2(AssetManager.TileSize / 2, AssetManager.TileSize / 2);
+                        var offset = new Vector2(AssetManager.HalfTileSize, AssetManager.HalfTileSize);
                         DrawLine(_spriteBatch,
                                  Camera2D.Instance.HexToPixel(mouseHex) + offset,
                                  Camera2D.Instance.HexToPixel(mobInstance.Coord) + offset);
+
+                        var abilityId = mobInfo.Abilities[abilityIndex.Value];
+                        var ability = _gameInstance.MobManager.Abilities[abilityId];
 
                         int distance = 0;
                         bool walled = false;
@@ -214,8 +216,6 @@ namespace HexMage.GUI.Renderers {
                                 walled = true;
                             }
 
-                            var abilityId = mobInfo.Abilities[abilityIndex.Value];
-                            var ability = _gameInstance.MobManager.AbilityForId(abilityId);
                             if (distance <= ability.Range && !walled) {
                                 DrawAt(hexUsable, cubeCoord);
                             } else {
@@ -224,9 +224,20 @@ namespace HexMage.GUI.Renderers {
 
                             distance++;
                         }
+
+                        var areaBuff = ability.AreaBuff;
+                        if (!areaBuff.IsZero) {
+                            foreach (var coord in _gameInstance.Map.AllCoords) {
+                                if (mouseHex.Distance(coord) <= areaBuff.Radius) {
+                                    DrawAt(hexUsable, coord, Color.White * 0.4f);
+                                }
+                            }
+                        }
                     } else {
                         if (_gameInstance.Pathfinder.IsValidCoord(mouseHex) &&
-                            _gameInstance.Map[mouseHex] != HexType.Wall) {
+                            _gameInstance.Map[mouseHex] != HexType.Wall &&
+                            // TODO: kdy nastane, ze path == null?!?
+                            path != null) {
                             if (!mouseMob.HasValue || mouseMob.Value != currentMob.Value) {
                                 foreach (var coord in path) {
                                     if (_gameInstance.Pathfinder.Distance(mobInstance.Coord, coord) <= mobInstance.Ap) {

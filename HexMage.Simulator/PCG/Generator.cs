@@ -174,7 +174,7 @@ namespace HexMage.Simulator.PCG {
 
                 // TODO - re-enable cooldowns?
                 //var cooldown = Random.Next(0, 3);
-                var cooldown = 0;
+                var cooldown = 1;
 
                 var ability = new AbilityInfo(RandomDmg(),
                                               RandomCost(maxAp),

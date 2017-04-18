@@ -49,8 +49,8 @@ namespace HexMage.Simulator.AI {
                 OneIteration(root, startingTeam);
                 iterationStopwatch.Stop();
 
-                //UctDebug.PrintDotgraph(root, () => iterations);
                 MillisecondsPerIterationAverage.Add(iterationStopwatch.Elapsed.TotalMilliseconds);
+#warning TODO: tohle je fuj, pridat moznost nastavit jak cas tak iterace
             } while (iterations < 25);
             //} while (stopwatch.ElapsedMilliseconds < _thinkTime);
 

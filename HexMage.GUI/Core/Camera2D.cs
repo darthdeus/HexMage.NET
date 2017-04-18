@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using HexMage.Simulator;
+using HexMage.Simulator.Model;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -86,6 +87,20 @@ namespace HexMage.GUI.Core {
 
         public Matrix Transform => Matrix.CreateScale(ZoomLevel) * Matrix.CreateTranslation(Translate);
         public Matrix TransformWithoutScale => Matrix.CreateTranslation(Translate);
+
+        public CachedMob CachedMouseMob(GameInstance game) {
+            var hex = MouseHex;
+            if (game.Pathfinder.IsValidCoord(hex)) {
+                var mobId = game.State.AtCoord(hex, true);
+                if (mobId != null) {
+                    return game.CachedMob(mobId.Value);
+                } else {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        }
 
         public Vector2 HexToPixel(AxialCoord coord) {
             return HexToPixel(coord, 1.0f);
