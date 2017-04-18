@@ -16,6 +16,12 @@ namespace HexMage.GUI.UI {
             Renderer = this;
         }
 
+        public Label(SpriteFont font, Color textColor) {
+            Font = font;
+            Renderer = this;
+            TextColor = textColor;
+        }
+
         public Label(string text, SpriteFont font) {
             Text = text;
             Font = font;

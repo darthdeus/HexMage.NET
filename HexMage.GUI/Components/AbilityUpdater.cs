@@ -9,47 +9,53 @@ using Microsoft.Xna.Framework;
 namespace HexMage.GUI.Components {
     public class AbilityUpdater : Component {
         private readonly Func<GameInstance> _gameFunc;
-        private readonly Func<int?> _mobFunc;
+        private readonly Func<CachedMob> _mobFunc;
         private readonly int _abilityIndex;
         private readonly Label _dmgLabel;
+        private readonly Label _abLabel;
         private readonly Label _rangeLabel;
-        private readonly Label _elementLabel;
+        private readonly Label _buffLabel;
         private readonly Label _cooldownLabel;
-        private readonly Label _buffsLabel;
+        private readonly Label _areaBuffLabel;
         private AbilityInfo _abilityInfo;
 
         public event Action<int> OnClick;
 
-        public AbilityUpdater(Func<GameInstance> gameFunc, Func<int?> mobFunc, int abilityIndex, Label dmgLabel,
+        public AbilityUpdater(Func<GameInstance> gameFunc,
+                              Func<CachedMob> mobFunc,
+                              int abilityIndex,
+                              Label dmgLabel,
+                              Label abLabel,
                               Label rangeLabel,
-                              Label elementLabel, Label cooldownLabel, Label buffsLabel) {
+                              Label buffLabel,
+                              Label cooldownLabel,
+                              Label areaBuffLabel) {
             _gameFunc = gameFunc;
             _mobFunc = mobFunc;
             _abilityIndex = abilityIndex;
             _dmgLabel = dmgLabel;
+            _abLabel = abLabel;
             _rangeLabel = rangeLabel;
-            _elementLabel = elementLabel;
+            _buffLabel = buffLabel;
             _cooldownLabel = cooldownLabel;
-            _buffsLabel = buffsLabel;
+            _areaBuffLabel = areaBuffLabel;
         }
 
         public override void Update(GameTime time) {
-            var mobId = _mobFunc();
-            if (mobId != null) {
+            var mob = _mobFunc();
+            if (mob != null) {
                 var gameInstance = _gameFunc();
                 var mobManager = gameInstance.MobManager;
 
-                var mobInfo = mobManager.MobInfos[mobId.Value];
-
                 // Update and rendering are skipped if the ability isn't present
-                if (_abilityIndex < mobInfo.Abilities.Count) {
+                if (_abilityIndex < mob.MobInfo.Abilities.Count) {
                     Entity.Hidden = false;
                 } else {
                     Entity.Hidden = true;
                     return;
                 }
 
-                var abilityId = mobInfo.Abilities[_abilityIndex];
+                var abilityId = mob.MobInfo.Abilities[_abilityIndex];
                 _abilityInfo = mobManager.AbilityForId(abilityId);
 
                 var inputManager = InputManager.Instance;
@@ -62,23 +68,33 @@ namespace HexMage.GUI.Components {
                     }
                 }
 
-                _dmgLabel.Text = $"DMG {_abilityInfo.Dmg}, Cost {_abilityInfo.Cost}";
-                _rangeLabel.Text = $"Range {_abilityInfo.Range}";
-                _elementLabel.Text = _abilityInfo.Element.ToString();
+                _dmgLabel.Text = _abilityInfo.Dmg.ToString();
+                _abLabel.Text = _abilityInfo.Cost.ToString();
+                _rangeLabel.Text = _abilityInfo.Range.ToString();
+                _buffLabel.Text =
+                    $"{_abilityInfo.Buff.HpChange}/{_abilityInfo.Buff.ApChange} " +
+                    $"({_abilityInfo.Buff.Lifetime} turns)";
+
+                _areaBuffLabel.Text =
+                    $"{_abilityInfo.AreaBuff.Effect.HpChange}/{_abilityInfo.AreaBuff.Effect.ApChange} " +
+                    $"({_abilityInfo.AreaBuff.Effect.Lifetime} turns, {_abilityInfo.AreaBuff.Radius}r)";
+
+                //_dmgLabel.Text = $"DMG {_abilityInfo.Dmg}, Cost {_abilityInfo.Cost}";
+                //_rangeLabel.Text = $"Range {_abilityInfo.Range}";
+                //_elementLabel.Text = _abilityInfo.Element.ToString();
 
                 var buffTextBuilder = new StringBuilder();
 
-                if (!_abilityInfo.Buff.IsZero) {
-                    var buff = _abilityInfo.Buff;
-                    buffTextBuilder.AppendLine($"Buff {buff.HpChange}/{buff.ApChange}\nover {buff.Lifetime} turns");
-                }
+                //if (!_abilityInfo.Buff.IsZero) {
+                //    var buff = _abilityInfo.Buff;
+                //    buffTextBuilder.AppendLine($"Buff {buff.HpChange}/{buff.ApChange}\nover {buff.Lifetime} turns");
+                //}
 
-                if (!_abilityInfo.AreaBuff.IsZero) {
-                    var areaBuff = _abilityInfo.AreaBuff;
-                    buffTextBuilder.AppendLine($"Area buff {areaBuff.Effect.HpChange}/{areaBuff.Effect.ApChange}\nover {areaBuff.Effect.Lifetime}, radius {areaBuff.Radius}");
-                }
+                //if (!_abilityInfo.AreaBuff.IsZero) {
+                //    var areaBuff = _abilityInfo.AreaBuff;
+                //    buffTextBuilder.AppendLine($"Area buff {areaBuff.Effect.HpChange}/{areaBuff.Effect.ApChange}\nover {areaBuff.Effect.Lifetime}, radius {areaBuff.Radius}");
+                //}
 
-                _buffsLabel.Text = buffTextBuilder.ToString();
             }
         }
     }

@@ -41,6 +41,7 @@ namespace HexMage.GUI.Core {
         public const string NoTexture = "ability_ui/magenta";
         public const string SpellHighlight = "ability_ui/spell_highlight";
 
+        public const string SpellBg = "ability_ui/spell_bg";
         public const string SpellEarthBg = "ability_ui/spell_earth_bg";
         public const string SpellEarthActiveBg = "ability_ui/spell_earth_active_bg";
         public const string SpellFireBg = "ability_ui/spell_fire_bg";
@@ -50,15 +51,19 @@ namespace HexMage.GUI.Core {
         public const string SpellAirBg = "ability_ui/spell_air_bg";
         public const string SpellAirActiveBg = "ability_ui/spell_air_active_bg";
 
+        public const string SpellBgCooldown = "ability_ui/spell_bg_cooldown";
+        public const string SpellBgNotEnoughAp = "ability_ui/spell_bg_not_enough_ap";
+
         public const string ShaderAbility = "shaders/ability_shader";
 
         public const string HistoryLogBg = "ability_ui/history_log_bg";
-        public const string MobDetailBg = "ability_ui/mob_detail_bg";
         public const string CrosshairCursor = "ability_ui/crosshair";
 
         public const string ParticleSprite = "particle";
 
         private const string FontName = "Arial";
+        private const string FontAbility = "AbilityFont";
+        private const string FontAbilitySmall = "AbilityFontSmall";
 
         public const string TitleRedTeam = "ui/title-red-team";
         public const string TitleBlueTeam = "ui/title-blue-team";
@@ -68,6 +73,10 @@ namespace HexMage.GUI.Core {
         public const string UiLeftBg = "ui/left-bg";
         public const string UiRightBg = "ui/right-bg";
 
+        public const string MobDetailBg = "ability_ui/mob_detail_bg";
+        public const string MobDetailBgStone = "ability_ui/mob_detail_bg_stone";
+        public const string MobDetailBgEmpty = "ability_ui/mob_detail_bg_empty";
+
         private readonly ContentManager _contentManager;
         private readonly GraphicsDevice _graphicsDevice;
         private readonly Dictionary<string, Texture2D> _textures = new Dictionary<string, Texture2D>();
@@ -75,6 +84,8 @@ namespace HexMage.GUI.Core {
         private readonly Dictionary<string, Effect> _effects = new Dictionary<string, Effect>();
         private readonly Dictionary<string, SoundEffect> _soundEffects = new Dictionary<string, SoundEffect>();
         private SpriteFont _font;
+        private SpriteFont _abilityFont;
+        private SpriteFont _abilityFontSmall;
 
         public AssetManager(ContentManager contentManager, GraphicsDevice graphicsDevice) {
             _contentManager = contentManager;
@@ -104,12 +115,33 @@ namespace HexMage.GUI.Core {
             return _soundEffects[name];
         }
 
-        public SpriteFont Font {
-            get {
+        public SpriteFont Font
+        {
+            get
+            {
                 Debug.Assert(_font != null, "Accessing AssetManager's Font before it's initialized");
                 return _font;
             }
         }
+
+        public SpriteFont AbilityFont
+        {
+            get
+            {
+                Debug.Assert(_abilityFont != null, "Accessing AssetManager's Ability Font before it's initialized");
+                return _abilityFont;
+            }
+        }
+
+        public SpriteFont AbilityFontSmall
+        {
+            get
+            {
+                Debug.Assert(_abilityFontSmall != null, "Accessing AssetManager's Ability Font Small before it's initialized");
+                return _abilityFontSmall;
+            }
+        }
+
 
         public Texture2D this[Color color] {
             get {
@@ -125,6 +157,9 @@ namespace HexMage.GUI.Core {
 
         public void Preload() {
             _font = _contentManager.Load<SpriteFont>(FontName);
+            _abilityFont = _contentManager.Load<SpriteFont>(FontAbility);
+            _abilityFontSmall = _contentManager.Load<SpriteFont>(FontAbilitySmall);
+
             foreach (var texture in new[] {HexWallSprite, HexPathSprite, HexEmptySprite}) {
                 _textures[texture] = _contentManager.Load<Texture2D>(texture);
             }

@@ -28,12 +28,8 @@ namespace HexMage.GUI.Components {
         private readonly Vector2 _usedAbilityOffset = new Vector2(80, -20);
         private AssetManager _assetManager;
         private DateTime _displayMessageBoxUntil = DateTime.Now;
-        private Label _emptyHexLabel;
-        private Entity _emptyHexPopover;
         private VerticalLayout _messageBox;
         private Label _messageBoxLabel;
-        private Label _mobHealthLabel;
-        private VerticalLayout _mobPopover;
         private Vector4 _popoverPadding;
 
         private Replay _replay;
@@ -371,85 +367,6 @@ namespace HexMage.GUI.Components {
         }
 
         private void UpdatePopovers(GameTime time, AxialCoord mouseHex) {
-            _mobPopover.Position = _emptyHexPopover.Position = new Vector2(660, 880);
-
-            _emptyHexPopover.Active = false;
-            _mobPopover.Active = false;
-
-            if (_game.Pathfinder.IsValidCoord(mouseHex)) {
-                var mobId = _game.State.AtCoord(mouseHex, true);
-
-                if (mobId == null) {
-                    var map = _game.Map;
-
-                    var labelText = new StringBuilder();
-
-                    // If there's no mob we can't calculate a distance from it
-                    if (_game.CurrentMob.HasValue) {
-                        var mobInstance = _game.State.MobInstances[_game.CurrentMob.Value];
-                        labelText.AppendLine(
-                            $"Distance: {_game.Pathfinder.Distance(mobInstance.Coord, mouseHex)}");
-                    }
-
-                    switch (map[mouseHex]) {
-                        case HexType.Empty:
-                            _emptyHexPopover.Active = true;
-                            labelText.AppendLine("Empty hex");
-                            labelText.AppendLine($"Coord: {mouseHex}");
-                            break;
-
-                        case HexType.Wall:
-                            _emptyHexPopover.Active = true;
-                            labelText.AppendLine("Indestructible wall");
-                            labelText.AppendLine($"Coord: {mouseHex}");
-                            break;
-                    }
-
-                    var buffs = _game.State.BuffsAt(mouseHex);
-                    Debug.Assert(buffs != null,
-                                 "Buffs can't be null since we're only using valid map coords (and those are all initialized).");
-
-                    foreach (var buff in buffs)
-                        labelText.AppendLine($"{buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");
-
-                    _emptyHexLabel.Text = labelText.ToString();
-                } else {
-                    _mobPopover.Active = true;
-                    var mobTextBuilder = new StringBuilder();
-                    var mobInstance = _game.State.MobInstances[mobId.Value];
-                    var mobInfo = _game.MobManager.MobInfos[mobId.Value];
-
-                    mobTextBuilder.AppendLine(
-                        $"HP {mobInstance.Hp}/{mobInfo.MaxHp}\nAP {mobInstance.Ap}/{mobInfo.MaxAp}");
-                    mobTextBuilder.AppendLine($"Iniciative: {mobInfo.Iniciative}");
-                    mobTextBuilder.AppendLine();
-
-                    mobTextBuilder.AppendLine("Buffs:");
-                    if (!mobInstance.Buff.IsZero) {
-                        var buff = mobInstance.Buff;
-                        mobTextBuilder.AppendLine(
-                            $"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");
-                    }
-
-
-                    mobTextBuilder.AppendLine();
-                    mobTextBuilder.AppendLine("Area buffs:");
-
-                    foreach (var buff in _game.State.BuffsAt(mobInstance.Coord)) {
-                        mobTextBuilder.AppendLine(
-                            $"  {buff.Element} - {buff.HpChange}/{buff.ApChange} for {buff.Lifetime} turns");
-                    }
-
-                    mobTextBuilder.AppendLine();
-                    mobTextBuilder.AppendLine($"Coord {mobInstance.Coord}");
-
-                    _mobHealthLabel.Text = mobTextBuilder.ToString();
-                }
-            } else {
-                _emptyHexPopover.Active = false;
-                _mobPopover.Active = false;
-            }
-
             _messageBox.Active = _displayMessageBoxUntil >= DateTime.Now;
         }
 
@@ -466,28 +383,6 @@ namespace HexMage.GUI.Components {
 
                 _messageBoxLabel = _messageBox.AddChild(new Label("Message Box", _assetManager.Font));
                 Entity.Scene.AddAndInitializeRootEntity(_messageBox, _assetManager);
-            }
-
-            {
-                _emptyHexPopover = new VerticalLayout {
-                    Renderer = new ColorRenderer(Color.LightGray),
-                    Padding = _popoverPadding,
-                    SortOrder = Camera2D.SortUI + 200
-                };
-
-                _emptyHexLabel = _emptyHexPopover.AddChild(new Label("Just an empty hex", _assetManager.Font));
-                Entity.Scene.AddAndInitializeRootEntity(_emptyHexPopover, _assetManager);
-            }
-
-            {
-                _mobPopover = new VerticalLayout {
-                    Renderer = new ColorRenderer(Color.LightGray),
-                    Padding = _popoverPadding,
-                    SortOrder = Camera2D.SortUI + 200
-                };
-
-                _mobHealthLabel = _mobPopover.AddChild(new Label("Mob health", _assetManager.Font));
-                Entity.Scene.AddAndInitializeRootEntity(_mobPopover, _assetManager);
             }
         }
 

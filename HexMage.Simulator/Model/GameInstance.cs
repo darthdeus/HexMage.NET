@@ -35,6 +35,9 @@ namespace HexMage.Simulator {
         [JsonIgnore]
         public int? CurrentMob => State.CurrentMob;
 
+        [JsonIgnore]
+        public CachedMob CurrentCachedMob => CurrentMob.HasValue ? CachedMob(CurrentMob.Value) : null;
+
         [JsonConstructor]
         public GameInstance() { }
 

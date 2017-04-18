@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using HexMage.GUI.Components;
 using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
@@ -43,14 +45,9 @@ namespace HexMage.GUI.Scenes {
             HistoryLog.Instance.Hidden = false;
             AddAndInitializeRootEntity(HistoryLog.Instance, _assetManager);
 
-            var detail = CreateRootEntity(Camera2D.SortUI + 100);
-            var bg = _assetManager[AssetManager.MobDetailBg];
-            detail.Renderer = new SpriteRenderer(bg);
-            detail.AddComponent(() => detail.Position = new Vector2(bg.Width, 1024 - bg.Height));
-
             var cursorSprite = _assetManager[AssetManager.CrosshairCursor];
 
-            var crosshairCursor = CreateRootEntity(Camera2D.SortUI);
+            var crosshairCursor = CreateRootEntity(Camera2D.SortUI + 10000);
             crosshairCursor.Renderer = new SpriteRenderer(cursorSprite);
             crosshairCursor.AddComponent(() => {
                 crosshairCursor.Position = InputManager.Instance.MousePosition.ToVector2() -
@@ -105,6 +102,8 @@ namespace HexMage.GUI.Scenes {
             rightBg.Position = new Vector2(1280 - 150, 0);
             rightBg.Renderer = new SpriteRenderer(_assetManager[AssetManager.UiRightBg]);
 
+            BuildMouseDetailUi();
+
             const int abilitySpacing = 70;
             var currentLayout = new VerticalLayout {
                 Spacing = abilitySpacing,
@@ -123,11 +122,17 @@ namespace HexMage.GUI.Scenes {
 
 #warning TODO - this shouldn't be a func, but rater pass it directly
             Func<GameInstance> gameFunc = () => _gameInstance;
-            Func<int?> currentMobFunc = () => _gameInstance.CurrentMob;
-            Func<int?> hoverMobFunc = () => {
+            Func<CachedMob> currentMobFunc = () => _gameInstance.CurrentCachedMob;
+            Func<CachedMob> hoverMobFunc = () => {
                 var mouseHex = Camera2D.Instance.MouseHex;
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                    return _gameInstance.State.AtCoord(mouseHex, true);
+                    var mid = _gameInstance.State.AtCoord(mouseHex, true);
+
+                    if (mid.HasValue) {
+                        return _gameInstance.CachedMob(mid.Value);
+                    } else {
+                        return null;
+                    }
                 } else {
                     return null;
                 }
@@ -160,7 +165,135 @@ namespace HexMage.GUI.Scenes {
             teamLabel.Position = new Vector2(1280 / 2 - 40, 5);
         }
 
-        private Entity AbilityDetail(Func<GameInstance> gameFunc, Func<int?> mobFunc, int abilityIndex,
+        private void BuildMouseDetailUi() {
+            var detail = CreateRootEntity(Camera2D.SortUI + 100);
+            var bg = _assetManager[AssetManager.MobDetailBg];
+            detail.Renderer = new SpriteRenderer(bg);
+            detail.AddComponent(() => detail.Position = new Vector2(bg.Width, 1024 - bg.Height));
+
+            var labelHp = detail.AddChild(new Label(() => {
+                var mob = _gameInstance.CurrentCachedMob;
+                if (mob != null) {
+                    return $"{mob.MobInstance.Hp}/{mob.MobInfo.MaxHp}";
+                } else {
+                    return "NOMOB";
+                }
+            }, _assetManager.AbilityFont, Color.White));
+
+            labelHp.Position = new Vector2(95, 60);
+
+            var labelAp = detail.AddChild(new Label(() => {
+                var mob = _gameInstance.CurrentCachedMob;
+                if (mob != null) {
+                    return $"{mob.MobInstance.Ap}/{mob.MobInfo.MaxAp}";
+                } else {
+                    return "NOMOB";
+                }
+            }, _assetManager.AbilityFont, Color.White));
+
+            labelAp.Position = new Vector2(95, 138);
+
+            var labelBuff = detail.AddChild(new Label(() => {
+                var mob = _gameInstance.CurrentCachedMob;
+                if (mob != null) {
+                    return
+                        $"{mob.MobInstance.Buff.HpChange}/{mob.MobInstance.Buff.ApChange} ({mob.MobInstance.Buff.Lifetime} turns)";
+                } else {
+                    return "NOMOB";
+                }
+            }, _assetManager.AbilityFont, Color.White));
+
+            labelBuff.Position = new Vector2(300, 95);
+
+            var labelAreaBuff = detail.AddChild(new Label(() => {
+                var mob = _gameInstance.CurrentCachedMob;
+                if (mob != null) {
+                    var areaBuffs = _gameInstance.State.BuffsAt(mob.MobInstance.Coord);
+                    var areaBuff = areaBuffs.Aggregate(Buff.ZeroBuff(), Buff.Combine);
+
+                    return
+                        $"{areaBuff.HpChange}/{areaBuff.ApChange} ({areaBuff.Lifetime} turns)";
+                } else {
+                    return "NOMOB";
+                }
+            }, _assetManager.AbilityFont, Color.White));
+
+            labelAreaBuff.Position = new Vector2(300, 143);
+
+            var labelCoord = detail.AddChild(new Label(() => Camera2D.Instance.MouseHex.ToString(),
+                                                       _assetManager.AbilityFont, Color.White));
+
+            labelCoord.Position = new Vector2(530, 150);
+
+            var labelDistance = detail.AddChild(new Label(() => {
+                var mob = _gameInstance.CurrentCachedMob;
+                var mouseHex = Camera2D.Instance.MouseHex;
+                if (mob != null && _gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
+                    return _gameInstance.Pathfinder.Distance(mob.MobInstance.Coord, mouseHex).ToString();
+                } else {
+                    return "";
+                }
+            }, _assetManager.AbilityFont, Color.White));
+
+            labelDistance.Position = new Vector2(130, 95);
+
+            var labelEmptyAreaBuff = detail.AddChild(new Label(() => {
+                var mouseHex = Camera2D.Instance.MouseHex;
+                if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
+                    var areaBuffs = _gameInstance.State.BuffsAt(mouseHex);
+                    var areaBuff = areaBuffs.Aggregate(Buff.ZeroBuff(), Buff.Combine);
+
+                    return
+                        $"{areaBuff.HpChange}/{areaBuff.ApChange} ({areaBuff.Lifetime} turns)";
+                } else {
+                    return "INVALID COORD";
+                }
+            }, _assetManager.AbilityFont, Color.White));
+
+            labelEmptyAreaBuff.Position = new Vector2(323, 120);
+
+            detail.AddComponent(() => {
+                var mouseHex = Camera2D.Instance.MouseHex;
+                if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
+                    var mobId = _gameInstance.State.AtCoord(mouseHex, true);
+
+                    if (mobId == null) {
+                        labelHp.Active = false;
+                        labelAp.Active = false;
+                        labelBuff.Active = false;
+                        labelAreaBuff.Active = false;
+
+                        if (_gameInstance.Map[mouseHex] == HexType.Wall) {
+                            labelEmptyAreaBuff.Active = false;
+                            labelDistance.Active = false;
+                            detail.Renderer = new SpriteRenderer(_assetManager[AssetManager.MobDetailBgStone]);
+                        } else {
+                            labelEmptyAreaBuff.Active = true;
+                            labelDistance.Active = true;
+                            detail.Renderer = new SpriteRenderer(_assetManager[AssetManager.MobDetailBgEmpty]);
+                        }
+                    } else {
+                        labelHp.Active = true;
+                        labelAp.Active = true;
+                        labelBuff.Active = true;
+                        labelAreaBuff.Active = true;
+                        labelEmptyAreaBuff.Active = false;
+                        labelDistance.Active = false;
+                        detail.Renderer = new SpriteRenderer(_assetManager[AssetManager.MobDetailBg]);
+                    }
+                } else {
+                    labelEmptyAreaBuff.Active = false;
+                    labelDistance.Active = false;
+                    detail.Renderer = new SpriteRenderer(_assetManager[AssetManager.MobDetailBgStone]);
+                    labelHp.Active = false;
+                    labelAp.Active = false;
+                    labelBuff.Active = false;
+                    labelAreaBuff.Active = false;
+                }
+            });
+        }
+
+        private Entity AbilityDetail(Func<GameInstance> gameFunc, Func<CachedMob> mobFunc, int abilityIndex,
                                      ParticleEffectSettings particleEffectSettings) {
             var abilityDetailWrapper = new Entity {
                 SizeFunc = () => new Vector2(120, 80),
@@ -169,28 +302,51 @@ namespace HexMage.GUI.Scenes {
 
             abilityDetailWrapper.AddComponent(_ => { abilityDetailWrapper.Hidden = mobFunc() == null; });
 
-            var abilityDetail = new VerticalLayout {
-                Padding = new Vector4(10, 10, 10, 10),
+            //var abilityDetail = new VerticalLayout {
+            //    Padding = new Vector4(10, 10, 10, 10),
+            //    Renderer = new SpellRenderer(_gameInstance, _gameBoardController, mobFunc, abilityIndex),
+            //    CustomBatch = true,
+            //};
+
+            var abilityDetail = new Entity() {
                 Renderer = new SpellRenderer(_gameInstance, _gameBoardController, mobFunc, abilityIndex),
-                CustomBatch = true
+                CustomBatch = true,
+                SizeFunc = () => new Vector2(150, 150)
             };
+
+            abilityDetail.AddComponent(() => {
+                abilityDetail.LayoutEntity();
+            });
 
             abilityDetailWrapper.AddChild(abilityDetail);
 
-            var dmgLabel = new Label(_assetManager.Font);
-            abilityDetail.AddChild(dmgLabel);
+            var dmgLabel = new Label(_assetManager.AbilityFont) {
+                Position = new Vector2(53, 12)
+            };
+            abilityDetailWrapper.AddChild(dmgLabel);
 
-            var rangeLabel = new Label(_assetManager.Font);
-            abilityDetail.AddChild(rangeLabel);
+            var apLabel = new Label(_assetManager.AbilityFont) {
+                Position = new Vector2(119, 12)
+            };
+            abilityDetailWrapper.AddChild(apLabel);
 
-            var elementLabel = new Label(_assetManager.Font);
-            abilityDetail.AddChild(elementLabel);
+            var rangeLabel = new Label(_assetManager.AbilityFont) {
+                Position = new Vector2(58, 53)
+            };
+            abilityDetailWrapper.AddChild(rangeLabel);
+
+            var buffLabel = new Label(_assetManager.AbilityFontSmall) {
+                Position = new Vector2(38, 106)
+            };
+            abilityDetailWrapper.AddChild(buffLabel);
+
+            var areaBuffLabel = new Label(_assetManager.AbilityFontSmall) {
+                Position = new Vector2(38, 124)
+            };
+            abilityDetailWrapper.AddChild(areaBuffLabel);
 
             var cooldownLabel = new Label(_assetManager.Font);
             abilityDetail.AddChild(cooldownLabel);
-
-            var buffsLabel = new Label(_assetManager.Font);
-            abilityDetail.AddChild(buffsLabel);
 
             const float speed = 1;
             const float horizontalOffset = 6;
@@ -222,15 +378,16 @@ namespace HexMage.GUI.Scenes {
                         int index = _gameBoardController.SelectedAbilityIndex.Value;
                         var ability =
                             _gameInstance.MobManager.AbilityForId(
-                                _gameInstance.MobManager.MobInfos[mob.Value].Abilities[index]);
+                                mob.MobInfo.Abilities[index]);
                         return ElementColor(ability.Element);
                     } else {
                         return Color.White;
                     }
                 };
 
-                abilityDetail.AddComponent(
-                    _ => { particles.Active = _gameBoardController.SelectedAbilityIndex == abilityIndex; });
+                abilityDetail.AddComponent(_ => {
+                    particles.Active = _gameBoardController.SelectedAbilityIndex == abilityIndex;
+                });
 
                 abilityDetailWrapper.AddChild(particles);
             }
@@ -239,10 +396,11 @@ namespace HexMage.GUI.Scenes {
                                                     mobFunc,
                                                     abilityIndex,
                                                     dmgLabel,
+                                                    apLabel,
                                                     rangeLabel,
-                                                    elementLabel,
+                                                    buffLabel,
                                                     cooldownLabel,
-                                                    buffsLabel);
+                                                    areaBuffLabel);
             abilityDetail.AddComponent(abilityUpdater);
 
             abilityUpdater.OnClick += index => {

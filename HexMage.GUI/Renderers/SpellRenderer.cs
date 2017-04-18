@@ -10,12 +10,12 @@ namespace HexMage.GUI.Renderers {
     public class SpellRenderer : IRenderer {
         private readonly GameInstance _game;
         private readonly GameBoardController _gameBoardController;
-        private readonly Func<int?> _mobFunc;
+        private readonly Func<CachedMob> _mobFunc;
         private readonly int _abilityIndex;
 
         public SpellRenderer(GameInstance game,
                              GameBoardController gameBoardController,
-                             Func<int?> mobFunc,
+                             Func<CachedMob> mobFunc,
                              int abilityIndex) {
             _game = game;
             _gameBoardController = gameBoardController;
@@ -31,14 +31,13 @@ namespace HexMage.GUI.Renderers {
             //effect.Parameters["Time"].SetValue(time);
             batch.Begin(effect: effect, samplerState: Camera2D.SamplerState);
 
-            var mobId = _mobFunc();
-            if (mobId != null) {
-                var mobInfo = _game.MobManager.MobInfos[mobId.Value];
-                var abilityId = mobInfo.Abilities[_abilityIndex];
+            var mob = _mobFunc();
+            if (mob != null) {
+                var abilityId = mob.MobInfo.Abilities[_abilityIndex];
 
                 var isActive = _gameBoardController.SelectedAbilityIndex == _abilityIndex;
 
-                if (GameInvariants.IsAbilityUsableNoTarget(_game, mobId.Value, abilityId)) {
+                if (GameInvariants.IsAbilityUsableNoTarget(_game, mob.MobId, abilityId)) {
                     isActive = true;
                 }
 
@@ -57,6 +56,8 @@ namespace HexMage.GUI.Renderers {
         }
 
         private string ElementBg(AbilityInfo abilityInfo, bool active = false) {
+            return AssetManager.SpellBg;
+
             switch (abilityInfo.Element) {
                 case AbilityElement.Earth:
                     return active ? AssetManager.SpellEarthActiveBg : AssetManager.SpellEarthBg;
