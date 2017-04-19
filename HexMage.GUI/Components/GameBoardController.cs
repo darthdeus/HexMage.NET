@@ -32,7 +32,9 @@ namespace HexMage.GUI.Components {
         private Label _messageBoxLabel;
         private Vector4 _popoverPadding;
 
-        private Replay _replay;
+        private readonly Replay _replay;
+
+        private readonly TimeSpan _abilityPopoverDisplayTime = TimeSpan.FromSeconds(3);
 
         public int? SelectedAbilityIndex;
 
@@ -385,8 +387,6 @@ namespace HexMage.GUI.Components {
                 Entity.Scene.AddAndInitializeRootEntity(_messageBox, _assetManager);
             }
         }
-
-        private readonly TimeSpan _abilityPopoverDisplayTime = TimeSpan.FromSeconds(3);
 
         private void UnselectAbilityIfNeeded() {
             var mobId = _game.CurrentMob;

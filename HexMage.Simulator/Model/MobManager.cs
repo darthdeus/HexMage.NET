@@ -18,6 +18,10 @@ namespace HexMage.Simulator {
             return Abilities[id];
         }
 
+        public AbilityInfo AbilityByIndex(CachedMob mob, int index) {
+            return Abilities[mob.MobInfo.Abilities[index]];
+        }
+
         [Obsolete]
         public void InitializeState(GameState state) {
 #warning DEPRECATED: InitializeState by se asi nemelo pouzivat vubec? K cemu to vlastne je?

@@ -9,7 +9,7 @@ namespace HexMage.GUI.Components {
     public class MobAnimationController : Component {
         private MobEntity _mobEntity;
         private int _mobId;
-        private GameInstance _gameInstance;
+        private readonly GameInstance _game;
 
         private TimeSpan _time;
         private Animation _animationClicked;
@@ -17,8 +17,8 @@ namespace HexMage.GUI.Components {
 
         public Animation CurrentAnimation { get; set; }
 
-        public MobAnimationController(GameInstance gameInstance) {
-            _gameInstance = gameInstance;
+        public MobAnimationController(GameInstance game) {
+            _game = game;
         }
 
         public override void Initialize(AssetManager assetManager) {
@@ -43,7 +43,7 @@ namespace HexMage.GUI.Components {
             base.Update(time);
 
             var mouseHex = Camera2D.Instance.MouseHex;
-            if (_gameInstance.State.MobInstances[_mobId].Coord.Equals(mouseHex)) {
+            if (_game.State.MobInstances[_mobId].Coord.Equals(mouseHex)) {
                 SwitchAnimation(_animationClicked);
             }
 

@@ -46,6 +46,6 @@ namespace HexMage.GUI.Core {
             _tcs.Task.Wait(Program.CancellationToken);
         }
 
-        public string Name => nameof(PlayerController);
+        public string Name => "Player";
     }
 }

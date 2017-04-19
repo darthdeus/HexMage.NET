@@ -410,9 +410,7 @@ namespace HexMage.GUI.Scenes {
                     var mob = mobFunc();
                     if (_gameBoardController.SelectedAbilityIndex.HasValue && mob != null) {
                         int index = _gameBoardController.SelectedAbilityIndex.Value;
-                        var ability =
-                            _gameInstance.MobManager.AbilityForId(
-                                mob.MobInfo.Abilities[index]);
+                        var ability = _gameInstance.MobManager.AbilityByIndex(mob, index);
                         return ElementColor(ability.Element);
                     } else {
                         return Color.White;

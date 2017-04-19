@@ -84,8 +84,8 @@ namespace HexMage.GUI.Scenes {
             left.AddChild(new Separator(5));
             right.AddChild(new Separator(5));
 
-            left.AddChild(new Label(() => _leftController?.ToString() ?? "", _assetManager.Font));
-            right.AddChild(new Label(() => _rightController?.ToString() ?? "", _assetManager.Font));
+            left.AddChild(new Label(() => _leftController?.ToString() ?? "", _assetManager.Font, Color.White));
+            right.AddChild(new Label(() => _rightController?.ToString() ?? "", _assetManager.Font, Color.White));
 
             left.AddChild(new Separator(5));
             right.AddChild(new Separator(5));
@@ -115,56 +115,27 @@ namespace HexMage.GUI.Scenes {
 
             bool first = true;
             hotkeyManager.AddComponent(() => {
+                var dict = new Dictionary<Keys, Func<IMobController>> {
+                    {Keys.A, () => new AiRuleBasedController(_gameInstance)},
+                    {Keys.S, () => new AiRandomController(_gameInstance)},
+                    {Keys.D, () => new MctsController(_gameInstance, 100)},
+                    {Keys.F, () => new PlayerController(_arenaScene, _gameInstance)},
+                    {Keys.G, () => new FlatMonteCarloController(_gameInstance) },
+                    {Keys.H, () => new MctsController(_gameInstance, 1000)},
+                    {Keys.J, () => new MctsController(_gameInstance, 1000)}
+                };
+
                 bool handPickedTeam = false;
-                if (InputManager.Instance.IsKeyJustPressed(Keys.A)) {
-                    if (first) {
-                        _leftController = new AiRuleBasedController(_gameInstance);
-                    } else {
-                        _rightController = new AiRuleBasedController(_gameInstance);
+                foreach (var pair in dict) {
+                    if (InputManager.Instance.IsKeyJustPressed(pair.Key)) {
+                        if (first) {
+                            _leftController = pair.Value();
+                        } else {
+                            _rightController = pair.Value();
+                        }
+                        handPickedTeam = true;
+                        break;
                     }
-                    handPickedTeam = true;
-                } else if (InputManager.Instance.IsKeyJustPressed(Keys.S)) {
-                    if (first) {
-                        _leftController = new AiRandomController(_gameInstance);
-                    } else {
-                        _rightController = new AiRandomController(_gameInstance);
-                    }
-                    handPickedTeam = true;
-                } else if (InputManager.Instance.IsKeyJustPressed(Keys.D)) {
-                    if (first) {
-                        _leftController = new MctsController(_gameInstance, 100);
-                    } else {
-                        _rightController = new MctsController(_gameInstance, 100);
-                    }
-                    handPickedTeam = true;
-                } else if (InputManager.Instance.IsKeyJustPressed(Keys.F)) {
-                    if (first) {
-                        _leftController = new PlayerController(_arenaScene, _gameInstance);
-                    } else {
-                        _rightController = new PlayerController(_arenaScene, _gameInstance);
-                    }
-                    handPickedTeam = true;
-                } else if (InputManager.Instance.IsKeyJustPressed(Keys.G)) {
-                    if (first) {
-                        _leftController = new FlatMonteCarloController(_gameInstance);
-                    } else {
-                        _rightController = new FlatMonteCarloController(_gameInstance);
-                    }
-                    handPickedTeam = true;
-                } else if (InputManager.Instance.IsKeyJustPressed(Keys.H)) {
-                    if (first) {
-                        _leftController = new MctsController(_gameInstance, 1000);
-                    } else {
-                        _rightController = new MctsController(_gameInstance, 1000);
-                    }
-                    handPickedTeam = true;
-                } else if (InputManager.Instance.IsKeyJustPressed(Keys.J)) {
-                    if (first) {
-                        _leftController = new MctsController(_gameInstance, 10000);
-                    } else {
-                        _rightController = new MctsController(_gameInstance, 10000);
-                    }
-                    handPickedTeam = true;
                 }
 
                 if (handPickedTeam) {
@@ -206,7 +177,7 @@ namespace HexMage.GUI.Scenes {
 
             _teamPreviewLayout = new VerticalLayout() {
                 SortOrder = Camera2D.SortUI,
-                Position = new Vector2(100, 200),
+                Position = new Vector2(100, 300),
                 Spacing = 40
             };
 
