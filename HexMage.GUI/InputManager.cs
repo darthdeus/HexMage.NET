@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using HexMage.Simulator;
 using HexMage.Simulator.Pathfinding;
@@ -26,6 +27,7 @@ namespace HexMage.GUI {
             return _lastKeyboardState.IsKeyUp(key) && _currentKeyboardState.IsKeyDown(key);
         }
 
+        [Obsolete]
         public bool IsKeyJustReleased(Keys key) {
             return _lastKeyboardState.IsKeyDown(key) && _currentKeyboardState.IsKeyUp(key);
         }

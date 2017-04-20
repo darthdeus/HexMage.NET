@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Scenes {
+    [Obsolete]
     public class MapSelectionScene : GameScene {
         private const int DefaultMapSize = 5;
         private const int MinSize = 4;
@@ -26,7 +27,7 @@ namespace HexMage.GUI.Scenes {
         private Map _currentMap;
         private VerticalLayout _seedHistory;
 
-        public MapSelectionScene(GameManager game) : base(game) {
+        public MapSelectionScene(GameManager gameManager) : base(gameManager) {
             _currentMap = _mapGenerator.Generate(DefaultMapSize, _currentSeed);
         }
 
@@ -59,19 +60,12 @@ namespace HexMage.GUI.Scenes {
             btnStartGame.OnClick += _ => { DoContinue(); };
             middleColumn.AddChild(btnStartGame);
 
-            var sizeSlider = new Slider(MinSize, MaxSize, new Point(100, 20));
-            sizeSlider.OnChange += size => {
-                _selectedSize = size;
-                GenerateMap();
-            };
-
             var sizeSliderLayout = new VerticalLayout {
                 Spacing = 5,
                 Position = new Vector2(300, 0)
             };
 
             sizeSliderLayout.AddChild(new Label("Change map size:", _assetManager.Font, Color.White));
-            sizeSliderLayout.AddChild(sizeSlider);
 
             middleColumn.AddChild(sizeSliderLayout);
 
@@ -127,13 +121,13 @@ namespace HexMage.GUI.Scenes {
                     game.MobManager.Teams[TeamColor.Red] = new AiRuleBasedController(game);
                     game.MobManager.Teams[TeamColor.Blue] = new AiRuleBasedController(game);
 
-                    LoadNewScene(new ArenaScene(_game, game));
+                    LoadNewScene(new ArenaScene(_gameManager, game));
                 }
 
                 if (InputManager.Instance.IsKeyJustPressed(Keys.R)) {
                     var replay = ReplayRecorder.Instance.Load(0);
 
-                    LoadNewScene(new ArenaScene(_game, replay));
+                    LoadNewScene(new ArenaScene(_gameManager, replay));
                 }
             });
 
@@ -141,7 +135,7 @@ namespace HexMage.GUI.Scenes {
         }
 
         private void DoContinue() {
-            LoadNewScene(new TeamSelectionScene(_game, _currentMap.DeepCopy()));
+            LoadNewScene(new TeamSelectionScene(_gameManager, _currentMap.DeepCopy()));
         }
 
         private void BtnGenerateMapOnOnClick(TextButton btn) {
@@ -188,7 +182,7 @@ namespace HexMage.GUI.Scenes {
                 game.PrepareEverything();
                 game.Reset();
 
-                var arenaScene = new ArenaScene(_game, game);
+                var arenaScene = new ArenaScene(_gameManager, game);
 
                 //game.MobManager.Teams[TeamColor.Red] = new PlayerController(arenaScene, game);
                 //game.MobManager.Teams[TeamColor.Blue] = new PlayerController(arenaScene, game);
@@ -210,7 +204,7 @@ namespace HexMage.GUI.Scenes {
             var map = Map.Load("data/map.json");
             var game = GameSetup.GenerateFromDna(d1, d2, map);
 
-            var arenaScene = new ArenaScene(_game, game);
+            var arenaScene = new ArenaScene(_gameManager, game);
 
             game.MobManager.Teams[TeamColor.Red] = new PlayerController(arenaScene, game);
             game.MobManager.Teams[TeamColor.Blue] = new MctsController(game, 1000);
@@ -220,7 +214,7 @@ namespace HexMage.GUI.Scenes {
         }
 
         public void LoadMapEditor() {
-            LoadNewScene(new MapEditorScene(_game));
+            LoadNewScene(new MapEditorScene(_gameManager));
         }
     }
 }

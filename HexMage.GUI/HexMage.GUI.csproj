@@ -115,7 +115,6 @@
     <Compile Include="UI\Panel.cs" />
     <Compile Include="UI\Separator.cs" />
     <Compile Include="UI\ShowOnHover.cs" />
-    <Compile Include="UI\Slider.cs" />
     <Compile Include="UI\SpriteElement.cs" />
     <Compile Include="UI\TextButton.cs" />
     <Compile Include="UI\VerticalLayout.cs" />

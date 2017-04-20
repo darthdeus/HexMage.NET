@@ -204,7 +204,7 @@ namespace HexMage.GUI.Components {
         private void HandleKeyboardAbilitySelect() {
             var inputManager = InputManager.Instance;
 
-            if (inputManager.IsKeyJustReleased(Keys.F10)) {
+            if (inputManager.IsKeyJustPressed(Keys.F10)) {
                 var repr = new MapRepresentation(_game.Map);
 
                 using (var writer = new StreamWriter(GameInstance.MapSaveFilename))
@@ -214,7 +214,7 @@ namespace HexMage.GUI.Components {
                 }
             }
 
-            if (inputManager.IsKeyJustReleased(Keys.F11)) {
+            if (inputManager.IsKeyJustPressed(Keys.F11)) {
                 using (var reader = new StreamReader(GameInstance.MapSaveFilename))
                 using (var mobReader = new StreamReader(GameInstance.MobsSaveFilename)) {
                     var mapRepr = JsonConvert.DeserializeObject<MapRepresentation>(reader.ReadToEnd());
@@ -225,7 +225,7 @@ namespace HexMage.GUI.Components {
                 }
             }
 
-            if (inputManager.IsKeyJustReleased(Keys.F12)) {
+            if (inputManager.IsKeyJustPressed(Keys.F12)) {
                 foreach (var mobId in _game.MobManager.Mobs) {
                     var mobInfo = _game.MobManager.MobInfos[mobId];
                     var mobInstance = _game.State.MobInstances[mobId];
@@ -233,20 +233,20 @@ namespace HexMage.GUI.Components {
                 }
             }
 
-            if (inputManager.IsKeyJustReleased(Keys.D1)) SelectAbility(0);
-            else if (inputManager.IsKeyJustReleased(Keys.D2)) SelectAbility(1);
-            else if (inputManager.IsKeyJustReleased(Keys.D3)) SelectAbility(2);
-            else if (inputManager.IsKeyJustReleased(Keys.D4)) SelectAbility(3);
-            else if (inputManager.IsKeyJustReleased(Keys.D5)) SelectAbility(4);
-            else if (inputManager.IsKeyJustReleased(Keys.D6)) SelectAbility(5);
+            if (inputManager.IsKeyJustPressed(Keys.D1)) SelectAbility(0);
+            else if (inputManager.IsKeyJustPressed(Keys.D2)) SelectAbility(1);
+            else if (inputManager.IsKeyJustPressed(Keys.D3)) SelectAbility(2);
+            else if (inputManager.IsKeyJustPressed(Keys.D4)) SelectAbility(3);
+            else if (inputManager.IsKeyJustPressed(Keys.D5)) SelectAbility(4);
+            else if (inputManager.IsKeyJustPressed(Keys.D6)) SelectAbility(5);
 
-            if (inputManager.IsKeyJustReleased(Keys.F1)) {
+            if (inputManager.IsKeyJustPressed(Keys.F1)) {
                 ((GameBoardRenderer) Entity.Renderer).Mode = BoardRenderMode.Default;
-            } else if (inputManager.IsKeyJustReleased(Keys.F2)) {
+            } else if (inputManager.IsKeyJustPressed(Keys.F2)) {
                 ((GameBoardRenderer) Entity.Renderer).Mode = BoardRenderMode.HoverHeatmap;
-            } else if (inputManager.IsKeyJustReleased(Keys.F3)) {
+            } else if (inputManager.IsKeyJustPressed(Keys.F3)) {
                 ((GameBoardRenderer) Entity.Renderer).Mode = BoardRenderMode.GlobalHeatmap;
-            } else if (inputManager.IsKeyJustReleased(Keys.F4)) {
+            } else if (inputManager.IsKeyJustPressed(Keys.F4)) {
                 ((GameBoardRenderer) Entity.Renderer).Mode = BoardRenderMode.VisibilityMap;
             }
         }

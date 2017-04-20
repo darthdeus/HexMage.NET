@@ -1,4 +1,5 @@
-﻿using HexMage.GUI.Core;
+﻿using System.IO;
+using HexMage.GUI.Core;
 using HexMage.Simulator.Pathfinding;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -8,8 +9,12 @@ namespace HexMage.GUI.Scenes {
     public class MapEditorScene : GameScene {
         private Map _map;
 
-        public MapEditorScene(GameManager game) : base(game) {
-            _map = new Map(5);
+        public MapEditorScene(GameManager gameManager) : base(gameManager) {
+            if (File.Exists("data/map.json")) {
+                _map = Map.Load("data/map.json");
+            } else {
+                _map = new Map(5);
+            }
         }
 
         public override void Initialize() {
@@ -26,7 +31,6 @@ namespace HexMage.GUI.Scenes {
                                     "1,2,3 ... reorder starting points\n" +
                                     "Space ... CONTINUE";
 
-
             root.AddChild(new Label(helpText, _assetManager.Font, Color.White));
 
             root.AddComponent(new MapEditor(() => _map, map => _map = map));
@@ -34,7 +38,7 @@ namespace HexMage.GUI.Scenes {
 
             root.AddComponent(() => {
                 if (InputManager.Instance.IsKeyJustPressed(Keys.Space)) {
-                    LoadNewScene(new TeamSelectionScene(_game, _map.DeepCopy()));
+                    LoadNewScene(new TeamSelectionScene(_gameManager, _map.DeepCopy()));
                 }
             });
         }

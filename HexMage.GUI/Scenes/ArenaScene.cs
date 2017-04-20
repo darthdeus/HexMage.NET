@@ -14,28 +14,28 @@ using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Scenes {
     public class ArenaScene : GameScene {
-        private readonly GameInstance _gameInstance;
+        private readonly GameInstance _game;
         private readonly GameEventHub _gameEventHub;
         public readonly Dictionary<int, MobEntity> MobEntities = new Dictionary<int, MobEntity>();
 
         private GameBoardController _gameBoardController;
         private readonly Replay _replay;
 
-        public ArenaScene(GameManager game, Replay replay) : base(game) {
+        public ArenaScene(GameManager gameManager, Replay replay) : base(gameManager) {
             _replay = replay;
 
-            _gameInstance = replay.Game;
+            _game = replay.Game;
 
-            _gameInstance.MobManager.Teams[TeamColor.Red] = new ReplayController();
-            _gameInstance.MobManager.Teams[TeamColor.Blue] = new ReplayController();
+            _game.MobManager.Teams[TeamColor.Red] = new ReplayController();
+            _game.MobManager.Teams[TeamColor.Blue] = new ReplayController();
 
             Constants.RecordReplays = false;
-            _gameEventHub = new GameEventHub(_gameInstance);
+            _gameEventHub = new GameEventHub(_game);
         }
 
-        public ArenaScene(GameManager game, GameInstance gameInstance) : base(game) {
-            _gameInstance = gameInstance;
-            _gameEventHub = new GameEventHub(_gameInstance);
+        public ArenaScene(GameManager gameManager, GameInstance game) : base(gameManager) {
+            _game = game;
+            _gameEventHub = new GameEventHub(_game);
         }
 
         public override void Initialize() {
@@ -64,24 +64,24 @@ namespace HexMage.GUI.Scenes {
                 }
             });
 
-            _gameBoardController = new GameBoardController(_gameInstance, _gameEventHub, crosshairCursor, this,
+            _gameBoardController = new GameBoardController(_game, _gameEventHub, crosshairCursor, this,
                                                            _replay);
 
             gameBoardEntity.AddComponent(_gameBoardController);
             gameBoardEntity.Renderer =
-                new GameBoardRenderer(_gameInstance, _gameBoardController, _gameEventHub, _camera);
+                new GameBoardRenderer(_game, _gameBoardController, _gameEventHub, _camera);
             gameBoardEntity.CustomBatch = true;
 
             _gameEventHub.AddSubscriber(_gameBoardController);
 
             BuildUi();
 
-            foreach (var mobId in _gameInstance.MobManager.Mobs) {
-                var mobAnimationController = new MobAnimationController(_gameInstance);
-                var mobEntity = new MobEntity(mobId, _gameInstance) {
+            foreach (var mobId in _game.MobManager.Mobs) {
+                var mobAnimationController = new MobAnimationController(_game);
+                var mobEntity = new MobEntity(mobId, _game) {
                     SortOrder = Camera2D.SortMobs,
                     // TODO - fetch the animation controller via GetComponent<T>
-                    Renderer = new MobRenderer(_gameInstance, mobId, mobAnimationController),
+                    Renderer = new MobRenderer(_game, mobId, mobAnimationController),
                     Transform = () => Camera2D.Instance.Transform
                 };
                 mobEntity.AddComponent(mobAnimationController);
@@ -125,15 +125,15 @@ namespace HexMage.GUI.Scenes {
             AddAndInitializeRootEntity(hoverLayout, _assetManager);
 
 #warning TODO - this shouldn't be a func, but rater pass it directly
-            Func<GameInstance> gameFunc = () => _gameInstance;
-            Func<CachedMob> currentMobFunc = () => _gameInstance.CurrentCachedMob;
+            Func<GameInstance> gameFunc = () => _game;
+            Func<CachedMob> currentMobFunc = () => _game.CurrentCachedMob;
             Func<CachedMob> hoverMobFunc = () => {
                 var mouseHex = Camera2D.Instance.MouseHex;
-                if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                    var mid = _gameInstance.State.AtCoord(mouseHex, true);
+                if (_game.Pathfinder.IsValidCoord(mouseHex)) {
+                    var mid = _game.State.AtCoord(mouseHex, true);
 
                     if (mid.HasValue) {
-                        return _gameInstance.CachedMob(mid.Value);
+                        return _game.CachedMob(mid.Value);
                     } else {
                         return null;
                     }
@@ -151,7 +151,7 @@ namespace HexMage.GUI.Scenes {
 
             var teamLabel = CreateRootEntity(Camera2D.SortUI - 10);
             teamLabel.Renderer = new SpriteRenderer(() => {
-                var team = _gameInstance.CurrentTeam;
+                var team = _game.CurrentTeam;
                 if (team.HasValue) {
                     if (team.Value == TeamColor.Red) {
                         return _assetManager[AssetManager.TitleRedTeam];
@@ -172,7 +172,7 @@ namespace HexMage.GUI.Scenes {
             detail.AddComponent(() => detail.Position = new Vector2(bg.Width, 1024 - bg.Height));
 
             var labelHp = detail.AddChild(new Label(() => {
-                var mob = Camera2D.Instance.CachedMouseMob(_gameInstance);
+                var mob = Camera2D.Instance.CachedMouseMob(_game);
                 if (mob != null) {
                     return $"{mob.MobInstance.Hp}/{mob.MobInfo.MaxHp}";
                 } else {
@@ -183,7 +183,7 @@ namespace HexMage.GUI.Scenes {
             labelHp.Position = new Vector2(95, 60);
 
             var labelAp = detail.AddChild(new Label(() => {
-                var mob = Camera2D.Instance.CachedMouseMob(_gameInstance);
+                var mob = Camera2D.Instance.CachedMouseMob(_game);
                 if (mob != null) {
                     return $"{mob.MobInstance.Ap}/{mob.MobInfo.MaxAp}";
                 } else {
@@ -194,7 +194,7 @@ namespace HexMage.GUI.Scenes {
             labelAp.Position = new Vector2(95, 138);
 
             var labelBuff = detail.AddChild(new Label(() => {
-                var mob = Camera2D.Instance.CachedMouseMob(_gameInstance);
+                var mob = Camera2D.Instance.CachedMouseMob(_game);
                 if (mob != null) {
                     return
                         $"{mob.MobInstance.Buff.HpChange}/{mob.MobInstance.Buff.ApChange} ({mob.MobInstance.Buff.Lifetime} turns)";
@@ -206,9 +206,9 @@ namespace HexMage.GUI.Scenes {
             labelBuff.Position = new Vector2(300, 95);
 
             var labelAreaBuff = detail.AddChild(new Label(() => {
-                var mob = Camera2D.Instance.CachedMouseMob(_gameInstance);
+                var mob = Camera2D.Instance.CachedMouseMob(_game);
                 if (mob != null) {
-                    var areaBuffs = _gameInstance.State.BuffsAt(mob.MobInstance.Coord);
+                    var areaBuffs = _game.State.BuffsAt(mob.MobInstance.Coord);
                     var areaBuff = areaBuffs.Aggregate(Buff.ZeroBuff(), Buff.Combine);
 
                     return
@@ -226,10 +226,10 @@ namespace HexMage.GUI.Scenes {
             labelCoord.Position = new Vector2(530, 150);
 
             var labelDistance = detail.AddChild(new Label(() => {
-                var mob = _gameInstance.CurrentCachedMob;
+                var mob = _game.CurrentCachedMob;
                 var mouseHex = Camera2D.Instance.MouseHex;
-                if (mob != null && _gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                    return _gameInstance.Pathfinder.Distance(mob.MobInstance.Coord, mouseHex).ToString();
+                if (mob != null && _game.Pathfinder.IsValidCoord(mouseHex)) {
+                    return _game.Pathfinder.Distance(mob.MobInstance.Coord, mouseHex).ToString();
                 } else {
                     return "";
                 }
@@ -239,8 +239,8 @@ namespace HexMage.GUI.Scenes {
 
             var labelEmptyAreaBuff = detail.AddChild(new Label(() => {
                 var mouseHex = Camera2D.Instance.MouseHex;
-                if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                    var areaBuffs = _gameInstance.State.BuffsAt(mouseHex);
+                if (_game.Pathfinder.IsValidCoord(mouseHex)) {
+                    var areaBuffs = _game.State.BuffsAt(mouseHex);
                     var areaBuff = areaBuffs.Aggregate(Buff.ZeroBuff(), Buff.Combine);
 
                     return
@@ -254,8 +254,8 @@ namespace HexMage.GUI.Scenes {
 
             detail.AddComponent(() => {
                 var mouseHex = Camera2D.Instance.MouseHex;
-                if (_gameInstance.Pathfinder.IsValidCoord(mouseHex)) {
-                    var mobId = _gameInstance.State.AtCoord(mouseHex, true);
+                if (_game.Pathfinder.IsValidCoord(mouseHex)) {
+                    var mobId = _game.State.AtCoord(mouseHex, true);
 
                     if (mobId == null) {
                         labelHp.Active = false;
@@ -263,7 +263,7 @@ namespace HexMage.GUI.Scenes {
                         labelBuff.Active = false;
                         labelAreaBuff.Active = false;
 
-                        if (_gameInstance.Map[mouseHex] == HexType.Wall) {
+                        if (_game.Map[mouseHex] == HexType.Wall) {
                             labelEmptyAreaBuff.Active = false;
                             labelDistance.Active = false;
                             detail.Renderer = new SpriteRenderer(_assetManager[AssetManager.MobDetailBgStone]);
@@ -303,7 +303,7 @@ namespace HexMage.GUI.Scenes {
             abilityDetailWrapper.AddComponent(_ => { abilityDetailWrapper.Hidden = mobFunc() == null; });
 
             var abilityDetail = new Entity() {
-                Renderer = new SpellRenderer(_gameInstance, _gameBoardController, mobFunc, abilityIndex),
+                Renderer = new SpellRenderer(_game, _gameBoardController, mobFunc, abilityIndex),
                 CustomBatch = true,
                 SizeFunc = () => new Vector2(150, 150)
             };
@@ -320,9 +320,9 @@ namespace HexMage.GUI.Scenes {
                 if (mob != null) {
                     if (abilityIndex < mob.MobInfo.Abilities.Count) {
                         var abilityId = mob.MobInfo.Abilities[abilityIndex];
-                        var ability = _gameInstance.MobManager.Abilities[abilityId];
+                        var ability = _game.MobManager.Abilities[abilityId];
 
-                        bool onCooldown = _gameInstance.State.Cooldowns[abilityId] > 0;
+                        bool onCooldown = _game.State.Cooldowns[abilityId] > 0;
                         abilityDetailNotEnoughAp.Hidden = ability.Cost <= mob.MobInstance.Ap;
 
                         if (abilityDetailNotEnoughAp.Hidden == false && onCooldown) {
@@ -347,7 +347,7 @@ namespace HexMage.GUI.Scenes {
                     if (abilityIndex < mob.MobInfo.Abilities.Count) {
                         var abilityId = mob.MobInfo.Abilities[abilityIndex];
 
-                        abilityDetailCooldown.Hidden = _gameInstance.State.Cooldowns[abilityId] == 0;
+                        abilityDetailCooldown.Hidden = _game.State.Cooldowns[abilityId] == 0;
                     } else {
                         abilityDetailCooldown.Hidden = true;
                     }
@@ -367,7 +367,7 @@ namespace HexMage.GUI.Scenes {
             abilityDetailWrapper.AddChild(apLabel);
 
             var rangeLabel = new Label(_assetManager.AbilityFont) {
-                Position = new Vector2(58, 53)
+                Position = new Vector2(58, 55)
             };
             abilityDetailWrapper.AddChild(rangeLabel);
 
@@ -381,8 +381,10 @@ namespace HexMage.GUI.Scenes {
             };
             abilityDetailWrapper.AddChild(areaBuffLabel);
 
-            var cooldownLabel = new Label(_assetManager.Font);
-            abilityDetail.AddChild(cooldownLabel);
+            var cooldownLabel = new Label(_assetManager.AbilityFont) {
+                Position = new Vector2(119, 55)
+            };
+            abilityDetailWrapper.AddChild(cooldownLabel);
 
             abilityDetailWrapper.AddChild(abilityDetailNotEnoughAp);
             abilityDetailWrapper.AddChild(abilityDetailCooldown);
@@ -415,7 +417,7 @@ namespace HexMage.GUI.Scenes {
                     var mob = mobFunc();
                     if (_gameBoardController.SelectedAbilityIndex.HasValue && mob != null) {
                         int index = _gameBoardController.SelectedAbilityIndex.Value;
-                        var ability = _gameInstance.MobManager.AbilityByIndex(mob, index);
+                        var ability = _game.MobManager.AbilityByIndex(mob, index);
                         return ElementColor(ability.Element);
                     } else {
                         return Color.White;
@@ -441,7 +443,7 @@ namespace HexMage.GUI.Scenes {
             abilityDetail.AddComponent(abilityUpdater);
 
             abilityUpdater.OnClick += index => {
-                if (_gameInstance.CurrentController is PlayerController) {
+                if (_game.CurrentController is PlayerController) {
                     _gameBoardController.SelectAbility(index);
                 }
             };

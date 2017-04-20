@@ -44,8 +44,8 @@ namespace HexMage.GUI.Components {
         public override void Update(GameTime time) {
             var mob = _mobFunc();
             if (mob != null) {
-                var gameInstance = _gameFunc();
-                var mobManager = gameInstance.MobManager;
+                var game = _gameFunc();
+                var mobManager = game.MobManager;
 
                 // Update and rendering are skipped if the ability isn't present
                 if (_abilityIndex < mob.MobInfo.Abilities.Count) {
@@ -78,6 +78,8 @@ namespace HexMage.GUI.Components {
                 _areaBuffLabel.Text =
                     $"{_abilityInfo.AreaBuff.Effect.HpChange}/{_abilityInfo.AreaBuff.Effect.ApChange} " +
                     $"({_abilityInfo.AreaBuff.Effect.Lifetime} turns, {_abilityInfo.AreaBuff.Radius}r)";
+
+                _cooldownLabel.Text = _abilityInfo.Cooldown.ToString();
 
                 //_dmgLabel.Text = $"DMG {_abilityInfo.Dmg}, Cost {_abilityInfo.Cost}";
                 //_rangeLabel.Text = $"Range {_abilityInfo.Range}";

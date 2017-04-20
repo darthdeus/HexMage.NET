@@ -53,7 +53,7 @@ namespace HexMage.GUI {
             Utils.RegisterLogger(new StdoutLogger());
 
             _gameManager = new GameManager(_camera, _inputManager, _assetManager, _spriteBatch);
-            _sceneManager = new SceneManager(new MapSelectionScene(_gameManager));
+            _sceneManager = new SceneManager(new MapEditorScene(_gameManager));
             _sceneManager.Initialize();
         }
 

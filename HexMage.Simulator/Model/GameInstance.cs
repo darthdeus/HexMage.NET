@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.Pathfinding;
 using Newtonsoft.Json;
@@ -79,6 +80,7 @@ namespace HexMage.Simulator {
             Pathfinder.PathfindDistanceAll();
             TurnManager.PresortTurnOrder();
             State.Reset(this);
+            GameSetup.ResetPositions(this);
             State.LastTeamColor = CurrentTeam;
         }
 
