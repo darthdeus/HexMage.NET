@@ -141,7 +141,7 @@ namespace HexMage.Simulator.Model {
             }
 
             Debug.Assert(this == gameInstance.State, "this == gameInstance.State");
-
+            
             for (int i = 0; i < AreaBuffs.Count; i++) {
                 var areaBuff = AreaBuffs[i];
                 foreach (var mobId in gameInstance.MobManager.Mobs) {

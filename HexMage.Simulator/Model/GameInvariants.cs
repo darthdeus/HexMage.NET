@@ -74,6 +74,15 @@ namespace HexMage.Simulator.Model {
         }
 
         [Conditional("DEBUG")]
+        public static void AssertMobPlayable(GameInstance game, CachedMob mob) {
+            if (mob.MobInstance.Hp <= 0) {
+                ReplayRecorder.Instance.SaveAndClear(game, 0);
+
+                throw new InvariantViolationException("Trying to play with a dead mob (currentMob.HP == 0)");
+            }
+        }
+
+        [Conditional("DEBUG")]
         public static void AssertAndRecord(GameInstance game, UctAction action, bool condition, string message) {
             if (!condition) {
                 ReplayRecorder.Instance.SaveAndClear(game, 0);
@@ -142,8 +151,9 @@ namespace HexMage.Simulator.Model {
             // TODO - kontrolovat i ze na to policko dojdu?
             bool withinRange = ability.Range >= from.Distance(target.MobInstance.Coord);
             bool enoughAp = remainingAp >= ability.Cost;
+            bool notOnCooldown = game.State.Cooldowns[abilityId] == 0;
 
-            return withinRange && enoughAp;
+            return withinRange && enoughAp && notOnCooldown;
         }
 
         public static bool IsTargetableNoSource(GameInstance game, CachedMob mob, CachedMob target) {
@@ -167,8 +177,9 @@ namespace HexMage.Simulator.Model {
 
             bool enoughAp = mob.MobInstance.Ap >= abilityInfo.Cost;
             bool withinRange = mob.MobInstance.Coord.Distance(target.MobInstance.Coord) <= abilityInfo.Range;
+            bool notOnCooldown = game.State.Cooldowns[abilityId] == 0;
 
-            return enoughAp && withinRange;
+            return enoughAp && withinRange && notOnCooldown;
         }
 
         public static bool IsAbilityUsable(GameInstance game, CachedMob mob, CachedMob target, int abilityId) {

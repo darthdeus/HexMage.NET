@@ -1,4 +1,4 @@
-namespace HexMage.Simulator {
+namespace HexMage.Simulator.AI {
     public enum UctActionType {
         EndTurn,
         Null,

@@ -5,15 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using HexMage.Simulator;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.Pathfinding;
-using HexMage.Simulator.PCG;
-using Newtonsoft.Json;
 
 namespace HexMage.Benchmarks {
     public class Benchmarks {
@@ -41,7 +36,7 @@ namespace HexMage.Benchmarks {
             using (var writer = new StreamWriter($@"data/results-rule.txt")) {
                 for (int i = step; i < 1000; i += step) {
                     var c1 = new MctsController(game, i);
-                    var c2 = new AiRuleBasedController(game);
+                    var c2 = new FlatMonteCarloController(game);
 
                     double result = GameEvaluator.CompareAiControllers(game,
                                                                        dnas,
@@ -115,7 +110,7 @@ namespace HexMage.Benchmarks {
             int c1Wins = 0;
             int c2Wins = 0;
 
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 1000; i++) {
                 dna.Randomize();
                 iterationStopwatch.Restart();
 

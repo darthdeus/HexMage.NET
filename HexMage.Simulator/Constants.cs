@@ -5,7 +5,7 @@ namespace HexMage.Simulator {
         public static bool RecordReplays = false;
 
         // MCTS benchmarks
-        public static int MctsBenchIterations = 200;
+        public static int MctsBenchIterations = 100;
         public static int MctsBenchType = 1;
 
         public static bool GnuPlot = true;

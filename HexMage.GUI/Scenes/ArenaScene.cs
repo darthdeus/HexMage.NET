@@ -96,11 +96,15 @@ namespace HexMage.GUI.Scenes {
         private void BuildUi() {
             var leftBg = CreateRootEntity(Camera2D.SortUI - 10);
             leftBg.Position = Vector2.Zero;
-            leftBg.Renderer = new SpriteRenderer(_assetManager[AssetManager.UiLeftBg]);
+            //leftBg.Renderer = new SpriteRenderer(_assetManager[AssetManager.UiLeftBg]);
 
             var rightBg = CreateRootEntity(Camera2D.SortUI - 10);
             rightBg.Position = new Vector2(1280 - 150, 0);
-            rightBg.Renderer = new SpriteRenderer(_assetManager[AssetManager.UiRightBg]);
+            //rightBg.Renderer = new SpriteRenderer(_assetManager[AssetManager.UiRightBg]);
+
+            var topBar = CreateRootEntity(Camera2D.SortUI - 10);
+            //topBar.Renderer = new SpriteRenderer(_assetManager[AssetManager.TitleBg]);
+            topBar.Position = new Vector2(150, 0);
 
             BuildMouseDetailUi();
 
@@ -144,10 +148,6 @@ namespace HexMage.GUI.Scenes {
                                                      ParticleEffectSettings.HighlightParticles));
                 hoverLayout.AddChild(AbilityDetail(gameFunc, hoverMobFunc, i, ParticleEffectSettings.NoParticles));
             }
-
-            var topBar = CreateRootEntity(Camera2D.SortUI - 10);
-            topBar.Renderer = new SpriteRenderer(_assetManager[AssetManager.TitleBg]);
-            topBar.Position = new Vector2(150, 0);
 
             var teamLabel = CreateRootEntity(Camera2D.SortUI - 10);
             teamLabel.Renderer = new SpriteRenderer(() => {
@@ -322,7 +322,12 @@ namespace HexMage.GUI.Scenes {
                         var abilityId = mob.MobInfo.Abilities[abilityIndex];
                         var ability = _gameInstance.MobManager.Abilities[abilityId];
 
+                        bool onCooldown = _gameInstance.State.Cooldowns[abilityId] > 0;
                         abilityDetailNotEnoughAp.Hidden = ability.Cost <= mob.MobInstance.Ap;
+
+                        if (abilityDetailNotEnoughAp.Hidden == false && onCooldown) {
+                            abilityDetailNotEnoughAp.Hidden = true;
+                        }
                     } else {
                         abilityDetailNotEnoughAp.Hidden = true;
                     }

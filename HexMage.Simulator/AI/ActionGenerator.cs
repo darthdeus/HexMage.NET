@@ -183,7 +183,12 @@ namespace HexMage.Simulator {
 
             coords.Shuffle();
 
-            int maximumMoveActions = Math.Max(0, 3 - result.Count);
+            var buffsAtMob = state.State.BuffsAt(mobInstance.Coord);
+
+            // Generate more actions if standing on an area buff
+            int maxActions = buffsAtMob.Count > 0 ? 3 : 3;            
+
+            int maximumMoveActions = Math.Max(0, maxActions - result.Count);
             for (int i = 0; i < Math.Min(coords.Count, maximumMoveActions); i++) {
                 var action = UctAction.DefensiveMoveAction(mobId, coords[i]);
                 GameInvariants.AssertValidAction(state, action);
@@ -280,26 +285,28 @@ namespace HexMage.Simulator {
             return foundAbilityUse;
         }
 
-        public static List<UctAction> PossibleActions(GameInstance state, UctNode parent, bool allowMove,
+        public static List<UctAction> PossibleActions(GameInstance game, UctNode parent, bool allowMove,
                                                       bool allowEndTurn) {
             // TODO - zmerit poradne, jestli tohle vubec pomaha, a kolik to ma byt
             var result = new List<UctAction>(10);
 
-            var currentMob = state.CurrentMob;
+            var currentMob = game.CurrentMob;
             if (currentMob.HasValue) {
-                var mob = state.CachedMob(currentMob.Value);
+                var mob = game.CachedMob(currentMob.Value);
 
-                bool foundAbilityUse = GenerateDirectAbilityUse(state, mob,
+                GameInvariants.AssertMobPlayable(game, mob);
+
+                bool foundAbilityUse = GenerateDirectAbilityUse(game, mob,
                                                                 result);
 
                 // We disable movement if there is a possibility to cast abilities.
                 if (allowMove && (Constants.AlwaysAttackMove || !foundAbilityUse)) {
-                    GenerateAttackMoveActions(state, state.CachedMob(mob.MobId), result);
+                    GenerateAttackMoveActions(game, game.CachedMob(mob.MobId), result);
                 }
 
                 if (allowMove) {
                     if (parent == null || parent.Action.Type != UctActionType.DefensiveMove) {
-                        GenerateDefensiveMoveActions(state, mob, result);
+                        GenerateDefensiveMoveActions(game, mob, result);
                     }
                 }
             } else {
@@ -316,7 +323,7 @@ namespace HexMage.Simulator {
                 }
             }
 
-            GameInvariants.AssertValidActions(state, result);
+            GameInvariants.AssertValidActions(game, result);
 
             return result;
         }

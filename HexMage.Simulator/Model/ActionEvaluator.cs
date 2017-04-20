@@ -76,7 +76,7 @@ namespace HexMage.Simulator.Model {
         private static void FastMove(GameInstance game, int mobId, AxialCoord coord) {
             var mobInstance = game.State.MobInstances[mobId];
 
-            int distance = mobInstance.Coord.Distance(coord);
+            int distance = game.Pathfinder.Distance(mobInstance.Coord, coord);
 
             game.State.ChangeMobAp(mobId, -distance);
             game.State.SetMobPosition(mobId, coord);

@@ -210,10 +210,11 @@ namespace HexMage.GUI.Scenes {
             var map = Map.Load("data/map.json");
             var game = GameSetup.GenerateFromDna(d1, d2, map);
 
-            game.MobManager.Teams[TeamColor.Red] = new MctsController(game, 1000);
+            var arenaScene = new ArenaScene(_game, game);
+
+            game.MobManager.Teams[TeamColor.Red] = new PlayerController(arenaScene, game);
             game.MobManager.Teams[TeamColor.Blue] = new MctsController(game, 1000);
 
-            var arenaScene = new ArenaScene(_game, game);
 
             LoadNewScene(arenaScene);
         }

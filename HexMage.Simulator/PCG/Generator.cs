@@ -174,7 +174,7 @@ namespace HexMage.Simulator.PCG {
 
                 // TODO - re-enable cooldowns?
                 //var cooldown = Random.Next(0, 3);
-                var cooldown = 1;
+                var cooldown = Random.Next(0, 2);
 
                 var ability = new AbilityInfo(RandomDmg(),
                                               RandomCost(maxAp),
@@ -232,7 +232,12 @@ namespace HexMage.Simulator.PCG {
         }
 
         public static AreaBuff RandomAreaBuff(AbilityElement element) {
-            return new AreaBuff(AxialCoord.Zero, Random.Next(4), RandomBuff(element));
+            var buff = new AreaBuff(AxialCoord.Zero, Random.Next(4), RandomBuff(element));
+            if (buff.Radius < 2) {
+                return AreaBuff.ZeroBuff();
+            } else {
+                return buff;
+            }
         }
     }
 }

@@ -60,7 +60,7 @@ namespace HexMage.GUI.Renderers {
                                  hpPercentage < 0.2 ? Color.White : Color.Black);
                 batch.DrawString(assetManager.AbilityFontSmall, $"{mobInstance.Ap}",
                                  hbPos.ToVector2() + new Vector2(11, 19),
-                                 apPercentage < 0.45 ? Color.White : Color.Black);
+                                 apPercentage < 0.38 ? Color.White : Color.Black);
             } else {
                 batch.Draw(assetManager[AssetManager.DarkMageDeath], pos, color);
             }
