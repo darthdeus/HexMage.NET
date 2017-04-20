@@ -19,12 +19,13 @@ namespace HexMage.GUI.Scenes {
         private readonly Map _map;
 
         private GameInstance _game;
-        private ControllerFactory _leftController;
-        private ControllerFactory _rightController;
 
         delegate IMobController ControllerFactory(GameInstance game, ArenaScene arena);
 
         private readonly List<Tuple<string, ControllerFactory>> _controllerFactories;
+
+        private Tuple<string, ControllerFactory> _leftController;
+        private Tuple<string, ControllerFactory> _rightController;
 
         private VerticalLayout _teamPreviewLayout;
         private HorizontalLayout _t1Preview;
@@ -60,8 +61,8 @@ namespace HexMage.GUI.Scenes {
             left.AddChild(new Separator(5));
             right.AddChild(new Separator(5));
 
-            left.AddChild(new Label(() => _leftController?.ToString() ?? "", _assetManager.Font, Color.White));
-            right.AddChild(new Label(() => _rightController?.ToString() ?? "", _assetManager.Font, Color.White));
+            left.AddChild(new Label(() => _leftController?.Item1 ?? "", _assetManager.AbilityFont, Color.White));
+            right.AddChild(new Label(() => _rightController?.Item1 ?? "", _assetManager.AbilityFont, Color.White));
 
             left.AddChild(new Separator(5));
             right.AddChild(new Separator(5));
@@ -69,13 +70,13 @@ namespace HexMage.GUI.Scenes {
             foreach (var pair in _controllerFactories) {
                 var btnLeft = left.AddChild(new TextButton(pair.Item1, _assetManager.Font));
                 btnLeft.OnClick += _ => {
-                    _leftController = pair.Item2;
+                    _leftController = pair;
                     RegenerateTeams();
                 };
 
                 var btnRight = right.AddChild(new TextButton(pair.Item1, _assetManager.Font));
                 btnRight.OnClick += _ => {
-                    _rightController = pair.Item2;
+                    _rightController = pair;
                     RegenerateTeams();
                 };
             }
@@ -96,14 +97,14 @@ namespace HexMage.GUI.Scenes {
                     return;
                 }
 
-                var dict = new Dictionary<Keys, ControllerFactory> {
-                    {Keys.A, _controllerFactories[0].Item2},
-                    {Keys.S, _controllerFactories[1].Item2},
-                    {Keys.D, _controllerFactories[2].Item2},
-                    {Keys.F, _controllerFactories[3].Item2},
-                    {Keys.G, _controllerFactories[4].Item2},
-                    {Keys.H, _controllerFactories[5].Item2},
-                    {Keys.J, _controllerFactories[6].Item2}
+                var dict = new Dictionary<Keys, Tuple<string, ControllerFactory>> {
+                    {Keys.A, _controllerFactories[0]},
+                    {Keys.S, _controllerFactories[1]},
+                    {Keys.D, _controllerFactories[2]},
+                    {Keys.F, _controllerFactories[3]},
+                    {Keys.G, _controllerFactories[4]},
+                    {Keys.H, _controllerFactories[5]},
+                    {Keys.J, _controllerFactories[6]}
                 };
 
                 bool handPickedTeam = false;
@@ -171,14 +172,20 @@ namespace HexMage.GUI.Scenes {
         }
 
         private void DoContinue() {
+            if (_teamSize > Math.Min(_game.Map.RedStartingPoints.Count, _game.Map.BlueStartingPoints.Count)) {
+                Utils.Log(LogSeverity.Error, nameof(TeamSelectionScene),
+                          "Not enough starting positions, decrease team size or add them in the map editor (Ctrl-R).");
+                return;
+            }
+
             if (_leftController != null && _rightController != null) {
                 var arena = new ArenaScene(_gameManager, _game);
 
                 const TeamColor t1 = TeamColor.Red;
                 const TeamColor t2 = TeamColor.Blue;
 
-                _game.MobManager.Teams[t1] = _leftController(_game, arena);
-                _game.MobManager.Teams[t2] = _rightController(_game, arena);
+                _game.MobManager.Teams[t1] = _leftController.Item2(_game, arena);
+                _game.MobManager.Teams[t2] = _rightController.Item2(_game, arena);
 
                 _game.PrepareEverything();
 
