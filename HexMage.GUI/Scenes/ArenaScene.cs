@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using HexMage.GUI.Components;
 using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
@@ -94,18 +93,6 @@ namespace HexMage.GUI.Scenes {
         public override void Cleanup() { }
 
         private void BuildUi() {
-            var leftBg = CreateRootEntity(Camera2D.SortUI - 10);
-            leftBg.Position = Vector2.Zero;
-            //leftBg.Renderer = new SpriteRenderer(_assetManager[AssetManager.UiLeftBg]);
-
-            var rightBg = CreateRootEntity(Camera2D.SortUI - 10);
-            rightBg.Position = new Vector2(1280 - 150, 0);
-            //rightBg.Renderer = new SpriteRenderer(_assetManager[AssetManager.UiRightBg]);
-
-            var topBar = CreateRootEntity(Camera2D.SortUI - 10);
-            //topBar.Renderer = new SpriteRenderer(_assetManager[AssetManager.TitleBg]);
-            topBar.Position = new Vector2(150, 0);
-
             BuildMouseDetailUi();
 
             const int abilitySpacing = 70;

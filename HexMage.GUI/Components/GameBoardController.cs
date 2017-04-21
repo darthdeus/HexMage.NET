@@ -150,7 +150,9 @@ namespace HexMage.GUI.Components {
             BuildPopovers();
 
             if (_replay == null) {
-                _eventHub.SlowMainLoop(TimeSpan.FromMilliseconds(500))
+                var turnEndSound = _assetManager.LoadSoundEffect(AssetManager.SoundEffectEndTurn);
+
+                _eventHub.SlowMainLoop(() => turnEndSound.Play())
                          .LogContinuation();
             } else {
                 _eventHub.PlayReplay(_replay.Actions)

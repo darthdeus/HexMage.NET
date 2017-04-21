@@ -637,3 +637,9 @@
 /processorParam:TextureFormat=Color
 /build:ability_ui/spell_bg_not_enough_ap.png
 
+#begin sound_effects/end_turn.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sound_effects/end_turn.wav
+

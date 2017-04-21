@@ -71,7 +71,7 @@ namespace HexMage.Simulator.AI {
                 }
 
                 if (!placed) {
-                    Utils.Log(LogSeverity.Warning, nameof(GameSetup), $"Ran out of placeholders for {mobInfo.Team}.");
+                    Utils.Log(LogSeverity.Error, nameof(GameSetup), $"Ran out of placeholders for {mobInfo.Team}, placing randomly.");
                     Generator.RandomPlaceMob(game, mobId);
                 }
             }
