@@ -6,7 +6,7 @@ using HexMage.Simulator.PCG;
 
 namespace HexMage.Simulator.AI {
     public static class GameSetup {
-        public static GameInstance GenerateForDnaSettings(int mobCount, int abilityCount, Map map = null) {
+        public static GameInstance GenerateForDnaSettings(int mobCount, int abilityCount, Map map = null, bool prepare = true) {
             if (map == null) {
                 map = new Map(Constants.EvolutionMapSize);
                 map.PrecomputeCubeLinedraw();                
@@ -17,7 +17,9 @@ namespace HexMage.Simulator.AI {
             var dna = new DNA(mobCount, abilityCount);
 
             UnpackTeamsIntoGame(game, dna, dna);
-            game.PrepareEverything();
+            if (prepare) {
+                game.PrepareEverything();
+            }
 
             return game;
         }

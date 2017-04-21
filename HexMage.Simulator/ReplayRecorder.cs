@@ -67,6 +67,8 @@ namespace HexMage.Simulator {
                 replay.Game.Pathfinder.AllPaths = new HexMap<HexMap<Path>>(replay.Game.Size);
                 replay.Game.Pathfinder.PathfindDistanceAll();
 
+                replay.Game.PrepareEverything();                
+
                 return replay;
             }
         }

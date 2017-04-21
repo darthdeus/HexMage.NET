@@ -148,14 +148,14 @@ namespace HexMage.GUI.Components {
             _assetManager = assetManager;
 
             BuildPopovers();
+            var turnEndSound = _assetManager.LoadSoundEffect(AssetManager.SoundEffectEndTurn);
 
             if (_replay == null) {
-                var turnEndSound = _assetManager.LoadSoundEffect(AssetManager.SoundEffectEndTurn);
 
-                _eventHub.SlowMainLoop(() => turnEndSound.Play())
+                _eventHub.SlowMainLoop(() => turnEndSound.Play(0.3f, 0, 0))
                          .LogContinuation();
             } else {
-                _eventHub.PlayReplay(_replay.Actions)
+                _eventHub.PlayReplay(_replay.Actions, () => turnEndSound.Play(0.3f, 0, 0))
                          .LogContinuation();
             }
         }

@@ -8,47 +8,6 @@ using HexMage.Simulator.Pathfinding;
 using MathNet.Numerics.Random;
 
 namespace HexMage.Simulator.PCG {
-    // TODO - remove map seeds altogether
-    public struct MapSeed {
-        private readonly Guid _guid;
-
-        public MapSeed(Guid guid) {
-            _guid = guid;
-        }
-
-        // TODO - figure out a better way to seed the random generator
-        public Random Random => new Random(_guid.ToByteArray().Sum(x => (int) x));
-
-        public static MapSeed CreateRandom() {
-            return new MapSeed(Guid.NewGuid());
-        }
-
-        public override string ToString() {
-            return _guid.ToString();
-        }
-    }
-
-    public class MapGenerator {
-        public Map Generate(int mapSize, MapSeed seed) {
-            var random = seed.Random;
-
-            var map = new Map(mapSize);
-
-            // TODO - neni jich uz moc?
-            int wallCount = mapSize > 6 ? 50 : 30;
-            for (int i = 0, total = 0; i < wallCount && total < 1000; i++, total++) {
-                var coord = map.AllCoords[random.Next(map.AllCoords.Count)];
-                if (map[coord] == HexType.Empty) {
-                    map[coord] = HexType.Wall;
-                } else {
-                    i++;
-                }
-            }
-
-            return map;
-        }
-    }
-
     public static class Generator {
         public static ThreadLocalGenerator Random = new ThreadLocalGenerator();
         //public static Random Random = new SystemRandomSource();

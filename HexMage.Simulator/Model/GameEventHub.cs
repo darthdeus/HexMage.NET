@@ -25,7 +25,7 @@ namespace HexMage.Simulator.Model {
             _gameInstance = gameInstance;
         }
 
-        public async Task<int> PlayReplay(List<UctAction> actions) {
+        public async Task<int> PlayReplay(List<UctAction> actions, Func<bool> endTurnFunc) {
             using (new TemporarilySuspendReplayRecording()) {
                 foreach (var action in actions) {
                     while (IsPaused) {
@@ -34,6 +34,8 @@ namespace HexMage.Simulator.Model {
 
                     if (action.Type == UctActionType.EndTurn) {
                         ActionEvaluator.FNoCopy(_gameInstance, action);
+                        endTurnFunc();
+                        await Task.Delay(200);
                     } else {
                         await SlowPlayAction(_gameInstance, action);
                     }

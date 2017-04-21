@@ -111,7 +111,7 @@ namespace HexMage.Simulator {
         /// </summary>        
         public static int RandomSeed = 12345;
 
-        public static bool UseGlobalSeed = true;
+        public static bool UseGlobalSeed = false;
 
         // TODO - fuj, to sem nepatri
         private static StringWriter LogBuffer = new StringWriter();

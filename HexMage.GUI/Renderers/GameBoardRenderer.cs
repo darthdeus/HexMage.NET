@@ -63,10 +63,6 @@ namespace HexMage.GUI.Renderers {
                     _spriteBatch.End();
                 }
             }
-
-            batch.Begin();
-            batch.DrawString(assetManager.Font, $"State: {_eventHub.State}", new Vector2(800, 30), Color.Black);
-            batch.End();
         }
 
         private void DrawVisibilityMap(int currentMob) {

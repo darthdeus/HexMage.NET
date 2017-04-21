@@ -1,4 +1,4 @@
-namespace HexMage.GUI.Scenes {
+namespace HexMage.GUI.UI {
     public enum ParticleEffectSettings {
         HighlightParticles,
         NoParticles
