@@ -95,12 +95,11 @@
     <Compile Include="Scenes\MapEditor.cs" />
     <Compile Include="Scenes\MapEditorRenderer.cs" />
     <Compile Include="Scenes\MapEditorScene.cs" />
-    <Compile Include="Scenes\ParticleEffectSettings.cs" />
+    <Compile Include="UI\ParticleEffectSettings.cs" />
     <Compile Include="Scenes\SceneSynchronizationContext.cs" />
     <Compile Include="Renderers\SpellRenderer.cs" />
     <Compile Include="Components\ColorChanger.cs" />
     <Compile Include="Scenes\GameScene.cs" />
-    <Compile Include="Scenes\MapSelectionScene.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scenes\SceneManager.cs" />

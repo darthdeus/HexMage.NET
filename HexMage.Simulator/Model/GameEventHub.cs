@@ -90,7 +90,7 @@ namespace HexMage.Simulator.Model {
 
             switch (action.Type) {
                 case UctActionType.AbilityUse:
-                    await SlowBroadcastAbilityUsed(action.MobId, action.TargetId, action.AbilityId);
+                    await SlowBroadcastAction(action);
                     break;
 
                 case UctActionType.EndTurn:
@@ -101,8 +101,10 @@ namespace HexMage.Simulator.Model {
                     // TODO - tohle se deje uz jinde
                     GameInvariants.AssertValidMoveAction(_gameInstance, action);
 
-                    await SlowBroadcastMobMoved(action.MobId, action.Coord);
-                    await SlowBroadcastAbilityUsed(action.MobId, action.TargetId, action.AbilityId);
+                    await SlowBroadcastAction(action.ToPureMove());
+                    await SlowBroadcastAction(action.ToPureAbilityUse());
+                    //await SlowBroadcastMobMoved(action.MobId, action.Coord);
+                    //await SlowBroadcastAbilityUsed(action.MobId, action.TargetId, action.AbilityId);
                     break;
 
                 case UctActionType.DefensiveMove:
@@ -110,7 +112,8 @@ namespace HexMage.Simulator.Model {
                     // TODO - tohle se deje uz jinde
                     GameInvariants.AssertValidMoveAction(_gameInstance, action);
 
-                    await SlowBroadcastMobMoved(action.MobId, action.Coord);
+                    await SlowBroadcastAction(action.ToPureMove());
+                    //await SlowBroadcastMobMoved(action.MobId, action.Coord);
                     break;
 
                 case UctActionType.Null:
@@ -122,17 +125,10 @@ namespace HexMage.Simulator.Model {
             _subscribers.Add(subscriber);
         }
 
-        private async Task SlowBroadcastMobMoved(int mob, AxialCoord pos) {
-            await Task.WhenAll(_subscribers.Select(x => x.SlowEventMobMoved(mob, pos)));
+        private async Task SlowBroadcastAction(UctAction action) {
+            await Task.WhenAll(_subscribers.Select(x => x.SlowActionApplied(action)));
 
-            ActionEvaluator.FNoCopy(_gameInstance, UctAction.MoveAction(mob, pos));
-        }
-
-        private async Task SlowBroadcastAbilityUsed(int mobId, int targetId, int abilityId) {
-            var ability = _gameInstance.MobManager.AbilityForId(abilityId);
-            await Task.WhenAll(_subscribers.Select(x => x.SlowEventAbilityUsed(mobId, targetId, ability)));
-
-            ActionEvaluator.FNoCopy(_gameInstance, UctAction.AbilityUseAction(abilityId, mobId, targetId));
+            ActionEvaluator.FNoCopy(_gameInstance, action);
         }
     }
 }

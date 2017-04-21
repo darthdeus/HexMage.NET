@@ -68,79 +68,15 @@ namespace HexMage.GUI.Components {
             HistoryLog.Instance.Log(_game.CurrentTeam.Value, action, mob, target, abilityInfo, moveCost);
         }
 
-        public async Task SlowEventMobMoved(int mobId, AxialCoord pos) {
-            var mobEntity = _arenaScene.MobEntities[mobId];
-            Debug.Assert(mobEntity != null, "Trying to move a mob without an associated entity.");
-
-            var from = _game.State.MobInstances[mobId].Coord;
-            var path = _game.Pathfinder.PathTo(from, pos);
-            path.Reverse();
-            foreach (var coord in path) {
-                await mobEntity.MoveTo(from, coord);
-                from = coord;
+        public async Task SlowActionApplied(UctAction action) {
+            if (action.Type == UctActionType.Move) {
+                await SlowEventMobMoved(action.MobId, action.Coord);
+            } else if (action.Type == UctActionType.AbilityUse) {
+                await SlowEventAbilityUsed(action.MobId, action.TargetId, _game.MobManager.Abilities[action.AbilityId]);
+            } else {
+                throw new ArgumentException(
+                    $"{nameof(GameBoardController)} only supports {nameof(UctActionType.Move)} and {nameof(UctActionType.AbilityUse)} actions.");
             }
-        }
-
-        public async Task SlowEventAbilityUsed(int mobId, int targetId, AbilityInfo abilityInfo) {
-            var sound = abilityInfo.Dmg > 18
-                            ? AssetManager.SoundEffectFireballLarge
-                            : AssetManager.SoundEffectFireballSmall;
-            _assetManager.LoadSoundEffect(sound).Play();
-
-            var mobInstance = _game.State.MobInstances[mobId];
-            var targetInstance = _game.State.MobInstances[targetId];
-
-            //BuildUsedAbilityPopover(mobId, abilityInfo).LogContinuation();
-
-            var projectileSprite = AssetManager.ProjectileSpriteForElement(abilityInfo.Element);
-
-            var projectileAnimation = new Animation(projectileSprite,
-                                                    TimeSpan.FromMilliseconds(50),
-                                                    AssetManager.TileSize,
-                                                    4);
-
-            projectileAnimation.Origin = new Vector2(AssetManager.TileSize / 2, AssetManager.TileSize / 2);
-
-            var projectile = new ProjectileEntity(
-                TimeSpan.FromMilliseconds(1500),
-                mobInstance.Coord,
-                targetInstance.Coord) {
-                Renderer = new AnimationRenderer(projectileAnimation),
-                SortOrder = Camera2D.SortProjectiles,
-                Transform = () => Camera2D.Instance.Transform
-            };
-
-            projectile.AddComponent(new AnimationController(projectileAnimation));
-
-            Entity.Scene.AddAndInitializeNextFrame(projectile);
-
-            await projectile.Task;
-
-            _assetManager.LoadSoundEffect(AssetManager.SoundEffectSpellHit).Play();
-
-            var explosion = new Entity {
-                Transform = () => Camera2D.Instance.Transform,
-                SortOrder = Camera2D.SortProjectiles
-            };
-
-            explosion.AddComponent(new PositionAtMob(targetId, _game));
-
-            var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(abilityInfo.Element);
-
-            var explosionAnimation = new Animation(
-                explosionSprite,
-                TimeSpan.FromMilliseconds(350),
-                AssetManager.TileSize,
-                4);
-
-            explosionAnimation.AnimationDone += () => { Entity.Scene.DestroyEntity(explosion); };
-
-            explosion.Renderer = new AnimationRenderer(explosionAnimation);
-            explosion.AddComponent(new AnimationController(explosionAnimation));
-
-            Entity.Scene.AddAndInitializeNextFrame(explosion);
-
-            Entity.Scene.DestroyEntity(projectile);
         }
 
         public override void Initialize(AssetManager assetManager) {
@@ -151,7 +87,6 @@ namespace HexMage.GUI.Components {
             var turnEndSound = _assetManager.LoadSoundEffect(AssetManager.SoundEffectEndTurn);
 
             if (_replay == null) {
-
                 _eventHub.SlowMainLoop(() => turnEndSound.Play(0.3f, 0, 0))
                          .LogContinuation();
             } else {
@@ -407,6 +342,82 @@ namespace HexMage.GUI.Components {
             _displayMessageBoxUntil = DateTime.Now.Add(TimeSpan.FromSeconds(displayForSeconds));
 
             return Task.Delay(TimeSpan.FromSeconds(displayForSeconds));
+        }
+
+
+        private async Task SlowEventMobMoved(int mobId, AxialCoord pos) {
+            var mobEntity = _arenaScene.MobEntities[mobId];
+            Debug.Assert(mobEntity != null, "Trying to move a mob without an associated entity.");
+
+            var from = _game.State.MobInstances[mobId].Coord;
+            var path = _game.Pathfinder.PathTo(from, pos);
+            path.Reverse();
+            foreach (var coord in path) {
+                await mobEntity.MoveTo(from, coord);
+                from = coord;
+            }
+        }
+
+        private async Task SlowEventAbilityUsed(int mobId, int targetId, AbilityInfo abilityInfo) {
+            var sound = abilityInfo.Dmg > 18
+                            ? AssetManager.SoundEffectFireballLarge
+                            : AssetManager.SoundEffectFireballSmall;
+            _assetManager.LoadSoundEffect(sound).Play();
+
+            var mobInstance = _game.State.MobInstances[mobId];
+            var targetInstance = _game.State.MobInstances[targetId];
+
+            //BuildUsedAbilityPopover(mobId, abilityInfo).LogContinuation();
+
+            var projectileSprite = AssetManager.ProjectileSpriteForElement(abilityInfo.Element);
+
+            var projectileAnimation = new Animation(projectileSprite,
+                                                    TimeSpan.FromMilliseconds(50),
+                                                    AssetManager.TileSize,
+                                                    4);
+
+            projectileAnimation.Origin = new Vector2(AssetManager.TileSize / 2, AssetManager.TileSize / 2);
+
+            var projectile = new ProjectileEntity(
+                TimeSpan.FromMilliseconds(1500),
+                mobInstance.Coord,
+                targetInstance.Coord) {
+                Renderer = new AnimationRenderer(projectileAnimation),
+                SortOrder = Camera2D.SortProjectiles,
+                Transform = () => Camera2D.Instance.Transform
+            };
+
+            projectile.AddComponent(new AnimationController(projectileAnimation));
+
+            Entity.Scene.AddAndInitializeNextFrame(projectile);
+
+            await projectile.Task;
+
+            _assetManager.LoadSoundEffect(AssetManager.SoundEffectSpellHit).Play();
+
+            var explosion = new Entity {
+                Transform = () => Camera2D.Instance.Transform,
+                SortOrder = Camera2D.SortProjectiles
+            };
+
+            explosion.AddComponent(new PositionAtMob(targetId, _game));
+
+            var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(abilityInfo.Element);
+
+            var explosionAnimation = new Animation(
+                explosionSprite,
+                TimeSpan.FromMilliseconds(350),
+                AssetManager.TileSize,
+                4);
+
+            explosionAnimation.AnimationDone += () => { Entity.Scene.DestroyEntity(explosion); };
+
+            explosion.Renderer = new AnimationRenderer(explosionAnimation);
+            explosion.AddComponent(new AnimationController(explosionAnimation));
+
+            Entity.Scene.AddAndInitializeNextFrame(explosion);
+
+            Entity.Scene.DestroyEntity(projectile);
         }
     }
 }
