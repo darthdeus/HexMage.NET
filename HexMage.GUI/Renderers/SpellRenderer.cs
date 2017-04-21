@@ -41,8 +41,8 @@ namespace HexMage.GUI.Renderers {
                     isActive = true;
                 }
 
-                var ability = _game.MobManager.AbilityForId(abilityId);
-                batch.Draw(assetManager[ElementBg(ability, isActive)], entity.RenderPosition);
+                var ability = _game.MobManager.Abilities[abilityId];
+                batch.Draw(assetManager[AssetManager.SpellBg], entity.RenderPosition);
 
                 if (entity.AABB.Contains(InputManager.Instance.MousePosition)) {
                     batch.Draw(assetManager[AssetManager.SpellHighlight], entity.RenderPosition);
@@ -61,23 +61,6 @@ namespace HexMage.GUI.Renderers {
             }
 
             batch.End();
-        }
-
-        private string ElementBg(AbilityInfo abilityInfo, bool active = false) {
-            return AssetManager.SpellBg;
-
-            switch (abilityInfo.Element) {
-                case AbilityElement.Earth:
-                    return active ? AssetManager.SpellEarthActiveBg : AssetManager.SpellEarthBg;
-                case AbilityElement.Fire:
-                    return active ? AssetManager.SpellFireActiveBg : AssetManager.SpellFireBg;
-                case AbilityElement.Air:
-                    return active ? AssetManager.SpellAirActiveBg : AssetManager.SpellAirBg;
-                case AbilityElement.Water:
-                    return active ? AssetManager.SpellWaterActiveBg : AssetManager.SpellWaterBg;
-                default:
-                    throw new ArgumentException("Invalid ability element", nameof(abilityInfo));
-            }
         }
     }
 }

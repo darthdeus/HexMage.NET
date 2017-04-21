@@ -403,9 +403,7 @@ namespace HexMage.GUI.Scenes {
                 particles.ColorFunc = () => {
                     var mob = mobFunc();
                     if (_gameBoardController.SelectedAbilityIndex.HasValue && mob != null) {
-                        int index = _gameBoardController.SelectedAbilityIndex.Value;
-                        var ability = _game.MobManager.AbilityByIndex(mob, index);
-                        return ElementColor(ability.Element);
+                        return Color.Red;
                     } else {
                         return Color.White;
                     }
@@ -436,21 +434,6 @@ namespace HexMage.GUI.Scenes {
             };
 
             return abilityDetailWrapper;
-        }
-
-        private Color ElementColor(AbilityElement element) {
-            switch (element) {
-                case AbilityElement.Earth:
-                    return Color.Orange;
-                case AbilityElement.Fire:
-                    return Color.Red;
-                case AbilityElement.Air:
-                    return Color.Gray;
-                case AbilityElement.Water:
-                    return Color.Blue;
-                default:
-                    throw new ArgumentException("Invalid element", nameof(element));
-            }
         }
     }
 }

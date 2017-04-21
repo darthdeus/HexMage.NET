@@ -10,26 +10,23 @@ namespace HexMage.Simulator {
         public int ap;
         public int range;
         public int cooldown;
-        public AbilityElement element;
         public Buff buff;
         public AreaBuff areaBuff;
 
         public JsonAbility() {
-            element = AbilityElement.Fire;
         }
 
-        public JsonAbility(int dmg, int ap, int range, int cooldown, AbilityElement element, Buff buff, AreaBuff areaBuff) {
+        public JsonAbility(int dmg, int ap, int range, int cooldown, Buff buff, AreaBuff areaBuff) {
             this.dmg = dmg;
             this.ap = ap;
             this.range = range;
             this.cooldown = cooldown;
-            this.element = element;
             this.buff = buff;
             this.areaBuff = areaBuff;
         }
 
         public AbilityInfo ToAbility() {
-            return new AbilityInfo(dmg, ap, range, cooldown, element, buff, areaBuff);
+            return new AbilityInfo(dmg, ap, range, cooldown, buff, areaBuff);
         }
     }
 

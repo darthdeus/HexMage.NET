@@ -20,6 +20,8 @@ namespace HexMage.GUI.Core {
 
         public const string SolidGrayColor = "color/gray";
 
+        public const string MapEditorBg = "map_editor_bg";
+
         public const string DarkMageIdle = "mobs/dark-mage-idle";
         public const string DarkMageClicked = "mobs/dark-mage-clicked";
         public const string DarkMageDeath = "mobs/dark-mage-death";
@@ -169,36 +171,6 @@ namespace HexMage.GUI.Core {
 
         public void RegisterTexture(string name, Texture2D texture2D) {
             _textures[name] = texture2D;
-        }
-
-        public static string ProjectileSpriteForElement(AbilityElement element) {
-            switch (element) {
-                case AbilityElement.Earth:
-                    return EarthboltSprite;
-                case AbilityElement.Fire:
-                    return FireballSprite;
-                case AbilityElement.Air:
-                    return LightningSprite;
-                case AbilityElement.Water:
-                    return FrostboltSprite;
-            }
-
-            throw new ArgumentException($"Invalid element type {element}", nameof(element));
-        }
-
-        public static string ProjectileExplosionSpriteForElement(AbilityElement element) {
-            switch (element) {
-                case AbilityElement.Earth:
-                    return EarthboltExplosionSprite;
-                case AbilityElement.Fire:
-                    return FireballExplosionSprite;
-                case AbilityElement.Air:
-                    return LightningExplosionSprite;
-                case AbilityElement.Water:
-                    return FrostboltExplosionSprite;
-            }
-
-            throw new ArgumentException($"Invalid element type {element}", nameof(element));
         }
     }
 }

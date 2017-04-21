@@ -11,23 +11,24 @@ using MathNet.Numerics.LinearAlgebra.Single;
 namespace HexMage.Simulator {
     public class DNA {
         public Vector<float> Data;
+
         //public List<float> Data = new List<float>();
         public int AbilityCount;
+
         public int MobCount;
 
         public const int MobAttributeCount = 2;
-        public const int AbilityAttributeCount = 12;
+        public const int AbilityAttributeCount = 11;
         public int MobSize => MobAttributeCount + AbilityCount * AbilityAttributeCount;
 
         // TODO - area buff
 
-        public DNA() {            
-        }
+        public DNA() { }
 
         public DNA(DNA dna) {
             MobCount = dna.MobCount;
             AbilityCount = dna.AbilityCount;
-            Data = (DenseVector)dna.Data.Clone();
+            Data = (DenseVector) dna.Data.Clone();
         }
 
         public DNA(int mobCount, int abilityCount) {
@@ -49,19 +50,10 @@ namespace HexMage.Simulator {
             return new DNA(this);
         }
 
-        public bool IsElementIndex(int index) {
-            return ((index % MobSize) - MobAttributeCount) % AbilityAttributeCount == 4;
-        }
-
         public void Randomize() {
-            do
-            {
+            do {
                 for (int i = 0; i < Data.Count; i++) {
-                    if (IsElementIndex(i)) {
-                        Data[i] = Generator.Random.Next(0, 4) / (float)4;
-                    } else {
-                        Data[i] = (float)Generator.Random.NextDouble();
-                    }
+                    Data[i] = (float) Generator.Random.NextDouble();
                 }
             } while (!ToTeam().IsValid());
         }
@@ -85,7 +77,7 @@ namespace HexMage.Simulator {
             var dna = new DNA();
             dna.MobCount = int.Parse(split[0]);
             dna.AbilityCount = int.Parse(split[1]);
-            
+
             dna.Data = DenseVector.OfEnumerable(split.Skip(2).Select(float.Parse));
 
             return dna;

@@ -29,24 +29,20 @@ namespace HexMage.Simulator {
                     int range = (int) Math.Round(dna.Data[offset + 2] * Constants.RangeMax);
                     int cooldown = (int) Math.Round(dna.Data[offset + 3] * Constants.CooldownMax);
 
-                    var element = ElementFromNumber(dna.Data[offset + 4]);
+                    int buffDmg = (int) Math.Round(dna.Data[offset + 4] * Constants.BuffDmgMax);
+                    int buffApDmg = (int) Math.Round(dna.Data[offset + 5] * Constants.BuffApDmgMax);
+                    int buffLifetime = (int) Math.Round(dna.Data[offset + 6] * Constants.BuffLifetimeMax);
 
-                    int buffDmg = (int) Math.Round(dna.Data[offset + 5] * Constants.BuffDmgMax);
-                    int buffApDmg = (int) Math.Round(dna.Data[offset + 6] * Constants.BuffApDmgMax);
-                    int buffLifetime = (int) Math.Round(dna.Data[offset + 7] * Constants.BuffLifetimeMax);
+                    int radius = (int) Math.Round(dna.Data[offset + 7] * Constants.BuffMaxRadius);
+                    int areaBuffDmg = (int) Math.Round(dna.Data[offset + 8] * Constants.BuffDmgMax);
+                    int areaBuffApDmg = (int) Math.Round(dna.Data[offset + 9] * Constants.BuffApDmgMax);
+                    int areaBuffLifetime = (int) Math.Round(dna.Data[offset + 10] * Constants.BuffLifetimeMax);
 
-                    int radius = (int) Math.Round(dna.Data[offset + 8] * Constants.BuffMaxRadius);
-                    int areaBuffDmg = (int) Math.Round(dna.Data[offset + 9] * Constants.BuffDmgMax);
-                    int areaBuffApDmg = (int) Math.Round(dna.Data[offset + 10] * Constants.BuffApDmgMax);
-                    int areaBuffLifetime = (int) Math.Round(dna.Data[offset + 11] * Constants.BuffLifetimeMax);
-
-                    var buff = new Buff(element,
-                                        -buffDmg,
+                    var buff = new Buff(-buffDmg,
                                         -buffApDmg,
                                         buffLifetime);
 
-                    var areaEffect = new Buff(element,
-                                              -areaBuffDmg,
+                    var areaEffect = new Buff(-areaBuffDmg,
                                               -areaBuffApDmg,
                                               areaBuffLifetime);
 
@@ -56,7 +52,6 @@ namespace HexMage.Simulator {
                                                   cost,
                                                   range,
                                                   cooldown,
-                                                  element,
                                                   buff,
                                                   areaBuff);
                     mob.abilities.Add(ability);
@@ -86,7 +81,6 @@ namespace HexMage.Simulator {
                     data.Add(ability.ap / (float) Constants.CostMax);
                     data.Add(ability.range / (float) Constants.RangeMax);
                     data.Add(ability.cooldown/ (float) Constants.CooldownMax);
-                    data.Add(NumberFromElement(ability.element));
 
                     var buff = ability.buff;
                     data.Add(-buff.HpChange / (float) Constants.BuffDmgMax);
@@ -110,35 +104,6 @@ namespace HexMage.Simulator {
         public static bool IsNear(float x, float n) {
             float delta = 0.05f;
             return Math.Abs(x - n) < delta;
-        }
-
-        public static AbilityElement ElementFromNumber(float x) {
-            if (IsNear(x, 0)) {
-                return AbilityElement.Fire;
-            } else if (IsNear(x, 0.25f)) {
-                return AbilityElement.Earth;
-            } else if (IsNear(x, 0.5f)) {
-                return AbilityElement.Air;
-            } else if (IsNear(x, 0.75f)) {
-                return AbilityElement.Water;
-            } else {
-                throw new InvalidEnumArgumentException($"Invalid value of {x} doesn't match any conversion.");
-            }
-        }
-
-        public static float NumberFromElement(AbilityElement element) {
-            switch (element) {
-                case AbilityElement.Fire:
-                    return 0;
-                case AbilityElement.Earth:
-                    return 0.25f;
-                case AbilityElement.Air:
-                    return 0.5f;
-                case AbilityElement.Water:
-                    return 0.75f;
-                default:
-                    throw new InvalidEnumArgumentException($"Invalid value of {element} doesn't match any conversion.");
-            }
-        }
+        }        
     }
 }

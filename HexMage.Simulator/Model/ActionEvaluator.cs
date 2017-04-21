@@ -104,10 +104,8 @@ namespace HexMage.Simulator.Model {
             //var targetInfo = game.MobManager.MobInfos[targetId];
             //Constants.WriteLogLine($"Did {ability.Dmg} damage, HP: {targetInstance.Hp}/{targetInfo.MaxHp}");
 
-            if (ability.Buff.IsZero) {
-                targetInstance.Buff = Buff.Combine(targetInstance.Buff, ability.ElementalEffect);
-            } else {
-                targetInstance.Buff = ability.Buff;
+            if (!ability.Buff.IsZero) {
+                targetInstance.Buff = Buff.Combine(targetInstance.Buff, ability.Buff);
             }
 
             game.State.MobInstances[targetId] = targetInstance;

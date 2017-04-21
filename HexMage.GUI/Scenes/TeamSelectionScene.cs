@@ -229,12 +229,12 @@ namespace HexMage.GUI.Scenes {
                 foreach (var abilityId in mobInfo.Abilities) {
                     var ability = game.MobManager.Abilities[abilityId];
                     builder.AppendLine("-----");
-                    builder.AppendLine($"{ability.Element}, DMG {ability.Dmg}, Range {ability.Range}");
+                    builder.AppendLine($"DMG {ability.Dmg}, Range {ability.Range}");
 
                     if (!ability.Buff.IsZero) {
                         var buff = ability.Buff;
                         builder.AppendLine("Buffs:");
-                        builder.AppendLine($"{buff.Element}, Hp {buff.HpChange}, Ap {buff.ApChange}");
+                        builder.AppendLine($"Hp {buff.HpChange}, Ap {buff.ApChange}");
                     }
                 }
 

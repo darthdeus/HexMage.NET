@@ -101,28 +101,11 @@ namespace HexMage.GUI.Renderers {
                 var hexBuffs = _gameInstance.State.BuffsAt(coord);
 
                 if (hexBuffs.Count > 0 && hexType != HexType.Wall) {
-                    foreach (var buff in hexBuffs) {
-                        DrawAt(_assetManager[AssetManager.HexHoverSprite], coord, ElementColor(buff.Element));
-                    }
+                    DrawAt(_assetManager[AssetManager.HexHoverSprite], coord, Color.Red);
                 }
             }
 
             _spriteBatch.End();
-        }
-
-        private Color ElementColor(AbilityElement element) {
-            switch (element) {
-                case AbilityElement.Earth:
-                    return Color.Brown;
-                case AbilityElement.Fire:
-                    return Color.Red;
-                case AbilityElement.Air:
-                    return Color.LightGray;
-                case AbilityElement.Water:
-                    return Color.LightBlue;
-                default:
-                    throw new InvalidOperationException("Invalid element type.");
-            }
         }
 
         private void DrawHoverHeatmap(int currentMob) {

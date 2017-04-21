@@ -174,12 +174,6 @@ namespace HexMage.Simulator {
             var dna = new DNA(first.dna.MobCount, first.dna.AbilityCount);
             dna.Data = sum;
 
-            for (int i = 0; i < sum.Count; i++) {
-                if (dna.IsElementIndex(i)) {
-                    sum[i] = (float) (Math.Round(sum[i] * 4) / 4);
-                }
-            }
-
             var resultFitness = CalculateFitness(game, initialDna, dna);
 
             return new GenerationMember(dna, resultFitness);
@@ -249,11 +243,7 @@ namespace HexMage.Simulator {
                 double change = Probability.Uniform(0.5) ? 1 + delta : 1 - delta;
 
                 int i = Generator.Random.Next(0, dna.Data.Count);
-                if (copy.IsElementIndex(i)) {
-                    copy.Data[i] = Generator.Random.Next(0, 4) / (float) 4;
-                } else {
-                    copy.Data[i] = (float) Mathf.Clamp(0.01f, dna.Data[i] * change, 1);
-                }
+                copy.Data[i] = (float) Mathf.Clamp(0.01f, dna.Data[i] * change, 1);
 
                 if (!copy.ToTeam().IsValid()) {
                     copy = dna.Clone();

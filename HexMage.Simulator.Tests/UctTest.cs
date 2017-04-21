@@ -110,7 +110,7 @@ namespace HexMage.Simulator.Tests {
         public void StateDeepCopyTest() {
             var game = new GameInstance(3);
 
-            var ability = new AbilityInfo(3, 1, 1, 0, AbilityElement.Fire);
+            var ability = new AbilityInfo(3, 1, 1, 0);
             var abilityId = game.AddAbilityWithInfo(ability);
 
             var abilities1 = new List<int>();
@@ -142,10 +142,10 @@ namespace HexMage.Simulator.Tests {
         public void DefaultPolicyTest() {
             var game = new GameInstance(3);
 
-            var ability1 = new AbilityInfo(1, 1, 1, 0, AbilityElement.Fire);
+            var ability1 = new AbilityInfo(1, 1, 1, 0);
             var a1 = game.AddAbilityWithInfo(ability1);
 
-            var ability2 = new AbilityInfo(3, 1, 1, 0, AbilityElement.Fire);
+            var ability2 = new AbilityInfo(3, 1, 1, 0);
             var a2 = game.AddAbilityWithInfo(ability2);
 
             var abilities1 = new List<int>();
@@ -184,7 +184,7 @@ namespace HexMage.Simulator.Tests {
         public void NodeActionComputeTest() {
             var game = new GameInstance(3);
 
-            var ability = new AbilityInfo(3, 1, 1, 0, AbilityElement.Fire);
+            var ability = new AbilityInfo(3, 1, 1, 0);
             var abilityId = game.AddAbilityWithInfo(ability);
 
             var abilities1 = new List<int>();

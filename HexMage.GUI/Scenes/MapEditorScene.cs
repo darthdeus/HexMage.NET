@@ -28,15 +28,9 @@ namespace HexMage.GUI.Scenes {
             var root = CreateRootEntity(Camera2D.SortUI);
             root.CustomBatch = true;
 
-            const string helpText = "L ... load\n" +
-                                    "S ... save\n" +
-                                    "Q ... place red starting point\n" +
-                                    "E ... place blue starting point\n" +
-                                    "W or RMB ... toggle walls\n" +
-                                    "1,2,3 ... reorder starting points\n" +
-                                    "Space ... CONTINUE";
-
-            root.AddChild(new Label(helpText, _assetManager.Font, Color.White));
+            var bg = CreateRootEntity(Camera2D.SortBackground);
+            bg.Renderer = new SpriteRenderer(_assetManager[AssetManager.MapEditorBg]);
+            bg.Position = Vector2.Zero;
 
             root.AddComponent(new MapEditor(() => _map, map => _map = map));
             root.Renderer = new MapEditorRenderer(() => _map);

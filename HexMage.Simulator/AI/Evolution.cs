@@ -142,13 +142,6 @@ namespace HexMage.Simulator.AI {
                 t2 += generation[i].Team2.Data * ratio;
             }
 
-            for (int i = 0; i < t1.Count; i++) {
-                if (first.Team1.IsElementIndex(i)) {
-                    t1[i] = (float) (Math.Round(t1[i] * 4) / 4);
-                    t2[i] = (float) (Math.Round(t2[i] * 4) / 4);
-                }
-            }
-
             var d1 = first.Team1.Clone();
             d1.Data = t1;
             var d2 = first.Team2.Clone();

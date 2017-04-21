@@ -369,9 +369,7 @@ namespace HexMage.GUI.Components {
 
             //BuildUsedAbilityPopover(mobId, abilityInfo).LogContinuation();
 
-            var projectileSprite = AssetManager.ProjectileSpriteForElement(abilityInfo.Element);
-
-            var projectileAnimation = new Animation(projectileSprite,
+            var projectileAnimation = new Animation(AssetManager.FireballSprite,
                                                     TimeSpan.FromMilliseconds(50),
                                                     AssetManager.TileSize,
                                                     4);
@@ -402,10 +400,8 @@ namespace HexMage.GUI.Components {
 
             explosion.AddComponent(new PositionAtMob(targetId, _game));
 
-            var explosionSprite = AssetManager.ProjectileExplosionSpriteForElement(abilityInfo.Element);
-
             var explosionAnimation = new Animation(
-                explosionSprite,
+                AssetManager.FireballExplosionSprite,
                 TimeSpan.FromMilliseconds(350),
                 AssetManager.TileSize,
                 4);

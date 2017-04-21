@@ -117,19 +117,13 @@ namespace HexMage.Simulator.PCG {
         }
 
         public static MobInfo RandomMob(MobManager mobManager, TeamColor team, GameState state) {
-            var elements = new[] {
-                AbilityElement.Earth, AbilityElement.Fire, AbilityElement.Air, AbilityElement.Water
-            };
-
             var abilities = new List<int>();
             int maxAp = RandomAp();
             int maxHp = RandomHp();
 
             for (int i = 0; i < 2; i++) {
-                var element = elements[Random.Next(0, 4)];
-                var buff = RandomBuff(element);
-
-                var areaBuff = RandomAreaBuff(element);
+                var buff = RandomBuff();
+                var areaBuff = RandomAreaBuff();
 
                 // TODO - re-enable cooldowns?
                 //var cooldown = Random.Next(0, 3);
@@ -139,7 +133,6 @@ namespace HexMage.Simulator.PCG {
                                               RandomCost(maxAp),
                                               RandomRange(),
                                               cooldown,
-                                              element,
                                               buff,
                                               areaBuff);
 
@@ -178,7 +171,7 @@ namespace HexMage.Simulator.PCG {
             return Random.Next(3, Constants.RangeMax);
         }
 
-        public static Buff RandomBuff(AbilityElement element) {
+        public static Buff RandomBuff() {
             var hpChange = Random.Next(-5, 0);
             var apChange = Random.Next(-2, 0);
             var lifetime = Random.Next(1, 3);
@@ -187,11 +180,11 @@ namespace HexMage.Simulator.PCG {
                 hpChange = Random.Next(-5, 0);
                 apChange = Random.Next(-2, 0);
             }
-            return new Buff(element, hpChange, apChange, lifetime);
+            return new Buff(hpChange, apChange, lifetime);
         }
 
-        public static AreaBuff RandomAreaBuff(AbilityElement element) {
-            var buff = new AreaBuff(AxialCoord.Zero, Random.Next(4), RandomBuff(element));
+        public static AreaBuff RandomAreaBuff() {
+            var buff = new AreaBuff(AxialCoord.Zero, Random.Next(4), RandomBuff());
             if (buff.Radius < 2) {
                 return AreaBuff.ZeroBuff();
             } else {

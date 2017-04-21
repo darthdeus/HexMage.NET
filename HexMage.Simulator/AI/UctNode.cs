@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 
@@ -34,6 +35,8 @@ namespace HexMage.Simulator {
         }
 
         public void PrecomputePossibleActions(bool allowMove, bool allowEndTurn) {
+            Debug.Assert(!State.IsFinished, "!State.IsFinished");
+
             if (PossibleActions == null) {
                 if (Action.Type == UctActionType.DefensiveMove) {
                     PossibleActions = new List<UctAction> {UctAction.EndTurnAction()};

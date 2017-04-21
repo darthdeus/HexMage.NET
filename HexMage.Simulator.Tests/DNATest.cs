@@ -31,24 +31,6 @@ namespace HexMage.Simulator.Tests {
         }
 
         [TestMethod]
-        public void DnaIselementIndexTest() {
-            var dna = new DNA(2, 2);
-
-            var indices = new int[] {
-                0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
-            };
-
-            for (int i = 0; i < dna.Data.Count; i++) {
-                bool b = indices[i] == 1 ? true : false;
-                if (i == 5) {
-                    Debugger.Break();
-                }
-                Assert.AreEqual(b, dna.IsElementIndex(i), $"Expected {i} to be {b}");
-            }
-        }
-
-        [TestMethod]
         public void DnaSerializationTest() {
             for (int i = 0; i < 50; i++) {
                 var dna = new DNA(1, 1);
