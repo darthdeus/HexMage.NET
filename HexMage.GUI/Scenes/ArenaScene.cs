@@ -139,7 +139,7 @@ namespace HexMage.GUI.Scenes {
             var teamLabel = CreateRootEntity(Camera2D.SortUI - 10);
             teamLabel.Renderer = new SpriteRenderer(() => {
                 var team = _game.CurrentTeam;
-                if (team.HasValue) {
+                if (team.HasValue && !_game.IsFinished) {
                     if (team.Value == TeamColor.Red) {
                         return _assetManager[AssetManager.TitleRedTeam];
                     } else {
