@@ -202,7 +202,10 @@ namespace HexMage.GUI.Scenes {
             _t1Preview.ClearChildren();
             _t2Preview.ClearChildren();
 
-            var game = GameSetup.GenerateForDnaSettings(_teamSize, 2, _map, false);
+            var dna = new DNA(_teamSize, 2);
+            dna.Randomize();
+
+            var game = GameSetup.GenerateFromDna(dna, dna.Clone(), _map, false);
 
             foreach (var mobId in game.MobManager.Mobs) {
                 var mobInfo = game.MobManager.MobInfos[mobId];

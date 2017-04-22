@@ -6,15 +6,18 @@ using HexMage.Simulator.PCG;
 
 namespace HexMage.Simulator.AI {
     public static class GameSetup {
-        public static GameInstance GenerateForDnaSettings(int mobCount, int abilityCount, Map map = null, bool prepare = true) {
+        [Obsolete]
+        public static GameInstance GenerateForDnaSettings(int mobCount, int abilityCount, Map map = null,
+                                                          bool prepare = true) {
             if (map == null) {
                 map = new Map(Constants.EvolutionMapSize);
-                map.PrecomputeCubeLinedraw();                
+                map.PrecomputeCubeLinedraw();
             }
 
             var game = new GameInstance(map);
 
             var dna = new DNA(mobCount, abilityCount);
+#warning Nechybi tu randomize???
 
             UnpackTeamsIntoGame(game, dna, dna);
             if (prepare) {
@@ -24,22 +27,24 @@ namespace HexMage.Simulator.AI {
             return game;
         }
 
-        public static GameInstance GenerateFromDna(DNA d1, DNA d2, Map map = null) {
+        public static GameInstance GenerateFromDna(DNA d1, DNA d2, Map map = null, bool prepare = true) {
             var game = GenerateForDnaSettings(d1.MobCount, d1.AbilityCount, map);
 
-            OverrideGameDna(game, d1, d2);
+            OverrideGameDna(game, d1, d2, prepare);
 
             return game;
         }
 
-        public static void OverrideGameDna(GameInstance game, DNA d1, DNA d2) {
+        public static void OverrideGameDna(GameInstance game, DNA d1, DNA d2, bool prepare = true) {
             game.MobManager.Clear();
             game.State.Clear();
 
             UnpackTeamsIntoGame(game, d1, d2);
 
-            game.PrepareTurnOrder();
-            ResetGameAndPositions(game);
+            if (prepare) {
+                game.PrepareTurnOrder();
+                ResetGameAndPositions(game);
+            }
         }
 
         public static void ResetGameAndPositions(GameInstance game) {
@@ -73,7 +78,8 @@ namespace HexMage.Simulator.AI {
                 }
 
                 if (!placed) {
-                    Utils.Log(LogSeverity.Error, nameof(GameSetup), $"Ran out of placeholders for {mobInfo.Team}, placing randomly.");
+                    Utils.Log(LogSeverity.Error, nameof(GameSetup),
+                              $"Ran out of placeholders for {mobInfo.Team}, placing randomly.");
                     Generator.RandomPlaceMob(game, mobId);
                 }
             }
