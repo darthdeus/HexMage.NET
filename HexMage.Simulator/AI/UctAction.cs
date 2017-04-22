@@ -44,12 +44,12 @@ namespace HexMage.Simulator.AI {
         }
 
         public UctAction ToPureMove() {
-            Debug.Assert(Type == UctActionType.DefensiveMove || Type == UctActionType.AttackMove);
+            Debug.Assert(Type == UctActionType.DefensiveMove || Type == UctActionType.AttackMove || Type == UctActionType.Move);
             return MoveAction(MobId, Coord);
         }
 
         public UctAction ToPureAbilityUse() {
-            Debug.Assert(Type == UctActionType.AttackMove);
+            Debug.Assert(Type == UctActionType.AttackMove || Type == UctActionType.AbilityUse);
             return AbilityUseAction(AbilityId, MobId, TargetId);
         }
 
