@@ -26,6 +26,9 @@ namespace HexMage.Simulator.Model {
         }
 
         public async Task<int> PlayReplay(List<UctAction> actions, Func<bool> endTurnFunc) {
+            // Wait for GUI initialization
+            await Task.Delay(TimeSpan.FromSeconds(2));
+
             using (new TemporarilySuspendReplayRecording()) {
                 foreach (var action in actions) {
                     while (IsPaused) {
@@ -46,7 +49,10 @@ namespace HexMage.Simulator.Model {
             return actions.Count;
         }
 
-        public async Task<int> SlowMainLoop(Func<bool> turnEndFunc) {
+        public async Task<int> SlowMainLoop(Func<bool> turnEndFunc, Action gameFinishedFunc) {
+            // Wait for GUI initialization
+            await Task.Delay(TimeSpan.FromSeconds(2));
+
             State = GameEventState.SettingUpTurn;
 
             var state = _gameInstance.State;
@@ -76,6 +82,8 @@ namespace HexMage.Simulator.Model {
 
             ReplayRecorder.Instance.SaveAndClear(_gameInstance);
             Console.WriteLine(Constants.GetLogBuffer());
+
+            gameFinishedFunc();
 
             return totalTurns;
         }

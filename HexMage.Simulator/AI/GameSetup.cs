@@ -28,7 +28,7 @@ namespace HexMage.Simulator.AI {
         }
 
         public static GameInstance GenerateFromDna(DNA d1, DNA d2, Map map = null, bool prepare = true) {
-            var game = GenerateForDnaSettings(d1.MobCount, d1.AbilityCount, map);
+            var game = GenerateForDnaSettings(d1.MobCount, d1.AbilityCount, map, prepare);
 
             OverrideGameDna(game, d1, d2, prepare);
 
@@ -42,6 +42,7 @@ namespace HexMage.Simulator.AI {
             UnpackTeamsIntoGame(game, d1, d2);
 
             if (prepare) {
+                Console.WriteLine($"Resetting");
                 game.PrepareTurnOrder();
                 ResetGameAndPositions(game);
             }

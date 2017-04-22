@@ -240,6 +240,7 @@ namespace HexMage.Simulator.Model {
                 Cooldowns[i] = 0;
             }
 
+            AreaBuffs.Clear();
             PlayersPlayed.Clear();
             CopyTurnOrderFromPresort(game);
             SetCurrentMobIndex(game, 0);

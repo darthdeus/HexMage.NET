@@ -81,12 +81,15 @@ namespace HexMage.Simulator.AI {
                 var previous = current;
                 current = EvolutionStrategy(game, generation);
 
-                if (Constants.SaveGoodOnes && !goodEnough && current.CombinedFitness() > 0.99) {
+                if (Constants.SaveGoodOnes && !goodEnough && current.CombinedFitness() > 0.95) {
                     goodCount++;
                     if (goodCount > 50) goodEnough = true;
-                    Console.WriteLine($"Found extra good {current.CombinedFitness()}");
+                    EvolutionBenchmark.SaveDna(goodCount, current.Team1, current.Team2);
 
-                    EvolutionBenchmark.SaveDna(0, current.Team1, current.Team2);
+                    Console.WriteLine($"Found extra good {current.CombinedFitness()}, restarting");
+
+                    current.Team1.Randomize();
+                    current.Team2.Randomize();
                 }
 
                 // TODO: zakazat timeouty v playoutu

@@ -63,7 +63,7 @@ namespace HexMage.GUI.Scenes {
                     LoadNewScene(new ArenaScene(_gameManager, game));
                 }
 
-                if (InputManager.Instance.IsKeyJustPressed(Keys.R)) {
+                if (InputManager.Instance.IsKeyJustPressed(Keys.Y)) {
                     var replay = ReplayRecorder.Instance.Load(0);
 
                     LoadNewScene(new ArenaScene(_gameManager, replay));
@@ -102,8 +102,8 @@ namespace HexMage.GUI.Scenes {
             }
         }
 
-        public void LoadEvolutionSave(int index) {
-            var lines = File.ReadAllLines(Constants.BuildEvoSavePath(index));
+        public static GameInstance LoadEvolutionSaveFile(string filename) {
+            var lines = File.ReadAllLines(filename);
 
             var d1 = DNA.FromSerializableString(lines[0]);
             var d2 = DNA.FromSerializableString(lines[1]);
@@ -111,11 +111,16 @@ namespace HexMage.GUI.Scenes {
             var map = Map.Load("data/map.json");
             var game = GameSetup.GenerateFromDna(d1, d2, map);
 
+            return game;
+        }
+
+        public void LoadEvolutionSave(int index) {
+            var game = LoadEvolutionSaveFile(Constants.BuildEvoSavePath(index));
+
             var arenaScene = new ArenaScene(_gameManager, game);
 
             game.MobManager.Teams[TeamColor.Red] = new PlayerController(arenaScene, game);
             game.MobManager.Teams[TeamColor.Blue] = new MctsController(game, 1000);
-
 
             LoadNewScene(arenaScene);
         }

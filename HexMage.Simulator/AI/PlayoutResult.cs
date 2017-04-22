@@ -26,6 +26,7 @@ namespace HexMage.Simulator.AI {
             return $"F:{fstr}\t{dna.ToDnaString()}";
         }
 
+        [Obsolete]
         public float SimpleFitness() {
             float fitA = 1 - HpPercentage;
             float fitB = (float) LengthSample(TotalTurns);

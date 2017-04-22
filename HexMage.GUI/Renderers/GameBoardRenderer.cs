@@ -20,17 +20,17 @@ namespace HexMage.GUI.Renderers {
         private readonly GameInstance _gameInstance;
         private readonly GameBoardController _gameBoardController;
         private readonly GameEventHub _eventHub;
-        private readonly Camera2D _camera;
         private SpriteBatch _spriteBatch;
         private AssetManager _assetManager;
+        private Camera2D _camera;
         public BoardRenderMode Mode { get; set; }
 
         public GameBoardRenderer(GameInstance gameInstance, GameBoardController gameBoardController,
-                                 GameEventHub eventHub, Camera2D camera) {
+                                 GameEventHub eventHub) {
             _gameInstance = gameInstance;
             _gameBoardController = gameBoardController;
             _eventHub = eventHub;
-            _camera = camera;
+            _camera = Camera2D.Instance;
         }
 
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
@@ -205,7 +205,7 @@ namespace HexMage.GUI.Renderers {
                         }
 
                         var areaBuff = ability.AreaBuff;
-                        if (!areaBuff.IsZero) {
+                        if (!areaBuff.IsZero && !walled) {
                             foreach (var coord in _gameInstance.Map.AllCoords) {
                                 if (mouseHex.Distance(coord) <= areaBuff.Radius) {
                                     DrawAt(hexUsable, coord, Color.White * 0.4f);

@@ -14,11 +14,11 @@ using Color = Microsoft.Xna.Framework.Color;
 namespace HexMage.GUI.Scenes {
     public class ArenaScene : GameScene {
         private readonly GameInstance _game;
-        private readonly GameEventHub _gameEventHub;
         public readonly Dictionary<int, MobEntity> MobEntities = new Dictionary<int, MobEntity>();
 
         private GameBoardController _gameBoardController;
         private readonly Replay _replay;
+        public Action GameFinishedCallback;
 
         public ArenaScene(GameManager gameManager, Replay replay) : base(gameManager) {
             _replay = replay;
@@ -29,12 +29,10 @@ namespace HexMage.GUI.Scenes {
             _game.MobManager.Teams[TeamColor.Blue] = new ReplayController();
 
             Constants.RecordReplays = false;
-            _gameEventHub = new GameEventHub(_game);
         }
 
         public ArenaScene(GameManager gameManager, GameInstance game) : base(gameManager) {
             _game = game;
-            _gameEventHub = new GameEventHub(_game);
         }
 
         public override void Initialize() {
@@ -63,15 +61,15 @@ namespace HexMage.GUI.Scenes {
                 }
             });
 
-            _gameBoardController = new GameBoardController(_game, _gameEventHub, crosshairCursor, this,
+            _gameBoardController = new GameBoardController(_game,
+                                                           crosshairCursor,
+                                                           this,
                                                            _replay);
 
-            gameBoardEntity.AddComponent(_gameBoardController);
-            gameBoardEntity.Renderer =
-                new GameBoardRenderer(_game, _gameBoardController, _gameEventHub, _camera);
-            gameBoardEntity.CustomBatch = true;
+            _gameBoardController.GameFinishedCallback = () => GameFinishedCallback?.Invoke();
 
-            _gameEventHub.AddSubscriber(_gameBoardController);
+            gameBoardEntity.AddComponent(_gameBoardController);
+            gameBoardEntity.CustomBatch = true;
 
             BuildUi();
 

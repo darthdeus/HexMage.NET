@@ -21,6 +21,7 @@ namespace HexMage.GUI.Core {
         public const string SolidGrayColor = "color/gray";
 
         public const string MapEditorBg = "map_editor_bg";
+        public const string TeamSelectionBg = "team_selection_bg";
 
         public const string DarkMageIdle = "mobs/dark-mage-idle";
         public const string DarkMageClicked = "mobs/dark-mage-clicked";

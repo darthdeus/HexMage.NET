@@ -48,14 +48,20 @@ namespace HexMage.GUI.Scenes {
         }
 
         public override void Initialize() {
+            var bg = CreateRootEntity(Camera2D.SortBackground);
+            bg.Renderer = new SpriteRenderer(_assetManager[AssetManager.TeamSelectionBg]);
+            bg.Position = Vector2.Zero;
+
+            var aiListOffset = new Vector2(400, 200);
+
             var left = new VerticalLayout {
                 SortOrder = Camera2D.SortUI,
-                Position = new Vector2(50, 50)
+                Position = new Vector2(50, 50) + aiListOffset
             };
 
             var right = new VerticalLayout {
                 SortOrder = Camera2D.SortUI,
-                Position = new Vector2(400, 50)
+                Position = new Vector2(400, 50) + aiListOffset
             };
 
             left.AddChild(new Separator(5));
@@ -80,13 +86,6 @@ namespace HexMage.GUI.Scenes {
                     RegenerateTeams();
                 };
             }
-
-            var btnStart = new TextButton("Start game", _assetManager.Font) {
-                SortOrder = Camera2D.SortUI,
-                Position = new Vector2(250, 20)
-            };
-
-            btnStart.OnClick += _ => { DoContinue(); };
 
             var hotkeyManager = new Entity() {SortOrder = Camera2D.SortUI};
 
@@ -143,22 +142,12 @@ namespace HexMage.GUI.Scenes {
 
             AddAndInitializeRootEntity(hotkeyManager, _assetManager);
 
-            var btnRegenerate = new TextButton("Regenerate teams", _assetManager.Font) {
-                SortOrder = Camera2D.SortUI,
-                Position = new Vector2(250, 40)
-            };
-
-            btnRegenerate.OnClick += _ => RegenerateTeams();
-
-            AddAndInitializeRootEntity(btnStart, _assetManager);
-            AddAndInitializeRootEntity(btnRegenerate, _assetManager);
-
             AddAndInitializeRootEntity(left, _assetManager);
             AddAndInitializeRootEntity(right, _assetManager);
 
             _teamPreviewLayout = new VerticalLayout() {
                 SortOrder = Camera2D.SortUI,
-                Position = new Vector2(100, 300),
+                Position = new Vector2(100, 300) + aiListOffset,
                 Spacing = 40
             };
 

@@ -212,7 +212,7 @@ namespace HexMage.Simulator {
 
         private void HandleGoodEnough(ref bool goodEnough, PlayoutResult newFitness, GenerationMember member,
                                       ref int goodCount) {
-            if (Constants.SaveGoodOnes && !goodEnough && newFitness.SimpleFitness() > 0.99) {
+            if (Constants.SaveGoodOnes && !goodEnough && newFitness.SimpleFitness() > 0.93) {
                 goodCount++;
                 if (goodCount > 50) goodEnough = true;
                 Console.WriteLine($"Found extra good {newFitness.SimpleFitness()}");
@@ -266,14 +266,18 @@ namespace HexMage.Simulator {
         }
 
         private void SaveDna(int savefileIndex, DNA dna) {
-            using (var writer = new StreamWriter(Constants.BuildEvoSavePath(savefileIndex))) {
+            var path = Constants.BuildEvoSavePath(savefileIndex);
+            using (var writer = new StreamWriter(path)) {
+                Console.WriteLine($"Saved to {path}");
                 writer.WriteLine(_initialDna.ToSerializableString());
                 writer.WriteLine(dna.ToSerializableString());
             }
         }
 
         public static void SaveDna(int fileIndex, DNA d1, DNA d2) {
-            using (var writer = new StreamWriter(Constants.BuildEvoSavePath(fileIndex))) {
+            string path = Constants.BuildEvoSavePath(fileIndex);
+            using (var writer = new StreamWriter(path)) {
+                Console.WriteLine($"Saved to {path}");
                 writer.WriteLine(d1.ToSerializableString());
                 writer.WriteLine(d2.ToSerializableString());
             }

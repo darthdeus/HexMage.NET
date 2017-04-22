@@ -100,7 +100,7 @@ namespace HexMage.Simulator {
             double distance = Distance.Euclidean(Data, team2.Data);
             double relativeDistance = distance / maxDistance;
 
-            double distanceFitness = 1 / (1 + Math.Exp(-20 * relativeDistance + 3));
+            double distanceFitness = 1 / (1 + Math.Exp(-60 * relativeDistance + 1.5));
 
             return (float) distanceFitness;
         }

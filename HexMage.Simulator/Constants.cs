@@ -2,7 +2,7 @@
 
 namespace HexMage.Simulator {
     public static class Constants {
-        public static bool RecordReplays = false;
+        public static bool RecordReplays = true;
 
         // MCTS benchmarks
         public static int MctsBenchIterations = 100;
@@ -81,7 +81,7 @@ namespace HexMage.Simulator {
 
         public static bool AverageHpTotals = true;
         public static bool SaveGoodOnes = true;
-        public static float InitialT = 1;
+        public static float InitialT = 0.5f;
         public static bool Logging = false;
 
         // TODO - check if disabling this helps

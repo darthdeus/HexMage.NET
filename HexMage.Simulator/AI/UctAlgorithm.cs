@@ -51,8 +51,8 @@ namespace HexMage.Simulator.AI {
 
                 MillisecondsPerIterationAverage.Add(iterationStopwatch.Elapsed.TotalMilliseconds);
 #warning TODO: tohle je fuj, pridat moznost nastavit jak cas tak iterace
-                //} while (iterations < 25);
-            } while (stopwatch.ElapsedMilliseconds < _thinkTime);
+            } while (iterations < 10);
+        //} while (stopwatch.ElapsedMilliseconds < _thinkTime);
 
             stopwatch.Stop();
 

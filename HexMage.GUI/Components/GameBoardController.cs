@@ -31,6 +31,7 @@ namespace HexMage.GUI.Components {
         private VerticalLayout _messageBox;
         private Label _messageBoxLabel;
         private Vector4 _popoverPadding;
+        public Action GameFinishedCallback;
 
         private readonly Replay _replay;
 
@@ -38,13 +39,14 @@ namespace HexMage.GUI.Components {
 
         public int? SelectedAbilityIndex;
 
-        public GameBoardController(GameInstance game, GameEventHub eventHub, Entity crosshairCursor,
+        public GameBoardController(GameInstance game, Entity crosshairCursor,
                                    ArenaScene arenaScene, Replay replay = null) {
             _game = game;
-            _eventHub = eventHub;
             _arenaScene = arenaScene;
             _crosshairCursor = crosshairCursor;
             _replay = replay;
+            _eventHub = new GameEventHub(game);
+            _eventHub.AddSubscriber(this);
         }
 
         public void ActionApplied(UctAction action) {
@@ -83,13 +85,16 @@ namespace HexMage.GUI.Components {
             AssertNotInitialized();
             _assetManager = assetManager;
 
+            Debug.Assert(Entity.Renderer == null);
+            Entity.Renderer = new GameBoardRenderer(_game, this, _eventHub);
+
             BuildPopovers();
             var turnEndSound = _assetManager.LoadSoundEffect(AssetManager.SoundEffectEndTurn);
 
             if (_replay == null) {
-                _eventHub.SlowMainLoop(() => turnEndSound.Play(0.3f, 0, 0))
+                _eventHub.SlowMainLoop(() => turnEndSound.Play(0.3f, 0, 0), () => GameFinishedCallback?.Invoke())
                          .LogContinuation();
-            } else {
+            } else {                
                 _eventHub.PlayReplay(_replay.Actions, () => turnEndSound.Play(0.3f, 0, 0))
                          .LogContinuation();
             }
