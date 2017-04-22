@@ -49,6 +49,9 @@ namespace HexMage.Simulator {
 
         public bool IsValid() {
             foreach (var mob in mobs) {
+                // TODO: resit to pri generovani
+                if (mob.hp == 0) return false;
+
                 foreach (var ability in mob.abilities) {
                     if (ability.ap > mob.ap) return false;
                     if (ability.dmg <= 0) return false;

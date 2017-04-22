@@ -53,9 +53,9 @@ namespace HexMage.Benchmarks {
             //Benchmarks.BenchmarkAllAisAgainstMcts();
             //return;
 
-            Constants.MctsBenchmark = true;
-            Benchmarks.CompareAi();
-            return;
+            //Constants.MctsBenchmark = true;
+            //Benchmarks.CompareAi();
+            //return;
 
 
             if ((args.Length > 0 && args[0] == "mcts-benchmark") || Constants.MctsBenchmark) {

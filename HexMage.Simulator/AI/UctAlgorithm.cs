@@ -85,9 +85,11 @@ namespace HexMage.Simulator.AI {
                     var type = expanded.Action.Type;
                     var allowMove = type != UctActionType.Move && type != UctActionType.DefensiveMove;
 
-                    expanded.PrecomputePossibleActions(allowMove, true);
-                    if (expanded.PossibleActions.Count == 1 && !expanded.IsTerminal) {
-                        expanded = Expand(expanded);
+                    if (!expanded.IsTerminal) {
+                        expanded.PrecomputePossibleActions(allowMove, true);
+                        if (expanded.PossibleActions.Count == 1) {
+                            expanded = Expand(expanded);
+                        }
                     }
 
                     return expanded;
