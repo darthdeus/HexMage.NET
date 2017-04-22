@@ -19,8 +19,13 @@ namespace HexMage.GUI.Scenes {
         public QuestionnaireScene(GameManager gameManager) : base(gameManager) { }
 
         public override void Initialize() {
+            var bg = CreateRootEntity(Camera2D.SortBackground);
+            bg.Renderer = new SpriteRenderer(_assetManager[AssetManager.QuestionnaireBg]);
+            bg.Position = Vector2.Zero;
+
             _rootLayout = new VerticalLayout {
-                SortOrder = Camera2D.SortUI
+                SortOrder = Camera2D.SortUI,
+                Position = new Vector2(530, 250)
             };
 
             GenerateChildren();
@@ -78,14 +83,9 @@ namespace HexMage.GUI.Scenes {
 
             foreach (var fileName in AllFiles()) {
                 if (IsDone(fileName)) {
-                    _rootLayout.AddChild(new Label(fileName, _assetManager.Font, Color.White));
+                    _rootLayout.AddChild(new Label($"- DONE {fileName}", _assetManager.AbilityFontSmall, Color.Gray));
                 } else {
-                    var btn = _rootLayout.AddChild(new TextButton(fileName, _assetManager.Font));
-
-                    btn.OnClick += _ => {
-                        MarkDone(fileName);
-                        DelayFor(TimeSpan.Zero, GenerateChildren);
-                    };
+                    _rootLayout.AddChild(new Label($"- TODO {fileName}", _assetManager.AbilityFontSmall, Color.White));
                 }
             }
         }
