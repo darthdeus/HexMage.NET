@@ -26,28 +26,28 @@ namespace HexMage.Benchmarks {
             //return;
 
 
-            if ((args.Length > 0 && args[0] == "mcts-benchmark") || Constants.MctsBenchmark) {
-                MctsBenchmark();
-                return;
-            }
+            //if ((args.Length > 0 && args[0] == "mcts-benchmark") || Constants.MctsBenchmark) {
+            //    MctsBenchmark();
+            //    return;
+            //}
 
-            if ((args.Length > 0 && args[0] == "stats") || Constants.MeasureSearchSpaceStats) {
-                MeasureSearchSpaceStats();
-            }
+            //if ((args.Length > 0 && args[0] == "stats") || Constants.MeasureSearchSpaceStats) {
+            //    MeasureSearchSpaceStats();
+            //}
 
-            var evo = new Evolution(keepCounter: true, breakWhenFound: true, maxGoodCount: 1);
-            foreach (var file in Directory.EnumerateFiles("data/manual-teams/")) {
-                if (file.EndsWith(".json")) {
-                    string content = File.ReadAllText(file);
+            //var evo = new Evolution(keepCounter: true, breakWhenFound: true, maxGoodCount: 1);
+            //foreach (var file in Directory.EnumerateFiles("data/manual-teams/")) {
+            //    if (file.EndsWith(".json")) {
+            //        string content = File.ReadAllText(file);
 
-                    var t1 = JsonConvert.DeserializeObject<Team>(content);
-                    evo.RunEvolutionStrategies(t1.ToDna(), false);
+            //        var t1 = JsonConvert.DeserializeObject<Team>(content);
+            //        evo.RunEvolutionStrategies(t1.ToDna(), false);
 
-                    Console.WriteLine($"File {file} done.");
-                }
-            }
+            //        Console.WriteLine($"File {file} done.");
+            //    }
+            //}
 
-            return;
+            //return;
 
 
             if (Constants.EvaluateAis) {
@@ -55,7 +55,7 @@ namespace HexMage.Benchmarks {
             } else {
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
-                //new Evolution().RunEvolutionStrategies(new DNA(2, 2));
+                new Evolution(false, 3, true).RunEvolutionStrategies(new DNA(2, 2));
                 stopwatch.Stop();
 
                 Console.WriteLine(

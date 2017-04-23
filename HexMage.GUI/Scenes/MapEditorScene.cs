@@ -115,7 +115,7 @@ namespace HexMage.GUI.Scenes {
         }
 
         public void LoadEvolutionSave(int index) {
-            var game = LoadEvolutionSaveFile(Constants.BuildEvoSavePath(5));
+            var game = LoadEvolutionSaveFile(Constants.BuildEvoSavePath(1));
 
             var arenaScene = new ArenaScene(_gameManager, game);
 

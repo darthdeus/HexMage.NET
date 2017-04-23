@@ -1,11 +1,11 @@
 {
   "mobs": [
     {
-      "hp": 83,
+      "hp": 80,
       "ap": 20,
       "abilities": [
         {
-          "dmg": 21,
+          "dmg": 15,
           "ap": 9,
           "range": 7,
           "cooldown": 1,
@@ -30,7 +30,7 @@
         {
           "dmg": 24,
           "ap": 15,
-          "range": 1,
+          "range": 0,
           "cooldown": 1,
           "buff": {
             "HpChange": -4,
@@ -53,7 +53,7 @@
       ]
     },
     {
-      "hp": 39,
+      "hp": 20,
       "ap": 10,
       "abilities": [
         {
@@ -82,8 +82,8 @@
         {
           "dmg": 5,
           "ap": 5,
-          "range": 8,
-          "cooldown": 1,
+          "range": 3,
+          "cooldown": 0,
           "buff": {
             "HpChange": 0,
             "ApChange": -4,

@@ -53,17 +53,17 @@
       ]
     },
     {
-      "hp": 69,
+      "hp": 70,
       "ap": 22,
       "abilities": [
         {
           "dmg": 27,
           "ap": 14,
-          "range": 8,
-          "cooldown": 1,
+          "range": 3,
+          "cooldown": 2,
           "buff": {
-            "HpChange": -3,
-            "ApChange": -2,
+            "HpChange": 0,
+            "ApChange": 0,
             "Lifetime": 0
           },
           "areaBuff": {
@@ -80,8 +80,8 @@
           }
         },
         {
-          "dmg": 23,
-          "ap": 18,
+          "dmg": 10,
+          "ap": 15,
           "range": 8,
           "cooldown": 1,
           "buff": {

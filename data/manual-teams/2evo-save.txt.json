@@ -1,7 +1,7 @@
 {
   "mobs": [
     {
-      "hp": 37,
+      "hp": 40,
       "ap": 22,
       "abilities": [
         {
@@ -31,7 +31,7 @@
           "dmg": 7,
           "ap": 10,
           "range": 3,
-          "cooldown": 2,
+          "cooldown": 1,
           "buff": {
             "HpChange": -1,
             "ApChange": -4,
@@ -62,7 +62,7 @@
           "range": 5,
           "cooldown": 1,
           "buff": {
-            "HpChange": -2,
+            "HpChange": -5,
             "ApChange": -4,
             "Lifetime": 0
           },
@@ -71,9 +71,9 @@
               "X": 0,
               "Y": 0
             },
-            "Radius": 2,
+            "Radius": 5,
             "Effect": {
-              "HpChange": -1,
+              "HpChange": -5,
               "ApChange": -1,
               "Lifetime": 2
             }
@@ -85,7 +85,7 @@
           "range": 7,
           "cooldown": 0,
           "buff": {
-            "HpChange": -2,
+            "HpChange": -5,
             "ApChange": -2,
             "Lifetime": 2
           },
@@ -94,9 +94,9 @@
               "X": 0,
               "Y": 0
             },
-            "Radius": 1,
+            "Radius": 5,
             "Effect": {
-              "HpChange": -3,
+              "HpChange": -5,
               "ApChange": -2,
               "Lifetime": 1
             }
