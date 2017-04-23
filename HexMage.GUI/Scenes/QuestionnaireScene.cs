@@ -19,6 +19,19 @@ namespace HexMage.GUI.Scenes {
         public QuestionnaireScene(GameManager gameManager) : base(gameManager) { }
 
         public override void Initialize() {
+            var credits = new Label(
+                "Sound of end turn made by Eric Matyas, available from \n" +
+                "http://soundimage.org/, Fireball sounds available under Creative Commons license from \n" +
+                "http://www.freesound.org/people/LiamG_SFX/sounds/334234/ and http://www.freesound.org/people/CTCollab/sounds/223615/, \n" +
+                "Hit sound also available under creative common license from http://www.freesound.org/people/Twisted_Euphoria/sounds/205938/",
+                _assetManager.Font,
+                Color.Gray) {
+                Position = new Vector2(0, 960),
+                SortOrder = Camera2D.SortUI,                
+            };
+
+            AddAndInitializeRootEntity(credits, _assetManager);
+
             var bg = CreateRootEntity(Camera2D.SortBackground);
             bg.Renderer = new SpriteRenderer(_assetManager[AssetManager.QuestionnaireBg]);
             bg.Position = Vector2.Zero;

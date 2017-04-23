@@ -451,12 +451,6 @@
 /processorParam:Quality=Best
 /build:sound_effects/spell_hit.wav
 
-#begin sound_effects/dying.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:sound_effects/dying.wav
-
 #begin ability_ui/history_log_bg.png
 /importer:TextureImporter
 /processor:TextureProcessor

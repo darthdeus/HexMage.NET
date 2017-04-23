@@ -2,19 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using HexMage.Benchmarks;
 using HexMage.Simulator.Pathfinding;
 using MathNet.Numerics.LinearAlgebra;
 
 namespace HexMage.Simulator.AI {
-    public class Evolution<T> {
-        private readonly Func<T, float> _fitnessFunc;
-        public static readonly RollingAverage AverageGenerationTime = new RollingAverage();
-
-        public Evolution(Func<T, float> fitnessFunc) {
-            _fitnessFunc = fitnessFunc;
-        }
-
+    public class Evolution {
         public void RunEvolutionStrategies() {
             var t1 = new DNA(2, 2);
             var t2 = t1.Clone();
