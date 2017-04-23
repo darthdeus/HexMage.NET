@@ -94,11 +94,15 @@ namespace HexMage.Simulator {
 
         public static void Log(LogSeverity logLevel, string owner, string message) {
             foreach (var logger in _loggers) {
+                if (Constants.RecordReplays) {
+                    ReplayRecorder.Instance.Log.Add(message);
+                }
                 logger.Log(logLevel, owner, message);
             }
         }
 
-        public static void LogTask(this Task task) {
+        [Obsolete]
+        private static void LogTask(this Task task) {
             if (task.IsFaulted) {
                 Log(LogSeverity.Error, nameof(task), $"Task {task} failed, exception: {task.Exception}.");
 

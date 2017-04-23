@@ -31,8 +31,8 @@ namespace HexMage.Simulator {
         private static readonly Dictionary<int, List<AxialCoord>> _allCoordDictionary =
             new Dictionary<int, List<AxialCoord>>();
 
-#warning TODO: pridat JsonIgnore
         // TODO - tohle by melo byt mnohem lepe udelana globalni cache (nebo thread local?)
+        [JsonIgnore]
         public List<AxialCoord> AllCoords {
             get {
                 lock (_allCoordDictionary) {

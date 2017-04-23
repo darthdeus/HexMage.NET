@@ -16,6 +16,7 @@ namespace HexMage.Simulator.Pathfinding {
             new AxialCoord(-1, 1)
         };
 
+        [JsonIgnore]
         public HexMap<HexMap<Path>> AllPaths;
 
         private Dictionary<int, IList<AxialCoord>> _precomputedPaths =

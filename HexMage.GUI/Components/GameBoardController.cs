@@ -243,7 +243,7 @@ namespace HexMage.GUI.Components {
                     InputManager.Instance.UserInputEnabled = false;
                     _eventHub.SlowPlayAction(_game, UctAction.AbilityUseAction(abilityId, mobId.Value, targetId))
                              .ContinueWith(t => { InputManager.Instance.UserInputEnabled = true; })
-                             .LogTask();
+                             .LogContinuation();
                 } else {
                     ShowMessage("Target is outside the range of the currently selected ability.");
                 }

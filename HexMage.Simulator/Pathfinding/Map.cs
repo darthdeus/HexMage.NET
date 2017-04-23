@@ -11,9 +11,9 @@ namespace HexMage.Simulator.Pathfinding {
     public class Map : IDeepCopyable<Map> {
         [JsonProperty] private readonly HexMap<HexType> _hexes;
 
-        [JsonProperty] private Dictionary<int, bool> _visibility = new Dictionary<int, bool>();
+        [JsonIgnore] private Dictionary<int, bool> _visibility = new Dictionary<int, bool>();
 
-        [JsonProperty] private Dictionary<int, List<AxialCoord>> _visibilityLines =
+        [JsonIgnore] private Dictionary<int, List<AxialCoord>> _visibilityLines =
             new Dictionary<int, List<AxialCoord>>();
 
         public List<AxialCoord> BlueStartingPoints = new List<AxialCoord>();
@@ -62,7 +62,7 @@ namespace HexMage.Simulator.Pathfinding {
             }
 
             map._visibilityLines = new Dictionary<int, List<AxialCoord>>();
-            foreach (var v in _visibilityLines) {                
+            foreach (var v in _visibilityLines) {
                 map._visibilityLines[v.Key] = v.Value.ToList();
             }
             return map;

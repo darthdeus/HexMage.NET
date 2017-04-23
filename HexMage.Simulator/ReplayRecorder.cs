@@ -12,12 +12,14 @@ using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
     public class Replay {
-        public GameInstance Game;
-        public List<UctAction> Actions;
+        public readonly GameInstance Game;
+        public readonly List<UctAction> Actions;
+        public List<string> Log;
 
-        public Replay(GameInstance game, List<UctAction> actions) {
+        public Replay(GameInstance game, List<UctAction> actions, List<string> log) {
             Game = game;
             Actions = actions;
+            Log = log;
         }
     }
 
@@ -26,9 +28,11 @@ namespace HexMage.Simulator {
         public static readonly ReplayRecorder Instance = new ReplayRecorder();
         public static int Index = 0;
         public readonly List<UctAction> Actions = new List<UctAction>();
+        public readonly List<string> Log = new List<string>();
 
         public void Clear() {
             Actions.Clear();
+            Log.Clear();
         }
 
         public void SaveAndClear(GameInstance game, int? index = null) {
@@ -46,7 +50,7 @@ namespace HexMage.Simulator {
                 Directory.CreateDirectory(ReplayDirectory);
             }
 
-            var replay = new Replay(game, Actions);
+            var replay = new Replay(game, Actions, Log);
             var contents = JsonConvert.SerializeObject(replay, Formatting.Indented);
 
             using (var writer = new StreamWriter($@"{ReplayDirectory}\replay{index}.json")) {
