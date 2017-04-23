@@ -4,13 +4,31 @@ using System.Diagnostics;
 using System.Linq;
 using HexMage.Simulator.Pathfinding;
 using MathNet.Numerics.LinearAlgebra;
+using Newtonsoft.Json;
 
 namespace HexMage.Simulator.AI {
     public class Evolution {
-        public void RunEvolutionStrategies() {
-            var t1 = new DNA(2, 2);
+        private readonly bool _keepCounter;
+        private readonly int _maxGoodCount;
+        private readonly bool _breakWhenFound;
+        private int _goodCount = 0;
+
+        public Evolution(bool keepCounter, int maxGoodCount, bool breakWhenFound) {
+            _keepCounter = keepCounter;
+            _maxGoodCount = maxGoodCount;
+            _breakWhenFound = breakWhenFound;
+        }
+
+        public void RunEvolutionStrategies(DNA initialDna, bool evolveTeam1 = true) {
+            if (!_keepCounter) {
+                _goodCount = 0;
+            }
+
+            var t1 = initialDna;
             var t2 = t1.Clone();
-            t1.Randomize();
+            if (evolveTeam1) {
+                t1.Randomize();
+            }
             t2.Randomize();
 
             var map = Map.Load("data/map.json");
@@ -21,7 +39,7 @@ namespace HexMage.Simulator.AI {
             int restartCount = 0;
 
             var current = new Individual(t1.Clone(),
-                                         t1.Clone(),
+                                         t2.Clone(),
                                          EvolutionBenchmark.CalculateFitness(game, t1, t2));
 
             List<double> plotT = new List<double>();
@@ -30,15 +48,13 @@ namespace HexMage.Simulator.AI {
             List<double> plotLength = new List<double>();
             List<double> plotDistance = new List<double>();
 
-            int goodCount = 0;
-            bool goodEnough = false;
-
             var gameCopies = Enumerable.Range(0, Constants.TeamsPerGeneration)
                                        .AsParallel()
                                        .Select(_ => game.DeepCopy())
                                        .ToList();
 
-            for (int i = 0; i < Constants.NumGenerations; i++) {
+            int i;
+            for (i = 0; i < Constants.NumGenerations; i++) {
                 var genWatch = new Stopwatch();
                 genWatch.Start();
 
@@ -46,7 +62,9 @@ namespace HexMage.Simulator.AI {
                 teamWatch.Start();
 
                 if (Constants.RestartFailures && current.CombinedFitness() < Constants.FitnessThreshold) {
-                    current.Team1.Randomize();
+                    if (evolveTeam1) {
+                        current.Team1.Randomize();
+                    }
                     current.Team2.Randomize();
                     restartCount++;
                 }
@@ -54,7 +72,10 @@ namespace HexMage.Simulator.AI {
                 var generation = Enumerable.Range(0, Constants.TeamsPerGeneration)
                                            .AsParallel()
                                            .Select(j => {
-                                               var newTeam1 = EvolutionBenchmark.Mutate(current.Team1);
+                                               var newTeam1 =
+                                                   evolveTeam1
+                                                       ? EvolutionBenchmark.Mutate(current.Team1)
+                                                       : current.Team1;
                                                var newTeam2 = EvolutionBenchmark.Mutate(current.Team2);
 
                                                var newFitness =
@@ -66,21 +87,7 @@ namespace HexMage.Simulator.AI {
                                            .ToList();
 
                 var previous = current;
-                current = EvolutionStrategy(game, generation);
-
-                if (Constants.SaveGoodOnes && !goodEnough && current.CombinedFitness() > 0.95) {
-                    goodCount++;
-                    if (goodCount > 50) goodEnough = true;
-                    EvolutionBenchmark.SaveDna(goodCount, current.Team1, current.Team2);
-
-                    Console.WriteLine($"Found extra good {current.CombinedFitness()}, restarting");
-
-                    current.Team1.Randomize();
-                    current.Team2.Randomize();
-                }
-
-                // TODO: zakazat timeouty v playoutu
-                //if (Constants.ForbidTimeouts && newMax.result.Timeouted) continue;
+                current = EvolutionStrategy(game, previous, generation, evolveTeam1);
 
 
                 plotT.Add(i);
@@ -89,22 +96,35 @@ namespace HexMage.Simulator.AI {
                 plotLength.Add(PlayoutResult.LengthSample(current.Result.TotalTurns));
                 plotDistance.Add(current.Team1.DistanceFitness(current.Team2));
 
-
                 if (i % Constants.EvolutionPrintModulo == 0) {
                     Console.WriteLine($"T: {i}\t\t" +
                                       $"F: {previous.CombinedFitness().ToString("0.0000")}" +
                                       $" -> {current.CombinedFitness().ToString("0.0000")}");
+                }
+
+                if (Constants.SaveGoodOnes && current.CombinedFitness() > 0.95) {
+                    _goodCount++;
+                    EvolutionBenchmark.SaveDna(_goodCount, current.Team1, current.Team2);
+
+                    Console.WriteLine($"Found extra good {current.CombinedFitness()}, restarting");
+
+                    if (evolveTeam1) {
+                        current.Team1.Randomize();
+                    }
+                    current.Team2.Randomize();
+
+                    if (_goodCount >= _maxGoodCount) {
+                        Console.WriteLine($"Stopping evolution early, reached target {_maxGoodCount} good matches.");
+                        break;
+                    }
                 }
             }
 
             Console.WriteLine($"Restarts: {restartCount}");
 
             if (Constants.GnuPlot) {
-                var gnuplotConfigString = $"title '{Constants.NumGenerations} generations," +
-                                          $"T_s = {Constants.InitialT}'";
-
                 GnuPlot.HoldOn();
-                GnuPlot.Set($"xrange [0:{Constants.NumGenerations}] reverse",
+                GnuPlot.Set($"xrange [0:{i}] reverse",
                             $"title '{Constants.NumGenerations} generations, T_s = {Constants.InitialT}",
                             //"yrange [0:1]",
                             //"style data lines",
@@ -113,12 +133,12 @@ namespace HexMage.Simulator.AI {
                 GnuPlot.Plot(plotT.ToArray(), plotHpPercentage.ToArray(), $"title 'HP percentage'");
                 GnuPlot.Plot(plotT.ToArray(), plotLength.ToArray(), "title 'Game length'");
                 GnuPlot.Plot(plotT.ToArray(), plotDistance.ToArray(), "title 'Team difference'");
-                //GnuPlot.Plot(plotT.ToArray(), plotProb.ToArray(), gnuplotConfigString);
                 Console.ReadKey();
             }
         }
 
-        public static Individual EvolutionStrategy(GameInstance game, List<Individual> generation) {
+        public static Individual EvolutionStrategy(GameInstance game, Individual previous, List<Individual> generation,
+                                                   bool evolveTeam1) {
             float totalFitness = generation.Sum(i => i.CombinedFitness());
 
             var first = generation[0];
@@ -136,6 +156,11 @@ namespace HexMage.Simulator.AI {
             d1.Data = t1;
             var d2 = first.Team2.Clone();
             d2.Data = t2;
+
+            if (!evolveTeam1) {
+                d1.Data = previous.Team1.Data;
+            }
+
             var newFitness = EvolutionBenchmark.CalculateFitness(game, d1, d2);
 
             return new Individual(d1, d2, newFitness);

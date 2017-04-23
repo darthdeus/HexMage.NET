@@ -1,10 +1,14 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace HexMage.Simulator.Model {
     public struct Buff {
         public readonly int HpChange;
         public readonly int ApChange;
         public int Lifetime;
+        
+        [JsonIgnore]
+        public bool IsZero => Lifetime == 0;
 
         public Buff(int hpChange, int apChange, int lifetime) {
             HpChange = hpChange;
@@ -23,8 +27,6 @@ namespace HexMage.Simulator.Model {
             return new Buff(a.HpChange + b.HpChange, a.ApChange + b.ApChange,
                             Math.Max(a.Lifetime, b.Lifetime));
         }
-
-        public bool IsZero => Lifetime == 0;
 
         public override string ToString() {
             return

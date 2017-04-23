@@ -11,6 +11,7 @@ using HexMage.Simulator.Pathfinding;
 using HexMage.Simulator.PCG;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
+using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
     public class EvolutionBenchmark {
@@ -266,16 +267,19 @@ namespace HexMage.Simulator {
         }
 
         private void SaveDna(int savefileIndex, DNA dna) {
-            var path = Constants.BuildEvoSavePath(savefileIndex);
-            using (var writer = new StreamWriter(path)) {
-                Console.WriteLine($"Saved to {path}");
-                writer.WriteLine(_initialDna.ToSerializableString());
-                writer.WriteLine(dna.ToSerializableString());
-            }
+            SaveDna(savefileIndex, _initialDna, dna);
         }
 
         public static void SaveDna(int fileIndex, DNA d1, DNA d2) {
             string path = Constants.BuildEvoSavePath(fileIndex);
+            using (var writer = new StreamWriter(path + ".generated.json")) {
+                writer.WriteLine(JsonConvert.SerializeObject(d1.ToTeam(), Formatting.Indented));
+                writer.WriteLine();
+                writer.WriteLine();
+                writer.WriteLine();
+                writer.WriteLine(JsonConvert.SerializeObject(d2.ToTeam(), Formatting.Indented));
+            }
+
             using (var writer = new StreamWriter(path)) {
                 Console.WriteLine($"Saved to {path}");
                 writer.WriteLine(d1.ToSerializableString());

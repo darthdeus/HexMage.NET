@@ -1,0 +1,108 @@
+{
+  "mobs": [
+    {
+      "hp": 72,
+      "ap": 9,
+      "abilities": [
+        {
+          "dmg": 26,
+          "ap": 4,
+          "range": 5,
+          "cooldown": 1,
+          "buff": {
+            "HpChange": -1,
+            "ApChange": -4,
+            "Lifetime": 2
+          },
+          "areaBuff": {
+            "Coord": {
+              "X": 0,
+              "Y": 0
+            },
+            "Radius": 0,
+            "Effect": {
+              "HpChange": -4,
+              "ApChange": 0,
+              "Lifetime": 0
+            }
+          }
+        },
+        {
+          "dmg": 21,
+          "ap": 2,
+          "range": 8,
+          "cooldown": 2,
+          "buff": {
+            "HpChange": -1,
+            "ApChange": 0,
+            "Lifetime": 2
+          },
+          "areaBuff": {
+            "Coord": {
+              "X": 0,
+              "Y": 0
+            },
+            "Radius": 0,
+            "Effect": {
+              "HpChange": -3,
+              "ApChange": -1,
+              "Lifetime": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "hp": 32,
+      "ap": 22,
+      "abilities": [
+        {
+          "dmg": 7,
+          "ap": 14,
+          "range": 1,
+          "cooldown": 2,
+          "buff": {
+            "HpChange": -4,
+            "ApChange": -4,
+            "Lifetime": 1
+          },
+          "areaBuff": {
+            "Coord": {
+              "X": 0,
+              "Y": 0
+            },
+            "Radius": 1,
+            "Effect": {
+              "HpChange": -3,
+              "ApChange": -2,
+              "Lifetime": 2
+            }
+          }
+        },
+        {
+          "dmg": 10,
+          "ap": 17,
+          "range": 2,
+          "cooldown": 1,
+          "buff": {
+            "HpChange": 0,
+            "ApChange": -2,
+            "Lifetime": 1
+          },
+          "areaBuff": {
+            "Coord": {
+              "X": 0,
+              "Y": 0
+            },
+            "Radius": 3,
+            "Effect": {
+              "HpChange": -3,
+              "ApChange": -2,
+              "Lifetime": 2
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

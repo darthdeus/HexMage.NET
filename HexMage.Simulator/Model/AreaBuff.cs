@@ -1,8 +1,13 @@
-﻿namespace HexMage.Simulator.Model {
+﻿using Newtonsoft.Json;
+
+namespace HexMage.Simulator.Model {
     public struct AreaBuff {
         public AxialCoord Coord;
         public int Radius;
         public Buff Effect;
+
+        [JsonIgnore]
+        public bool IsZero => Radius == 0;
 
         public static AreaBuff ZeroBuff() {
             return new AreaBuff(AxialCoord.Zero, 0, Buff.ZeroBuff());
@@ -13,8 +18,6 @@
             Radius = radius;
             Effect = effect;
         }
-
-        public bool IsZero => Radius == 0;
 
         public void DecreaseLifetime() {
             Effect.Lifetime--;

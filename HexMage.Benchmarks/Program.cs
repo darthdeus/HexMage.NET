@@ -1,35 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using HexMage.Simulator;
 using HexMage.Simulator.AI;
+using Newtonsoft.Json;
 using Constants = HexMage.Simulator.Constants;
 
 namespace HexMage.Benchmarks {
     internal static class Program {
         private static void Main(string[] args) {
-            // TODO - proc to ale s timhle nekonverguje?!?!?!?!??!
-            //Generator.Random = new Random(3);
-
             if (!ProcessArguments(args)) return;
-
-            {
-                //var dis = new Normal(10, 3);
-
-                //var px = new List<double>();
-                //var py = new List<double>();
-
-                //for (double i = 0; i < 30; i += 0.001) {
-                //    px.Add(i);
-                //    py.Add(GameEvaluator.LengthSample(i));
-                //}
-
-                //GnuPlot.Plot(px.ToArray(), py.ToArray());
-                //Console.ReadKey();
-
-                //Console.WriteLine($"{1 - dis.CumulativeDistribution(7)}, {dis.CumulativeDistribution(13)}");
-                //return;
-            }
+            
 
 
             //new Benchmarks().Run();
@@ -53,13 +35,27 @@ namespace HexMage.Benchmarks {
                 MeasureSearchSpaceStats();
             }
 
+            var evo = new Evolution(keepCounter: true, breakWhenFound: true, maxGoodCount: 1);
+            foreach (var file in Directory.EnumerateFiles("data/manual-teams/")) {
+                if (file.EndsWith(".json")) {
+                    string content = File.ReadAllText(file);
+
+                    var t1 = JsonConvert.DeserializeObject<Team>(content);
+                    evo.RunEvolutionStrategies(t1.ToDna(), false);
+
+                    Console.WriteLine($"File {file} done.");
+                }
+            }
+
+            return;
+
+
             if (Constants.EvaluateAis) {
                 //new AiEvaluator().Run();
             } else {
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
-                new Evolution().RunEvolutionStrategies();
-                //new EvolutionBenchmark().RunSimulatedAnnealing();
+                //new Evolution().RunEvolutionStrategies(new DNA(2, 2));
                 stopwatch.Stop();
 
                 Console.WriteLine(

@@ -69,7 +69,7 @@ namespace HexMage.Simulator {
         }
 
         public string ToSerializableString() {
-            return $"{MobCount},{AbilityCount},{string.Join(",", Data)}";
+            return $"{MobCount},{AbilityCount},{string.Join(",", Data.Select(n => n.ToString("0.00")))}";
         }
 
         public static DNA FromSerializableString(string str) {
