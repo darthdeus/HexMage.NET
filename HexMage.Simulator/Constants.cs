@@ -89,7 +89,7 @@ namespace HexMage.Simulator {
 
         public static bool HillClimbing = false;
 
-        public static int NumGenerations = 5000;
+        public static int NumGenerations = 2000;
         public static int EvolutionPrintModulo = 10;
         public static int TeamsPerGeneration = 50;
         public static double MutationDelta = 0.25;
@@ -111,7 +111,7 @@ namespace HexMage.Simulator {
         /// </summary>        
         public static int RandomSeed = 12345;
 
-        public static bool UseGlobalSeed = false;
+        public static bool UseGlobalSeed = true;
 
         // TODO - fuj, to sem nepatri
         private static StringWriter LogBuffer = new StringWriter();

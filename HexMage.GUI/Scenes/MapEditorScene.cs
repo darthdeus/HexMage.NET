@@ -115,11 +115,12 @@ namespace HexMage.GUI.Scenes {
         }
 
         public void LoadEvolutionSave(int index) {
-            var game = LoadEvolutionSaveFile(Constants.BuildEvoSavePath(index));
+            var game = LoadEvolutionSaveFile(Constants.BuildEvoSavePath(5));
 
             var arenaScene = new ArenaScene(_gameManager, game);
 
             game.MobManager.Teams[TeamColor.Red] = new PlayerController(arenaScene, game);
+            //game.MobManager.Teams[TeamColor.Red] = new MctsController(game, 1000);
             game.MobManager.Teams[TeamColor.Blue] = new MctsController(game, 1000);
 
             LoadNewScene(arenaScene);

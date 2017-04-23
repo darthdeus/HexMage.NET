@@ -94,7 +94,7 @@ namespace HexMage.Simulator {
                 var generation = Enumerable.Range(0, Constants.TeamsPerGeneration)
                                            .AsParallel()
                                            .Select(j => {
-                                               var newDna = Mutate(current1.dna, (float) tmp);
+                                               var newDna = Mutate(current1.dna);
                                                var newFitness =
                                                    CalculateFitness(gameCopies[j], initialDnaCopies[j], newDna);
 
@@ -230,7 +230,7 @@ namespace HexMage.Simulator {
             return result;
         }
 
-        public static DNA Mutate(DNA dna, float T) {
+        public static DNA Mutate(DNA dna) {
             var copy = dna.Clone();
 
             bool redo = false;

@@ -23,10 +23,12 @@ namespace HexMage.Simulator.AI {
 
         private readonly int _thinkTime;
         private readonly double _exploExplo;
+        private readonly bool _iterationsOverTime;
 
-        public UctAlgorithm(int thinkTime, double exploExplo = 2) {
+        public UctAlgorithm(int thinkTime, double exploExplo = 2, bool iterationsOverTime = true) {
             _thinkTime = thinkTime;
             _exploExplo = exploExplo;
+            _iterationsOverTime = iterationsOverTime;
         }
 
         public UctSearchResult UctSearch(GameInstance initialState) {
@@ -50,9 +52,13 @@ namespace HexMage.Simulator.AI {
                 iterationStopwatch.Stop();
 
                 MillisecondsPerIterationAverage.Add(iterationStopwatch.Elapsed.TotalMilliseconds);
-#warning TODO: tohle je fuj, pridat moznost nastavit jak cas tak iterace
-            } while (iterations < 10);
-        //} while (stopwatch.ElapsedMilliseconds < _thinkTime);
+
+                if (_iterationsOverTime) {
+                    if (iterations >= _thinkTime) break;
+                } else {
+                    if (stopwatch.ElapsedMilliseconds >= _thinkTime) break;
+                }
+            } while (true);
 
             stopwatch.Stop();
 

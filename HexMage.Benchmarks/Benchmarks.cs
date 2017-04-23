@@ -114,6 +114,7 @@ namespace HexMage.Benchmarks {
                 dna.Randomize();
                 iterationStopwatch.Restart();
 
+                // TODO: use CompareAiControllers
                 GameSetup.OverrideGameDna(game, dna, dna);
                 var r1 = GameEvaluator.Playout(game, c1, c2);
 

@@ -25,7 +25,6 @@ namespace HexMage.Simulator.AI {
             if (GlobalFactories.Count == 0) {
                 GlobalFactories.Add(new RuleBasedFactory());
                 GlobalFactories.Add(new MctsFactory(1));
-                //GlobalFactories.Add(new MctsFactory(2));
             }
 
             var stopwatch = new Stopwatch();

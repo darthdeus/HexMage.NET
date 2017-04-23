@@ -42,7 +42,6 @@ namespace HexMage.Simulator.AI {
             UnpackTeamsIntoGame(game, d1, d2);
 
             if (prepare) {
-                Console.WriteLine($"Resetting");
                 game.PrepareTurnOrder();
                 ResetGameAndPositions(game);
             }

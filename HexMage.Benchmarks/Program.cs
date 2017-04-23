@@ -3,25 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using HexMage.Simulator;
 using HexMage.Simulator.AI;
-using HexMage.Simulator.PCG;
-using MathNet.Numerics;
-using MathNet.Numerics.Distributions;
-using MathNet.Numerics.LinearAlgebra.Single;
-using MathNet.Numerics.Random;
 using Constants = HexMage.Simulator.Constants;
 
 namespace HexMage.Benchmarks {
-    internal class Program {
+    internal static class Program {
         private static void Main(string[] args) {
-            //var v1 = DenseVector.Build.Dense(78, 0);
-            //var v2 = DenseVector.Build.Dense(78, 1);
-
-            //Console.WriteLine($"Euclidean: {Distance.Euclidean(v1, v2)}");
-            //Console.WriteLine($"V1 ... L1: {v1.L1Norm()}, L2: {v1.L2Norm()}");
-            //Console.WriteLine($"V2 ... L1: {v2.L1Norm()}, L2: {v2.L2Norm()}");
-
-            //return;
-
             // TODO - proc to ale s timhle nekonverguje?!?!?!?!??!
             //Generator.Random = new Random(3);
 
@@ -89,9 +75,6 @@ namespace HexMage.Benchmarks {
             if (key.Key == ConsoleKey.D2) {
                 Constants.MctsLogging = false;
                 //RunEvaluator();
-            } else if (key.Key == ConsoleKey.D3) {
-                Constants.MctsLogging = false;
-                new EvolutionBenchmark().RunSimulatedAnnealing();
             } else {
                 for (int i = 0; i < 10; i++) {
                     new Benchmarks().Run();
@@ -129,7 +112,7 @@ namespace HexMage.Benchmarks {
                 for (int j = 0; j < Constants.MeasureNeighboursPerSample; j++) {
                     iterations++;
                     if (iterations % 1000 == 0) printStats();
-                    var neighbour = EvolutionBenchmark.Mutate(d2, 0);
+                    var neighbour = EvolutionBenchmark.Mutate(d2);
 
                     var neighbourFitness = EvolutionBenchmark.CalculateFitness(game, d1, neighbour);
 

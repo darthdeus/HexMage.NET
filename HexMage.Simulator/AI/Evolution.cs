@@ -47,28 +47,23 @@ namespace HexMage.Simulator.AI {
                                        .ToList();
 
             for (int i = 0; i < Constants.NumGenerations; i++) {
-                float tpercentage = Math.Max(0, 1.0f - (float) i / Constants.NumGenerations);
-                float T = Constants.InitialT * tpercentage;
-
                 var genWatch = new Stopwatch();
                 genWatch.Start();
 
                 var teamWatch = new Stopwatch();
                 teamWatch.Start();
 
-                if (Constants.RestartFailures && current.Result.SimpleFitness() < Constants.FitnessThreshold) {
+                if (Constants.RestartFailures && current.CombinedFitness() < Constants.FitnessThreshold) {
                     current.Team1.Randomize();
                     current.Team2.Randomize();
                     restartCount++;
                 }
 
-                //_initialDna = Mutate(_initialDna, T);
-
                 var generation = Enumerable.Range(0, Constants.TeamsPerGeneration)
                                            .AsParallel()
                                            .Select(j => {
-                                               var newTeam1 = EvolutionBenchmark.Mutate(current.Team1, (float) T);
-                                               var newTeam2 = EvolutionBenchmark.Mutate(current.Team2, (float) T);
+                                               var newTeam1 = EvolutionBenchmark.Mutate(current.Team1);
+                                               var newTeam2 = EvolutionBenchmark.Mutate(current.Team2);
 
                                                var newFitness =
                                                    EvolutionBenchmark.CalculateFitness(
@@ -96,7 +91,7 @@ namespace HexMage.Simulator.AI {
                 //if (Constants.ForbidTimeouts && newMax.result.Timeouted) continue;
 
 
-                plotT.Add(T);
+                plotT.Add(i);
                 plotFit.Add(current.CombinedFitness());
                 plotHpPercentage.Add(1 - current.Result.HpPercentage);
                 plotLength.Add(PlayoutResult.LengthSample(current.Result.TotalTurns));
@@ -104,7 +99,7 @@ namespace HexMage.Simulator.AI {
 
 
                 if (i % Constants.EvolutionPrintModulo == 0) {
-                    Console.WriteLine($"T: {T.ToString("0.0000")}\t\t" +
+                    Console.WriteLine($"T: {i}\t\t" +
                                       $"F: {previous.CombinedFitness().ToString("0.0000")}" +
                                       $" -> {current.CombinedFitness().ToString("0.0000")}");
                 }
@@ -117,7 +112,7 @@ namespace HexMage.Simulator.AI {
                                           $"T_s = {Constants.InitialT}'";
 
                 GnuPlot.HoldOn();
-                GnuPlot.Set($"xrange [{Constants.InitialT}:0] reverse",
+                GnuPlot.Set($"xrange [0:{Constants.NumGenerations}] reverse",
                             $"title '{Constants.NumGenerations} generations, T_s = {Constants.InitialT}",
                             //"yrange [0:1]",
                             //"style data lines",

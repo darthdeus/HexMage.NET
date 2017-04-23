@@ -1,22 +1,17 @@
-using HexMage.Simulator.Model;
-
-namespace HexMage.Simulator {
+namespace HexMage.Simulator.Model {
     public class Heatmap {
-        // TODO - make these properties
-        public HexMap<int> Map;
+        public readonly HexMap<int> Map;
 
-        public int Size;
         public int MaxValue;
         public int MinValue;
 
-        public Heatmap(int size) {
-            Size = size;
+        private Heatmap(int size) {
             Map = new HexMap<int>(size);
             MaxValue = 0;
             MinValue = int.MaxValue;
         }
 
-        public static Heatmap BuildHeatmap(GameInstance game, int? chosenMob = null) {
+        public static Heatmap BuildHeatmap(GameInstance game, int? chosenMob = null, bool ignoreAp = false) {
             var heatmap = new Heatmap(game.Size);
 
             int maxDmg = 0;
@@ -44,11 +39,11 @@ namespace HexMage.Simulator {
 
                     int maxAbilityDmg = 0;
                     foreach (var abilityId in enemyInfo.Abilities) {
-                        var abilityInfo = game.MobManager.AbilityForId(abilityId);
+                        var abilityInfo = game.MobManager.Abilities[abilityId];
 
                         bool withinRange = game.Map.AxialDistance(enemyInstance.Coord, coord) <= abilityInfo.Range;
                         bool onCooldown = game.State.Cooldowns[abilityId] > 0;
-                        bool hasEnoughAp = abilityInfo.Cost <= enemyInstance.Ap;
+                        bool hasEnoughAp = abilityInfo.Cost <= enemyInstance.Ap || ignoreAp;
 
                         bool isAbilityUsable = withinRange && !onCooldown && hasEnoughAp;
 

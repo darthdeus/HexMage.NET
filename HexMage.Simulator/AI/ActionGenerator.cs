@@ -162,7 +162,7 @@ namespace HexMage.Simulator {
         }
 
         public static void GenerateDefensiveMoveActions(GameInstance state, CachedMob mob, List<UctAction> result) {
-            var heatmap = Heatmap.BuildHeatmap(state);
+            var heatmap = Heatmap.BuildHeatmap(state, null, false);
             var coords = new List<AxialCoord>();
 
             var mobInstance = mob.MobInstance;
