@@ -25,7 +25,7 @@ namespace HexMage.Simulator.AI {
         private readonly double _exploExplo;
         private readonly bool _iterationsOverTime;
 
-        public UctAlgorithm(int thinkTime, double exploExplo = 2, bool iterationsOverTime = true) {
+        public UctAlgorithm(int thinkTime, double exploExplo = 2, bool iterationsOverTime = false) {
             _thinkTime = thinkTime;
             _exploExplo = exploExplo;
             _iterationsOverTime = iterationsOverTime;
