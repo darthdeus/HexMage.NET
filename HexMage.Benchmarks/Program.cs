@@ -11,7 +11,7 @@ namespace HexMage.Benchmarks {
     internal static class Program {
         private static void Main(string[] args) {
             if (!ProcessArguments(args)) return;
-            
+
 
 
             //new Benchmarks().Run();
@@ -35,19 +35,23 @@ namespace HexMage.Benchmarks {
             //    MeasureSearchSpaceStats();
             //}
 
-            //var evo = new Evolution(keepCounter: true, breakWhenFound: true, maxGoodCount: 1);
-            //foreach (var file in Directory.EnumerateFiles("data/manual-teams/")) {
-            //    if (file.EndsWith(".json")) {
-            //        string content = File.ReadAllText(file);
 
-            //        var t1 = JsonConvert.DeserializeObject<Team>(content);
-            //        evo.RunEvolutionStrategies(t1.ToDna(), false);
+            var evo = new Evolution(keepCounter: true, breakWhenFound: true, maxGoodCount: 1);
+            evo.GoodCount = 3;
+            foreach (var file in Directory.EnumerateFiles("data/manual-teams/"))
+            {
+                if (file.EndsWith(".json"))
+                {
+                    string content = File.ReadAllText(file);
 
-            //        Console.WriteLine($"File {file} done.");
-            //    }
-            //}
+                    var t1 = JsonConvert.DeserializeObject<Team>(content);
+                    evo.RunEvolutionStrategies(t1.ToDna(), false);
 
-            //return;
+                    Console.WriteLine($"File {file} done.");
+                }
+            }
+
+            return;
 
 
             if (Constants.EvaluateAis) {
