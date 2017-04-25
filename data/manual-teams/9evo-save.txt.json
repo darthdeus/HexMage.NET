@@ -1,40 +1,18 @@
 {
   "mobs": [
     {
-      "hp": 57,
+      // slow, resilient mob with huuuge amount of hp but no really dangerous spell, can suck ap from others
+      "hp": 99,
       "ap": 21,
       "abilities": [
         {
-          "dmg": 21,
-          "ap": 11,
-          "range": 3,
-          "cooldown": 2,
-          "buff": {
-            "HpChange": -1,
-            "ApChange": -4,
-            "Lifetime": 1
-          },
-          "areaBuff": {
-            "Coord": {
-              "X": 0,
-              "Y": 0
-            },
-            "Radius": 3,
-            "Effect": {
-              "HpChange": -3,
-              "ApChange": -4,
-              "Lifetime": 2
-            }
-          }
-        },
-        {
-          "dmg": 16,
-          "ap": 17,
+          "dmg": 3,
+          "ap": 4,
           "range": 3,
           "cooldown": 0,
           "buff": {
-            "HpChange": -4,
-            "ApChange": -1,
+            "HpChange": 0,
+            "ApChange": -5,
             "Lifetime": 1
           },
           "areaBuff": {
@@ -45,25 +23,19 @@
             "Radius": 0,
             "Effect": {
               "HpChange": 0,
-              "ApChange": -4,
-              "Lifetime": 1
+              "ApChange": 0,
+              "Lifetime": 0
             }
           }
-        }
-      ]
-    },
-    {
-      "hp": 26,
-      "ap": 16,
-      "abilities": [
+        },
         {
-          "dmg": 23,
-          "ap": 11,
+          "dmg": 5,
+          "ap": 15,
           "range": 2,
           "cooldown": 1,
           "buff": {
-            "HpChange": -3,
-            "ApChange": -2,
+            "HpChange": -4,
+            "ApChange": -3,
             "Lifetime": 2
           },
           "areaBuff": {
@@ -71,9 +43,39 @@
               "X": 0,
               "Y": 0
             },
-            "Radius": 1,
+            "Radius": 2,
             "Effect": {
               "HpChange": 0,
+              "ApChange": -3,
+              "Lifetime": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      // Radius mob - not good on 1on1 but perfect for groups
+      "hp": 66,
+      "ap": 16,
+      "abilities": [
+        {
+          "dmg": 23,
+          "ap": 11,
+          "range": 6,
+          "cooldown": 2,
+          "buff": {
+            "HpChange": 0,
+            "ApChange": 0,
+            "Lifetime": 0
+          },
+          "areaBuff": {
+            "Coord": {
+              "X": 0,
+              "Y": 0
+            },
+            "Radius": 4,
+            "Effect": {
+              "HpChange": -3,
               "ApChange": -1,
               "Lifetime": 2
             }
@@ -81,12 +83,12 @@
         },
         {
           "dmg": 5,
-          "ap": 9,
-          "range": 1,
+          "ap": 10,
+          "range": 5,
           "cooldown": 1,
           "buff": {
-            "HpChange": 0,
-            "ApChange": -4,
+            "HpChange": -2,
+            "ApChange": 0,
             "Lifetime": 1
           },
           "areaBuff": {
@@ -94,7 +96,7 @@
               "X": 0,
               "Y": 0
             },
-            "Radius": 0,
+            "Radius": 5,
             "Effect": {
               "HpChange": -3,
               "ApChange": -4,

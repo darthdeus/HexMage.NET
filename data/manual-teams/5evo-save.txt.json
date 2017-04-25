@@ -1,7 +1,9 @@
+
 {
   "mobs": [
     {
-      "hp": 72,
+      // Jednoranka s obrovskym bum bac!
+      "hp": 12,
       "ap": 9,
       "abilities": [
         {
@@ -10,7 +12,7 @@
           "range": 5,
           "cooldown": 1,
           "buff": {
-            "HpChange": -1,
+            "HpChange": -5,
             "ApChange": -4,
             "Lifetime": 2
           },
@@ -19,19 +21,19 @@
               "X": 0,
               "Y": 0
             },
-            "Radius": 0,
+            "Radius": 1,
             "Effect": {
-              "HpChange": -4,
+              "HpChange": -2,
               "ApChange": 0,
-              "Lifetime": 0
+              "Lifetime": 1
             }
           }
         },
         {
-          "dmg": 21,
-          "ap": 2,
-          "range": 8,
-          "cooldown": 2,
+          "dmg": 20,
+          "ap": 8,
+          "range": 6,
+          "cooldown": 1,
           "buff": {
             "HpChange": -1,
             "ApChange": 0,
@@ -42,7 +44,7 @@
               "X": 0,
               "Y": 0
             },
-            "Radius": 0,
+            "Radius": 1,
             "Effect": {
               "HpChange": -3,
               "ApChange": -1,
@@ -53,17 +55,18 @@
       ]
     },
     {
+      // range - dostreli  vsude!
       "hp": 32,
       "ap": 22,
       "abilities": [
         {
-          "dmg": 7,
-          "ap": 14,
-          "range": 1,
-          "cooldown": 2,
+          "dmg": 4,
+          "ap": 18,
+          "range": 10,
+          "cooldown": 0,
           "buff": {
-            "HpChange": -4,
-            "ApChange": -4,
+            "HpChange": -1,
+            "ApChange": -1,
             "Lifetime": 1
           },
           "areaBuff": {
@@ -73,31 +76,31 @@
             },
             "Radius": 1,
             "Effect": {
-              "HpChange": -3,
+              "HpChange": -2,
               "ApChange": -2,
-              "Lifetime": 2
+              "Lifetime": 1
             }
           }
         },
         {
-          "dmg": 10,
-          "ap": 17,
-          "range": 2,
-          "cooldown": 1,
+          "dmg": 6,
+          "ap": 10,
+          "range": 9,
+          "cooldown": 0,
           "buff": {
             "HpChange": 0,
-            "ApChange": -2,
-            "Lifetime": 1
+            "ApChange": 0,
+            "Lifetime": 0
           },
           "areaBuff": {
             "Coord": {
               "X": 0,
               "Y": 0
             },
-            "Radius": 3,
+            "Radius": 1,
             "Effect": {
-              "HpChange": -3,
-              "ApChange": -2,
+              "HpChange": -1,
+              "ApChange": -1,
               "Lifetime": 2
             }
           }

@@ -1,18 +1,20 @@
+
 {
   "mobs": [
     {
+      // upir - vysava zivoty, jinak zdanlive nic nedela. 
       "hp": 67,
-      "ap": 13,
+      "ap": 17,
       "abilities": [
         {
-          "dmg": 17,
+          "dmg": 2,
           "ap": 11,
           "range": 5,
           "cooldown": 1,
           "buff": {
-            "HpChange": -4,
-            "ApChange": -1,
-            "Lifetime": 0
+            "HpChange": -5,
+            "ApChange": 0,
+            "Lifetime": 2
           },
           "areaBuff": {
             "Coord": {
@@ -21,9 +23,9 @@
             },
             "Radius": 2,
             "Effect": {
-              "HpChange": 0,
-              "ApChange": -4,
-              "Lifetime": 1
+              "HpChange": -5,
+              "ApChange": 0,
+              "Lifetime": 2
             }
           }
         },
@@ -44,15 +46,16 @@
             },
             "Radius": 1,
             "Effect": {
-              "HpChange": -1,
-              "ApChange": -2,
-              "Lifetime": 2
+              "HpChange": -3,
+              "ApChange": 0,
+              "Lifetime": 1
             }
           }
         }
       ]
     },
     {
+      // dalsi nudak
       "hp": 85,
       "ap": 13,
       "abilities": [
@@ -60,9 +63,9 @@
           "dmg": 15,
           "ap": 5,
           "range": 9,
-          "cooldown": 1,
+          "cooldown": 2,
           "buff": {
-            "HpChange": -4,
+            "HpChange": -1,
             "ApChange": -2,
             "Lifetime": 1
           },
@@ -71,11 +74,11 @@
               "X": 0,
               "Y": 0
             },
-            "Radius": 4,
+            "Radius": 0,
             "Effect": {
-              "HpChange": -1,
-              "ApChange": -4,
-              "Lifetime": 2
+              "HpChange": 0,
+              "ApChange": 0,
+              "Lifetime": 0
             }
           }
         },
@@ -83,9 +86,9 @@
           "dmg": 12,
           "ap": 9,
           "range": 5,
-          "cooldown": 2,
+          "cooldown": 1,
           "buff": {
-            "HpChange": -5,
+            "HpChange": 0,
             "ApChange": -2,
             "Lifetime": 1
           },
@@ -94,11 +97,11 @@
               "X": 0,
               "Y": 0
             },
-            "Radius": 3,
+            "Radius": 0,
             "Effect": {
               "HpChange": 0,
-              "ApChange": -4,
-              "Lifetime": 2
+              "ApChange": 0,
+              "Lifetime": 0
             }
           }
         }

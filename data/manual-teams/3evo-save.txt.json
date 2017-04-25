@@ -1,17 +1,19 @@
+
 {
   "mobs": [
     {
+      // berserker 1
       "hp": 38,
       "ap": 15,
       "abilities": [
         {
           "dmg": 24,
           "ap": 7,
-          "range": 2,
-          "cooldown": 2,
+          "range": 1,
+          "cooldown": 0,
           "buff": {
             "HpChange": -1,
-            "ApChange": -4,
+            "ApChange": 0,
             "Lifetime": 3
           },
           "areaBuff": {
@@ -19,19 +21,19 @@
               "X": 0,
               "Y": 0
             },
-            "Radius": 3,
+            "Radius": 0,
             "Effect": {
               "HpChange": 0,
-              "ApChange": -3,
-              "Lifetime": 3
+              "ApChange": 0,
+              "Lifetime": 0
             }
           }
         },
         {
           "dmg": 22,
           "ap": 11,
-          "range": 4,
-          "cooldown": 2,
+          "range": 1,
+          "cooldown": 0,
           "buff": {
             "HpChange": -2,
             "ApChange": -2,
@@ -42,25 +44,26 @@
               "X": 0,
               "Y": 0
             },
-            "Radius": 4,
+            "Radius": 0,
             "Effect": {
-              "HpChange": -5,
-              "ApChange": -1,
-              "Lifetime": 3
+              "HpChange": 0,
+              "ApChange": 0,
+              "Lifetime": 0
             }
           }
         }
       ]
     },
     {
-      "hp": 97,
+      // berserker 2
+      "hp": 44,
       "ap": 22,
       "abilities": [
         {
           "dmg": 16,
-          "ap": 17,
-          "range": 4,
-          "cooldown": 1,
+          "ap": 15,
+          "range": 2,
+          "cooldown": 0,
           "buff": {
             "HpChange": -3,
             "ApChange": -4,
@@ -71,34 +74,34 @@
               "X": 0,
               "Y": 0
             },
-            "Radius": 1,
+            "Radius": 0,
             "Effect": {
-              "HpChange": -1,
-              "ApChange": -5,
-              "Lifetime": 2
+              "HpChange": 0,
+              "ApChange": 0,
+              "Lifetime": 0
             }
           }
         },
         {
-          "dmg": 17,
+          "dmg": 20,
           "ap": 5,
           "range": 1,
           "cooldown": 1,
           "buff": {
-            "HpChange": -1,
-            "ApChange": -2,
-            "Lifetime": 2
+            "HpChange": 0,
+            "ApChange": 0,
+            "Lifetime": 0
           },
           "areaBuff": {
             "Coord": {
               "X": 0,
               "Y": 0
             },
-            "Radius": 4,
+            "Radius": 0,
             "Effect": {
-              "HpChange": -5,
-              "ApChange": -4,
-              "Lifetime": 1
+              "HpChange": 0,
+              "ApChange": 0,
+              "Lifetime": 0
             }
           }
         }

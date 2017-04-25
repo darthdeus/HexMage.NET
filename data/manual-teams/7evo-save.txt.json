@@ -1,8 +1,10 @@
+
 {
   "mobs": [
     {
-      "hp": 67,
-      "ap": 21,
+      // PRUMERNEJ NUDAK
+      "hp": 47,
+      "ap": 20,
       "abilities": [
         {
           "dmg": 10,
@@ -19,21 +21,21 @@
               "X": 0,
               "Y": 0
             },
-            "Radius": 2,
+            "Radius": 0,
             "Effect": {
               "HpChange": 0,
-              "ApChange": -3,
-              "Lifetime": 2
+              "ApChange": 0,
+              "Lifetime": 0
             }
           }
         },
         {
-          "dmg": 10,
+          "dmg": 4,
           "ap": 4,
-          "range": 3,
-          "cooldown": 1,
+          "range": 4,
+          "cooldown": 0,
           "buff": {
-            "HpChange": -4,
+            "HpChange": -2,
             "ApChange": -3,
             "Lifetime": 1
           },
@@ -45,7 +47,7 @@
             "Radius": 1,
             "Effect": {
               "HpChange": -3,
-              "ApChange": -3,
+              "ApChange": -1,
               "Lifetime": 2
             }
           }
@@ -53,13 +55,14 @@
       ]
     },
     {
-      "hp": 83,
-      "ap": 4,
+      // extra malo ap - muze pouzit schopnost nebo jit, nic mezi
+      "hp": 53,
+      "ap": 7,
       "abilities": [
         {
           "dmg": 6,
-          "ap": 1,
-          "range": 1,
+          "ap": 5,
+          "range": 4,
           "cooldown": 0,
           "buff": {
             "HpChange": -1,
@@ -81,8 +84,8 @@
         },
         {
           "dmg": 13,
-          "ap": 1,
-          "range": 7,
+          "ap": 5,
+          "range": 6,
           "cooldown": 0,
           "buff": {
             "HpChange": -5,
