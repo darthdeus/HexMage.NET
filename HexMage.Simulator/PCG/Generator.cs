@@ -17,6 +17,14 @@ namespace HexMage.Simulator.PCG {
             private ThreadLocal<Random> _rng = new ThreadLocal<Random>(() => new Random(_srng.Next(int.MaxValue)));
             private const bool useLocks = false;
 
+            static ThreadLocalGenerator() {
+                if (Constants.UseGlobalSeed) {
+                    _srng = new Random(Constants.RandomSeed);
+                } else {
+                    _srng = new Random();
+                }
+            }
+
             public int Next(int min, int max) {
                 if (useLocks) {
                     lock (this) {

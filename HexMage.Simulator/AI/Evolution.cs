@@ -49,7 +49,7 @@ namespace HexMage.Simulator.AI {
             List<double> plotDistance = new List<double>();
 
             var gameCopies = Enumerable.Range(0, Constants.TeamsPerGeneration)
-                                       .AsParallel()
+                                       //.AsParallel()
                                        .Select(_ => game.DeepCopy())
                                        .ToList();
 
@@ -70,7 +70,7 @@ namespace HexMage.Simulator.AI {
                 }
 
                 var generation = Enumerable.Range(0, Constants.TeamsPerGeneration)
-                                           .AsParallel()
+                                           //.AsParallel()
                                            .Select(j => {
                                                var newTeam1 =
                                                    evolveTeam1
