@@ -2,7 +2,6 @@
 {
   "mobs": [
     {
-      // upir - vysava zivoty, jinak zdanlive nic nedela. 
       "hp": 67,
       "ap": 17,
       "abilities": [
@@ -55,7 +54,6 @@
       ]
     },
     {
-      // dalsi nudak
       "hp": 85,
       "ap": 13,
       "abilities": [

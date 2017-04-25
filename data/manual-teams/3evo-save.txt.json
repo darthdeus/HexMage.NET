@@ -2,7 +2,6 @@
 {
   "mobs": [
     {
-      // berserker 1
       "hp": 38,
       "ap": 15,
       "abilities": [
@@ -55,7 +54,6 @@
       ]
     },
     {
-      // berserker 2
       "hp": 44,
       "ap": 22,
       "abilities": [

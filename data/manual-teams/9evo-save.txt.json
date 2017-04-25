@@ -1,7 +1,6 @@
 {
   "mobs": [
     {
-      // slow, resilient mob with huuuge amount of hp but no really dangerous spell, can suck ap from others
       "hp": 99,
       "ap": 21,
       "abilities": [
@@ -54,7 +53,6 @@
       ]
     },
     {
-      // Radius mob - not good on 1on1 but perfect for groups
       "hp": 66,
       "ap": 16,
       "abilities": [

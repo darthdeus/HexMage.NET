@@ -12,6 +12,7 @@ namespace HexMage.Simulator.AI {
         private readonly int _maxGoodCount;
         private readonly bool _breakWhenFound;
         public int GoodCount = 0;
+        public int GoodIndexOffset = 0;
 
         public Evolution(bool keepCounter, int maxGoodCount, bool breakWhenFound) {
             _keepCounter = keepCounter;
@@ -19,7 +20,8 @@ namespace HexMage.Simulator.AI {
             _breakWhenFound = breakWhenFound;
         }
 
-        public void RunEvolutionStrategies(DNA initialDna, bool evolveTeam1 = true) {
+        public void RunEvolutionStrategies(DNA initialDna, bool evolveTeam1 = true, int? forcedIndex = null,
+                                           bool stopWhenGood = false) {
             if (!_keepCounter) {
                 GoodCount = 0;
             }
@@ -103,8 +105,10 @@ namespace HexMage.Simulator.AI {
                 }
 
                 if (Constants.SaveGoodOnes && current.CombinedFitness() > 0.95) {
+                    int index = forcedIndex ?? GoodCount + GoodIndexOffset;
+                    EvolutionBenchmark.SaveDna(index, current.Team1, current.Team2);
+
                     GoodCount++;
-                    EvolutionBenchmark.SaveDna(GoodCount, current.Team1, current.Team2);
 
                     Console.WriteLine($"Found extra good {current.CombinedFitness()}, restarting");
 
@@ -113,7 +117,7 @@ namespace HexMage.Simulator.AI {
                     }
                     current.Team2.Randomize();
 
-                    if (GoodCount >= _maxGoodCount) {
+                    if (stopWhenGood || GoodCount >= _maxGoodCount) {
                         Console.WriteLine($"Stopping evolution early, reached target {_maxGoodCount} good matches.");
                         break;
                     }

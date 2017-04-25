@@ -2,7 +2,6 @@
 {
   "mobs": [
     {
-      // malej ale extra silnej, proto ma dlouhy cooldowny
       "hp": 36,
       "ap": 20,
       "abilities": [
@@ -55,7 +54,6 @@
       ]
     },
     {
-      // hodne ap, opakuje slabe kouzla, zadnoefektak
       "hp": 44,
       "ap": 25,
       "abilities": [

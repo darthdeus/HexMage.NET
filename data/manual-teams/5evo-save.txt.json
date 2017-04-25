@@ -2,7 +2,6 @@
 {
   "mobs": [
     {
-      // Jednoranka s obrovskym bum bac!
       "hp": 12,
       "ap": 9,
       "abilities": [
@@ -55,7 +54,6 @@
       ]
     },
     {
-      // range - dostreli  vsude!
       "hp": 32,
       "ap": 22,
       "abilities": [

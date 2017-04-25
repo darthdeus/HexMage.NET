@@ -2,7 +2,6 @@
 {
   "mobs": [
     {
-      // PRUMERNEJ NUDAK
       "hp": 47,
       "ap": 20,
       "abilities": [
@@ -55,7 +54,6 @@
       ]
     },
     {
-      // extra malo ap - muze pouzit schopnost nebo jit, nic mezi
       "hp": 53,
       "ap": 7,
       "abilities": [

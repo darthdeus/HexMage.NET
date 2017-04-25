@@ -34,20 +34,19 @@ namespace HexMage.Benchmarks {
             //}
 
 
-            //var evo = new Evolution(keepCounter: true, breakWhenFound: true, maxGoodCount: 1);
-            //evo.GoodCount = 3;
-            //foreach (var file in Directory.EnumerateFiles("data/manual-teams/"))
-            //{
-            //    if (file.EndsWith(".json"))
-            //    {
-            //        string content = File.ReadAllText(file);
+            var evo = new Evolution(keepCounter: true, breakWhenFound: true, maxGoodCount: 1);
+            int index = 0;
+            foreach (var file in Directory.EnumerateFiles("data/manual-teams/")) {
+                if (file.EndsWith(".json")) {
+                    Console.WriteLine($"Processing {file}\n\n\n");
+                    string content = File.ReadAllText(file);
 
-            //        var t1 = JsonConvert.DeserializeObject<Team>(content);
-            //        evo.RunEvolutionStrategies(t1.ToDna(), false);
+                    var t1 = JsonConvert.DeserializeObject<Team>(content);
+                    evo.RunEvolutionStrategies(t1.ToDna(), false, index++);
 
-            //        Console.WriteLine($"File {file} done.");
-            //    }
-            //}
+                    Console.WriteLine($"File {file} done.");
+                }
+            }
 
             //return;
 
@@ -57,7 +56,9 @@ namespace HexMage.Benchmarks {
             } else {
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
-                new Evolution(false, 3, true).RunEvolutionStrategies(new DNA(2, 2));
+                var evolution = new Evolution(false, 10, true);
+                evolution.GoodIndexOffset = 10;
+                evolution.RunEvolutionStrategies(new DNA(2, 2));
                 stopwatch.Stop();
 
                 Console.WriteLine(

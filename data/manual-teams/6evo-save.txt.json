@@ -1,8 +1,6 @@
-
 {
   "mobs": [
     {
-      // medium range 
       "hp": 20,
       "ap": 25,
       "abilities": [
@@ -55,7 +53,6 @@
       ]
     },
     {
-      // jedno kouzlo na dalku jedno na blizko - stridak
       "hp": 40,
       "ap": 10,
       "abilities": [
@@ -76,7 +73,7 @@
             },
             "Radius": 0,
             "Effect": {
-              "HpChange": ,
+              "HpChange": 0,
               "ApChange": 0,
               "Lifetime": 0
             }
