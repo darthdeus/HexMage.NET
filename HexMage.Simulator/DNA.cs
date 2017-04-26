@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -73,12 +74,16 @@ namespace HexMage.Simulator {
         }
 
         public static DNA FromSerializableString(string str) {
+            Console.WriteLine($"Processing****\n\n'{str}'\n\n*****");
             var split = str.Split(',');
             var dna = new DNA();
             dna.MobCount = int.Parse(split[0]);
             dna.AbilityCount = int.Parse(split[1]);
 
-            dna.Data = DenseVector.OfEnumerable(split.Skip(2).Select(float.Parse));
+            dna.Data = DenseVector.OfEnumerable(split.Skip(2).Select(x => {
+                Console.WriteLine($"Parsing {x}");
+                return float.Parse(x, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+            }));
 
             return dna;
         }

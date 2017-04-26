@@ -10,9 +10,9 @@
           "range": 1,
           "cooldown": 1,
           "buff": {
-            "HpChange": 0,
+            "HpChange": -5,
             "ApChange": 0,
-            "Lifetime": 0
+            "Lifetime": 2
           },
           "areaBuff": {
             "Coord": {
@@ -21,9 +21,9 @@
             },
             "Radius": 0,
             "Effect": {
-              "HpChange": 0,
+              "HpChange": -5,
               "ApChange": 0,
-              "Lifetime": 0
+              "Lifetime": 2
             }
           }
         },

@@ -30,7 +30,7 @@
         {
           "dmg": 24,
           "ap": 15,
-          "range": 0,
+          "range": 1,
           "cooldown": 1,
           "buff": {
             "HpChange": -4,

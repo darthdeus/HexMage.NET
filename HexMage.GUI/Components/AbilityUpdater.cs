@@ -71,13 +71,16 @@ namespace HexMage.GUI.Components {
                 _dmgLabel.Text = _abilityInfo.Dmg.ToString();
                 _abLabel.Text = _abilityInfo.Cost.ToString();
                 _rangeLabel.Text = _abilityInfo.Range.ToString();
-                _buffLabel.Text =
-                    $"{_abilityInfo.Buff.HpChange}/{_abilityInfo.Buff.ApChange} " +
-                    $"({_abilityInfo.Buff.Lifetime} turns)";
 
+                var buff = _abilityInfo.Buff.IsZero ? Buff.ZeroBuff() : _abilityInfo.Buff;
+                _buffLabel.Text =
+                    $"{buff.HpChange}/{buff.ApChange} " +
+                    $"({buff.Lifetime} turns)";
+
+                var areaBuff = _abilityInfo.AreaBuff.IsZero ? AreaBuff.ZeroBuff() : _abilityInfo.AreaBuff;
                 _areaBuffLabel.Text =
-                    $"{_abilityInfo.AreaBuff.Effect.HpChange}/{_abilityInfo.AreaBuff.Effect.ApChange} " +
-                    $"({_abilityInfo.AreaBuff.Effect.Lifetime} turns, {_abilityInfo.AreaBuff.Radius}r)";
+                    $"{areaBuff.Effect.HpChange}/{areaBuff.Effect.ApChange} " +
+                    $"({areaBuff.Effect.Lifetime} turns, {areaBuff.Radius}r)";
 
                 _cooldownLabel.Text = _abilityInfo.Cooldown.ToString();
 

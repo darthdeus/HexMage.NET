@@ -2,6 +2,8 @@
 
 namespace HexMage.Simulator {
     public static class Constants {
+        public static bool EnableSounds = false;
+
         public static bool RecordReplays = false;
 
         // MCTS benchmarks
@@ -91,7 +93,7 @@ namespace HexMage.Simulator {
 
         public static int NumGenerations = 20000;
         public static int EvolutionPrintModulo = 10;
-        public static int TeamsPerGeneration = 50;
+        public static int TeamsPerGeneration = 40;
         public static double MutationDelta = 0.25;
 
         /// <summary>

@@ -52,8 +52,8 @@ namespace HexMage.Simulator {
                                                   cost,
                                                   range,
                                                   cooldown,
-                                                  buff,
-                                                  areaBuff);
+                                                  new JsonBuff(buff), 
+                                                  new JsonAreaBuff(areaBuff));
                     mob.abilities.Add(ability);
                 }
 

@@ -88,14 +88,18 @@ namespace HexMage.GUI.Components {
             Debug.Assert(Entity.Renderer == null);
             Entity.Renderer = new GameBoardRenderer(_game, this, _eventHub);
 
-            BuildPopovers();
-            var turnEndSound = _assetManager.LoadSoundEffect(AssetManager.SoundEffectEndTurn);
-
+            BuildPopovers();            
+            
             if (_replay == null) {
-                _eventHub.SlowMainLoop(() => turnEndSound.Play(0.3f, 0, 0), () => GameFinishedCallback?.Invoke())
+                _eventHub.SlowMainLoop(() => {
+                             if (Constants.EnableSounds) {
+                                 _assetManager.LoadSoundEffect(AssetManager.SoundEffectEndTurn).Play(0.3f, 0, 0);
+                             }
+                             return true;
+                         }, () => GameFinishedCallback?.Invoke())
                          .LogContinuation();
             } else {                
-                _eventHub.PlayReplay(_replay.Actions, () => turnEndSound.Play(0.3f, 0, 0))
+                _eventHub.PlayReplay(_replay.Actions, () => true)
                          .LogContinuation();
             }
         }
@@ -367,7 +371,10 @@ namespace HexMage.GUI.Components {
             var sound = abilityInfo.Dmg > 18
                             ? AssetManager.SoundEffectFireballLarge
                             : AssetManager.SoundEffectFireballSmall;
-            _assetManager.LoadSoundEffect(sound).Play();
+
+            if (Constants.EnableSounds) {
+                _assetManager.LoadSoundEffect(sound).Play();
+            }
 
             var mobInstance = _game.State.MobInstances[mobId];
             var targetInstance = _game.State.MobInstances[targetId];
@@ -396,7 +403,9 @@ namespace HexMage.GUI.Components {
 
             await projectile.Task;
 
-            _assetManager.LoadSoundEffect(AssetManager.SoundEffectSpellHit).Play();
+            if (Constants.EnableSounds) {
+                _assetManager.LoadSoundEffect(AssetManager.SoundEffectSpellHit).Play();
+            }
 
             var explosion = new Entity {
                 Transform = () => Camera2D.Instance.Transform,

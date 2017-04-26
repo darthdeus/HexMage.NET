@@ -11,7 +11,6 @@ namespace HexMage.Benchmarks {
     internal static class Program {
         private static void Main(string[] args) {
             if (!ProcessArguments(args)) return;
-
             //new Benchmarks().Run();
             //return;
 
@@ -36,9 +35,10 @@ namespace HexMage.Benchmarks {
 
             var evo = new Evolution(keepCounter: true, breakWhenFound: true, maxGoodCount: 1);
             int index = 0;
+
             foreach (var file in Directory.EnumerateFiles("data/manual-teams/")) {
                 if (file.EndsWith(".json")) {
-                    Console.WriteLine($"Processing {file}\n\n\n");
+                    Console.WriteLine($"\n\n\n\nProcessing {file}");
                     string content = File.ReadAllText(file);
 
                     var t1 = JsonConvert.DeserializeObject<Team>(content);

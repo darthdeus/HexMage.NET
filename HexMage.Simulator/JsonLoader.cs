@@ -5,18 +5,56 @@ using HexMage.Simulator.Model;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
+    public class JsonBuff {
+        public int HpChange;
+        public int ApChange;
+        public int Lifetime;
+
+        public JsonBuff() { }
+
+        public JsonBuff(Buff buff) {
+            HpChange = buff.HpChange;
+            ApChange = buff.ApChange;
+            Lifetime = buff.Lifetime;
+        }
+
+        public Buff ToBuff() {
+            var res = new Buff(HpChange, ApChange, Lifetime);
+            return res.IsZero ? Buff.ZeroBuff() : res;
+        }
+    }
+
+    public class JsonAreaBuff {
+        public AxialCoord Coord;
+        public int Radius;
+        public JsonBuff Effect;
+
+        public JsonAreaBuff() {
+        }
+
+        public JsonAreaBuff(AreaBuff areaBuff) {
+            Coord = areaBuff.Coord;
+            Radius = areaBuff.Radius;
+            Effect = new JsonBuff(areaBuff.Effect);
+        }
+
+        public AreaBuff ToBuff() {
+            var res = new AreaBuff(Coord, Radius, Effect.ToBuff());
+            return res.IsZero ? AreaBuff.ZeroBuff() : res;
+        }
+    }
+
     public class JsonAbility {
         public int dmg;
         public int ap;
         public int range;
         public int cooldown;
-        public Buff buff;
-        public AreaBuff areaBuff;
+        public JsonBuff buff;
+        public JsonAreaBuff areaBuff;
 
-        public JsonAbility() {
-        }
+        public JsonAbility() { }
 
-        public JsonAbility(int dmg, int ap, int range, int cooldown, Buff buff, AreaBuff areaBuff) {
+        public JsonAbility(int dmg, int ap, int range, int cooldown, JsonBuff buff, JsonAreaBuff areaBuff) {
             this.dmg = dmg;
             this.ap = ap;
             this.range = range;
@@ -26,7 +64,7 @@ namespace HexMage.Simulator {
         }
 
         public AbilityInfo ToAbility() {
-            return new AbilityInfo(dmg, ap, range, cooldown, buff, areaBuff);
+            return new AbilityInfo(dmg, ap, range, cooldown, buff.ToBuff(), areaBuff.ToBuff());
         }
     }
 
@@ -68,7 +106,7 @@ namespace HexMage.Simulator {
         public List<JsonMob> red = new List<JsonMob>();
         public List<JsonMob> blue = new List<JsonMob>();
 
-        public Setup() {}
+        public Setup() { }
 
         public Setup(List<JsonMob> red, List<JsonMob> blue) {
             this.red = red;
