@@ -82,7 +82,7 @@ namespace HexMage.Simulator {
 
             dna.Data = DenseVector.OfEnumerable(split.Skip(2).Select(x => {
                 Console.WriteLine($"Parsing {x}");
-                return float.Parse(x, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                return float.Parse(x, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture);
             }));
 
             return dna;

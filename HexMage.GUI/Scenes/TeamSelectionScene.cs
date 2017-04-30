@@ -161,6 +161,12 @@ namespace HexMage.GUI.Scenes {
         }
 
         private void DoContinue() {
+            if (_game == null) {
+                Utils.Log(LogSeverity.Warning, nameof(TeamSelectionScene),
+                          "Failed to start a game, no controllers selected.");
+                return;
+            }
+
             if (_teamSize > Math.Min(_game.Map.RedStartingPoints.Count, _game.Map.BlueStartingPoints.Count)) {
                 Utils.Log(LogSeverity.Error, nameof(TeamSelectionScene),
                           "Not enough starting positions, decrease team size or add them in the map editor (Ctrl-R).");
