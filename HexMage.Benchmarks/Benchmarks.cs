@@ -79,8 +79,8 @@ namespace HexMage.Benchmarks {
                     c2 = new AiRuleBasedController(game);
                     break;
                 case 2:
-                    c1 = new AiRandomController(game);
-                    c2 = new AiRuleBasedController(game);
+                    c1 = new AiRuleBasedController(game);
+                    c2 = new AiRandomController(game);
                     break;
                 case 3:
                     c1 = new FlatMonteCarloController(game);
@@ -123,13 +123,13 @@ namespace HexMage.Benchmarks {
 
                 iterationStopwatch.Stop();
 
-                Console.WriteLine($"Iteration: {iterationStopwatch.ElapsedMilliseconds}ms");
+                //Console.WriteLine($"Iteration: {iterationStopwatch.ElapsedMilliseconds}ms");
                 Console.WriteLine(Accounting.GetStats());
 
                 c1Wins += r1.RedWins + r2.BlueWins;
                 c2Wins += r1.BlueWins + r2.RedWins;
 
-                Console.WriteLine($"STATS: M2: {c1Wins}, M5: {c2Wins}");
+                Console.WriteLine($"{i.ToString("0000")} STATS: M2: {c1Wins}, M5: {c2Wins}, winrate: {((double)c1Wins/(c1Wins+c2Wins)).ToString("0.000")}");
             }
         }
 

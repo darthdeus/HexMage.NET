@@ -31,7 +31,7 @@ namespace HexMage.Simulator {
         public static void PrintDotgraph(UctNode root, Func<int> indexFunc = null) {
             var builder = new StringBuilder();
 
-            int budget = 100;
+            int budget = 4;
 
             builder.AppendLine("digraph G {");
             PrintDotNode(builder, null, root, budget);
