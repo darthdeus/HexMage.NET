@@ -8,13 +8,11 @@ namespace HexMage.Simulator.Model {
         public static int MctsWins = 0;
         public static int RandomAiWins = 0;
         public static int RuleBasedAiWins = 0;
-        public static int FlatMonteCarloWins = 0;
 
         public static void Reset() {
             MctsWins = 0;
             RandomAiWins = 0;
             RuleBasedAiWins = 0;
-            FlatMonteCarloWins = 0;
         }
 
         public static void IncrementWinner(IMobController controller) {
@@ -25,8 +23,6 @@ namespace HexMage.Simulator.Model {
                 Interlocked.Increment(ref RandomAiWins);
             } else if (type == typeof(AiRuleBasedController)) {
                 Interlocked.Increment(ref RuleBasedAiWins);
-            } else if (type == typeof(FlatMonteCarloController)) {
-                Interlocked.Increment(ref FlatMonteCarloWins);
             } else {
                 throw new ArgumentException($"Invalid type of {type}", nameof(controller));
             }
@@ -37,7 +33,6 @@ namespace HexMage.Simulator.Model {
             if (MctsWins > 0) builder.AppendLine($"MCTS: {MctsWins}");
             if (RandomAiWins > 0) builder.AppendLine($"Random: {RandomAiWins}");
             if (RuleBasedAiWins > 0) builder.AppendLine($"Rule: {RuleBasedAiWins}");
-            if (FlatMonteCarloWins > 0) builder.AppendLine($"Flat: {FlatMonteCarloWins}");
 
             return builder.ToString();
         }

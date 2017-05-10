@@ -11,26 +11,23 @@ namespace HexMage.Benchmarks {
     internal static class Program {
         private static void Main(string[] args) {
             if (!ProcessArguments(args)) return;
-            //new Benchmarks().Run();
-            //return;
 
-            //Constants.MctsBenchmark = true;
-            //Benchmarks.BenchmarkAllAisAgainstMcts();
-            //return;
+                new Benchmarks().Run();
+            if (args.Length > 0 && args[0] == "mcts-measure-speed") {
+                new Benchmarks().Run();
+                return;
+            }
 
-            //Constants.MctsBenchmark = true;
-            //Benchmarks.CompareAi();
-            //return;
+            if (args.Length > 0 && args[0] == "compare-ai") {
+                Constants.MctsBenchmark = true;
+                Benchmarks.CompareAi();
+                return;
+            }
 
-
-            //if ((args.Length > 0 && args[0] == "mcts-benchmark") || Constants.MctsBenchmark) {
-            //    MctsBenchmark();
-            //    return;
-            //}
-
-            //if ((args.Length > 0 && args[0] == "stats") || Constants.MeasureSearchSpaceStats) {
-            //    MeasureSearchSpaceStats();
-            //}
+            if (args.Length > 0 && args[0] == "space-stats") {
+                MeasureSearchSpaceStats();
+                return;
+            }
 
 
             var evo = new Evolution(keepCounter: true, breakWhenFound: true, maxGoodCount: 1);
@@ -81,6 +78,10 @@ namespace HexMage.Benchmarks {
             }
         }
 
+        /// <summary>
+        /// Samples our search space to see how many neighbours are up and how many are down.
+        /// The results are printed to stdout.
+        /// </summary>
         private static void MeasureSearchSpaceStats() {
             var d1 = new DNA(2, 2);
             var d2 = new DNA(2, 2);
@@ -182,40 +183,6 @@ namespace HexMage.Benchmarks {
                 }
             }
             return true;
-        }
-
-        public static void MctsBenchmark() {
-            var d1 = new DNA(3, 2);
-            var game = GameSetup.GenerateFromDna(d1, d1);
-
-            List<double> xs = new List<double>();
-            List<double> ys = new List<double>();
-
-            for (int i = 1; i < 10000; i += 20) {
-                var stopwatch = new Stopwatch();
-                stopwatch.Start();
-
-                var controller = new MctsController(game, i);
-
-                //controller = new AiRuleBasedController(game);
-
-                int iterations = GameEvaluator.Playout(game, d1, d1, controller, controller);
-
-                stopwatch.Stop();
-
-                Console.WriteLine("************************************");
-                Console.WriteLine(
-                    $"I:{i} Took ${Constants.MaxPlayoutEvaluationIterations - iterations} iterations, time {stopwatch.ElapsedMilliseconds}ms");
-                Console.WriteLine();
-
-                xs.Add(i);
-                ys.Add(stopwatch.ElapsedMilliseconds);
-            }
-
-            if (Constants.GnuPlot) {
-                GnuPlot.Plot(xs.ToArray(), ys.ToArray(), "with linespoints");
-                Console.ReadKey();
-            }
         }
     }
 }

@@ -379,8 +379,6 @@ namespace HexMage.GUI.Components {
             var mobInstance = _game.State.MobInstances[mobId];
             var targetInstance = _game.State.MobInstances[targetId];
 
-            //BuildUsedAbilityPopover(mobId, abilityInfo).LogContinuation();
-
             var projectileAnimation = new Animation(AssetManager.FireballSprite,
                                                     TimeSpan.FromMilliseconds(50),
                                                     AssetManager.TileSize,

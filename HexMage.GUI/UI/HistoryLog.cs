@@ -38,7 +38,6 @@ namespace HexMage.GUI.UI {
 
             _childrenPlaceholder = AddChild(new VerticalLayout());
             _childrenPlaceholder.Position = _textOffset;
-            //_childrenPlaceholder.Renderer = new ColorRenderer(Color.Black);
             _childrenPlaceholder.Renderer = new SpriteRenderer(_assetManager[AssetManager.HistoryLogBg]);
             _childrenPlaceholder.Padding = new Vector4(35, 20, 20, 20);
 

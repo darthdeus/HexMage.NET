@@ -93,7 +93,7 @@
     <Compile Include="Components\HoverUpdater.cs" />
     <Compile Include="Core\PlayerController.cs" />
     <Compile Include="Components\MapEditor.cs" />
-    <Compile Include="Scenes\MapEditorRenderer.cs" />
+    <Compile Include="Renderers\MapEditorRenderer.cs" />
     <Compile Include="Scenes\MapEditorScene.cs" />
     <Compile Include="Scenes\QuestionnaireScene.cs" />
     <Compile Include="UI\ParticleEffectSettings.cs" />

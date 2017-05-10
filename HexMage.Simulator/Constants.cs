@@ -23,14 +23,6 @@ namespace HexMage.Simulator {
         // Game Evaluation
         public static int MaxPlayoutEvaluationIterations = 1;
 
-        // MCTS
-        /// <summary>
-        /// When enabled, UCB reward will be scaled by the HP percentage left.
-        /// 
-        /// TODO - experiment
-        /// </summary>
-        public static bool UseHpPercentageScaling = false;
-
         /// <summary>
         /// When enabled, rewards are slowly dampened each turn, penalizing rewards
         /// from longer games.
@@ -55,23 +47,17 @@ namespace HexMage.Simulator {
         /// <summary>
         /// Disabling this will only generate the respective MOVE action,
         /// instead of a combined ATTACK-MOVE.
-        /// 
-        /// TODO - profile/benchmark both cases and create pretty graphs
         /// </summary>
         public static bool AttackMoveEnabled = true;
 
         /// <summary>
         /// Triggers attack move generation even when a direct attack was found.
-        /// 
-        /// // TODO - again experiment with triggering this
         /// </summary>
         public static bool AlwaysAttackMove = false;
 
         /// <summary>
         /// If `true` END-TURN actions will be generated even if there are enough
         /// other actions.
-        /// 
-        /// // TODO - again experiment with triggering this
         /// </summary>
         public static bool EndTurnAsLastResort = true;
 
@@ -86,7 +72,6 @@ namespace HexMage.Simulator {
         public static float InitialT = 0.5f;
         public static bool Logging = false;
 
-        // TODO - check if disabling this helps
         public static bool ForbidTimeouts = true;
 
         public static bool HillClimbing = false;

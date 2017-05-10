@@ -44,17 +44,6 @@ namespace HexMage.Simulator.AI {
         }
 
         private void LogActions(UctSearchResult result) {
-#warning TODO - FUUUUUUUUUUUJ tohle sem nepatri
-            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
-            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
-            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
-            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
-            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
-            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
-            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
-            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
-            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
-            // TODO - FUUUUUUUUUUUJ tohle sem nepatri
             float abilityUse = ActionEvaluator.ActionCounts[UctActionType.AbilityUse];
             float attackMove = ActionEvaluator.ActionCounts[UctActionType.AttackMove];
             float defensiveMove = ActionEvaluator.ActionCounts[UctActionType.DefensiveMove];
@@ -66,8 +55,6 @@ namespace HexMage.Simulator.AI {
             string abilityMoveRatio = ((abilityUse + attackMove) / (move + defensiveMove)).ToString("0.00");
 
             if (Constants.MctsLogging) {
-                //Console.WriteLine($"*** MCTS SPEED: {result.MillisecondsPerIteration}ms/iter***");
-
                 foreach (var action in result.Actions) {
                     Console.WriteLine($"action: {action}");
                 }

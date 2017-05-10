@@ -1,5 +1,5 @@
 //#define XML
-//#define DOTGRAPH
+#define DOTGRAPH
 
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,6 @@ using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator.AI {
     public class UctAlgorithm {
-        // TODO - extrahovat do args nebo configuraku
         public static int SearchCount = 0;
 
         public static int ExpandCount = 0;
@@ -62,7 +61,9 @@ namespace HexMage.Simulator.AI {
 
             stopwatch.Stop();
 
-            //UctDebug.PrintTreeRepresentation(root);
+#if DOTGRAPH
+            UctDebug.PrintTreeRepresentation(root);
+#endif
             Interlocked.Increment(ref SearchCount);
 
             var actions = SelectBestActions(root);
@@ -116,24 +117,18 @@ namespace HexMage.Simulator.AI {
         }
 
         public static UctNode Expand(UctNode node) {
-            try {
-                var type = node.Action.Type;
+            var type = node.Action.Type;
 
-                var allowMove = type != UctActionType.Move && type != UctActionType.DefensiveMove;
-                node.PrecomputePossibleActions(allowMove, true || type != UctActionType.EndTurn);
+            var allowMove = type != UctActionType.Move && type != UctActionType.DefensiveMove;
+            node.PrecomputePossibleActions(allowMove, true || type != UctActionType.EndTurn);
 
-                var action = node.PossibleActions[node.Children.Count];
-                var child = new UctNode(0, 0, action, ActionEvaluator.F(node.State, action));
-                child.Parent = node;
+            var action = node.PossibleActions[node.Children.Count];
+            var child = new UctNode(0, 0, action, ActionEvaluator.F(node.State, action));
+            child.Parent = node;
 
-                node.Children.Add(child);
+            node.Children.Add(child);
 
-                return child;
-                // TODO: fuj
-            } catch (ArgumentOutOfRangeException e) {
-                Debugger.Break();
-                throw;
-            }
+            return child;
         }
 
         public static float PlayoutAction(GameInstance game, UctAction action, TeamColor startingTeam) {
@@ -189,31 +184,19 @@ namespace HexMage.Simulator.AI {
         }
 
         public static float CalculateDeltaReward(GameInstance game, TeamColor startingTeam, TeamColor? victoryTeam) {
-            const bool rewardDamage = false;
-            if (rewardDamage) {
-                TeamColor opposingTeam = startingTeam == TeamColor.Red ? TeamColor.Blue : TeamColor.Red;
+            float result;
 
-                return 1 - game.PercentageHp(opposingTeam);
-            } else {
-                float result;
-
-                // TODO - tohle duplikuje to dole
-                if (victoryTeam.HasValue) {
-                    if (startingTeam == victoryTeam.Value) {
-                        result = 1;
-                    } else {
-                        result = 0;
-                    }
+            if (victoryTeam.HasValue) {
+                if (startingTeam == victoryTeam.Value) {
+                    result = 1;
                 } else {
                     result = 0;
                 }
-
-                if (Constants.UseHpPercentageScaling) {
-                    result *= game.PercentageHp(startingTeam);
-                }
-
-                return result;
+            } else {
+                result = 0;
             }
+
+            return result;
         }
 
         public static void Backup(UctNode node, float delta) {
@@ -258,15 +241,6 @@ namespace HexMage.Simulator.AI {
                 if (current.Children.Count == 0) break;
 
                 UctNode max = current.Children.FastMax(c => c.Q / c.N);
-
-                //UctNode max = current.Children[0];
-
-                //foreach (var child in current.Children) {
-                //    if (child.Q / child.N > max.Q / max.N) {
-                //        max = child;
-                //    }
-                //}
-
                 if (max.Q / max.N < 0.2) {
                     //Console.WriteLine($"Bad action {max.Q} / {max.N}, generating via rules");
                     var state = current.State.CopyStateOnly();

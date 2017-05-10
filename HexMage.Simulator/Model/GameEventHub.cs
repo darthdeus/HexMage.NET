@@ -129,6 +129,10 @@ namespace HexMage.Simulator.Model {
             }
         }
 
+        public void FastPlayAction(UctAction action) {
+            ActionEvaluator.FNoCopy(_gameInstance, action);
+        }
+
         public void AddSubscriber(IGameEventSubscriber subscriber) {
             _subscribers.Add(subscriber);
         }

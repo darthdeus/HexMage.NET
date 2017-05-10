@@ -8,9 +8,9 @@ using Newtonsoft.Json;
 namespace HexMage.Simulator.Model {
     public class GameState {
         public List<AreaBuff> AreaBuffs = new List<AreaBuff>();
-
         public MobInstance[] MobInstances = new MobInstance[0];
         public readonly List<int> Cooldowns = new List<int>();
+
         public int? CurrentMobIndex { get; private set; }
         public TeamColor? LastTeamColor;
         public TeamColor? CurrentTeamColor;

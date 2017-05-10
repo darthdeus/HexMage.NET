@@ -9,9 +9,6 @@ namespace HexMage.Simulator {
     public static class ActionGenerator {
         public static UctAction MaxAbilityRatio(GameInstance game, List<UctAction> actions,
                                                 bool deterministic = false) {
-#warning TODO: vyzkouset tohle s i bez methodimpl aggressiveinlining
-            //return actions.FastMax(action => game.MobManager.Abilities[action.AbilityId].DmgCostRatio);
-
             if (deterministic) {
                 return DeterministicMaxAbilityRatio(game, actions);
             } else {
@@ -72,9 +69,9 @@ namespace HexMage.Simulator {
         public static UctAction DefaultPolicyAction(GameInstance state) {
             var mobId = state.CurrentMob;
 
-            // TODO - shortcut pokud nemam zadny AP, tak rovnou end turn :)
-            if (mobId == null)
+            if (mobId == null) {
                 throw new InvalidOperationException("Requesting mob action when there is no current mob.");
+            }
 
             Debug.Assert(state.State.MobInstances[mobId.Value].Hp > 0, "Current mob is dead");
 
@@ -99,7 +96,6 @@ namespace HexMage.Simulator {
 
                 moveTargetId = possibleTargetId;
 
-                // TODO - remove corpse targetting
                 if (!GameInvariants.IsTargetable(state, mob, possibleTarget)) continue;
 
                 if (abilityIds.Count == 0) continue;
@@ -149,12 +145,9 @@ namespace HexMage.Simulator {
                 mob.MobInstance.Ap) {
                 return UctAction.MoveAction(mob.MobId, moveTarget.Value);
             } else if (moveTarget == null) {
-                //Console.WriteLine("Move target is null");
-                // TODO - intentionally doing nothing
+                // Intentionally doing nothing
                 return UctAction.EndTurnAction();
             } else {
-                //Console.WriteLine("Move failed!");
-
                 Utils.Log(LogSeverity.Debug, nameof(AiRuleBasedController),
                           $"Move failed since target is too close, source {mob.MobInstance.Coord}, target {target.MobInstance.Coord}");
                 return UctAction.EndTurnAction();
@@ -177,7 +170,6 @@ namespace HexMage.Simulator {
 
                 if (!canMoveTo) continue;
 
-                // TODO - samplovat po sektorech
                 coords.Add(coord);
             }
 
@@ -186,7 +178,7 @@ namespace HexMage.Simulator {
             var buffsAtMob = state.State.BuffsAt(mobInstance.Coord);
 
             // Generate more actions if standing on an area buff
-            int maxActions = buffsAtMob.Count > 0 ? 3 : 3;            
+            int maxActions = buffsAtMob.Count > 0 ? 3 : 3;
 
             int maximumMoveActions = Math.Max(0, maxActions - result.Count);
             for (int i = 0; i < Math.Min(coords.Count, maximumMoveActions); i++) {
@@ -201,7 +193,6 @@ namespace HexMage.Simulator {
             var mobInfo = mob.MobInfo;
             var mobInstance = mob.MobInstance;
 
-            // TODO - preferovat blizsi policka pri vyberu akci?
             foreach (var enemyId in state.MobManager.Mobs) {
                 var target = state.CachedMob(enemyId);
 
@@ -287,7 +278,6 @@ namespace HexMage.Simulator {
 
         public static List<UctAction> PossibleActions(GameInstance game, UctNode parent, bool allowMove,
                                                       bool allowEndTurn) {
-            // TODO - zmerit poradne, jestli tohle vubec pomaha, a kolik to ma byt
             var result = new List<UctAction>(10);
 
             var currentMob = game.CurrentMob;
@@ -317,7 +307,6 @@ namespace HexMage.Simulator {
 
             if (allowEndTurn) {
                 // We would skip end turn if there are not enough actions.
-                // TODO - generate more move actions if we don't have enough?
                 if (!Constants.EndTurnAsLastResort || result.Count <= 1) {
                     result.Add(UctAction.EndTurnAction());
                 }

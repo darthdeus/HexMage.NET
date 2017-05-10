@@ -44,6 +44,5 @@ namespace HexMage.Simulator.AI {
         public static IMobController Build(GameInstance game) {
             return new AiRuleBasedController(game);
         }
-
     }
 }

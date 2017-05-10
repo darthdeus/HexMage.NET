@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.Pathfinding;
@@ -6,7 +7,6 @@ using HexMage.Simulator.PCG;
 
 namespace HexMage.Simulator.AI {
     public static class GameSetup {
-        [Obsolete]
         public static GameInstance GenerateForDnaSettings(int mobCount, int abilityCount, Map map = null,
                                                           bool prepare = true) {
             if (map == null) {
@@ -17,7 +17,6 @@ namespace HexMage.Simulator.AI {
             var game = new GameInstance(map);
 
             var dna = new DNA(mobCount, abilityCount);
-#warning Nechybi tu randomize???
 
             UnpackTeamsIntoGame(game, dna, dna);
             if (prepare) {
@@ -85,7 +84,12 @@ namespace HexMage.Simulator.AI {
             }
         }
 
-        private static void UnpackTeamsIntoGame(GameInstance game, DNA team1, DNA team2) {
+        /// <summary>
+        /// Takes DNAs for both teams as arguments and de-serializes them into the provided <code>GameInstance</code>
+        /// object. Note that both teams must be of the same size.
+        /// </summary>
+        public static void UnpackTeamsIntoGame(GameInstance game, DNA team1, DNA team2) {
+            Debug.Assert(team1.Data.Count == team2.Data.Count);
             var red = team1.ToTeam();
             var blue = team2.ToTeam();
 

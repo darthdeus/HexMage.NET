@@ -18,9 +18,8 @@ namespace HexMage.Simulator.AI {
             _writer = writer;
         }
 
-        public static List<IAiFactory> GlobalFactories = new List<IAiFactory>();
+        public static readonly List<IAiFactory> GlobalFactories = new List<IAiFactory>();
 
-        // TODO: wat, tohle dat pryc a pouzivat obecnejsi
         public PlayoutResult Evaluate() {
             if (GlobalFactories.Count == 0) {
                 GlobalFactories.Add(new RuleBasedFactory());
@@ -49,7 +48,6 @@ namespace HexMage.Simulator.AI {
                                                                     total.BlueWins + curr.BlueWins);
                                        });
 
-#warning TODO: nema tu byt spis min/max nez prumer?
             result.HpPercentage /= playoutResults.Count;
             result.TotalTurns /= playoutResults.Count;
 

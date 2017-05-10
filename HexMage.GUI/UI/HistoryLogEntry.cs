@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using HexMage.GUI.Core;
 using HexMage.GUI.Renderers;
-using HexMage.Simulator;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 using Microsoft.Xna.Framework;
