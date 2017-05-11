@@ -97,7 +97,7 @@ namespace HexMage.Simulator {
         /// <summary>
         /// Sets the initial temperature for Simulated Annealing.
         /// </summary>
-        public static double InitialT = 0.5;
+        public static float InitialT = 0.5f;
 
         /// <summary>
         /// Determines whether the results with high enough fitness value are saved.

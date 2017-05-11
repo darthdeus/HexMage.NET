@@ -16,29 +16,27 @@ namespace HexMage.GUI {
             return task.ContinueWith(_ => continuation(), TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        public static Task ContinueOnGuiThread(this Task task, Action<Task> continuation)
-        {
+        public static Task ContinueOnGuiThread(this Task task, Action<Task> continuation) {
             return task.ContinueWith(continuation, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        public static Task ContinueOnGuiThread<T>(this Task<T> task, Action<Task<T>> continuation)
-        {
+        public static Task ContinueOnGuiThread<T>(this Task<T> task, Action<Task<T>> continuation) {
             return task.ContinueWith(continuation, TaskScheduler.FromCurrentSynchronizationContext());
         }
     }
 
     public class SceneSynchronizationContext : SynchronizationContext {
-        ConcurrentQueue<KeyValuePair<SendOrPostCallback, object>> _queue = new ConcurrentQueue<KeyValuePair<SendOrPostCallback, object>>();
+        ConcurrentQueue<KeyValuePair<SendOrPostCallback, object>> _queue =
+            new ConcurrentQueue<KeyValuePair<SendOrPostCallback, object>>();
 
         public override void Send(SendOrPostCallback d, object state) {
-            Utils.Log(LogSeverity.Error, nameof(SceneSynchronizationContext), "Sending callback, this is highly unexpected");
+            Utils.Log(LogSeverity.Error, nameof(SceneSynchronizationContext),
+                      "Sending callback, this is highly unexpected");
 
             base.Send(d, state);
         }
 
         public override void Post(SendOrPostCallback d, object state) {
-#warning TODO - figure out if there's a way to perserve logging while keeping it possible to post callbacks directly (without causing inifinite recursion)
-            //Utils.Log(LogSeverity.Info, nameof(SceneSynchronizationContext), "Posting callback");
             _queue.Enqueue(new KeyValuePair<SendOrPostCallback, object>(d, state));
         }
 
