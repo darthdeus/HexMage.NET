@@ -54,7 +54,6 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="AbilityBuffTest.cs" />
     <Compile Include="DNATest.cs" />
     <Compile Include="StateTest.cs" />
     <Compile Include="TestHelpers.cs" />

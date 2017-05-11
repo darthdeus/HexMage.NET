@@ -82,24 +82,7 @@ namespace HexMage.GUI.Components {
                     $"{areaBuff.Effect.HpChange}/{areaBuff.Effect.ApChange} " +
                     $"({areaBuff.Effect.Lifetime} turns, {areaBuff.Radius}r)";
 
-                _cooldownLabel.Text = _abilityInfo.Cooldown.ToString();
-
-                //_dmgLabel.Text = $"DMG {_abilityInfo.Dmg}, Cost {_abilityInfo.Cost}";
-                //_rangeLabel.Text = $"Range {_abilityInfo.Range}";
-                //_elementLabel.Text = _abilityInfo.Element.ToString();
-
-                var buffTextBuilder = new StringBuilder();
-
-                //if (!_abilityInfo.Buff.IsZero) {
-                //    var buff = _abilityInfo.Buff;
-                //    buffTextBuilder.AppendLine($"Buff {buff.HpChange}/{buff.ApChange}\nover {buff.Lifetime} turns");
-                //}
-
-                //if (!_abilityInfo.AreaBuff.IsZero) {
-                //    var areaBuff = _abilityInfo.AreaBuff;
-                //    buffTextBuilder.AppendLine($"Area buff {areaBuff.Effect.HpChange}/{areaBuff.Effect.ApChange}\nover {areaBuff.Effect.Lifetime}, radius {areaBuff.Radius}");
-                //}
-
+                _cooldownLabel.Text = _abilityInfo.Cooldown.ToString();                
             }
         }
     }

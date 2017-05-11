@@ -12,9 +12,8 @@ namespace HexMage.Benchmarks {
         private static void Main(string[] args) {
             if (!ProcessArguments(args)) return;
 
-                new Benchmarks().Run();
             if (args.Length > 0 && args[0] == "mcts-measure-speed") {
-                new Benchmarks().Run();
+                new Benchmarks().RunMctsProfiling();
                 return;
             }
 
@@ -29,7 +28,13 @@ namespace HexMage.Benchmarks {
                 return;
             }
 
+            GenerateExperimentData();
+        }
 
+        /// <summary>
+        /// Generates data for the experiment. The initial seed files are defined under data/manual-teams.
+        /// </summary>
+        private static void GenerateExperimentData() {
             var evo = new Evolution(keepCounter: true, breakWhenFound: true, maxGoodCount: 1);
             int index = 0;
 
@@ -39,43 +44,27 @@ namespace HexMage.Benchmarks {
                     string content = File.ReadAllText(file);
 
                     var t1 = JsonConvert.DeserializeObject<Team>(content);
-                    evo.RunEvolutionStrategies(t1.ToDna(), false, index++);
+                    //evo.RunEvolutionStrategies(t1.ToDna(), false, index);
+
+                    index++;
 
                     Console.WriteLine($"File {file} done.");
                 }
             }
 
-            //return;
+            Console.WriteLine($"\n\n\n\nManually prepared teams done, now generating both sides at once\n\n\n");
 
 
-            if (Constants.EvaluateAis) {
-                //new AiEvaluator().Run();
-            } else {
-                var stopwatch = new Stopwatch();
-                stopwatch.Start();
-                var evolution = new Evolution(false, 10, true);
-                evolution.GoodIndexOffset = 10;
-                evolution.RunEvolutionStrategies(new DNA(2, 2));
-                stopwatch.Stop();
 
-                Console.WriteLine(
-                    $"Total evolution time: {stopwatch.ElapsedMilliseconds}ms, {Constants.NumGenerations} generations");
-            }
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var evolution = new Evolution(false, index, true);
+            evolution.GoodIndexOffset = index;
+            evolution.RunEvolutionStrategies(new DNA(2, 2));
+            stopwatch.Stop();
 
-            return;
-
-            var key = Console.ReadKey();
-
-            Console.WriteLine();
-
-            if (key.Key == ConsoleKey.D2) {
-                Constants.MctsLogging = false;
-                //RunEvaluator();
-            } else {
-                for (int i = 0; i < 10; i++) {
-                    new Benchmarks().Run();
-                }
-            }
+            Console.WriteLine(
+                $"Total evolution time: {stopwatch.ElapsedMilliseconds}ms, {Constants.NumGenerations} generations");
         }
 
         /// <summary>

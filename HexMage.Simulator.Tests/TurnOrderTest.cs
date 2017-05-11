@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace HexMage.Simulator.Tests
-{
+namespace HexMage.Simulator.Tests {
     [TestClass]
-    public class TurnOrderTest
-    {
+    public class TurnOrderTest {
         [TestMethod]
         public void BasicIniciativeTest() {
             var game = new GameInstance(3);

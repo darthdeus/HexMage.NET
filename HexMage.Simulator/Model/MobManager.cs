@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HexMage.Simulator.Model;
 using Newtonsoft.Json;
 
-namespace HexMage.Simulator {
+namespace HexMage.Simulator.Model {
     public class MobManager : IDeepCopyable<MobManager> {
         public List<int> Mobs = new List<int>();
         public readonly List<AbilityInfo> Abilities = new List<AbilityInfo>();
@@ -13,7 +12,6 @@ namespace HexMage.Simulator {
         [JsonIgnore] public readonly Dictionary<TeamColor, IMobController> Teams =
             new Dictionary<TeamColor, IMobController>();
 
-        [Obsolete]
         public AbilityInfo AbilityForId(int id) {
             return Abilities[id];
         }

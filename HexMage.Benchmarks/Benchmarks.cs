@@ -1,6 +1,3 @@
-//#define COPY_BENCH
-
-#define FAST
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,6 +9,9 @@ using HexMage.Simulator.Pathfinding;
 
 namespace HexMage.Benchmarks {
     public class Benchmarks {
+        /// <summary>
+        /// Runs a benchmark comparing two different AIs against each other on a fixed map.
+        /// </summary>
         public static void CompareAi() {
             var dna = new DNA(2, 2);
             dna.Randomize();
@@ -59,7 +59,6 @@ namespace HexMage.Benchmarks {
 
                 iterationStopwatch.Stop();
 
-                //Console.WriteLine($"Iteration: {iterationStopwatch.ElapsedMilliseconds}ms");
                 Console.WriteLine(Accounting.GetStats());
 
                 c1Wins += r1.RedWins + r2.BlueWins;
@@ -69,7 +68,11 @@ namespace HexMage.Benchmarks {
             }
         }
 
-        public void Run() {
+        /// <summary>
+        /// Runs a small benchmark on MCTS whcih keeps playing the same game in a loop.
+        /// This is used mostly for profiling the internals of MCTS.
+        /// </summary>
+        public void RunMctsProfiling() {
             var s = Stopwatch.StartNew();
             CoordRadiusCache.Instance.PrecomputeUpto(50);
             Console.WriteLine($"Cache precomputed in {s.Elapsed.TotalMilliseconds}ms");

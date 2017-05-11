@@ -168,7 +168,6 @@ namespace HexMage.GUI.Scenes {
         }
 
         public void Render(GameTime gameTime) {
-            // TODO - figure out if GameTime would be useful to pass here?
             RenderRootEntities();
         }
 

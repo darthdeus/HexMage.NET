@@ -41,7 +41,6 @@ namespace HexMage.GUI.Scenes {
                 Tuple.Create<string, ControllerFactory>("Random", (game, _) => new AiRandomController(game)),
                 Tuple.Create<string, ControllerFactory>("MCTS#1000", (game, _) => new MctsController(game, 1000)),
                 Tuple.Create<string, ControllerFactory>("Player", (game, arena) => new PlayerController(arena, game)),
-                Tuple.Create<string, ControllerFactory>("FlatMC", (game, _) => new FlatMonteCarloController(game)),
                 Tuple.Create<string, ControllerFactory>("MCTS#100", (game, _) => new MctsController(game, 100)),
                 Tuple.Create<string, ControllerFactory>("MCTS#10000", (game, _) => new MctsController(game, 10000))
             };
@@ -102,8 +101,7 @@ namespace HexMage.GUI.Scenes {
                     {Keys.D, _controllerFactories[2]},
                     {Keys.F, _controllerFactories[3]},
                     {Keys.G, _controllerFactories[4]},
-                    {Keys.H, _controllerFactories[5]},
-                    {Keys.J, _controllerFactories[6]}
+                    {Keys.H, _controllerFactories[5]}
                 };
 
                 bool handPickedTeam = false;

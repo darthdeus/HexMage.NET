@@ -1,3 +1,6 @@
+// #define PARALLEL
+/// Uncomment the above line for parallel encounter generation. Note that
+/// this will make the outcome non-deterministic.
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -51,7 +54,9 @@ namespace HexMage.Simulator.AI {
             List<double> plotDistance = new List<double>();
 
             var gameCopies = Enumerable.Range(0, Constants.TeamsPerGeneration)
-                                       //.AsParallel()
+#if PARALLEL
+                                       .AsParallel()
+#endif
                                        .Select(_ => game.DeepCopy())
                                        .ToList();
 
@@ -72,7 +77,9 @@ namespace HexMage.Simulator.AI {
                 }
 
                 var generation = Enumerable.Range(0, Constants.TeamsPerGeneration)
-                                           //.AsParallel()
+#if PARALLEL
+                                            .AsParallel()
+#endif
                                            .Select(j => {
                                                var newTeam1 =
                                                    evolveTeam1

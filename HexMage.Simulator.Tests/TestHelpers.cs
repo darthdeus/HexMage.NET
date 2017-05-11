@@ -3,6 +3,9 @@ using HexMage.Simulator.Pathfinding;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HexMage.Simulator.Tests {
+    /// <summary>
+    /// Generic test helpers for deep comparison of <code>GameInstance</code> objects.
+    /// </summary>
     public static class TestHelpers {
         public static void GameInstancesEqual(GameInstance instance1, GameInstance instance2) {
             Assert.AreEqual(instance1.Size, instance2.Size);
@@ -17,9 +20,6 @@ namespace HexMage.Simulator.Tests {
             CollectionAssert.AreEqual(state1.AreaBuffs, state2.AreaBuffs);
             Assert.AreEqual(state1.CurrentMobIndex, state2.CurrentMobIndex);
             Assert.AreEqual(state1.CurrentTeamColor, state2.CurrentTeamColor);
-
-            // TODO - tohle funguje?
-            //CollectionAssert.AreEqual(state1.MobPositions, state2.MobPositions);
 
             Assert.AreEqual(state1.RedTotalHp, state2.RedTotalHp);
             Assert.AreEqual(state1.BlueTotalHp, state2.BlueTotalHp);
