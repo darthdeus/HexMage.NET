@@ -136,7 +136,7 @@ namespace HexMage.Simulator.AI {
             if (Constants.GnuPlot) {
                 GnuPlot.HoldOn();
                 GnuPlot.Set($"xrange [0:{i}] reverse",
-                            $"title '{Constants.NumGenerations} generations, T_s = {Constants.InitialT}",
+                            $"title '{Constants.NumGenerations} generations",
                             //"yrange [0:1]",
                             //"style data lines",
                             "key tmargin center horizontal");

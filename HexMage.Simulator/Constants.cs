@@ -2,18 +2,42 @@
 
 namespace HexMage.Simulator {
     public static class Constants {
+        /// <summary>
+        /// When set to <code>true</code> it will enable the sound effects. Note that OpenAL compatible
+        /// drivers must be installed, otherwise playing the sound effects will crash with an internal error.
+        /// </summary>
         public static bool EnableSounds = false;
 
+        /// <summary>
+        /// When set to <code>true</code> games' replays will be automatically recorded.
+        /// See <code>ReplayRecorder</code> for more details.
+        /// </summary>
         public static bool RecordReplays = false;
 
         // MCTS benchmarks
+        /// <summary>
+        /// The number of iterations of MCTS during the AI benchmark.
+        /// </summary>
         public static int MctsBenchIterations = 100;
+
+        /// <summary>
+        /// Specifies the type of AIs playing against each other when running <code>CompareAIs</code>
+        /// </summary>
         public static int MctsBenchType = 2;
 
+        /// <summary>
+        /// When set to <code>true</code> evolution will generate a resulting plot using GNU Plot.
+        /// </summary>
         public static bool GnuPlot = false;
 
         public static bool MeasureSearchSpaceStats = false;
+        /// <summary>
+        /// Determines the number of samples measured in the serach space.
+        /// </summary>
         public static int MeasureSamples = 1000000;
+        /// <summary>
+        /// Determines the number of neighbours measured for each sample.
+        /// </summary>
         public static int MeasureNeighboursPerSample = 10;
 
         // Benchmark controls
@@ -24,12 +48,8 @@ namespace HexMage.Simulator {
         public static int MaxPlayoutEvaluationIterations = 1;
 
         /// <summary>
-        /// When enabled, rewards are slowly dampened each turn, penalizing rewards
-        /// from longer games.
+        /// Enables logging of MCTS progress.
         /// </summary>
-        public static bool DampenLongRewards = false;
-
-        public static float DampeningFactor = 0.95f;
         public static bool MctsLogging = false;
 
         /// <summary>
@@ -41,7 +61,9 @@ namespace HexMage.Simulator {
         public static double Mu = 10;
         public static double Sigma = 3;
 
-        // Rule based AI
+        /// <summary>
+        /// Determines which ruleset the Rule based AI uses for generating tis actions.
+        /// </summary>
         public static bool FastActionGeneration = false;
 
         /// <summary>
@@ -62,35 +84,62 @@ namespace HexMage.Simulator {
         public static bool EndTurnAsLastResort = true;
 
         // Evolution
+        /// <summary>
+        /// Enables restarting when the fitness lowers below a given threshold
+        /// </summary>
         public static bool RestartFailures = true;
+
+        /// <summary>
+        /// Sets the fitness threshold for determining a bad result and restarts.
+        /// </summary>
         public static double FitnessThreshold = 0.1;
 
-        public static bool RandomizeInitialTeam = true;
+        /// <summary>
+        /// Sets the initial temperature for Simulated Annealing.
+        /// </summary>
+        public static double InitialT = 0.5;
 
-        public static bool AverageHpTotals = true;
+        /// <summary>
+        /// Determines whether the results with high enough fitness value are saved.
+        /// </summary>
         public static bool SaveGoodOnes = true;
-        public static float InitialT = 0.5f;
         public static bool Logging = false;
 
-        public static bool ForbidTimeouts = true;
-
+        /// <summary>
+        /// Switches Simulated Annealing over to hill climbing when enabled.
+        /// </summary>
         public static bool HillClimbing = false;
 
+        /// <summary>
+        /// Determines the number of iterations of ES/SA.
+        /// </summary>
         public static int NumGenerations = 20000;
+        /// <summary>
+        /// Determines how often are the intermediate results printed.
+        /// </summary>
         public static int EvolutionPrintModulo = 10;
+        /// <summary>
+        /// Determines the number of neighbours ES looks at.
+        /// </summary>
         public static int TeamsPerGeneration = 40;
+        /// <summary>
+        /// Determines the maximum size of a given mutation.
+        /// </summary>
         public static double MutationDelta = 0.25;
 
         /// <summary>
         /// Take game length into account when evaluating the fitness function
-        /// 
-        /// Note that this doesn't converge at all, never goes above 0.5
-        /// TODO: why?
         /// </summary>
         public static bool FitnessGameLength = false;
 
+        /// <summary>
+        /// Determines the probability of consequent mutations.
+        /// </summary>
         public static double SecondMutationProb = 0.35f;
 
+        /// <summary>
+        /// When enabled, the intermediate results will print the difference between fitness values.
+        /// </summary>
         public static bool PrintFitnessDiff = true;
 
         /// <summary>
@@ -98,9 +147,31 @@ namespace HexMage.Simulator {
         /// </summary>        
         public static int RandomSeed = 12345;
 
+        /// <summary>
+        /// Enables the global rnadom seed.
+        /// </summary>
         public static bool UseGlobalSeed = true;
 
-        // TODO - fuj, to sem nepatri
+        #region DNA constants
+        
+        public static int HpMax = 100;
+        public static int ApMax = 25;
+        public static int DmgMax = 30;
+        public static int CostMax = 20;
+        public static int CooldownMax = 2;
+        public static int RangeMax = 10;
+        public static int EvolutionMapSize = 5;
+        public static int ElementCount = 4;
+
+        public static int BuffDmgMax = 5;
+        public static int BuffApDmgMax = 5;
+        public static int BuffLifetimeMax = 3;
+        public static int BuffMaxRadius = 5;
+
+        #endregion
+
+        #region Logging
+
         private static StringWriter LogBuffer = new StringWriter();
 
         public static StringWriter GetLogBuffer() {
@@ -119,25 +190,13 @@ namespace HexMage.Simulator {
             }
         }
 
-        public static int HpMax = 100;
-        public static int ApMax = 25;
-        public static int DmgMax = 30;
-        public static int CostMax = 20;
-        public static int CooldownMax = 2;
-        public static int RangeMax = 10;
-        public static int EvolutionMapSize = 5;
-        public static int ElementCount = 4;
-
-        public static int BuffDmgMax = 5;
-        public static int BuffApDmgMax = 5;
-        public static int BuffLifetimeMax = 3;
-        public static int BuffMaxRadius = 5;
-
         public static readonly string SaveFile = @"evo-save.txt";
         public static readonly string SaveDir = "data/save-files/";
 
         public static string BuildEvoSavePath(int index) {
             return SaveDir + index.ToString() + SaveFile;
         }
+
+        #endregion Logging
     }
 }

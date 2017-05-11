@@ -242,7 +242,6 @@ namespace HexMage.Simulator.AI {
 
                 UctNode max = current.Children.FastMax(c => c.Q / c.N);
                 if (max.Q / max.N < 0.2) {
-                    //Console.WriteLine($"Bad action {max.Q} / {max.N}, generating via rules");
                     var state = current.State.CopyStateOnly();
                     do {
                         var action = ActionGenerator.RuleBasedAction(state);
