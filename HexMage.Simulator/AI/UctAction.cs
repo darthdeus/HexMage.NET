@@ -3,6 +3,9 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator.AI {
+    /// <summary>
+    /// Represents a single action in the game tree.
+    /// </summary>
     public struct UctAction {
         public readonly UctActionType Type;
         public readonly int AbilityId;
@@ -43,11 +46,19 @@ namespace HexMage.Simulator.AI {
             return new UctAction(UctActionType.AttackMove, abilityId, mobId, targetId, coord);
         }
 
+        /// <summary>
+        /// Convers attack move and defensive move to a simple move.
+        /// </summary>
+        /// <returns></returns>
         public UctAction ToPureMove() {
             Debug.Assert(Type == UctActionType.DefensiveMove || Type == UctActionType.AttackMove || Type == UctActionType.Move);
             return MoveAction(MobId, Coord);
         }
 
+        /// <summary>
+        /// Converts attack move to a simple ability use.
+        /// </summary>
+        /// <returns></returns>
         public UctAction ToPureAbilityUse() {
             Debug.Assert(Type == UctActionType.AttackMove || Type == UctActionType.AbilityUse);
             return AbilityUseAction(AbilityId, MobId, TargetId);

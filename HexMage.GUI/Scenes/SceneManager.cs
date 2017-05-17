@@ -35,7 +35,6 @@ namespace HexMage.GUI.Scenes {
                 case SceneUpdateResult.NewScene:
                     Debug.Assert(newScene != null);
                     newScene.Initialize();
-                    // TODO - check if this is actually necessary
                     newScene.InitializeRootEntities();
                     _scenes.Push(newScene);
                     break;

@@ -7,6 +7,11 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace HexMage.GUI.Core {
+    /// <summary>
+    /// Encapsulates most of the camera logic, such as zooming, scrolling and panning
+    /// around the screen. It also provides helpers for converting from and to hex and mouse
+    /// pixel coordinates.
+    /// </summary>
     public class Camera2D {
         public static SamplerState SamplerState = null;
 
@@ -33,7 +38,6 @@ namespace HexMage.GUI.Core {
         public Camera2D(InputManager inputManager) {
             _inputManager = inputManager;
 
-            // TODO - change this into a proper singleton later
             Debug.Assert(Instance == null);
             Instance = this;
         }

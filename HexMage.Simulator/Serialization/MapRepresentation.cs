@@ -5,6 +5,9 @@ using HexMage.Simulator.Pathfinding;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
+    /// <summary>
+    /// Representation of the map intended for serialization.
+    /// </summary>
     public class MapRepresentation {
         public int Size { get; set; }
         public MapItem[] Hexes { get; set; }

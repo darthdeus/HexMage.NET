@@ -7,6 +7,10 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace HexMage.GUI.UI {
+    /// <summary>
+    /// A simple text button which can handle hover and on click events. It also
+    /// automatically changes its render color when hovered and clicked.
+    /// </summary>
     public class TextButton : Entity, IRenderer {
         public string Text { get; set; } = "";
         public SpriteFont Font { get; set; }

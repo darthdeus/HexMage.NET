@@ -5,12 +5,20 @@ using System.Linq;
 using HexMage.Simulator.PCG;
 
 namespace HexMage.Simulator {
+    /// <summary>
+    /// A collection of probability helpers.
+    /// </summary>
     public static class Probability {
-        // TODO - pravdepodpobnostni abstrakcio - hozeni kostkou, norm, apod, expo/poiss?
+        /// <summary>
+        /// Coin flip of a given percentage.
+        /// </summary>
         public static bool Uniform(double percentage) {
             return Generator.Random.NextDouble() < percentage;
         }
 
+        /// <summary>
+        /// Calculating the value of a normal distribution.
+        /// </summary>
         public static double Norm(double x) {
             return Math.Exp(-(x - Constants.Mu) * (x - Constants.Mu)
                             / (2 * Constants.Sigma * Constants.Sigma))
@@ -18,7 +26,6 @@ namespace HexMage.Simulator {
         }
 
         public static double Exponential(double lambda, double u) {
-            // TODO - otestovat, co to vlastne ma delat :)
             return Math.Log(1 - u) / -lambda;
         }
 
@@ -27,6 +34,9 @@ namespace HexMage.Simulator {
             return Exponential(lambda, u);
         }
 
+        /// <summary>
+        /// Picks from a list of elements where each element has a defined probability.
+        /// </summary>
         public static T UniformPick<T>(List<T> items, IList<double> probabilities) {
             Debug.Assert(items.Count > 0, "items.Count > 0");
             Debug.Assert(items.Count == probabilities.Count, "items.Count == probabilities.Count");

@@ -96,14 +96,14 @@ namespace HexMage.Benchmarks {
                 d1.Randomize();
                 d2.Randomize();
 
-                var fitness = EvolutionBenchmark.CalculateFitness(game, d1, d2);
+                var fitness = AnnealingBenchmark.CalculateFitness(game, d1, d2);
 
                 for (int j = 0; j < Constants.MeasureNeighboursPerSample; j++) {
                     iterations++;
                     if (iterations % 1000 == 0) printStats();
-                    var neighbour = EvolutionBenchmark.Mutate(d2);
+                    var neighbour = AnnealingBenchmark.Mutate(d2);
 
-                    var neighbourFitness = EvolutionBenchmark.CalculateFitness(game, d1, neighbour);
+                    var neighbourFitness = AnnealingBenchmark.CalculateFitness(game, d1, neighbour);
 
                     float delta = neighbourFitness.SimpleFitness() - fitness.SimpleFitness();
 

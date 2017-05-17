@@ -1,13 +1,15 @@
 using System;
 using HexMage.GUI.Core;
-using HexMage.GUI.Renderers;
 using HexMage.Simulator;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.Pathfinding;
 using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
 
-namespace HexMage.GUI.Scenes {
+namespace HexMage.GUI.Renderers {
+    /// <summary>
+    /// Renderer for the map editor.
+    /// </summary>
     public class MapEditorRenderer : IRenderer {
         private readonly Func<Map> _mapFunc;
 

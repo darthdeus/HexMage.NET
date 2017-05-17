@@ -8,6 +8,9 @@ using HexMage.Simulator.PCG;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator.Pathfinding {
+    /// <summary>
+    /// Represents the game map.
+    /// </summary>
     public class Map : IDeepCopyable<Map> {
         [JsonProperty] private readonly HexMap<HexType> _hexes;
 
@@ -26,7 +29,6 @@ namespace HexMage.Simulator.Pathfinding {
         [JsonIgnore]
         public List<AxialCoord> AllCoords => _hexes.AllCoords;
 
-        // TODO - remove Guid, it's no longer needed
         public Guid Guid = Guid.NewGuid();
 
         [JsonConstructor]

@@ -4,6 +4,9 @@ using System.Diagnostics;
 using HexMage.Simulator.AI;
 
 namespace HexMage.Simulator.Model {
+    /// <summary>
+    /// A number of helpers used to verify the invariants defined by the game mechanics.
+    /// </summary>
     public static class GameInvariants {
         [Conditional("DEBUG")]
         public static void AssertValidActions(GameInstance game, List<UctAction> actions) {
@@ -49,7 +52,6 @@ namespace HexMage.Simulator.Model {
                             $"Using an ability on a target with {mobInstance.Hp}HP");
 
             var isVisible = game.Map.IsVisible(mobInstance.Coord, targetInstance.Coord);
-            // TODO: do invariant checku se pise pozitivni nebo negativni cas?
             AssertAndRecord(game, action, isVisible, "Target is not visible");
 
             int distance = mobInstance.Coord.Distance(targetInstance.Coord);
@@ -142,7 +144,6 @@ namespace HexMage.Simulator.Model {
 
             int remainingAp = mob.MobInstance.Ap - game.Pathfinder.Distance(mob.MobInstance.Coord, from);
 
-            // TODO - kontrolovat i ze na to policko dojdu?
             bool withinRange = ability.Range >= from.Distance(target.MobInstance.Coord);
             bool enoughAp = remainingAp >= ability.Cost;
             bool notOnCooldown = game.State.Cooldowns[abilityId] == 0;

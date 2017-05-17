@@ -3,6 +3,9 @@ using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra.Single;
 
 namespace HexMage.Simulator.AI {
+    /// <summary>
+    /// Represents a single DNA pair together with its fitness evaluation result. Used in ES.
+    /// </summary>
     public class Individual {
         public DNA Team1;
         public DNA Team2;

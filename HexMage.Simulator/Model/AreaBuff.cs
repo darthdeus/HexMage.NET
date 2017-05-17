@@ -1,6 +1,9 @@
 ﻿using Newtonsoft.Json;
 
 namespace HexMage.Simulator.Model {
+    /// <summary>
+    /// Represents an AOE debuff definition.
+    /// </summary>
     public struct AreaBuff {
         public AxialCoord Coord;
         public int Radius;

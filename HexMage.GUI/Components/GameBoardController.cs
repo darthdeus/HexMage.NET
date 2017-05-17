@@ -119,7 +119,6 @@ namespace HexMage.GUI.Components {
             }
 
             if (inputManager.IsKeyJustPressed(Keys.Pause)) {
-                // TODO - pausing
                 if (_eventHub.IsPaused) {
                     ShowMessage("Game resumed.");
                 } else {
@@ -149,27 +148,6 @@ namespace HexMage.GUI.Components {
 
         private void HandleKeyboardAbilitySelect() {
             var inputManager = InputManager.Instance;
-
-            if (inputManager.IsKeyJustPressed(Keys.F10)) {
-                var repr = new MapRepresentation(_game.Map);
-
-                using (var writer = new StreamWriter(GameInstance.MapSaveFilename))
-                using (var mobWriter = new StreamWriter(GameInstance.MobsSaveFilename)) {
-                    writer.Write(JsonConvert.SerializeObject(repr));
-                    mobWriter.Write(JsonConvert.SerializeObject(_game.MobManager));
-                }
-            }
-
-            if (inputManager.IsKeyJustPressed(Keys.F11)) {
-                using (var reader = new StreamReader(GameInstance.MapSaveFilename))
-                using (var mobReader = new StreamReader(GameInstance.MobsSaveFilename)) {
-                    var mapRepr = JsonConvert.DeserializeObject<MapRepresentation>(reader.ReadToEnd());
-                    mapRepr.UpdateMap(_game.Map);
-
-                    var mobManager = JsonConvert.DeserializeObject<MobManager>(mobReader.ReadToEnd());
-                    Console.WriteLine(mobManager);
-                }
-            }
 
             if (inputManager.IsKeyJustPressed(Keys.F12)) {
                 foreach (var mobId in _game.MobManager.Mobs) {
@@ -278,7 +256,6 @@ namespace HexMage.GUI.Components {
                             if (mobInfo.Team == targetInfo.Team) {
                                 ShowMessage("You can't target your team.");
                             } else if (SelectedAbilityIndex.HasValue) {
-                                // TODO - tohle by se melo kontrolovat mnohem driv
                                 if (abilitySelected) {
                                     AttackMob(targetId.Value);
                                 } else {

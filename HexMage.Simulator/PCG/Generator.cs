@@ -8,6 +8,9 @@ using HexMage.Simulator.Pathfinding;
 using MathNet.Numerics.Random;
 
 namespace HexMage.Simulator.PCG {
+    /// <summary>
+    /// Wraps a number of simple helpers for generating the initial encounter content.
+    /// </summary>
     public static class Generator {
         public static ThreadLocalGenerator Random = new ThreadLocalGenerator();
         //public static Random Random = new SystemRandomSource();
@@ -56,36 +59,6 @@ namespace HexMage.Simulator.PCG {
             }
         }
 
-
-        //static Generator() {
-        //    if (Constants.UseGlobalSeed) {
-        //        Random = new Random(Constants.RandomSeed);
-        //    } else {
-        //        Random = new Random();
-        //    }
-        //}
-
-        //public static GameInstance RandomGame(int size, MapSeed seed, int teamSize, Func<GameInstance, IMobController> controllerFunc) {
-        //    var map = new MapGenerator().Generate(size, seed);
-        //    var game = new GameInstance(map);
-
-        //    const TeamColor t1 = TeamColor.Red;
-        //    const TeamColor t2 = TeamColor.Blue;
-
-        //    game.MobManager.Teams[t1] = controllerFunc(game);
-        //    game.MobManager.Teams[t2] = controllerFunc(game);
-
-        //    for (int i = 0; i < teamSize; i++) {
-        //        game.MobManager.AddMob(RandomMob(game.MobManager, t1, size, c => game.MobManager.AtCoord(c) == null));
-        //        game.MobManager.AddMob(RandomMob(game.MobManager, t2, size, c => game.MobManager.AtCoord(c) == null));
-        //    }
-
-        //    game.RedAlive = teamSize;
-        //    game.BlueAlive = teamSize;
-
-        //    return game;
-        //}
-
         public static void RandomPlaceMob(GameInstance game, int mobId) {
             var map = game.Map;
             var state = game.State;
@@ -101,7 +74,6 @@ namespace HexMage.Simulator.PCG {
 
             state.MobInstances[mobId].Coord = AxialCoord.Zero;
 
-            // TODO: when run out of iteration, sequential scan
             int iterations = 10000;
 
             while (--iterations > 0) {
@@ -133,8 +105,6 @@ namespace HexMage.Simulator.PCG {
                 var buff = RandomBuff();
                 var areaBuff = RandomAreaBuff();
 
-                // TODO - re-enable cooldowns?
-                //var cooldown = Random.Next(0, 3);
                 var cooldown = Random.Next(0, 2);
 
                 var ability = new AbilityInfo(RandomDmg(),
@@ -144,7 +114,6 @@ namespace HexMage.Simulator.PCG {
                                               buff,
                                               areaBuff);
 
-                // TODO - use GameInstance.AddAbilityWithInfo instead
                 int id = mobManager.Abilities.Count;
                 mobManager.Abilities.Add(ability);
                 state.Cooldowns.Add(0);
@@ -154,7 +123,6 @@ namespace HexMage.Simulator.PCG {
 
             int iniciative = Random.Next(10);
 
-#warning TODO - generated mobs do not have their coords assigned
             return new MobInfo(team, maxHp, maxAp, iniciative, abilities);
         }
 

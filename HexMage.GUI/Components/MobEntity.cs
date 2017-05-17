@@ -5,6 +5,9 @@ using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.Components {
+    /// <summary>
+    /// Represents a single mob on a game board.
+    /// </summary>
     public class MobEntity : Entity {
         private readonly GameInstance _gameInstance;
         private float _moveProgress;

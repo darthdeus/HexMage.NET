@@ -6,6 +6,9 @@ using HexMage.Simulator.Model;
 using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.Components {
+    /// <summary>
+    /// Wraps the animation loop of a single mob.
+    /// </summary>
     public class MobAnimationController : Component {
         private MobEntity _mobEntity;
         private int _mobId;

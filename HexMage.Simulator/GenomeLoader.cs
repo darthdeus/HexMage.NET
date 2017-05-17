@@ -7,8 +7,10 @@ using HexMage.Simulator.Model;
 using MathNet.Numerics.LinearAlgebra.Single;
 
 namespace HexMage.Simulator {
+    /// <summary>
+    /// Helpers for converting between DNA and Team.
+    /// </summary>
     public static class GenomeLoader {
-#warning TODO: pridat do Constants
         const int minDmg = 5;
 
         public static Team FromDna(DNA dna) {

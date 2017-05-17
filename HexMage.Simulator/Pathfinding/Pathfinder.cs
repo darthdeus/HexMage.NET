@@ -6,6 +6,9 @@ using HexMage.Simulator.Model;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator.Pathfinding {
+    /// <summary>
+    /// Wraps all of the pathfinding logic.
+    /// </summary>
     public class Pathfinder {
         private static readonly List<AxialCoord> NeighbourDiffs = new List<AxialCoord> {
             new AxialCoord(-1, 0),
@@ -39,8 +42,6 @@ namespace HexMage.Simulator.Pathfinding {
                 copy.AllPaths[coord] = AllPaths[coord].DeepCopy();
             }
 
-            //copy.PathfindDistanceAll();
-
             return copy;
         }
 
@@ -58,6 +59,9 @@ namespace HexMage.Simulator.Pathfinding {
             AllPaths = allPaths;
         }
 
+        /// <summary>
+        /// Calculates the furthest walkable point ot the given target mob.
+        /// </summary>
         public AxialCoord? FurthestPointToTarget(CachedMob mob, CachedMob target) {
             var path = PrecomputedPathTo(mob.MobInstance.Coord, target.MobInstance.Coord);
 
@@ -110,6 +114,9 @@ namespace HexMage.Simulator.Pathfinding {
             return result;
         }
 
+        /// <summary>
+        /// Returns a walkable path between two points.
+        /// </summary>
         public List<AxialCoord> PathTo(AxialCoord from, AxialCoord to) {
             var result = new List<AxialCoord>();
 
@@ -170,12 +177,7 @@ namespace HexMage.Simulator.Pathfinding {
 
                     if (_precomputedPaths.ContainsKey(key)) continue;
 
-                    // TODO - path returns a reversed path including the starting point
                     var path = PathFromSourceToTarget(source, destination);
-                    //if (path.Count > 0) {
-                    //    path.RemoveAt(0);
-                    //}
-                    //path.Reverse();
                     _precomputedPaths.Add(key, path);
                 }
             }
@@ -239,12 +241,15 @@ namespace HexMage.Simulator.Pathfinding {
             }
         }
 
+        /// <summary>
+        /// Calculates a walk distance between two hexes.
+        /// </summary>
         public int Distance(AxialCoord from, AxialCoord to) {
             var current = AllPaths[from];
             Debug.Assert(current != null);
             return current[to].Distance;
         }
-
+        
         private AxialCoord? NearestEmpty(AxialCoord from, AxialCoord to) {
             AxialCoord? result = null;
             foreach (var diff in NeighbourDiffs) {
@@ -261,19 +266,16 @@ namespace HexMage.Simulator.Pathfinding {
             return result;
         }
 
+        /// <summary>
+        /// Checks if a given coord is valid on the map.
+        /// </summary>
         public bool IsValidCoord(AxialCoord c) {
             int a = (c.X + c.Y);
             int distance = ((c.X < 0 ? -c.X : c.X)
                             + (a < 0 ? -a : a)
                             + (c.Y < 0 ? -c.Y : c.Y)) / 2;
 
-            //int distance = (Math.Abs(c.X)
-            //                + Math.Abs(c.X + c.Y)
-            //                + Math.Abs(c.Y)) / 2;
             return distance <= Game.Size;
-
-            //return _map.AxialDistance(c, new AxialCoord(0, 0)) <= _map.Size;
-            //return _map.CubeDistance(new CubeCoord(0, 0, 0), c) <= _map.Size;
         }
 
         public Pathfinder ShallowCopy(GameInstance gameInstanceCopy) {

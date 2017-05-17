@@ -7,6 +7,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI.Components {
+    /// <summary>
+    /// Represents a single particle in the particle system.
+    /// </summary>
     public class Particle {
         public Vector2 Position { get; set; } = Vector2.Zero;
         public Vector2 Velocity { get; set; }
@@ -18,6 +21,9 @@ namespace HexMage.GUI.Components {
         }
     }
 
+    /// <summary>
+    /// Automatically handles particle movement, emitting and decay.
+    /// </summary>
     public class ParticleSystem : Entity {
         private Random _rnd = new Random();
 

@@ -1,9 +1,10 @@
 using System;
 
-namespace HexMage.Simulator
-{
-    public struct CubeCoord : IEquatable<CubeCoord>
-    {
+namespace HexMage.Simulator {
+    /// <summary>
+    /// Cube coord, see http://www.redblobgames.com/grids/hexagons/
+    /// </summary>
+    public struct CubeCoord : IEquatable<CubeCoord> {
         public int X { get; set; }
         public int Y { get; set; }
         public int Z { get; set; }
@@ -15,7 +16,7 @@ namespace HexMage.Simulator
         }
 
         public int Distance(CubeCoord to) {
-            return (Math.Abs(X - to.X) + Math.Abs(Y - to.Y) + Math.Abs(Z - to.Z))/2;
+            return (Math.Abs(X - to.X) + Math.Abs(Y - to.Y) + Math.Abs(Z - to.Z)) / 2;
         }
 
         public static CubeCoord operator +(CubeCoord a, CubeCoord b) {
@@ -54,8 +55,8 @@ namespace HexMage.Simulator
         public override int GetHashCode() {
             unchecked {
                 var hashCode = X;
-                hashCode = (hashCode*397) ^ Y;
-                hashCode = (hashCode*397) ^ Z;
+                hashCode = (hashCode * 397) ^ Y;
+                hashCode = (hashCode * 397) ^ Z;
                 return hashCode;
             }
         }

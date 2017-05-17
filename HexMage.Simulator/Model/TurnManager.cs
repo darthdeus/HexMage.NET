@@ -4,7 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace HexMage.Simulator {
+namespace HexMage.Simulator.Model {
+    /// <summary>
+    /// Wraps all of the logic with regards to turn and round management.
+    /// </summary>
     public class TurnManager {
         public List<int> PresortedOrder;
 
@@ -68,7 +71,6 @@ namespace HexMage.Simulator {
         public TurnManager DeepCopy(GameInstance gameCopy) {
             var copy = new TurnManager(gameCopy);
 
-            // TODO - this is certainly the wrong place to do it, but at some point the game instance needs to be initialized
             if (PresortedOrder == null) {
                 Utils.Log(LogSeverity.Warning, nameof(TurnManager),
                           "Initiated DeepCopy on an uninitialized GameInstance");
@@ -96,7 +98,6 @@ namespace HexMage.Simulator {
             state.LowerCooldowns();
             state.SetCurrentMobIndex(game, 0);
 
-            // TODO: wut, ma tu tohle vubec byt?
             if (Game.CurrentMob.HasValue) {
                 Debug.Assert(state.MobInstances[Game.CurrentMob.Value].Hp > 0, "Current mob is dead");
             }

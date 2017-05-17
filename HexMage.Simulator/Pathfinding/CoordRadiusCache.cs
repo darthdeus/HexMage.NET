@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 
 namespace HexMage.Simulator {
+    /// <summary>
+    /// Caches coords within a certain radius up to a given maximum map size.
+    /// </summary>
     public class CoordRadiusCache {
         public static CoordRadiusCache Instance = new CoordRadiusCache();
 

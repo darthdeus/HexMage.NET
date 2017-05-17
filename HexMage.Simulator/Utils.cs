@@ -6,6 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace HexMage.Simulator {
+    /// <summary>
+    /// Various utilities mostly with rergard to logging.
+    /// </summary>
+
     public enum LogSeverity {
         Debug,
         Info,
@@ -36,7 +40,6 @@ namespace HexMage.Simulator {
             Console.WriteLine(message);
 
             if (logLevel == LogSeverity.Error) {
-                // TODO: reenable
                 //Console.WriteLine(new StackTrace());
             }
 
@@ -101,27 +104,17 @@ namespace HexMage.Simulator {
             }
         }
 
-        [Obsolete]
         private static void LogTask(this Task task) {
             if (task.IsFaulted) {
                 Log(LogSeverity.Error, nameof(task), $"Task {task} failed, exception: {task.Exception}.");
-
-#warning TODO - sync context se spatne nastavuje
-                //SynchronizationContext.Current.Post(_ => { throw task.Exception; }, null);
                 throw task.Exception;
-            } else {
-                //Log(LogSeverity.Info, nameof(task), $"Task {task} complete: {task.IsCompleted}, faulted: {task.IsFaulted}");
             }
         }
 
         public static void LogTask<T>(this Task<T> task) {
             if (task.IsFaulted) {
                 Log(LogSeverity.Error, nameof(task), $"Task<T> {task} failed, exception {task.Exception}.");
-
-                //SynchronizationContext.Current.Post(_ => { throw task.Exception; }, null);
                 throw task.Exception;
-            } else {
-                //Log(LogSeverity.Info, nameof(task), $"Task<T> {task} complete: {task.IsCompleted}, result: {task.Result}, faulted: {task.IsFaulted}");
             }
         }
 

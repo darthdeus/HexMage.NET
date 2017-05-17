@@ -3,6 +3,10 @@ using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.Components {
+    /// <summary>
+    /// Positions an entity right over a given mob. This is used mostly for the arena scene
+    /// UI elements that show near each mob.
+    /// </summary>
     public class PositionAtMob : Component {
         private readonly int _mobId;
         private readonly GameInstance _gameInstance;

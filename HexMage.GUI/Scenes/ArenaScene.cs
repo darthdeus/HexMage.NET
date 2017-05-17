@@ -77,7 +77,6 @@ namespace HexMage.GUI.Scenes {
                 var mobAnimationController = new MobAnimationController(_game);
                 var mobEntity = new MobEntity(mobId, _game) {
                     SortOrder = Camera2D.SortMobs,
-                    // TODO - fetch the animation controller via GetComponent<T>
                     Renderer = new MobRenderer(_game, mobId, mobAnimationController),
                     Transform = () => Camera2D.Instance.Transform
                 };
@@ -109,7 +108,6 @@ namespace HexMage.GUI.Scenes {
             };
             AddAndInitializeRootEntity(hoverLayout, _assetManager);
 
-#warning TODO - this shouldn't be a func, but rater pass it directly
             Func<GameInstance> gameFunc = () => _game;
             Func<CachedMob> currentMobFunc = () => _game.CurrentCachedMob;
             Func<CachedMob> hoverMobFunc = () => {
@@ -127,7 +125,6 @@ namespace HexMage.GUI.Scenes {
                 }
             };
 
-#warning TODO: 6 je fuj
             for (int i = 0; i < 6; i++) {
                 currentLayout.AddChild(AbilityDetail(gameFunc, currentMobFunc, i,
                                                      ParticleEffectSettings.HighlightParticles));

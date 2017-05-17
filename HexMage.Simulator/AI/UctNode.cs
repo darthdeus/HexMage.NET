@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 
-namespace HexMage.Simulator {
+namespace HexMage.Simulator.AI {
+    /// <summary>
+    /// Represents a single node in the MCTS tree.
+    /// </summary>
     public class UctNode {
         private static int _id = 0;
         public int Id;

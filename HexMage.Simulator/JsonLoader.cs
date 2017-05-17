@@ -4,6 +4,9 @@ using System.Linq;
 using HexMage.Simulator.Model;
 using Newtonsoft.Json;
 
+/// <summary>
+/// Json friendly variants of the game setup.
+/// </summary>
 namespace HexMage.Simulator {
     public class JsonBuff {
         public int HpChange;

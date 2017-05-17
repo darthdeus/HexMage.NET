@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
-using HexMage.GUI.Components;
 using HexMage.GUI.Core;
+using HexMage.GUI.Scenes;
 using HexMage.Simulator;
 using HexMage.Simulator.Model;
 using HexMage.Simulator.Pathfinding;
@@ -12,7 +12,10 @@ using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 
-namespace HexMage.GUI.Scenes {
+namespace HexMage.GUI.Components {
+    /// <summary>
+    /// Handles commands for the map editor scene.
+    /// </summary>
     public class MapEditor : Component {
         private readonly Action<Map> _loadNewMap;
         private readonly Func<Map> _mapFunc;
@@ -60,7 +63,6 @@ namespace HexMage.GUI.Scenes {
                         using (var writer = new StreamWriter(fileDialog.FileName)) {
                             var data = JsonConvert.SerializeObject(map);
                             writer.Write(data);
-                            //new MapRepresentation(map).SaveToStream(writer);
                         }
                     }
                 } catch (IOException e) {
@@ -128,6 +130,9 @@ namespace HexMage.GUI.Scenes {
             }
         }
 
+        /// <summary>
+        /// Loads a map from a given stream.
+        /// </summary>
         public static Map LoadMapFromStream(Stream stream) {
             using (var reader = new StreamReader(stream)) {
                 var content = reader.ReadToEnd();
@@ -135,6 +140,9 @@ namespace HexMage.GUI.Scenes {
             }
         }
 
+        /// <summary>
+        /// Loads a map from a given file.
+        /// </summary>
         public static Map LoadMapFromFile(string filename) {
             using (var reader = new StreamReader(filename)) {
                 var content = reader.ReadToEnd();
@@ -142,6 +150,10 @@ namespace HexMage.GUI.Scenes {
             }
         }
 
+        /// <summary>
+        /// Changes the order of starting points such that the starting
+        /// point under mouse cursor is moved to a given index.
+        /// </summary>
         private void ReorderStartingPoint(Keys key, int index, AxialCoord mouseHex, List<AxialCoord> hoverList) {
             if (InputManager.Instance.IsKeyJustPressed(key)) {
                 var tmp = hoverList[index];

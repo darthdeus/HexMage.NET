@@ -2,6 +2,9 @@ using System.Threading.Tasks;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator.AI {
+    /// <summary>
+    /// Implementation of the Rule Based AI.
+    /// </summary>
     public class AiRuleBasedController : IMobController {
         private readonly GameInstance _gameInstance;
 

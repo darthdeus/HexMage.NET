@@ -10,6 +10,9 @@ using System.Threading;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator.AI {
+    /// <summary>
+    /// Implements the core logic behind MCTS (UCT).
+    /// </summary>
     public class UctAlgorithm {
         public static int SearchCount = 0;
 
@@ -24,12 +27,18 @@ namespace HexMage.Simulator.AI {
         private readonly double _exploExplo;
         private readonly bool _iterationsOverTime;
 
+        /// <param name="thinkTime">Determines the total amount of time MCTS has.</param>
+        /// <param name="exploExplo">Determines the exploration/exploitation constant value.</param>
+        /// <param name="iterationsOverTime">Specifies whether MCTS is limited by a number of iterations or by time</param>
         public UctAlgorithm(int thinkTime, double exploExplo = 2, bool iterationsOverTime = true) {
             _thinkTime = thinkTime;
             _exploExplo = exploExplo;
             _iterationsOverTime = iterationsOverTime;
         }
 
+        /// <summary>
+        /// Runs the actual MCTS search on a given initial state.
+        /// </summary>
         public UctSearchResult UctSearch(GameInstance initialState) {
             var root = new UctNode(0, 0, UctAction.NullAction(), initialState.CopyStateOnly());
 
@@ -73,14 +82,19 @@ namespace HexMage.Simulator.AI {
             return new UctSearchResult(actions, millisecondsPerIteration);
         }
 
+        /// <summary>
+        /// Runs a single iteration of MCTS, returning a resulting delta value.
+        /// </summary>
         public float OneIteration(UctNode root, TeamColor startingTeam) {
             UctNode v = TreePolicy(root, startingTeam);
-            // TODO: ma tu byt root node team, nebo aktualni?
             float delta = DefaultPolicy(v.State, startingTeam);
             Backup(v, delta);
             return delta;
         }
 
+        /// <summary>
+        /// Runs the tree policy on a given node, selecting the most promising child.
+        /// </summary>
         public UctNode TreePolicy(UctNode node, TeamColor startingTeam) {
             bool wasDefense = node.Action.Type == UctActionType.DefensiveMove;
 
@@ -92,6 +106,8 @@ namespace HexMage.Simulator.AI {
                     var type = expanded.Action.Type;
                     var allowMove = type != UctActionType.Move && type != UctActionType.DefensiveMove;
 
+                    // We double-expand nodes which are a single child to reduce
+                    // the number of needed simulations.
                     if (!expanded.IsTerminal) {
                         expanded.PrecomputePossibleActions(allowMove, true);
                         if (expanded.PossibleActions.Count == 1) {
@@ -116,6 +132,11 @@ namespace HexMage.Simulator.AI {
             return node;
         }
 
+        /// <summary>
+        /// Expands a given node, adding a new possible state.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         public static UctNode Expand(UctNode node) {
             var type = node.Action.Type;
 
@@ -135,6 +156,9 @@ namespace HexMage.Simulator.AI {
             return DefaultPolicy(ActionEvaluator.F(game, action), startingTeam);
         }
 
+        /// <summary>
+        /// Simulates the playout till the end and calculates a reward.
+        /// </summary>
         public static float DefaultPolicy(GameInstance game, TeamColor startingTeam) {
             if (game.IsFinished) {
                 Debug.Assert(game.VictoryTeam.HasValue || game.AllDead, "game.VictoryTeam.HasValue");
@@ -183,6 +207,9 @@ namespace HexMage.Simulator.AI {
             return CalculateDeltaReward(game, startingTeam, victoryTeam);
         }
 
+        /// <summary>
+        /// Calculates a reward based on the starting team.
+        /// </summary>
         public static float CalculateDeltaReward(GameInstance game, TeamColor startingTeam, TeamColor? victoryTeam) {
             float result;
 
@@ -199,30 +226,29 @@ namespace HexMage.Simulator.AI {
             return result;
         }
 
+        /// <summary>
+        /// Backpropagates the reward up the tree.
+        /// </summary>
         public static void Backup(UctNode node, float delta) {
             while (node != null) {
                 node.N++;
                 node.Q += delta;
                 node = node.Parent;
-
-                // TODO: Nepouziva se, protoze odmeny jsou 0 nebo 1
-                //if (node != null && node.Action.Type == UctActionType.EndTurn) {
-                //    bool teamColorChanged = node.State.CurrentTeam != node.State.State.LastTeamColor;
-
-                //    if (teamColorChanged) {
-                //        //delta = -delta;
-                //    }
-                //}
             }
         }
 
+        /// <summary>
+        /// Returns the best child based on the UCB-1 value.
+        /// </summary>
         public static UctNode BestChild(UctNode node, TeamColor startingTeam, double k = 2) {
             if (node.Children.Count == 0) return null;
 
             return node.Children.FastMax(c => UcbValue(node, c, k, startingTeam));
         }
 
-        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        /// <summary>
+        /// Calculates the UCB-1 value of a given node.
+        /// </summary>
         public static float UcbValue(UctNode parent, UctNode node, double k, TeamColor startingTeam) {
             float value = node.Q / node.N;
 
@@ -233,6 +259,9 @@ namespace HexMage.Simulator.AI {
             return (float) (value + Math.Sqrt(k * Math.Log(parent.N) / node.N));
         }
 
+        /// <summary>
+        /// Returns a list of best possible actions until the end of a turn.
+        /// </summary>
         private List<UctAction> SelectBestActions(UctNode root) {
             var result = new List<UctAction>();
             UctNode current = root;
@@ -269,20 +298,6 @@ namespace HexMage.Simulator.AI {
             } while (current.Action.Type != UctActionType.EndTurn);
 
             done:
-
-            //bool wasDefense = false;
-            //foreach (var action in result) {
-            //    if (action.Type == UctActionType.DefensiveMove) {
-            //        if (wasDefense) {
-            //            UctDebug.PrintDotgraph(root, () => 1);
-            //            Debugger.Break();
-            //            throw new InvalidOperationException($"Double defensive move");
-            //        }
-            //        wasDefense = true;
-            //    } else {
-            //        wasDefense = false;
-            //    }
-            //}
 
             return result;
         }

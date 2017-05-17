@@ -1,5 +1,7 @@
 ﻿using System.IO;
+using HexMage.GUI.Components;
 using HexMage.GUI.Core;
+using HexMage.GUI.Renderers;
 using HexMage.Simulator;
 using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
@@ -40,10 +42,6 @@ namespace HexMage.GUI.Scenes {
                     LoadNewScene(new TeamSelectionScene(_gameManager, _map.DeepCopy()));
                 }
 
-                if (InputManager.Instance.IsKeyJustPressed(Keys.F11)) {
-                    LoadWorldFromSave();
-                }
-
                 if (InputManager.Instance.IsKeyJustPressed(Keys.F12)) {
                     LoadEvolutionSave(1);
                 }
@@ -73,35 +71,6 @@ namespace HexMage.GUI.Scenes {
 
         public override void Cleanup() { }
 
-
-        public void LoadWorldFromSave() {
-            using (var reader = new StreamReader(GameInstance.MapSaveFilename))
-            using (var mobReader = new StreamReader(GameInstance.MobsSaveFilename)) {
-                var mapRepr = JsonConvert.DeserializeObject<MapRepresentation>(reader.ReadToEnd());
-
-                var game = new GameInstance(mapRepr.Size);
-                mapRepr.UpdateMap(game.Map);
-
-                var mobManager = JsonConvert.DeserializeObject<MobManager>(mobReader.ReadToEnd());
-                game.MobManager = mobManager;
-
-                // TODO: potrebuju InitializeState????
-                game.PrepareEverything();
-                game.Reset();
-
-                var arenaScene = new ArenaScene(_gameManager, game);
-
-                //game.MobManager.Teams[TeamColor.Red] = new PlayerController(arenaScene, game);
-                //game.MobManager.Teams[TeamColor.Blue] = new PlayerController(arenaScene, game);
-                game.MobManager.Teams[TeamColor.Red] = new MctsController(game, 1);
-                game.MobManager.Teams[TeamColor.Blue] = new MctsController(game, 1);
-
-                game.PrepareEverything();
-
-                LoadNewScene(arenaScene);
-            }
-        }
-
         public static GameInstance LoadEvolutionSaveFile(string filename) {
             var lines = File.ReadAllLines(filename);
 
@@ -120,7 +89,6 @@ namespace HexMage.GUI.Scenes {
             var arenaScene = new ArenaScene(_gameManager, game);
 
             game.MobManager.Teams[TeamColor.Red] = new PlayerController(arenaScene, game);
-            //game.MobManager.Teams[TeamColor.Red] = new MctsController(game, 1000);
             game.MobManager.Teams[TeamColor.Blue] = new MctsController(game, 1000);
 
             LoadNewScene(arenaScene);

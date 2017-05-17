@@ -10,10 +10,12 @@ using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Single;
 
 namespace HexMage.Simulator {
+    /// <summary>
+    /// Represents a single team in the encounter.
+    /// </summary>
     public class DNA {
         public Vector<float> Data;
 
-        //public List<float> Data = new List<float>();
         public int AbilityCount;
 
         public int MobCount;
@@ -21,8 +23,6 @@ namespace HexMage.Simulator {
         public const int MobAttributeCount = 2;
         public const int AbilityAttributeCount = 11;
         public int MobSize => MobAttributeCount + AbilityCount * AbilityAttributeCount;
-
-        // TODO - area buff
 
         public DNA() { }
 
@@ -51,6 +51,10 @@ namespace HexMage.Simulator {
             return new DNA(this);
         }
 
+        /// <summary>
+        /// Randomizes all of the attributes. Note that this can take a few iterations
+        /// as the values are validated after generating.
+        /// </summary>
         public void Randomize() {
             do {
                 for (int i = 0; i < Data.Count; i++) {
@@ -59,6 +63,9 @@ namespace HexMage.Simulator {
             } while (!ToTeam().IsValid());
         }
 
+        /// <summary>
+        /// Converts to a printable string format, used mainly for debugging.
+        /// </summary>
         public string ToDnaString() {
             var dnaString = new StringBuilder();
             foreach (var num in Data) {
@@ -69,19 +76,23 @@ namespace HexMage.Simulator {
             return dnaString.ToString();
         }
 
+        /// <summary>
+        /// Converts to a serializable DNA format as described in the programmer documentation.
+        /// </summary>
         public string ToSerializableString() {
             return $"{MobCount},{AbilityCount},{string.Join(",", Data.Select(n => n.ToString("0.00")))}";
         }
 
+        /// <summary>
+        /// Deserializes the string format created by <code>ToSerializableString</code>
+        /// </summary>
         public static DNA FromSerializableString(string str) {
-            Console.WriteLine($"Processing****\n\n'{str}'\n\n*****");
             var split = str.Split(',');
             var dna = new DNA();
             dna.MobCount = int.Parse(split[0]);
             dna.AbilityCount = int.Parse(split[1]);
 
             dna.Data = DenseVector.OfEnumerable(split.Skip(2).Select(x => {
-                Console.WriteLine($"Parsing {x}");
                 return float.Parse(x, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture);
             }));
 
@@ -96,6 +107,9 @@ namespace HexMage.Simulator {
             return GenomeLoader.FromDna(this);
         }
 
+        /// <summary>
+        /// Calculates a distance fitness value between two DNAs.
+        /// </summary>
         public float DistanceFitness(DNA team2) {
             var low = DenseVector.Build.Dense(Data.Count, 0);
             var high = DenseVector.Build.Dense(Data.Count, 1);
@@ -105,9 +119,13 @@ namespace HexMage.Simulator {
             double distance = Distance.Euclidean(Data, team2.Data);
             double relativeDistance = distance / maxDistance;
 
-            double distanceFitness = 1 / (1 + Math.Exp(-60 * relativeDistance + 1.5));
+            var distanceFitness = RelativeDistance(relativeDistance);
 
             return (float) distanceFitness;
+        }
+
+        public static double RelativeDistance(double relativeDistance) {
+            return 1 / (1 + Math.Exp(-60 * relativeDistance + 1.5));
         }
     }
 }

@@ -2,6 +2,9 @@
 using MathNet.Numerics.Distributions;
 
 namespace HexMage.Simulator.AI {
+    /// <summary>
+    /// Represents a result of a playout, used in ES.
+    /// </summary>
     public struct PlayoutResult {
         public int TotalTurns;
         public float HpPercentage;
@@ -26,16 +29,11 @@ namespace HexMage.Simulator.AI {
             return $"F:{fstr}\t{dna.ToDnaString()}";
         }
 
-        [Obsolete]
         public float SimpleFitness() {
             float fitA = 1 - HpPercentage;
             float fitB = (float) LengthSample(TotalTurns);
 
             float fitness = (fitA + fitB) / 2;
-
-            if (Math.Abs(fitA - 1) < 0.01) {
-                //Console.WriteLine($"HEUHEHUE");
-            }
 
             if (!AllPlayed) {
                 fitness = 0.0001f;

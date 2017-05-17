@@ -2,10 +2,9 @@
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator.Model {
-    // TODO - rename
-
-#warning TODO - this should be a struct
-
+    /// <summary>
+    /// The definition of a single ability.
+    /// </summary>
     public class AbilityInfo : IDeepCopyable<AbilityInfo> {
         public int Dmg { get; set; }
         public int Cost { get; set; }
@@ -17,8 +16,6 @@ namespace HexMage.Simulator.Model {
         public float DmgCostRatio => (float) Dmg / (float) Cost;
 
         [JsonConstructor]
-        [Obsolete]
-#warning TODO: is this still needed?
         public AbilityInfo() { }
 
         public AbilityInfo(int dmg, int cost, int range, int cooldown)
@@ -39,8 +36,6 @@ namespace HexMage.Simulator.Model {
             var copy = new AbilityInfo(Dmg, Cost, Range, Cooldown, Buff, AreaBuff);
             return copy;
         }
-
-#warning TODO - ulozit je do nejaky tabulky a jenom referencovat
 
         protected bool Equals(AbilityInfo other) {
             return Dmg == other.Dmg && Cost == other.Cost && Range == other.Range && Cooldown == other.Cooldown &&

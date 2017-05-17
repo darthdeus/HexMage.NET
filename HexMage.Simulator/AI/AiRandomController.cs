@@ -4,6 +4,9 @@ using HexMage.Simulator.Model;
 using HexMage.Simulator.PCG;
 
 namespace HexMage.Simulator.AI {
+    /// <summary>
+    /// Implementation of the random AI.
+    /// </summary>
     public class AiRandomController : IMobController {
         private readonly GameInstance _gameInstance;
 

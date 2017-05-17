@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator.AI {
+    /// <summary>
+    /// An implementation of the MCTS AI.
+    /// </summary>
     public class MctsController : IMobController {
         private readonly GameInstance _gameInstance;
         private readonly int _thinkTime;
@@ -25,7 +28,6 @@ namespace HexMage.Simulator.AI {
                 ActionEvaluator.FNoCopy(_gameInstance, action);
             }
 
-#warning TODO: not threadsafe
             ExponentialMovingAverage.Instance.Average(result.MillisecondsPerIteration);
 
             LogActions(result);

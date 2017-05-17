@@ -2,11 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 
-namespace HexMage.Simulator {
+namespace HexMage.Simulator.AI {
+    /// <summary>
+    /// Wraps all the helpers for generating game actions.
+    /// </summary>
     public static class ActionGenerator {
+        /// <summary>
+        /// Stochastically picks an ability based on its damage/cost. Can be optionally
+        /// run with a deterministic result simply returning the maximum value.
+        /// </summary>
         public static UctAction MaxAbilityRatio(GameInstance game, List<UctAction> actions,
                                                 bool deterministic = false) {
             if (deterministic) {
@@ -44,6 +50,9 @@ namespace HexMage.Simulator {
             return max;
         }
 
+        /// <summary>
+        /// Calculates an action based on a simple set of rules.
+        /// </summary>
         public static UctAction RuleBasedAction(GameInstance game) {
             if (Constants.FastActionGeneration) return DefaultPolicyAction(game);
 
@@ -66,6 +75,10 @@ namespace HexMage.Simulator {
             return UctAction.EndTurnAction();
         }
 
+        /// <summary>
+        /// Calculates an action according to a simple default policy. Used mainly
+        /// in MCTS playouts.
+        /// </summary>
         public static UctAction DefaultPolicyAction(GameInstance state) {
             var mobId = state.CurrentMob;
 
@@ -121,6 +134,9 @@ namespace HexMage.Simulator {
             }
         }
 
+        /// <summary>
+        /// Calculates a move towards an enemy, or ends a turn if no such move is possible.
+        /// </summary>
         private static UctAction PickMoveTowardsEnemyAction(GameInstance game, CachedMob mob,
                                                             CachedMob possibleTarget) {
             foreach (var targetId in game.MobManager.Mobs) {
@@ -136,6 +152,9 @@ namespace HexMage.Simulator {
             return UctAction.EndTurnAction();
         }
 
+        /// <summary>
+        /// Returns an action that moves towards an enemy as fast as possible.
+        /// </summary>
         public static UctAction FastMoveTowardsEnemy(GameInstance state, CachedMob mob, CachedMob target) {
             var pathfinder = state.Pathfinder;
 
@@ -154,6 +173,9 @@ namespace HexMage.Simulator {
             }
         }
 
+        /// <summary>
+        /// Generates a number of defensive move actions based on a heatmap.
+        /// </summary>
         public static void GenerateDefensiveMoveActions(GameInstance state, CachedMob mob, List<UctAction> result) {
             var heatmap = Heatmap.BuildHeatmap(state, null, false);
             var coords = new List<AxialCoord>();
@@ -175,12 +197,7 @@ namespace HexMage.Simulator {
 
             coords.Shuffle();
 
-            var buffsAtMob = state.State.BuffsAt(mobInstance.Coord);
-
-            // Generate more actions if standing on an area buff
-            int maxActions = buffsAtMob.Count > 0 ? 3 : 3;
-
-            int maximumMoveActions = Math.Max(0, maxActions - result.Count);
+            int maximumMoveActions = Math.Max(0, 3 - result.Count);
             for (int i = 0; i < Math.Min(coords.Count, maximumMoveActions); i++) {
                 var action = UctAction.DefensiveMoveAction(mobId, coords[i]);
                 GameInvariants.AssertValidAction(state, action);
@@ -189,6 +206,9 @@ namespace HexMage.Simulator {
             }
         }
 
+        /// <summary>
+        /// Generates possible attack move actions.
+        /// </summary>
         public static void GenerateAttackMoveActions(GameInstance state, CachedMob mob, List<UctAction> result) {
             var mobInfo = mob.MobInfo;
             var mobInstance = mob.MobInstance;
@@ -251,6 +271,9 @@ namespace HexMage.Simulator {
             }
         }
 
+        /// <summary>
+        /// Generates possible direct ability use actions.
+        /// </summary>
         public static bool GenerateDirectAbilityUse(GameInstance state,
                                                     CachedMob mob,
                                                     List<UctAction> result) {
@@ -276,6 +299,9 @@ namespace HexMage.Simulator {
             return foundAbilityUse;
         }
 
+        /// <summary>
+        /// Generates a list of possible actions, truncated for the purposes of MCTS.
+        /// </summary>
         public static List<UctAction> PossibleActions(GameInstance game, UctNode parent, bool allowMove,
                                                       bool allowEndTurn) {
             var result = new List<UctAction>(10);
@@ -300,9 +326,9 @@ namespace HexMage.Simulator {
                     }
                 }
             } else {
-                throw new InvalidOperationException();
                 Utils.Log(LogSeverity.Warning, nameof(UctNode),
                           "Final state reached while trying to compute possible actions.");
+                throw new InvalidOperationException();
             }
 
             if (allowEndTurn) {

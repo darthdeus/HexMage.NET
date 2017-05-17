@@ -4,6 +4,11 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
+    /// <summary>
+    /// A generic hex map shaped array-like data structure with
+    /// precomputed coords up to a maximum radius.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class HexMap<T> : IDeepCopyable<HexMap<T>> {
         [JsonProperty] private readonly T[,] _data;
 
@@ -31,7 +36,6 @@ namespace HexMage.Simulator {
         private static readonly Dictionary<int, List<AxialCoord>> _allCoordDictionary =
             new Dictionary<int, List<AxialCoord>>();
 
-        // TODO - tohle by melo byt mnohem lepe udelana globalni cache (nebo thread local?)
         [JsonIgnore]
         public List<AxialCoord> AllCoords {
             get {
@@ -72,7 +76,6 @@ namespace HexMage.Simulator {
         public void RecalculateCoords() {
             AllCoords.Clear();
 
-            // TODO - go from -Size
             for (var i = -Size; i < Size; i++) {
                 for (var j = -Size; j < Size; j++) {
                     for (var k = -Size; k < Size; k++) {

@@ -71,7 +71,8 @@
     <Compile Include="Components\MobEntity.cs" />
     <Compile Include="Components\PositionAtMob.cs" />
     <Compile Include="Components\ProjectileEntity.cs" />
-    <Compile Include="Components\SpriteChanger.cs" />
+    <Compile Include="Core\AnimatedSpriteRenderer.cs" />
+    <Compile Include="Core\SpriteRenderer.cs" />
     <Compile Include="Renderers\IRenderer.cs" />
     <Compile Include="Components\LambdaComponent.cs" />
     <Compile Include="Renderers\AnimationRenderer.cs" />
@@ -84,7 +85,6 @@
     <Compile Include="Core\AssetManager.cs" />
     <Compile Include="Core\Camera2D.cs" />
     <Compile Include="Core\GuiConfig.cs" />
-    <Compile Include="Core\FrameCounter.cs" />
     <Compile Include="Core\GameManager.cs" />
     <Compile Include="HexMageGame.cs" />
     <Compile Include="InputManager.cs" />

@@ -4,6 +4,9 @@ using System.Linq;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator.Model {
+    /// <summary>
+    /// Wraps all of the helpres with regard to mobs.
+    /// </summary>
     public class MobManager : IDeepCopyable<MobManager> {
         public List<int> Mobs = new List<int>();
         public readonly List<AbilityInfo> Abilities = new List<AbilityInfo>();
@@ -20,9 +23,7 @@ namespace HexMage.Simulator.Model {
             return Abilities[mob.MobInfo.Abilities[index]];
         }
 
-        [Obsolete]
         public void InitializeState(GameState state) {
-#warning DEPRECATED: InitializeState by se asi nemelo pouzivat vubec? K cemu to vlastne je?
             state.Cooldowns.Clear();
             state.MobInstances = new MobInstance[Mobs.Count];
 

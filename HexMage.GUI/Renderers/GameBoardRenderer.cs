@@ -16,6 +16,10 @@ namespace HexMage.GUI.Renderers {
         VisibilityMap
     }
 
+    /// <summary>
+    /// Renders the hex arena as well as the content related to the mouse cursor,
+    /// heatmaps, etc.
+    /// </summary>
     public class GameBoardRenderer : IRenderer {
         private readonly GameInstance _gameInstance;
         private readonly GameBoardController _gameBoardController;
@@ -76,7 +80,6 @@ namespace HexMage.GUI.Renderers {
             _spriteBatch.Begin(transformMatrix: _camera.Transform, samplerState: Camera2D.SamplerState);
             foreach (var to in _gameInstance.Map.AllCoords) {
                 if (_gameInstance.Map.IsVisible(from, to)) {
-                    // TODO - extrahovat hover sprite
                     DrawAt(_assetManager[AssetManager.HexHoverSprite], to, Color.Red * 0.5f);
                 }
             }
@@ -157,7 +160,6 @@ namespace HexMage.GUI.Renderers {
 
                 if (_gameInstance.Pathfinder.IsValidCoord(mouseHex) &&
                     _gameInstance.Pathfinder.Distance(mobInstance.Coord, mouseHex) != int.MaxValue) {
-                    // TODO: fuj
                     IList<AxialCoord> path;
 
                     var mouseMob = _gameInstance.State.AtCoord(mouseHex, true);
@@ -215,7 +217,6 @@ namespace HexMage.GUI.Renderers {
                     } else {
                         if (_gameInstance.Pathfinder.IsValidCoord(mouseHex) &&
                             _gameInstance.Map[mouseHex] != HexType.Wall &&
-                            // TODO: kdy nastane, ze path == null?!?
                             path != null) {
                             if (!mouseMob.HasValue || mouseMob.Value != currentMob.Value) {
                                 foreach (var coord in path) {

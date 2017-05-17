@@ -6,6 +6,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.UI {
+    /// <summary>
+    /// A simple text label with a customizable font and text color.
+    /// </summary>
     public class Label : Entity, IRenderer {
         public string Text { get; set; } = "";
         public SpriteFont Font { get; set; }

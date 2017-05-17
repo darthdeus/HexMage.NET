@@ -1,4 +1,7 @@
 namespace HexMage.Simulator.Model {
+    /// <summary>
+    /// A simple heatmap with visiblity of all enemies calculated for each hex in the arena.
+    /// </summary>
     public class Heatmap {
         public readonly HexMap<int> Map;
 
@@ -27,7 +30,6 @@ namespace HexMage.Simulator.Model {
                     var enemyInfo = game.MobManager.MobInfos[mobId];
                     var enemyInstance = game.State.MobInstances[mobId];
 
-                    // TODO - fuj
                     if (chosenMob.HasValue && chosenMob.Value != mobId) continue;
 
                     bool isFriendly = playerTeam == enemyInfo.Team;

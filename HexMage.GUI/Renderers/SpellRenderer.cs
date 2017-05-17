@@ -7,6 +7,9 @@ using HexMage.Simulator.Model;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI.Renderers {
+    /// <summary>
+    /// Renders a single ability.
+    /// </summary>
     public class SpellRenderer : IRenderer {
         private readonly GameInstance _game;
         private readonly GameBoardController _gameBoardController;
@@ -26,9 +29,6 @@ namespace HexMage.GUI.Renderers {
         public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
             var effect = assetManager.LoadEffect(AssetManager.ShaderAbility);
 
-            var time = ((float) DateTime.Now.Millisecond) / 1000 * 2 - 1;
-
-            //effect.Parameters["Time"].SetValue(time);
             batch.Begin(effect: effect, samplerState: Camera2D.SamplerState);
 
             var mob = _mobFunc();
@@ -47,14 +47,6 @@ namespace HexMage.GUI.Renderers {
                 if (entity.AABB.Contains(InputManager.Instance.MousePosition)) {
                     batch.Draw(assetManager[AssetManager.SpellHighlight], entity.RenderPosition);
                 }
-
-                //if (mob.MobInstance.Ap < ability.Cost) {
-                //    batch.Draw(assetManager[AssetManager.SpellBgNotEnoughAp], entity.RenderPosition);
-                //}
-
-                //if (ability.Cooldown > 0) {
-                //    batch.Draw(assetManager[AssetManager.SpellBgCooldown], entity.RenderPosition);
-                //}
             } else {
                 Debug.WriteLine("ERROR - Rendering abilities, but no mob is currently active.");
                 batch.Draw(assetManager[AssetManager.NoTexture], entity.RenderPosition);

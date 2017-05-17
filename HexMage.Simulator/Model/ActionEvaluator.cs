@@ -4,10 +4,12 @@ using System.Diagnostics;
 using HexMage.Simulator.AI;
 
 namespace HexMage.Simulator.Model {
+    /// <summary>
+    /// Encapsulates the logic of evaluating actions on a given game state.
+    /// </summary>
     public static class ActionEvaluator {
         public static int Actions = 0;
 
-        // TODO: extract all the accounting
         public static readonly Dictionary<UctActionType, int> ActionCounts = new Dictionary<UctActionType, int>();
 
         public static string ActionCountString() {
@@ -34,7 +36,6 @@ namespace HexMage.Simulator.Model {
         }
 
         public static GameInstance FNoCopy(GameInstance state, UctAction action) {
-            // TODO - atomic?
             Actions++;
             ActionCounts[action.Type]++;
 
@@ -72,7 +73,6 @@ namespace HexMage.Simulator.Model {
             return state;
         }
 
-        // TODO - rename
         private static void FastMove(GameInstance game, int mobId, AxialCoord coord) {
             var mobInstance = game.State.MobInstances[mobId];
 
@@ -82,7 +82,6 @@ namespace HexMage.Simulator.Model {
             game.State.SetMobPosition(mobId, coord);
         }
 
-        // TODO - rename
         private static void FastUse(GameInstance game, int abilityId, int mobId, int targetId) {
             var ability = game.MobManager.AbilityForId(abilityId);
 
@@ -91,7 +90,6 @@ namespace HexMage.Simulator.Model {
             TargetHit(game, abilityId, mobId, targetId);
         }
 
-        // TODO - rename
         private static void TargetHit(GameInstance game, int abilityId, int mobId, int targetId) {
             var ability = game.MobManager.AbilityForId(abilityId);
 
@@ -100,26 +98,16 @@ namespace HexMage.Simulator.Model {
 
             var targetInstance = game.State.MobInstances[targetId];
 
-
-            //var targetInfo = game.MobManager.MobInfos[targetId];
-            //Constants.WriteLogLine($"Did {ability.Dmg} damage, HP: {targetInstance.Hp}/{targetInfo.MaxHp}");
-
             if (!ability.Buff.IsZero) {
                 targetInstance.Buff = Buff.Combine(targetInstance.Buff, ability.Buff);
             }
 
             game.State.MobInstances[targetId] = targetInstance;
-            //targetInstance.Buffs.Add(ability.ElementalEffect);
-            //foreach (var abilityBuff in ability.Buffs) {
-            //    // TODO - handle lifetimes
-            //    targetInstance.Buffs.Add(abilityBuff);
-            //}
 
             if (!ability.AreaBuff.IsZero) {
                 var copy = ability.AreaBuff;
                 copy.Coord = targetInstance.Coord;
 
-                // TODO: tohle je pomaly
                 game.State.AreaBuffs.Add(copy);
             }
 

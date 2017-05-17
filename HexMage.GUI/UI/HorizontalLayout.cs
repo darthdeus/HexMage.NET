@@ -4,6 +4,10 @@ using HexMage.GUI.Core;
 using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.UI {
+    /// <summary>
+    /// Horizontally stacked layout where entities are layed out horizontally
+    /// next to each other.
+    /// </summary>
     public class HorizontalLayout : Entity {
         public int Spacing = 0;
 

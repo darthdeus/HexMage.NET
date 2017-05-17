@@ -7,6 +7,9 @@ using HexMage.Simulator.Model;
 using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.Components {
+    /// <summary>
+    /// Updates the ability view on the side of the arena scene.
+    /// </summary>
     public class AbilityUpdater : Component {
         private readonly Func<GameInstance> _gameFunc;
         private readonly Func<CachedMob> _mobFunc;

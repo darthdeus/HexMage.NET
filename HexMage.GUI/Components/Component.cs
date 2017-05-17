@@ -3,6 +3,9 @@ using HexMage.GUI.Core;
 using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.Components {
+    /// <summary>
+    /// Represents a unit of behavior that can be attached to <code>Entity</code> instances.
+    /// </summary>
     public class Component {
         public bool IsInitialized { get; private set; } = false;
         public Entity Entity { get; set; }

@@ -3,21 +3,13 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using HexMage.Simulator.AI;
+using HexMage.Simulator.Model;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
-    public class Replay {
-        public readonly GameInstance Game;
-        public readonly List<UctAction> Actions;
-        public List<string> Log;
-
-        public Replay(GameInstance game, List<UctAction> actions, List<string> log) {
-            Game = game;
-            Actions = actions;
-            Log = log;
-        }
-    }
-
+    /// <summary>
+    /// Handles replay and history recording and serialization/deserialization.
+    /// </summary>
     public class ReplayRecorder {
         public const string ReplayDirectory = @"data\replays";
         public static readonly ReplayRecorder Instance = new ReplayRecorder();

@@ -6,6 +6,12 @@ using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 
 namespace HexMage.GUI.Core {
+    /// <summary>
+    /// An implementation of the <code>IMobController</code> interface for a human player.
+    /// It simply delays the game loop until the player has finished playing. It doesn't
+    /// directly handle actions as those should be applied on the game instance externally.
+    /// It only handles pausing the game event loop.
+    /// </summary>
     internal class PlayerController : IMobController {
         private readonly ArenaScene _arenaScene;
 

@@ -1,7 +1,9 @@
 ﻿namespace HexMage.Simulator.Model {
+    /// <summary>
+    /// Represents the current transient state of a given mob.
+    /// </summary>
     public struct MobInstance {
         public static readonly int InvalidId = -1;
-        // TODO - remove the id?
         public int Id;
         public AxialCoord Coord;
         public int Hp;

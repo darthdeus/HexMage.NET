@@ -1,19 +1,14 @@
 using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using HexMage.Simulator.AI;
-using HexMage.Simulator.Model;
 using HexMage.Simulator.Pathfinding;
 using Newtonsoft.Json;
 
-namespace HexMage.Simulator {
+namespace HexMage.Simulator.Model {
+    /// <summary>
+    /// Represents a single encounter with all of the definitions and game state.
+    /// </summary>
     public class GameInstance : IDeepCopyable<GameInstance>, IResettable {
-        // TODO - fuj hardcoded cesty
-        public static string MapSaveFilename = @"C:\dev\HexMage\HexMage\HexMage.GUI\map.json";
-
-        public static string MobsSaveFilename = @"C:\dev\HexMage\HexMage\HexMage.GUI\mobs.json";
-
         public Map Map { get; set; }
         public MobManager MobManager { get; set; }
         public Pathfinder Pathfinder { get; set; }
@@ -23,7 +18,6 @@ namespace HexMage.Simulator {
         public int Size { get; set; }
 
         [JsonIgnore]
-        [Obsolete]
         public bool AllDead => State.RedTotalHp == 0 && State.BlueTotalHp == 0;
 
         [JsonIgnore]
@@ -85,7 +79,6 @@ namespace HexMage.Simulator {
         }
 
         public void PrepareTurnOrder() {
-            // TODO - je tohle potreba?
             TurnManager.PresortTurnOrder();
             State.Reset(this);
         }
@@ -175,7 +168,6 @@ namespace HexMage.Simulator {
             return totalCurrentHp / totalMaxHp;
         }
 
-        /// TODO - fix stuff below
         public int AddMobWithInfo(MobInfo mobInfo) {
             Debug.Assert(State.MobInstances.Length == MobManager.MobInfos.Count,
                          "State.MobInstances.Length == MobManager.MobInfos.Count");

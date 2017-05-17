@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace HexMage.Simulator {
+    /// <summary>
+    /// A collection of math helpers.
+    /// </summary>
     public static class Mathf {
         public static float Clamp(float min, float value, float max) {
             if (value < min) return min;

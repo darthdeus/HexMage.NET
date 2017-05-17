@@ -12,6 +12,10 @@ namespace HexMage.Simulator.Model {
         SettingUpTurn
     }
 
+    /// <summary>
+    /// Encapsulates the logic of the main game loop. Subscribers can subscribe themselves
+    /// to the game loop to receive notifications of the actions in progress.
+    /// </summary>
     public class GameEventHub {
         private readonly GameInstance _gameInstance;
         private readonly List<IGameEventSubscriber> _subscribers = new List<IGameEventSubscriber>();
@@ -71,9 +75,6 @@ namespace HexMage.Simulator.Model {
 
                 await _gameInstance.CurrentController.SlowPlayTurn(this);
 
-                // TODO - try to use this to find some more race conditions :)
-                // Delay used to find random race conditions
-                //await Task.Delay(TimeSpan.FromMilliseconds(1000));
                 ActionEvaluator.FNoCopy(_gameInstance, UctAction.EndTurnAction());
 
                 turnEndFunc();
@@ -87,9 +88,11 @@ namespace HexMage.Simulator.Model {
 
             return totalTurns;
         }
-
+        
+        /// <summary>
+        /// Asnychronously run a given action, notifying all of the subscribers.
+        /// </summary>
         public async Task SlowPlayAction(GameInstance game, UctAction action) {
-            // TODDO - game vs _gameInstance?
             Debug.Assert(game == _gameInstance, "instance == _gameInstance");
 
             foreach (var subscriber in _subscribers) {
@@ -102,26 +105,20 @@ namespace HexMage.Simulator.Model {
                     break;
 
                 case UctActionType.EndTurn:
-                    // TODO - nastavit nejakej stav?                    
                     break;
 
                 case UctActionType.AttackMove:
-                    // TODO - tohle se deje uz jinde
                     GameInvariants.AssertValidMoveAction(_gameInstance, action);
 
                     await SlowBroadcastAction(action.ToPureMove());
                     await SlowBroadcastAction(action.ToPureAbilityUse());
-                    //await SlowBroadcastMobMoved(action.MobId, action.Coord);
-                    //await SlowBroadcastAbilityUsed(action.MobId, action.TargetId, action.AbilityId);
                     break;
 
                 case UctActionType.DefensiveMove:
                 case UctActionType.Move:
-                    // TODO - tohle se deje uz jinde
                     GameInvariants.AssertValidMoveAction(_gameInstance, action);
 
                     await SlowBroadcastAction(action.ToPureMove());
-                    //await SlowBroadcastMobMoved(action.MobId, action.Coord);
                     break;
 
                 case UctActionType.Null:

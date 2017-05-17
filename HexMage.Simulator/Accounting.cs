@@ -4,6 +4,9 @@ using System.Threading;
 using HexMage.Simulator.AI;
 
 namespace HexMage.Simulator.Model {
+    /// <summary>
+    /// Wraps win statistics for a number of AIs in a threadsafe manner.
+    /// </summary>
     public static class Accounting {
         public static int MctsWins = 0;
         public static int RandomAiWins = 0;

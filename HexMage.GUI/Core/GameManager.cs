@@ -1,9 +1,11 @@
-﻿using System;
-using System.Threading;
-using HexMage.GUI.Core;
+﻿using System.Threading;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace HexMage.GUI {
+namespace HexMage.GUI.Core {
+    /// <summary>
+    /// Wraps together the Camera, InputManager, AssetManager and the current SpriteBatch.
+    /// It also ties to a synchronization context, which is initialized to <code>SceneSynchronizationContext</code>.
+    /// </summary>
     public class GameManager {
         public Camera2D Camera { get; set; }
         public InputManager InputManager { get; set; }

@@ -1,4 +1,8 @@
 namespace HexMage.Simulator.AI {
+    /// <summary>
+    /// Represents a mean computation to which results can be added at any time
+    /// and the mean value is recomputed in a threadsafe manner.
+    /// </summary>
     public class RollingAverage {
         private double _total = 0;
         private int _count = 0;

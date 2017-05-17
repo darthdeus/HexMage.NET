@@ -2,6 +2,9 @@
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
+    /// <summary>
+    /// Axial coord, see http://www.redblobgames.com/grids/hexagons/
+    /// </summary>
     public struct AxialCoord : IEquatable<AxialCoord> {
         public int X;
         public int Y;

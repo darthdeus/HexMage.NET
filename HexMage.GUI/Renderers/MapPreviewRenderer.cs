@@ -7,6 +7,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI.Renderers {
+    /// <summary>
+    /// Renderer for a mob preview in the team selection scene.
+    /// </summary>
     public class MapPreviewRenderer : IRenderer {
         private readonly Func<Map> _mapFunc;
         private readonly float _scale;

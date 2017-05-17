@@ -11,6 +11,12 @@ using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Vector4 = Microsoft.Xna.Framework.Vector4;
 
 namespace HexMage.GUI.Core {
+    /// <summary>
+    /// Objects in the game scenes are represented as entities. Entities can have
+    /// an arbitrary amount of components which handle per-frame update logic. They
+    /// can also have an optional <code>Renderer</code> which takes care of the rendering
+    /// logic.
+    /// </summary>
     public class Entity {
         public Func<Matrix> Transform { get; set; } = () => Matrix.Identity;
         public Matrix RenderTransform { get; set; }
@@ -173,37 +179,6 @@ namespace HexMage.GUI.Core {
 
         public void ClearChildren() {
             Children.Clear();
-        }
-    }
-
-    public class SpriteRenderer : IRenderer {
-        private readonly Func<Texture2D> _texFunc;
-        public Texture2D Tex;
-
-        public SpriteRenderer(Func<Texture2D> texFunc) {
-            _texFunc = texFunc;
-        }
-
-        public SpriteRenderer(Texture2D tex) {
-            Tex = tex;
-        }
-
-        public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
-            batch.Draw(_texFunc?.Invoke() ?? Tex, entity.RenderPosition);
-        }
-    }
-
-    public class AnimatedSpriteRenderer : IRenderer {
-        public readonly Texture2D Tex;
-        private readonly Func<Rectangle> _spriteSelector;
-
-        public AnimatedSpriteRenderer(Texture2D tex, Func<Rectangle> spriteSelector) {
-            Tex = tex;
-            _spriteSelector = spriteSelector;
-        }
-
-        public void Render(Entity entity, SpriteBatch batch, AssetManager assetManager) {
-            batch.Draw(Tex, entity.RenderPosition, _spriteSelector(), Color.White);
         }
     }
 }

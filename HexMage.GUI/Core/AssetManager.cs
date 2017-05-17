@@ -8,7 +8,14 @@ using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Core {
+    /// <summary>
+    /// AssetManager handles all asset loading throughout the game. It also provides caching
+    /// functionality, as well as the option to preload some of the assets.
+    /// </summary>
     public class AssetManager {
+        /// <summary>
+        /// Size of a single hex tile.
+        /// </summary>
         public const int TileSize = 64;
         public const int HalfTileSize = TileSize / 2;
 

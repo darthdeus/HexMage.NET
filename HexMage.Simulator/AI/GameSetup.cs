@@ -6,7 +6,14 @@ using HexMage.Simulator.Pathfinding;
 using HexMage.Simulator.PCG;
 
 namespace HexMage.Simulator.AI {
+    /// <summary>
+    /// Contains helpers for generating initial encounter setups.
+    /// </summary>
     public static class GameSetup {
+        /// <summary>
+        /// Generates a game for the given DNA constant settings and a given map.
+        /// Can also optionally precompute everything.
+        /// </summary>
         public static GameInstance GenerateForDnaSettings(int mobCount, int abilityCount, Map map = null,
                                                           bool prepare = true) {
             if (map == null) {
@@ -34,6 +41,9 @@ namespace HexMage.Simulator.AI {
             return game;
         }
 
+        /// <summary>
+        /// Takes a game and overrides its settings based on a given DNA pair.
+        /// </summary>
         public static void OverrideGameDna(GameInstance game, DNA d1, DNA d2, bool prepare = true) {
             game.MobManager.Clear();
             game.State.Clear();
@@ -46,11 +56,18 @@ namespace HexMage.Simulator.AI {
             }
         }
 
+        /// <summary>
+        /// Resets the game to an initial state as well as resetting the mobs to their
+        /// starting positions.
+        /// </summary>
         public static void ResetGameAndPositions(GameInstance game) {
             game.Reset();
             ResetPositions(game);
         }
 
+        /// <summary>
+        /// Resets the mobs to their starting positions.
+        /// </summary>
         public static void ResetPositions(GameInstance game) {
             int redCursor = 0;
             int blueCursor = 0;

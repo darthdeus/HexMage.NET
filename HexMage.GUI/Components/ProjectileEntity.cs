@@ -5,6 +5,11 @@ using HexMage.Simulator;
 using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.Components {
+    /// <summary>
+    /// Represents a projectile from a used ability. It automatically handles animation
+    /// between the source and destination, as well as providing a callback for when
+    /// the projectile hits the target.
+    /// </summary>
     public class ProjectileEntity : Entity {
         private readonly TimeSpan _duration;
         private readonly AxialCoord _source;

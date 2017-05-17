@@ -10,6 +10,10 @@ using MathNet.Numerics.LinearAlgebra;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator.AI {
+    /// <summary>
+    /// Contains all of the logic related to evolution strategies
+    /// for generating a balanced encounter.
+    /// </summary>
     public class Evolution {
         private readonly bool _keepCounter;
         private readonly int _maxGoodCount;
@@ -137,8 +141,6 @@ namespace HexMage.Simulator.AI {
                 GnuPlot.HoldOn();
                 GnuPlot.Set($"xrange [0:{i}] reverse",
                             $"title '{Constants.NumGenerations} generations",
-                            //"yrange [0:1]",
-                            //"style data lines",
                             "key tmargin center horizontal");
                 GnuPlot.Plot(plotT.ToArray(), plotFit.ToArray(), $"title 'Fitness {Constants.NumGenerations}gen'");
                 GnuPlot.Plot(plotT.ToArray(), plotHpPercentage.ToArray(), $"title 'HP percentage'");
@@ -148,6 +150,9 @@ namespace HexMage.Simulator.AI {
             }
         }
 
+        /// <summary>
+        /// Runs a single iteration of ES on a given individual.
+        /// </summary>
         public static Individual EvolutionStrategy(GameInstance game, Individual previous, List<Individual> generation,
                                                    bool evolveTeam1) {
             float totalFitness = generation.Sum(i => i.CombinedFitness());

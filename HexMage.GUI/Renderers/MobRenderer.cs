@@ -8,6 +8,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Renderers {
+    /// <summary>
+    /// Renderer for a single mob.
+    /// </summary>
     public class MobRenderer : IRenderer {
         private readonly GameInstance _game;
         private readonly int _mobId;
@@ -49,8 +52,6 @@ namespace HexMage.GUI.Renderers {
                 var apPos = hbPos + new Point(_healthbarWidth, 0);
                 DrawHealthbar((double) mobInstance.Ap / mobInfo.MaxAp,
                               batch, assetManager, apPos, Color.DarkBlue, Color.LightBlue);
-
-                const int textOffset = 20;
 
                 float hpPercentage = mobInstance.Hp / (float) mobInfo.MaxHp;
                 float apPercentage = mobInstance.Ap / (float) mobInfo.MaxAp;

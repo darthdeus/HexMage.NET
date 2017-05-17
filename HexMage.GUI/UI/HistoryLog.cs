@@ -8,6 +8,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace HexMage.GUI.UI {
+    /// <summary>
+    /// A simple game history log which shows the history of game actions.
+    /// </summary>
     public class HistoryLog : Entity {
         private const int MaxHistorySize = 10;
         private readonly List<HistoryLogEntry> _log = new List<HistoryLogEntry>();

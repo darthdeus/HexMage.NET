@@ -30,7 +30,6 @@ namespace HexMage.GUI.UI {
             var font = _assetManager.Font;
             var height = font.MeasureString(Message).Y;
 
-            // TODO - calculate the width properly
             LayoutSize = new Vector2(650, height);
         }
 

@@ -6,6 +6,9 @@ using HexMage.Simulator.Pathfinding;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator.Model {
+    /// <summary>
+    /// Wraps all of the mutable state in the game.
+    /// </summary>
     public class GameState {
         public List<AreaBuff> AreaBuffs = new List<AreaBuff>();
         public MobInstance[] MobInstances = new MobInstance[0];
@@ -18,12 +21,7 @@ namespace HexMage.Simulator.Model {
         public bool AllPlayed = false;
         public List<int> PlayersPlayed = new List<int>();
 
-        // This is optimized specifically for the smaller data sets on which
-        // the evolution is being performed.
-        // TODO - pole lepsi?
-        //[JsonIgnore] public Dictionary<int, AxialCoord> MobPositions = new Dictionary<int, AxialCoord>();
         public int RedTotalHp = 0;
-
         public int BlueTotalHp = 0;
 
         [JsonIgnore]
@@ -71,7 +69,6 @@ namespace HexMage.Simulator.Model {
         }
 
         public List<Buff> BuffsAt(AxialCoord coord) {
-            // TODO - pomale?
             return AreaBuffs.Where(b => b.Coord.Distance(coord) <= b.Radius)
                             .Select(b => b.Effect)
                             .ToList();
@@ -123,8 +120,6 @@ namespace HexMage.Simulator.Model {
         }
 
         public void ApplyDots(Map map, GameInstance gameInstance) {
-            // TODO: vycistit, fuj
-
             foreach (var mobId in gameInstance.MobManager.Mobs) {
                 var mobInstance = MobInstances[mobId];
                 if (mobInstance.Hp <= 0) continue;
@@ -141,7 +136,7 @@ namespace HexMage.Simulator.Model {
             }
 
             Debug.Assert(this == gameInstance.State, "this == gameInstance.State");
-            
+
             for (int i = 0; i < AreaBuffs.Count; i++) {
                 var areaBuff = AreaBuffs[i];
                 foreach (var mobId in gameInstance.MobManager.Mobs) {

@@ -1,9 +1,10 @@
 ﻿using System;
 
-namespace HexMage.Simulator
-{
-    public struct PixelCoord : IEquatable<PixelCoord>
-    {
+namespace HexMage.Simulator {
+    /// <summary>
+    /// Represents a pixel coordinate of the hex, see http://www.redblobgames.com/grids/hexagons/
+    /// </summary>
+    public struct PixelCoord : IEquatable<PixelCoord> {
         public int X { get; set; }
         public int Y { get; set; }
 

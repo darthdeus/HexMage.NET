@@ -2,6 +2,9 @@
 using System.Linq;
 
 namespace HexMage.Simulator.Model {
+    /// <summary>
+    /// Represents the immutable part of a mob definition.
+    /// </summary>
     public struct MobInfo : IDeepCopyable<MobInfo> {
         public int MaxHp { get; set; }
         public int MaxAp { get; set; }

@@ -4,6 +4,10 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace HexMage.GUI.UI {
+    /// <summary>
+    /// A separator of arbitrary size, intended for use in Vertical and Horizontal
+    /// layouts.
+    /// </summary>
     public class Separator : Entity, IRenderer {
         private readonly int _size;
 

@@ -9,6 +9,9 @@ using HexMage.Simulator.AI;
 using HexMage.Simulator.Model;
 
 namespace HexMage.Simulator {
+    /// <summary>
+    /// Debug helpers for MCTS.
+    /// </summary>
     public class UctDebug {
         public static void PrintTreeRepresentation(UctNode root) {
 #if XML
@@ -28,6 +31,11 @@ namespace HexMage.Simulator {
 #endif
         }
 
+        /// <summary>
+        /// Prints the MCTS tree in a graphviz DOT file representation.
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="indexFunc"></param>
         public static void PrintDotgraph(UctNode root, Func<int> indexFunc = null) {
             var builder = new StringBuilder();
 

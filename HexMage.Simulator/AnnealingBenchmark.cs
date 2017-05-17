@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HexMage.Benchmarks;
 using HexMage.Simulator.AI;
+using HexMage.Simulator.Model;
 using HexMage.Simulator.Pathfinding;
 using HexMage.Simulator.PCG;
 using MathNet.Numerics;
@@ -14,12 +15,15 @@ using MathNet.Numerics.LinearAlgebra;
 using Newtonsoft.Json;
 
 namespace HexMage.Simulator {
-    public class EvolutionBenchmark {
+    /// <summary>
+    /// Wraps simulated annealing.
+    /// </summary>
+    public class AnnealingBenchmark {
         private readonly GameInstance _game;
         private DNA _initialDna;
         private int _restartCount = 0;
 
-        public EvolutionBenchmark() {
+        public AnnealingBenchmark() {
             if (!Directory.Exists(Constants.SaveDir)) {
                 Directory.CreateDirectory(Constants.SaveDir);
             }
@@ -29,9 +33,6 @@ namespace HexMage.Simulator {
             team.mobs.RemoveAt(0);
 
             _initialDna = GenomeLoader.FromTeam(team);
-            //if (Constants.RandomizeInitialTeam) {
-            //    _initialDna.Randomize();
-            //}
 
             _initialDna = new DNA(2, 2);
             _initialDna.Randomize();
@@ -108,11 +109,6 @@ namespace HexMage.Simulator {
 
                 HandleGoodEnough(ref goodEnough, newMax.result, current, ref goodCount);
 
-                // TODO: tohle pak budu mozna chtit vratit
-                //if (goodEnough) break;
-
-                //if (Constants.ForbidTimeouts && newMax.result.Timeouted) continue;
-
                 float e = current.result.SimpleFitness();
                 float ep = newMax.result.SimpleFitness();
 
@@ -150,13 +146,10 @@ namespace HexMage.Simulator {
                 GnuPlot.HoldOn();
                 GnuPlot.Set($"xrange [{Constants.InitialT}:{T}] reverse",
                             $"title '{Constants.NumGenerations} generations, T_s = {Constants.InitialT}",
-                            //"yrange [0:1]",
-                            //"style data lines",
                             "key tmargin center horizontal");
                 GnuPlot.Plot(plotT.ToArray(), plotFit.ToArray(), $"title 'Fitness {Constants.NumGenerations}gen'");
                 GnuPlot.Plot(plotT.ToArray(), plotHpPercentage.ToArray(), $"title 'HP percentage'");
                 GnuPlot.Plot(plotT.ToArray(), plotLength.ToArray(), "title 'Game length'");
-                //GnuPlot.Plot(plotT.ToArray(), plotProb.ToArray(), gnuplotConfigString);
                 Console.ReadKey();
             }
         }
@@ -178,19 +171,6 @@ namespace HexMage.Simulator {
             var resultFitness = CalculateFitness(game, initialDna, dna);
 
             return new GenerationMember(dna, resultFitness);
-
-            //generation.Sort((a, b) => a.result.Fitness.CompareTo(b.result.Fitness));
-
-            //GenerationMember newMax = generation[0];
-
-            //for (int j = 1; j < Constants.TeamsPerGeneration; j++) {
-            //    var potentialMax = generation[j];
-
-            //    if (potentialMax.result.Fitness > newMax.result.Fitness) {
-            //        newMax = potentialMax;
-            //    }
-            //}
-            //return newMax;
         }
 
         private static void PrintEvaluationResult(int i, float e, float ep, double probability, double T,
@@ -251,7 +231,6 @@ namespace HexMage.Simulator {
                     redo = true;
                 }
 
-                // TODO - zkusit ruzny pravdepodobnosti - ovlivnovat to teplotou?
             } while (redo || Probability.Uniform(Constants.SecondMutationProb));
 
             return copy;
@@ -285,21 +264,6 @@ namespace HexMage.Simulator {
                 writer.WriteLine(d1.ToSerializableString());
                 writer.WriteLine(d2.ToSerializableString());
             }
-        }
-
-        private static void LogStats() {
-            //writer.WriteLine(
-            //    $"Total:\t\t{teamWatch.ElapsedMilliseconds}ms\nPer turn:\t{mpt}ms\nPer iteration:\t{mpi}ms");
-            //writer.WriteLine();
-            //writer.WriteLine();
-
-            //Console.WriteLine("Win stats:");
-            //foreach (var pair in GameInstanceEvaluator.GlobalControllerStatistics) {
-            //    Console.WriteLine($"{pair.Key}: {pair.Value}");
-            //}
-            //Console.WriteLine(
-            //    $"Expand: {UctAlgorithm.ExpandCount}, BestChild: {UctAlgorithm.BestChildCount}, Ratio: {(float) UctAlgorithm.ExpandCount / (float) UctAlgorithm.BestChildCount}");
-            //Console.WriteLine("\n\n");
         }
     }
 }

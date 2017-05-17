@@ -1,4 +1,7 @@
-namespace HexMage.Simulator {
+namespace HexMage.Simulator.AI {
+    /// <summary>
+    /// A simple exponential moving average with variable parameters.
+    /// </summary>
     public class ExponentialMovingAverage {
         private readonly double _alpha;
         public double? CurrentValue;
@@ -17,6 +20,6 @@ namespace HexMage.Simulator {
             return newValue;
         }
 
-        public static ExponentialMovingAverage Instance = new ExponentialMovingAverage(0.9);
+        public static readonly ExponentialMovingAverage Instance = new ExponentialMovingAverage(0.9);
     }
 }

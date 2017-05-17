@@ -15,7 +15,6 @@ using Color = Microsoft.Xna.Framework.Color;
 
 namespace HexMage.GUI.Scenes {
     public class TeamSelectionScene : GameScene {
-        // TODO - fuj, referencovat primo game instance
         private readonly Map _map;
 
         private GameInstance _game;

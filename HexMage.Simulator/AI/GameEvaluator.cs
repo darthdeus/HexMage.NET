@@ -9,6 +9,10 @@ using MathNet.Numerics.Distributions;
 using Newtonsoft.Json.Serialization;
 
 namespace HexMage.Simulator.AI {
+    /// <summary>
+    /// Contains helpers for evaluating the results of an encounter
+    /// in various different ways.
+    /// </summary>
     public class GameEvaluator {
         private readonly GameInstance _game;
         private readonly TextWriter _writer;
@@ -54,6 +58,9 @@ namespace HexMage.Simulator.AI {
             return result;
         }
 
+        /// <summary>
+        /// Runs a playout with two given controllers and reports the result.
+        /// </summary>
         public static PlayoutResult Playout(GameInstance game, IMobController ai1, IMobController ai2) {
             var hub = new GameEventHub(game);
 
@@ -134,7 +141,9 @@ namespace HexMage.Simulator.AI {
             return (double) redWins / (double) totalGames;
         }
 
-        // TODO - na co tohle vlastne je?
+        /// <summary>
+        /// Runs a playout with the given encounter defined by a DNA pair and both controllers.
+        /// </summary>
         public static int Playout(GameInstance game, DNA d1, DNA d2, IMobController c1, IMobController c2) {
             GameSetup.OverrideGameDna(game, d1, d2);
 

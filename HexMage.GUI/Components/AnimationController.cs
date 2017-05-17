@@ -2,6 +2,9 @@
 using Microsoft.Xna.Framework;
 
 namespace HexMage.GUI.Components {
+    /// <summary>
+    /// Handles animation frame updating for a given animation
+    /// </summary>
     public class AnimationController : Component {
         private readonly Animation _animation;
         public AnimationController(Animation animation) {
